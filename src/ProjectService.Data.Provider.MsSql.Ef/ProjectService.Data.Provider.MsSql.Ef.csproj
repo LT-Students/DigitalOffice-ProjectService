@@ -1,7 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef</AssemblyName>
+    <RootNamespace>LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />
+    <ProjectReference Include="..\ProjectService.Data.Provider\ProjectService.Data.Provider.csproj" />
+  </ItemGroup>
 
 </Project>

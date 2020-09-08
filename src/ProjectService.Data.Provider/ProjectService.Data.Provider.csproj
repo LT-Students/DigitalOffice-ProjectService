@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>LT.DigitalOffice.ProjectService.Data.Provider</AssemblyName>
+    <RootNamespace>LT.DigitalOffice.ProjectService.Data.Provider</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />
+  </ItemGroup>
 
 </Project>

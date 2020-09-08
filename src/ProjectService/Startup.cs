@@ -1,17 +1,18 @@
 using FluentValidation;
-using LT.DigitalOffice.Broker.Requests;
+using LT.DigitalOffice.ProjectService.Broker.Requests;
 using LT.DigitalOffice.Kernel;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.ProjectService.Commands;
 using LT.DigitalOffice.ProjectService.Commands.Interfaces;
-using LT.DigitalOffice.ProjectService.Database;
-using LT.DigitalOffice.ProjectService.Database.Entities;
-using LT.DigitalOffice.ProjectService.Mappers;
+using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models;
-using LT.DigitalOffice.ProjectService.Repositories;
-using LT.DigitalOffice.ProjectService.Repositories.Interfaces;
-using LT.DigitalOffice.ProjectService.Validators;
+using LT.DigitalOffice.ProjectService.Mappers;
+using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Models.Db.Entities;
+using LT.DigitalOffice.ProjectService.Data;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation;
+using LT.DigitalOffice.ProjectService.Data.Provider;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -44,6 +45,7 @@ namespace LT.DigitalOffice.ProjectService
             services.AddKernelExtensions(Configuration);
             ConfigureCommands(services);
             ConfigureRepositories(services);
+            ConfigureProvider(services);
             ConfigureMappers(services);
             ConfigureValidators(services);
             ConfigureMassTransit(services);
@@ -84,6 +86,11 @@ namespace LT.DigitalOffice.ProjectService
         private void ConfigureRepositories(IServiceCollection services)
         {
             services.AddTransient<IProjectRepository, ProjectRepository>();
+        }
+
+        private void ConfigureProvider(IServiceCollection services)
+        {
+            services.AddTransient<IDataProvider, ProjectServiceDbContext>();
         }
 
         private void ConfigureMappers(IServiceCollection services)

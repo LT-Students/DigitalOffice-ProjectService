@@ -2,6 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>LT.DigitalOffice.ProjectService.Data</AssemblyName>
+    <RootNamespace>LT.DigitalOffice.ProjectService.Data</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProjectService.Data.Provider\ProjectService.Data.Provider.csproj" />
+    <ProjectReference Include="..\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
+    <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />
+  </ItemGroup>
 
 </Project>

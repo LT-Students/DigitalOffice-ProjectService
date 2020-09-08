@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using LT.DigitalOffice.ProjectService.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto;
 using LT.DigitalOffice.ProjectService.Commands.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Controllers

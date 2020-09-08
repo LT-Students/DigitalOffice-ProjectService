@@ -7,18 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="9.0.1" />
     <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.0.2" />
     <PackageReference Include="MassTransit" Version="7.0.3" />
     <PackageReference Include="MassTransit.AspNetCore" Version="7.0.3" />
     <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.0.3" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProjectService.Broker\ProjectService.Broker.csproj" />
+    <ProjectReference Include="..\ProjectService.Business\ProjectService.Business.csproj" />
+    <ProjectReference Include="..\ProjectService.Data\ProjectService.Data.csproj" />
+    <ProjectReference Include="..\ProjectService.Validation\ProjectService.Validation.csproj" />
+    <ProjectReference Include="..\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
+    <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />
+    <ProjectReference Include="..\ProjectService.Data.Provider.MsSql.Ef\ProjectService.Data.Provider.MsSql.Ef.csproj" />
+    <ProjectReference Include="..\ProjectService.Mappers\ProjectService.Mappers.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
