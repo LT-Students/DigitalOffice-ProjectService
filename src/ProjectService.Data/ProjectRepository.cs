@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using LT.DigitalOffice.ProjectService.Data.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db.Entities;
 using LT.DigitalOffice.ProjectService.Models.Dto;
-using LT.DigitalOffice.ProjectService.Data.Provider;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {

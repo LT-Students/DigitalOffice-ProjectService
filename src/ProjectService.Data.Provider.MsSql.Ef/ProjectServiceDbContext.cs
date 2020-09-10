@@ -19,12 +19,30 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
         // Fluent API is written here.
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            modelBuilder.ApplyConfigurationsFromAssembly(
+                Assembly.Load("LT.DigitalOffice.ProjectService.Models.Db"));
         }
 
         public void SaveModelsChanges()
         {
             this.SaveChanges();
+        }
+
+        public object MakeEntityDetached(object obj)
+        {
+            this.Entry(obj).State = EntityState.Detached;
+
+            return this.Entry(obj).State;
+        }
+
+        public void EnsureDeleted()
+        {
+            this.Database.EnsureDeleted();
+        }
+
+        public bool IsInMemory()
+        {
+            return this.Database.IsInMemory();
         }
     }
 }

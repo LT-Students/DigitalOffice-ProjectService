@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
-using LT.DigitalOffice.ProjectService.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto;
+using Microsoft.AspNetCore.Mvc;
 
-namespace LT.DigitalOffice.ProjectService.Commands
+namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
     public class DisableWorkersInProjectCommand : IDisableWorkersInProjectCommand
     {

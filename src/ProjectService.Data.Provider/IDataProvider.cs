@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using LT.DigitalOffice.ProjectService.Models.Db.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace LT.DigitalOffice.ProjectService.Data.Provider
 {
@@ -8,5 +8,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider
         DbSet<DbProject> Projects { get; set; }
 
         void SaveModelsChanges();
+        object MakeEntityDetached(object obj);
+        void EnsureDeleted();
+        bool IsInMemory();
     }
 }

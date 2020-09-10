@@ -1,13 +1,13 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
-using LT.DigitalOffice.ProjectService.Commands.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db.Entities;
+using LT.DigitalOffice.ProjectService.Models.Dto;
+using Microsoft.AspNetCore.Mvc;
 using System;
 
-namespace LT.DigitalOffice.ProjectService.Commands
+namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
     public class EditProjectByIdCommand : IEditProjectByIdCommand
     {

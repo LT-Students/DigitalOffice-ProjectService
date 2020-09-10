@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Models.Dto;
 using System;
 
-namespace LT.DigitalOffice.ProjectService.Commands.Interfaces
+namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
     /// <summary>
     /// Represents interface for a command in command pattern.
