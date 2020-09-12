@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>LT.DigitalOffice.ProjectService.Mappers</AssemblyName>
+    <RootNamespace>LT.DigitalOffice.ProjectService.Mappers</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
+    <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />
+  </ItemGroup>
+
+</Project>
