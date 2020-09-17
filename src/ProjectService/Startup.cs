@@ -34,6 +34,8 @@ namespace LT.DigitalOffice.ProjectService
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHealthChecks();
+
             services.Configure<RabbitMQOptions>(Configuration);
 
             services.AddDbContext<ProjectServiceDbContext>(options =>
@@ -43,6 +45,7 @@ namespace LT.DigitalOffice.ProjectService
 
             services.AddControllers();
             services.AddKernelExtensions(Configuration);
+
             ConfigureCommands(services);
             ConfigureRepositories(services);
             ConfigureProvider(services);
@@ -109,6 +112,8 @@ namespace LT.DigitalOffice.ProjectService
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseHealthChecks("/healthcheck");
+
             app.UseExceptionHandler(tempApp => tempApp.Run(CustomExceptionHandler.HandleCustomException));
 
             UpdateDatabase(app);
