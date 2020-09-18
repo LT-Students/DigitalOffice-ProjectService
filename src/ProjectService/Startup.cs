@@ -71,12 +71,12 @@ namespace LT.DigitalOffice.ProjectService
                     });
                 });
 
-				x.AddRequestClient<IGetFileRequest>(
-					new Uri("rabbitmq://localhost/FileService"));
+                x.AddRequestClient<IGetFileRequest>(
+                  new Uri("rabbitmq://localhost/FileService"));
             });
 
             services.AddMassTransitHostedService();
-		}
+		    }
 
         private void ConfigureCommands(IServiceCollection services)
         {
