@@ -76,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService
             });
 
             services.AddMassTransitHostedService();
-		    }
+	    }
 
         private void ConfigureCommands(IServiceCollection services)
         {
