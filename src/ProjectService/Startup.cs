@@ -71,12 +71,12 @@ namespace LT.DigitalOffice.ProjectService
                     });
                 });
 
-				x.AddRequestClient<IGetFileRequest>(
-					new Uri("rabbitmq://localhost/FileService"));
+                x.AddRequestClient<IGetFileRequest>(
+                  new Uri("rabbitmq://localhost/FileService"));
             });
 
             services.AddMassTransitHostedService();
-		}
+	    }
 
         private void ConfigureCommands(IServiceCollection services)
         {
@@ -112,7 +112,7 @@ namespace LT.DigitalOffice.ProjectService
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseHealthChecks("/healthcheck");
+            app.UseHealthChecks("/api/healthcheck");
 
             app.UseExceptionHandler(tempApp => tempApp.Run(CustomExceptionHandler.HandleCustomException));
 
