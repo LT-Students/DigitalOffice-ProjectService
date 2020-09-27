@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 defaultValue: false);
 
             migrationBuilder.CreateTable(
-                name: "DbProjectFile",
+                name: "ProjectFile",
                 columns: table => new
                 {
                     ProjectId = table.Column<Guid>(nullable: false),
@@ -35,9 +35,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbProjectFile", x => new { x.ProjectId, x.FileId });
+                    table.PrimaryKey("PK_ProjectFile", x => new { x.ProjectId, x.FileId });
                     table.ForeignKey(
-                        name: "FK_DbProjectFile_Projects_ProjectId",
+                        name: "FK_ProjectFile_Projects_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
@@ -45,7 +45,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 });
 
             migrationBuilder.CreateTable(
-                name: "DbProjectWorkerUser",
+                name: "ProjectWorkerUser",
                 columns: table => new
                 {
                     ProjectId = table.Column<Guid>(nullable: false),
@@ -55,9 +55,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbProjectWorkerUser", x => new { x.ProjectId, x.WorkerUserId });
+                    table.PrimaryKey("PK_ProjectWorkerUser", x => new { x.ProjectId, x.WorkerUserId });
                     table.ForeignKey(
-                        name: "FK_DbProjectWorkerUser_Projects_ProjectId",
+                        name: "FK_ProjectWorkerUser_Projects_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
@@ -68,10 +68,10 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "DbProjectFile");
+                name: "ProjectFile");
 
             migrationBuilder.DropTable(
-                name: "DbProjectWorkerUser");
+                name: "ProjectWorkerUser");
 
             migrationBuilder.DropColumn(
                 name: "IsActive",
