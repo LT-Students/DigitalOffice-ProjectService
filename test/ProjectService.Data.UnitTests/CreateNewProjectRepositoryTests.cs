@@ -15,8 +15,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private IDataProvider provider;
         private IProjectRepository repository;
 
-        private ProjectServiceDbContext dbContext;
-
         private DbProject newProject;
 
         [SetUp]
@@ -26,8 +24,9 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 .UseInMemoryDatabase("ProjectServiceTest")
                 .Options;
 
-            dbContext = new ProjectServiceDbContext(dbOptionsProjectService);
-            repository = new ProjectRepository(dbContext);
+            provider = new ProjectServiceDbContext(dbOptionsProjectService);
+
+            repository = new ProjectRepository(provider);
 
             newProject = new DbProject
             {
@@ -49,7 +48,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             newProjectWithRepeatedName.Id = Guid.NewGuid();
 
             Assert.That(repository.CreateNewProject(newProject), Is.EqualTo(newProjectWithRepeatedName.Id));
-            SerializerAssert.AreEqual(newProjectWithRepeatedName, dbContext.Projects.FirstOrDefault(project => project.Id == newProjectWithRepeatedName.Id));
+            SerializerAssert.AreEqual(newProjectWithRepeatedName, provider.Projects.FirstOrDefault(project => project.Id == newProjectWithRepeatedName.Id));
         }
 
         [Test]
@@ -59,15 +58,15 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             newProject.Id = Guid.NewGuid();
 
             Assert.AreEqual(newProject.Id, repository.CreateNewProject(newProject));
-            Assert.That(dbContext.Projects.Find(newProject.Id), Is.EqualTo(newProject));
+            Assert.That(provider.Projects.Find(newProject.Id), Is.EqualTo(newProject));
         }
 
         [TearDown]
         public void CleanMemoryDb()
         {
-            if (dbContext.Database.IsInMemory())
+            if (provider.IsInMemory())
             {
-                dbContext.Database.EnsureDeleted();
+                provider.EnsureDeleted();
             }
         }
     }

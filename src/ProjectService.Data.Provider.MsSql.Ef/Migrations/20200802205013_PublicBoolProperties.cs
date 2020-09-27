@@ -8,13 +8,13 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
         {
             migrationBuilder.AddColumn<bool>(
                 name: "IsActive",
-                table: "DbProjectWorkerUser",
+                table: "ProjectWorkerUser",
                 nullable: false,
                 defaultValue: false);
 
             migrationBuilder.AddColumn<bool>(
                 name: "IsManager",
-                table: "DbProjectWorkerUser",
+                table: "ProjectWorkerUser",
                 nullable: false,
                 defaultValue: false);
         }
@@ -23,11 +23,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
         {
             migrationBuilder.DropColumn(
                 name: "IsActive",
-                table: "DbProjectWorkerUser");
+                table: "ProjectWorkerUser");
 
             migrationBuilder.DropColumn(
                 name: "IsManager",
-                table: "DbProjectWorkerUser");
+                table: "ProjectWorkerUser");
         }
     }
 }
