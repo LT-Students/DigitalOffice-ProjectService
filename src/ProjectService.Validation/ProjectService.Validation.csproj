@@ -13,5 +13,5 @@
   <ItemGroup>
     <ProjectReference Include="..\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
   </ItemGroup>
-  
+
 </Project>
