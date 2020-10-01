@@ -18,6 +18,7 @@
     <ProjectReference Include="..\ProjectService.Broker\ProjectService.Broker.csproj" />
     <ProjectReference Include="..\ProjectService.Business\ProjectService.Business.csproj" />
     <ProjectReference Include="..\ProjectService.Data\ProjectService.Data.csproj" />
+    <ProjectReference Include="..\ProjectService.Models.BrokerRequest\ProjectService.Models.BrokerRequest.csproj" />
     <ProjectReference Include="..\ProjectService.Validation\ProjectService.Validation.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />
