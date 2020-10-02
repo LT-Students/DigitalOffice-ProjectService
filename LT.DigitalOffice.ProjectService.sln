@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectService.Validation.U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectService.Validation", "src\ProjectService.Validation\ProjectService.Validation.csproj", "{11C531E0-828C-444A-91C2-EB4416303482}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectService.Models.BrokerRequest", "src\ProjectService.Models.BrokerRequest\ProjectService.Models.BrokerRequest.csproj", "{F5572099-D919-4127-942B-122760B25322}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,10 @@ Global
 		{11C531E0-828C-444A-91C2-EB4416303482}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11C531E0-828C-444A-91C2-EB4416303482}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11C531E0-828C-444A-91C2-EB4416303482}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5572099-D919-4127-942B-122760B25322}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5572099-D919-4127-942B-122760B25322}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5572099-D919-4127-942B-122760B25322}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5572099-D919-4127-942B-122760B25322}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -123,6 +129,7 @@ Global
 		{9848E9F4-8741-4E00-BBB1-439096EE8F58} = {2C7E657A-5475-4CDA-B85B-A067479E4BB1}
 		{BF00397A-5CED-4FE0-9F7F-B611BE346737} = {2C7E657A-5475-4CDA-B85B-A067479E4BB1}
 		{11C531E0-828C-444A-91C2-EB4416303482} = {8D074877-13E0-4CF8-8030-106459895742}
+		{F5572099-D919-4127-942B-122760B25322} = {8D074877-13E0-4CF8-8030-106459895742}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {439611D1-CD91-4C8D-B5F8-ACF7A40B8563}

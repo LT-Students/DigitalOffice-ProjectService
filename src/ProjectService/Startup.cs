@@ -1,7 +1,7 @@
 using FluentValidation;
 using LT.DigitalOffice.Kernel;
 using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.ProjectService.Broker.Requests;
+using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data;
