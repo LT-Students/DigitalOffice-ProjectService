@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService
             });
 
             services.AddControllers();
-            services.AddKernelExtensions();
+            services.AddKernelExtensions(Configuration);
 
             ConfigureCommands(services);
             ConfigureRepositories(services);
