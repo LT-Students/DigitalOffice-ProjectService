@@ -36,12 +36,14 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
 
             workerId = Guid.NewGuid();
             projectId = Guid.NewGuid();
+
             dbWorkersIds = new DbProjectWorkerUser
             {
                 ProjectId = projectId,
                 Project = project,
                 WorkerUserId = workerId
             };
+
             project = new DbProject
             {
                 Name = NAME,
