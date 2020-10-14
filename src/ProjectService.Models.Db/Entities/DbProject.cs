@@ -9,6 +9,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db.Entities
         [Key]
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string ShortName { get; set; }
         public string Description { get; set; }
         public Guid DepartmentId { get; set; }
         public bool Deferred { get; set; }

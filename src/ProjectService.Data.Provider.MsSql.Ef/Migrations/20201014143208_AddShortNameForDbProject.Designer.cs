@@ -2,14 +2,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrations
 {
     [DbContext(typeof(ProjectServiceDbContext))]
-    partial class ProjectServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201014143208_AddShortNameForDbProject")]
+    partial class AddShortNameForDbProject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,7 +58,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
                     b.HasKey("ProjectId", "FileId");
 
-                    b.ToTable("DbProjectFile");
+                    b.ToTable("ProjectFile");
                 });
 
             modelBuilder.Entity("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProjectWorkerUser", b =>
@@ -81,7 +83,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
                     b.HasKey("ProjectId", "WorkerUserId");
 
-                    b.ToTable("DbProjectWorkerUser");
+                    b.ToTable("ProjectWorkerUser");
                 });
 
             modelBuilder.Entity("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProjectFile", b =>

@@ -1,7 +1,7 @@
 using FluentValidation;
+using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Kernel;
 using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data;
@@ -105,12 +105,12 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureValidators(IServiceCollection services)
         {
-            services.AddTransient<IValidator<NewProjectRequest>, NewProjectValidator>();
+            services.AddTransient<IValidator<NewProjectRequest>, ProjectValidator>();
             services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
             services.AddTransient<IValidator<WorkersIdsInProjectRequest>, WorkersProjectIdsValidator>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseHealthChecks("/api/healthcheck");
 

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrations
 {
-    public partial class managersremoved : Migration
+    public partial class AddShortNameForDbProject : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,20 +11,12 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 name: "ProjectFile");
 
             migrationBuilder.DropTable(
-                name: "ProjectManagerUser");
-
-            migrationBuilder.DropTable(
                 name: "ProjectWorkerUser");
 
-            migrationBuilder.DropColumn(
-                name: "Obsolete",
-                table: "Project");
-
-            migrationBuilder.AddColumn<bool>(
-                name: "IsActive",
+            migrationBuilder.AddColumn<string>(
+                name: "ShortName",
                 table: "Project",
-                nullable: false,
-                defaultValue: false);
+                nullable: true);
 
             migrationBuilder.CreateTable(
                 name: "ProjectFile",
@@ -51,7 +43,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                     ProjectId = table.Column<Guid>(nullable: false),
                     WorkerUserId = table.Column<Guid>(nullable: false),
                     AddedOn = table.Column<DateTime>(nullable: false),
-                    RemovedOn = table.Column<DateTime>(nullable: true)
+                    RemovedOn = table.Column<DateTime>(nullable: true),
+                    IsManager = table.Column<bool>(nullable: false),
+                    IsActive = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,15 +68,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 name: "ProjectWorkerUser");
 
             migrationBuilder.DropColumn(
-                name: "IsActive",
+                name: "ShortName",
                 table: "Project");
-
-            migrationBuilder.AddColumn<bool>(
-                name: "Obsolete",
-                table: "Project",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
 
             migrationBuilder.CreateTable(
                 name: "ProjectFile",
@@ -103,29 +90,15 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProjectManagerUser",
-                columns: table => new
-                {
-                    ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ManagerUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProjectManagerUser", x => new { x.ProjectId, x.ManagerUserId });
-                    table.ForeignKey(
-                        name: "FK_ProjectManagerUser_Project_ProjectId",
-                        column: x => x.ProjectId,
-                        principalTable: "Project",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ProjectWorkerUser",
                 columns: table => new
                 {
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    WorkerUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    WorkerUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsManager = table.Column<bool>(type: "bit", nullable: false),
+                    RemovedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
