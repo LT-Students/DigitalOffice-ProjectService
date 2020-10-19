@@ -2,6 +2,10 @@
 using System;
 using LT.DigitalOffice.ProjectService.Models.Dto;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using NUnit.Framework;
+using System.Collections.Generic;
+using LT.DigitalOffice.ProjectService.Business.Commands;
+using LT.DigitalOffice.ProjectService.Models.Db.Entities;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
@@ -37,6 +41,13 @@ namespace LT.DigitalOffice.ProjectService.Controllers
             [FromQuery] WorkersIdsInProjectRequest request)
         {
             command.Execute(request);
+        }
+        [HttpGet("getuserprojects")]
+        public List<DbProject> GetUserProjects(
+            [FromServices] GetUserProjectsCommand command, //get realisiation comand
+            [FromQuery] Guid userId) //my data
+        {
+            return command.Execute(userId); 
         }
     }
 }

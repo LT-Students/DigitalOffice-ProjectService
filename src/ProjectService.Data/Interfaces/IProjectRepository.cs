@@ -1,6 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Models.Db.Entities;
 using LT.DigitalOffice.ProjectService.Models.Dto;
 using System;
+using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
@@ -36,5 +37,12 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// </summary>
         /// <param name="request">Contains workers id and project id.</param>
         void DisableWorkersInProject(WorkersIdsInProjectRequest request);
+
+        /// <summary>
+        /// Returns the list of projects with the specified id from database.
+        /// </summary>
+        /// <param name="userId">Specified id of user.</param>
+        /// <returns>list of projects where is the userId.</returns>
+        List<DbProject> GetUserProjects(Guid userId);
     }
 }
