@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using LT.DigitalOffice.Kernel.Exceptions;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
@@ -82,18 +84,18 @@ namespace LT.DigitalOffice.ProjectService.Data
             provider.Projects.Update(dbProject);
             provider.SaveModelsChanges();
         }
-        public List<DbProject> GetUserProjects(Guid userId)
+
+        public IEnumerable<DbProject> GetUserProjects(Guid userId)
         {
-            //check id in db
-            /*if ()
+            if (userId == Guid.Empty)
             {
-                throw new NullReferenceException("This user does not exist.");
-            }*/
+                throw new BadRequestException("This user does not exist.");
+            }
 
             List<DbProject> projectsList = provider.Projects.Where(
                 p => p.WorkersUsersIds.Any(
                     w => w.WorkerUserId == userId)).ToList();
-            
+
             return projectsList;
         }
     }

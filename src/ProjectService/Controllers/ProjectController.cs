@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+﻿using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
-using NUnit.Framework;
+using LT.DigitalOffice.ProjectService.Models.Dto;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
-using LT.DigitalOffice.ProjectService.Business.Commands;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
@@ -42,12 +40,13 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         {
             command.Execute(request);
         }
+
         [HttpGet("getuserprojects")]
-        public List<DbProject> GetUserProjects(
-            [FromServices] GetUserProjectsCommand command, //get realisiation comand
-            [FromQuery] Guid userId) //my data
+        public IEnumerable<Project> GetUserProjects(
+            [FromServices] GetUserProjectsCommand command,
+            [FromQuery] Guid userId)
         {
-            return command.Execute(userId); 
+            return command.Execute(userId);
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using LT.DigitalOffice.ProjectService.Models.Dto;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
@@ -15,6 +15,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
         /// </summary>
         /// <param name="userId">Specified id of user.</param>
         /// <returns>List of projects with specified user id.</returns>
-        List<DbProject> Execute(Guid userId);
+        IEnumerable<Project> Execute(Guid userId);
     }
 }
