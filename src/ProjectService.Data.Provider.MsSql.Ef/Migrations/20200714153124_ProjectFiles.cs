@@ -18,9 +18,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 {
                     table.PrimaryKey("PK_ProjectFile", x => new { x.ProjectId, x.FileId });
                     table.ForeignKey(
-                        name: "FK_ProjectFile_Project_ProjectId",
+                        name: "FK_ProjectFile_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Project",
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });

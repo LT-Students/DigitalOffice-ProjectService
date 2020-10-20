@@ -18,11 +18,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
             migrationBuilder.DropColumn(
                 name: "Obsolete",
-                table: "Project");
+                table: "Projects");
 
             migrationBuilder.AddColumn<bool>(
                 name: "IsActive",
-                table: "Project",
+                table: "Projects",
                 nullable: false,
                 defaultValue: false);
 
@@ -37,9 +37,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 {
                     table.PrimaryKey("PK_ProjectFile", x => new { x.ProjectId, x.FileId });
                     table.ForeignKey(
-                        name: "FK_ProjectFile_Project_ProjectId",
+                        name: "FK_ProjectFile_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Project",
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -57,9 +57,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 {
                     table.PrimaryKey("PK_ProjectWorkerUser", x => new { x.ProjectId, x.WorkerUserId });
                     table.ForeignKey(
-                        name: "FK_ProjectWorkerUser_Project_ProjectId",
+                        name: "FK_ProjectWorkerUser_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Project",
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -75,11 +75,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
             migrationBuilder.DropColumn(
                 name: "IsActive",
-                table: "Project");
+                table: "Projects");
 
             migrationBuilder.AddColumn<bool>(
                 name: "Obsolete",
-                table: "Project",
+                table: "Projects",
                 type: "bit",
                 nullable: false,
                 defaultValue: false);
@@ -95,9 +95,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 {
                     table.PrimaryKey("PK_ProjectFile", x => new { x.ProjectId, x.FileId });
                     table.ForeignKey(
-                        name: "FK_ProjectFile_Project_ProjectId",
+                        name: "FK_ProjectFile_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Project",
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -113,9 +113,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 {
                     table.PrimaryKey("PK_ProjectManagerUser", x => new { x.ProjectId, x.ManagerUserId });
                     table.ForeignKey(
-                        name: "FK_ProjectManagerUser_Project_ProjectId",
+                        name: "FK_ProjectManagerUser_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Project",
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -131,9 +131,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 {
                     table.PrimaryKey("PK_ProjectWorkerUser", x => new { x.ProjectId, x.WorkerUserId });
                     table.ForeignKey(
-                        name: "FK_ProjectWorkerUser_Project_ProjectId",
+                        name: "FK_ProjectWorkerUser_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Project",
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });

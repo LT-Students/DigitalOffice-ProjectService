@@ -43,7 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
                     b.HasKey("Id");
 
-                    b.ToTable("Project");
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProjectFile", b =>
@@ -56,7 +56,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
                     b.HasKey("ProjectId", "FileId");
 
-                    b.ToTable("DbProjectFile");
+                    b.ToTable("ProjectFile");
                 });
 
             modelBuilder.Entity("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProjectWorkerUser", b =>
@@ -81,12 +81,12 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
                     b.HasKey("ProjectId", "WorkerUserId");
 
-                    b.ToTable("DbProjectWorkerUser");
+                    b.ToTable("ProjectWorkerUser");
                 });
 
             modelBuilder.Entity("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProjectFile", b =>
                 {
-                    b.HasOne("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProject", "Project")
+                    b.HasOne("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProject", "Projects")
                         .WithMany("FilesIds")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -95,7 +95,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
             modelBuilder.Entity("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProjectWorkerUser", b =>
                 {
-                    b.HasOne("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProject", "Project")
+                    b.HasOne("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProject", "Projects")
                         .WithMany("WorkersUsersIds")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)

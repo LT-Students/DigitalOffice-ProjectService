@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
             migrationBuilder.AddColumn<string>(
                 name: "ShortName",
-                table: "Project",
+                table: "Projects",
                 nullable: true);
 
             migrationBuilder.CreateTable(
@@ -29,9 +29,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 {
                     table.PrimaryKey("PK_ProjectFile", x => new { x.ProjectId, x.FileId });
                     table.ForeignKey(
-                        name: "FK_ProjectFile_Project_ProjectId",
+                        name: "FK_ProjectFile_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Project",
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -51,9 +51,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 {
                     table.PrimaryKey("PK_ProjectWorkerUser", x => new { x.ProjectId, x.WorkerUserId });
                     table.ForeignKey(
-                        name: "FK_ProjectWorkerUser_Project_ProjectId",
+                        name: "FK_ProjectWorkerUser_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Project",
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -69,7 +69,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
             migrationBuilder.DropColumn(
                 name: "ShortName",
-                table: "Project");
+                table: "Projects");
 
             migrationBuilder.CreateTable(
                 name: "ProjectFile",
@@ -82,9 +82,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 {
                     table.PrimaryKey("PK_ProjectFile", x => new { x.ProjectId, x.FileId });
                     table.ForeignKey(
-                        name: "FK_ProjectFile_Project_ProjectId",
+                        name: "FK_ProjectFile_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Project",
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -104,9 +104,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 {
                     table.PrimaryKey("PK_ProjectWorkerUser", x => new { x.ProjectId, x.WorkerUserId });
                     table.ForeignKey(
-                        name: "FK_ProjectWorkerUser_Project_ProjectId",
+                        name: "FK_ProjectWorkerUser_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Project",
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
