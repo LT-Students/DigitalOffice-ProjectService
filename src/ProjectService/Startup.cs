@@ -122,6 +122,14 @@ namespace LT.DigitalOffice.ProjectService
 
             app.UseRouting();
 
+            string corsUrl = Configuration.GetSection("Settings")["CorsUrl"];
+
+            app.UseCors(builder =>
+                builder
+                    .WithOrigins(corsUrl)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod());
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
