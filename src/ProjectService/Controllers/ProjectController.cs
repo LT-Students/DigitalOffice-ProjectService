@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
             command.Execute(request);
         }
 
-        [HttpGet("getuserprojects")]
+        [HttpGet("getUserProjects")]
         public IEnumerable<Project> GetUserProjects(
             [FromServices] GetUserProjectsCommand command,
             [FromQuery] Guid userId)

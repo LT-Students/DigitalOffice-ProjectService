@@ -87,6 +87,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public IEnumerable<DbProject> GetUserProjects(Guid userId)
         {
+
             if (userId == Guid.Empty)
             {
                 throw new BadRequestException("This user does not exist.");

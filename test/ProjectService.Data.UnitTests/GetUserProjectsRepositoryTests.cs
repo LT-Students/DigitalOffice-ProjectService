@@ -25,25 +25,17 @@ namespace ProjectService.Data.UnitTests
         private DbProjectWorkerUser user2;
         private DbProjectWorkerUser userWithoutProject;
 
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            var dbOptions = new DbContextOptionsBuilder<ProjectServiceDbContext>()
-                .UseInMemoryDatabase("InMemoryDatabase").Options;
-
-            provider = new ProjectServiceDbContext(dbOptions);
-            repository = new ProjectRepository(provider);
-
             user1 = new DbProjectWorkerUser
             {
-                //ProjectId,
                 WorkerUserId = Guid.NewGuid(),
                 IsActive = true
             };
 
             user2 = new DbProjectWorkerUser
             {
-                //ProjectId,
                 WorkerUserId = Guid.NewGuid(),
                 IsActive = true
             };
@@ -69,6 +61,16 @@ namespace ProjectService.Data.UnitTests
                 Name = "Project2",
                 WorkersUsersIds = listWorkersUsersIdsTwo
             };
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            var dbOptions = new DbContextOptionsBuilder<ProjectServiceDbContext>()
+                .UseInMemoryDatabase("InMemoryDatabase").Options;
+
+            provider = new ProjectServiceDbContext(dbOptions);
+            repository = new ProjectRepository(provider);
 
             provider.Projects.Add(dbProjectOne);
             provider.Projects.Add(dbProjectTwo);
