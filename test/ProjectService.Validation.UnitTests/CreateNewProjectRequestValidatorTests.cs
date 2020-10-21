@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
 using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Models.Dto;
-using LT.DigitalOffice.ProjectService.Validation;
 using NUnit.Framework;
 using System;
 
-namespace LT.DigitalOffice.ProjectServiceUnitTests.Validators
+namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
     public class CreateNewProjectRequestValidatorTests
     {
@@ -33,11 +32,13 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Validators
             validator.ShouldHaveValidationErrorFor(x => x.Name, "");
         }
 
+        [Test]
         public void ShouldHaveValidationErrorWhenProjectShortNameIsEmpty()
         {
             validator.ShouldHaveValidationErrorFor(x => x.Name, "");
         }
 
+        [Test]
         public void ShouldHaveValidationErrorWhenProjectShortNameIsTooLong()
         {
             var shortName = projectRequest.Description.PadLeft(100);
@@ -45,11 +46,28 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Validators
             validator.ShouldHaveValidationErrorFor(x => x.ShortName, shortName);
         }
 
+        [Test]
+        public void ShouldNotHaveAnyValidationErrorsWhenProjectShortNameIsNull()
+        {
+            string shortName = null;
+
+            validator.ShouldNotHaveValidationErrorFor(x => x.ShortName, shortName);
+        }
+
+        [Test]
         public void ShouldThrowValidationExceptionWhenDescriptionIsTooLong()
         {
             var description = projectRequest.Description.PadLeft(501);
 
             validator.ShouldHaveValidationErrorFor(er => er.Description, description);
+        }
+
+        [Test]
+        public void ShouldNotHaveAnyValidationErrorsWhenDescriptionIsNull()
+        {
+            string description = null;
+
+            validator.ShouldNotHaveValidationErrorFor(er => er.Description, description);
         }
 
         [Test]
