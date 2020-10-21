@@ -13,15 +13,19 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     .MaximumLength(80)
                     .WithMessage("Project name is too long.");
 
-            RuleFor(project => project.ShortName)
-                    .NotEmpty()
-                    .WithMessage("Project must have a short name.")
+            When(project => project.ShortName != null, () =>
+            {
+                RuleFor(project => project.ShortName)
                     .MaximumLength(32)
                     .WithMessage("Project short name is too long.");
+            });
 
-            RuleFor(project => project.Description)
+            When(project => project.Description != null, () =>
+            {
+                RuleFor(project => project.Description)
                 .MaximumLength(500)
                 .WithMessage("Project description is too long.");
+            });
         }
     }
 }
