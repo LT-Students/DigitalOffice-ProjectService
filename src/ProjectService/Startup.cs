@@ -84,6 +84,8 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
             services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
             services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
+            services.AddTransient<IGetUserProjectsCommand, GetUserProjectsCommand>();
+
         }
 
         private void ConfigureRepositories(IServiceCollection services)
