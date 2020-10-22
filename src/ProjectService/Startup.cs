@@ -118,7 +118,9 @@ namespace LT.DigitalOffice.ProjectService
 
             UpdateDatabase(app);
 
+#if RELEASE
             app.UseHttpsRedirection();
+#endif
 
             app.UseRouting();
 
