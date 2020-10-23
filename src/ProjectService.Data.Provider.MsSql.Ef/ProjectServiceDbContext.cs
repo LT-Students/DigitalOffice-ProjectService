@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
         }
 
         public DbSet<DbProject> Projects { get; set; }
-
+        public DbSet<DbRole> Roles { get; set; }
         // Fluent API is written here.
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

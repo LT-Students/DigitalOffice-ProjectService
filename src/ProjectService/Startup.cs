@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService
             });
 
             services.AddControllers();
-            services.AddKernelExtensions(Configuration);
+            services.AddKernelExtensions();
 
             ConfigureCommands(services);
             ConfigureRepositories(services);
@@ -56,9 +56,7 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureMassTransit(IServiceCollection services)
         {
-            const string serviceSection = "RabbitMQ";
-            string serviceName = Configuration.GetSection(serviceSection)["Username"];
-            string servicePassword = Configuration.GetSection(serviceSection)["Password"];
+            var rabbitmqOptions = Configuration.GetSection(RabbitMQOptions.RabbitMQ).Get<RabbitMQOptions>();
 
             services.AddMassTransit(x =>
             {
@@ -66,13 +64,15 @@ namespace LT.DigitalOffice.ProjectService
                 {
                     cfg.Host("localhost", "/", host =>
                     {
-                        host.Username($"{serviceName}_{servicePassword}");
-                        host.Password(servicePassword);
+                        host.Username($"{rabbitmqOptions.Username}_{rabbitmqOptions.Password}");
+                        host.Password(rabbitmqOptions.Password);
                     });
                 });
 
                 x.AddRequestClient<IGetFileRequest>(
                   new Uri("rabbitmq://localhost/FileService"));
+
+                x.ConfigureKernelMassTransit(rabbitmqOptions);
             });
 
             services.AddMassTransitHostedService();
@@ -84,11 +84,13 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
             services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
             services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
+            services.AddTransient<ICreateRoleCommand, CreateRoleCommand>();
         }
 
         private void ConfigureRepositories(IServiceCollection services)
         {
             services.AddTransient<IProjectRepository, ProjectRepository>();
+            services.AddTransient<IRoleRepository, RoleRepository>();
         }
 
         private void ConfigureProvider(IServiceCollection services)
@@ -99,8 +101,10 @@ namespace LT.DigitalOffice.ProjectService
         private void ConfigureMappers(IServiceCollection services)
         {
             services.AddTransient<IMapper<DbProject, Project>, ProjectMapper>();
+            services.AddTransient<IMapper<DbRole, Role>, RoleMapper>();
             services.AddTransient<IMapper<NewProjectRequest, DbProject>, ProjectMapper>();
             services.AddTransient<IMapper<EditProjectRequest, DbProject>, ProjectMapper>();
+            services.AddTransient<IMapper<CreateRoleRequest, DbRole>, RoleMapper>();
         }
 
         private void ConfigureValidators(IServiceCollection services)
@@ -108,6 +112,7 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<IValidator<NewProjectRequest>, NewProjectValidator>();
             services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
             services.AddTransient<IValidator<WorkersIdsInProjectRequest>, WorkersProjectIdsValidator>();
+            services.AddTransient<IValidator<CreateRoleRequest>, CreateRoleValidator>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

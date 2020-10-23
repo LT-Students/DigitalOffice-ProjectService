@@ -10,29 +10,27 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
-    public class CreateNewProjectCommand : ICreateNewProjectCommand
+    public class CreateRoleCommand : ICreateRoleCommand
     {
-        private readonly IProjectRepository repository;
-        private readonly IValidator<NewProjectRequest> validator;
-        private readonly IMapper<NewProjectRequest, DbProject> mapper;
+        private readonly IRoleRepository repository;
+        private readonly IValidator<CreateRoleRequest> validator;
+        private readonly IMapper<CreateRoleRequest, DbRole> mapper;
 
-        public CreateNewProjectCommand(
-            [FromServices] IProjectRepository repository,
-            [FromServices] IValidator<NewProjectRequest> validator,
-            [FromServices] IMapper<NewProjectRequest, DbProject> mapper)
+        public CreateRoleCommand(
+            [FromServices] IRoleRepository repository,
+            [FromServices] IValidator<CreateRoleRequest> validator,
+            [FromServices] IMapper<CreateRoleRequest, DbRole> mapper)
         {
             this.repository = repository;
             this.validator = validator;
             this.mapper = mapper;
         }
 
-        public Guid Execute(NewProjectRequest request)
+        public Guid Execute(CreateRoleRequest request)
         {
             validator.ValidateAndThrowCustom(request);
 
-            var dbProject = mapper.Map(request);
-
-            return repository.CreateNewProject(dbProject);
+            return repository.CreateRole(mapper.Map(request));
         }
     }
 }
