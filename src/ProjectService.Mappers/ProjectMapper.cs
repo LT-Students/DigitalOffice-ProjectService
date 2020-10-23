@@ -18,6 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers
             return new Project
             {
                 Name = dbProject.Name,
+                ShortName = dbProject.ShortName,
                 WorkersIds = dbProject.WorkersUsersIds?.Select(x => x.WorkerUserId).ToList()
             };
         }
@@ -32,6 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers
             return new DbProject
             {
                 Id = Guid.NewGuid(),
+                ShortName = request.ShortName,
                 DepartmentId = request.DepartmentId,
                 Description = request.Description,
                 IsActive = request.IsActive,
@@ -50,6 +52,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers
             return new DbProject
             {
                 Id = request.Id,
+                ShortName = request.ShortName,
                 DepartmentId = request.DepartmentId,
                 Name = request.Name,
                 Description = request.Description,

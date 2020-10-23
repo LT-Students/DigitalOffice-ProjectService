@@ -32,6 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             {
                 Id = Guid.NewGuid(),
                 Name = "DigitalOffice",
+                ShortName = "DO",
                 DepartmentId = Guid.NewGuid(),
                 Description = "New project for Lanit-Tercom",
                 Deferred = false,

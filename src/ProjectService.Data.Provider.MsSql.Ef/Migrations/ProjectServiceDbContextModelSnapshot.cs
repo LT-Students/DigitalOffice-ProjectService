@@ -13,11 +13,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.5")
+                .HasAnnotation("ProductVersion", "3.1.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("LT.DigitalOffice.ProjectService.Database.Entities.DbProject", b =>
+            modelBuilder.Entity("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProject", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,12 +38,15 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ShortName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("LT.DigitalOffice.ProjectService.Database.Entities.DbProjectFile", b =>
+            modelBuilder.Entity("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProjectFile", b =>
                 {
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
@@ -56,7 +59,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                     b.ToTable("ProjectFile");
                 });
 
-            modelBuilder.Entity("LT.DigitalOffice.ProjectService.Database.Entities.DbProjectWorkerUser", b =>
+            modelBuilder.Entity("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProjectWorkerUser", b =>
                 {
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
@@ -81,18 +84,18 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                     b.ToTable("ProjectWorkerUser");
                 });
 
-            modelBuilder.Entity("LT.DigitalOffice.ProjectService.Database.Entities.DbProjectFile", b =>
+            modelBuilder.Entity("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProjectFile", b =>
                 {
-                    b.HasOne("LT.DigitalOffice.ProjectService.Database.Entities.DbProject", "Project")
+                    b.HasOne("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProject", "Projects")
                         .WithMany("FilesIds")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LT.DigitalOffice.ProjectService.Database.Entities.DbProjectWorkerUser", b =>
+            modelBuilder.Entity("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProjectWorkerUser", b =>
                 {
-                    b.HasOne("LT.DigitalOffice.ProjectService.Database.Entities.DbProject", "Project")
+                    b.HasOne("LT.DigitalOffice.ProjectService.Models.Db.Entities.DbProject", "Projects")
                         .WithMany("WorkersUsersIds")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)

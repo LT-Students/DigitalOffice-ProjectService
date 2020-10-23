@@ -73,7 +73,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
             modelBuilder.Entity("ProjectService.Database.Entities.ProjectManagerUser", b =>
                 {
-                    b.HasOne("ProjectService.Database.Entities.Project", "Project")
+                    b.HasOne("ProjectService.Database.Entities.Project", "Projects")
                         .WithMany("ManagersUsersIds")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -82,7 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
             modelBuilder.Entity("ProjectService.Database.Entities.ProjectWorkerUser", b =>
                 {
-                    b.HasOne("ProjectService.Database.Entities.Project", "Project")
+                    b.HasOne("ProjectService.Database.Entities.Project", "Projects")
                         .WithMany("WorkersUsersIds")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)

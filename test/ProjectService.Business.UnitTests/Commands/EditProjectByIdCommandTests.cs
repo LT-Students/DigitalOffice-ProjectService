@@ -36,6 +36,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
             {
                 Id = projectId,
                 Name = "DigitalOffice",
+                ShortName = "DO",
                 DepartmentId = Guid.NewGuid(),
                 Description = "A new description",
                 IsActive = false
@@ -45,6 +46,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
             {
                 Id = projectId,
                 Name = editRequest.Name,
+                ShortName = editRequest.ShortName,
                 DepartmentId = editRequest.DepartmentId,
                 Description = editRequest.Description,
                 IsActive = editRequest.IsActive
