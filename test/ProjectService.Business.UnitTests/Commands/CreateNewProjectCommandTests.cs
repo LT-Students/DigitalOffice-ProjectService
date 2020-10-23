@@ -34,6 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             newRequest = new NewProjectRequest
             {
                 Name = "DigitalOffice",
+                ShortName = "DO",
                 DepartmentId = Guid.NewGuid(),
                 Description = "New project for Lanit-Tercom",
                 IsActive = true
@@ -42,6 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             newProject = new DbProject
             {
                 Id = Guid.NewGuid(),
+                ShortName = newRequest.ShortName,
                 Name = newRequest.Name,
                 DepartmentId = newRequest.DepartmentId,
                 Description = newRequest.Description,

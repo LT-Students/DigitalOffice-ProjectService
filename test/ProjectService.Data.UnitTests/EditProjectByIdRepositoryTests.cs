@@ -36,6 +36,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             dbProject = new DbProject
             {
                 Name = "A test name",
+                ShortName = "Test",
                 DepartmentId = departmentId,
                 Description = "Description",
                 IsActive = true,
@@ -45,6 +46,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             editProject = new DbProject
             {
                 Name = "Is different",
+                ShortName = "Test",
                 DepartmentId = Guid.NewGuid(),
                 Description = "Is different too",
                 IsActive = false,

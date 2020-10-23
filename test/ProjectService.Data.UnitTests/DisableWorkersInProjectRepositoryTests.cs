@@ -63,6 +63,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             {
                 Id = projectId,
                 Name = "DigitalOffice",
+                ShortName = "DO",
                 DepartmentId = Guid.NewGuid(),
                 Description = "New project for Lanit-Tercom",
                 Deferred = false,
