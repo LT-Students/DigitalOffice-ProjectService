@@ -39,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         void DisableWorkersInProject(WorkersIdsInProjectRequest request);
 
         /// <summary>
-        /// Returns the list of projects with the specified id from database.
+        /// Returns the list of projects with the specified user id from database.
         /// </summary>
         /// <param name="userId">Specified id of user.</param>
         /// <returns>list of projects where is the userId.</returns>

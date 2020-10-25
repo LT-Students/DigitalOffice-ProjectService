@@ -18,7 +18,7 @@ namespace ProjectService.Business.UnitTests.Commands
         private Guid userId;
         private List<DbProject> projectsList;
 
-        [SetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             repositoryMock = new Mock<IProjectRepository>();
@@ -43,7 +43,9 @@ namespace ProjectService.Business.UnitTests.Commands
                 new Project()
             };
 
-            repositoryMock.Setup(x => x.GetUserProjects(It.IsAny<Guid>())).Returns(projectsList);
+            repositoryMock
+                .Setup(x => x.GetUserProjects(It.IsAny<Guid>()))
+                .Returns(projectsList);
 
             var result = command.Execute(userId);
 
@@ -53,7 +55,9 @@ namespace ProjectService.Business.UnitTests.Commands
         [Test]
         public void ShouldThrowExceptionWhenRepositoryThrowsIt()
         {
-            repositoryMock.Setup(x => x.GetUserProjects(It.IsAny<Guid>())).Throws(new Exception());
+            repositoryMock
+                .Setup(x => x.GetUserProjects(It.IsAny<Guid>()))
+                .Throws(new Exception());
 
             Assert.Throws<Exception>(() => command.Execute(userId));
         }
