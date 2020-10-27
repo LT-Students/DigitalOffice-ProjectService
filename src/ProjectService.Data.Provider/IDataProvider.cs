@@ -7,6 +7,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider
     {
         DbSet<DbProject> Projects { get; set; }
 
+        DbSet<DbRole> Roles { get; set; }
+
         void SaveModelsChanges();
         object MakeEntityDetached(object obj);
         void EnsureDeleted();

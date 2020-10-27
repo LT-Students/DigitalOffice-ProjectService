@@ -1,0 +1,34 @@
+﻿using LT.DigitalOffice.Kernel.AccessValidator.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using System;
+
+namespace LT.DigitalOffice.ProjectService.Business.Commands
+{
+    public class DeleteRoleCommand : IDeleteRoleCommand
+    {
+        private readonly IRoleRepository repository;
+        private readonly IAccessValidator accessValidator;
+
+        public DeleteRoleCommand(
+            [FromServices] IRoleRepository repository,
+            [FromServices] IAccessValidator accessValidator)
+        {
+            this.repository = repository;
+            this.accessValidator = accessValidator;
+        }
+
+        public bool Execute(Guid roleId)
+        {
+            const int rightId = 2;
+
+            if (!(accessValidator.IsAdmin() || accessValidator.HasRights(rightId)))
+            {
+                throw new Exception("Not enough rights");
+            }
+
+            return repository.DeleteRole(roleId);
+        }
+    }
+}
