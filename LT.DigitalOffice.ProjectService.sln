@@ -37,7 +37,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectService.Validation.U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectService.Validation", "src\ProjectService.Validation\ProjectService.Validation.csproj", "{11C531E0-828C-444A-91C2-EB4416303482}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectService.Models.Broker", "src\ProjectService.Models.Broker\ProjectService.Models.Broker.csproj", "{C31DF49C-9EB4-4500-9697-36D2FB34560D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectService.Models.Broker", "src\ProjectService.Models.Broker\ProjectService.Models.Broker.csproj", "{C31DF49C-9EB4-4500-9697-36D2FB34560D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B0D95CED-3575-430E-9796-70FF3790073A}"
+	ProjectSection(SolutionItems) = preProject
+		Common.Configurations.targets = Common.Configurations.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

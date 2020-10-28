@@ -12,10 +12,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectService.Data\ProjectService.Data.csproj" />
+    <ProjectReference Include="..\ProjectService.Models.Broker\ProjectService.Models.Broker.csproj" />
     <ProjectReference Include="..\ProjectService.Validation\ProjectService.Validation.csproj" />
     <ProjectReference Include="..\ProjectService.Mappers\ProjectService.Mappers.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />
   </ItemGroup>
-  
+
 </Project>

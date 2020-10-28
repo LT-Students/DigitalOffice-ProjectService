@@ -1,17 +1,16 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 
 namespace LT.DigitalOffice.ProjectService.Mappers
 {
-    public class WorkerMapper : IMapper<ProjectWorker, DbProjectWorkerUser>
+    public class WorkerMapper : IMapper<ProjectUser, DbProjectUser>
     {
-        public DbProjectWorkerUser Map(ProjectWorker projectWorker)
+        public DbProjectUser Map(ProjectUser projectWorker)
         {
-            return new DbProjectWorkerUser
+            return new DbProjectUser
             {
-                WorkerUserId = projectWorker.WorkerId,
-
+                UserId = projectWorker.User.Id,
             };
         }
     }

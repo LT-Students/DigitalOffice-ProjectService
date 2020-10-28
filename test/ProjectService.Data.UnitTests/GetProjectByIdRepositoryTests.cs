@@ -1,9 +1,10 @@
-using LT.DigitalOffice.Kernel.UnitTestLibrary;
+using LT.DigitalOffice.Kernel.Exceptions;
 using LT.DigitalOffice.ProjectService.Data;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
@@ -35,7 +36,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             };
 
             provider.Projects.Add(dbProject);
-            provider.SaveModelsChanges();
+            provider.Save();
         }
 
         [TearDown]
@@ -50,14 +51,14 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         [Test]
         public void ShouldThrowExceptionWhenProjectDoesNotExist()
         {
-            Assert.Throws<Exception>(() => repository.GetProjectInfoById(Guid.NewGuid()));
-            Assert.That(provider.Projects, Is.EquivalentTo(new List<DbProject> {dbProject}));
+            Assert.Throws<NotFoundException>(() => repository.GetProject(Guid.NewGuid()));
+            Assert.That(provider.Projects, Is.EquivalentTo(new List<DbProject> { dbProject }));
         }
 
         [Test]
         public void ShouldReturnProjectInfo()
         {
-            var result = repository.GetProjectInfoById(dbProject.Id);
+            var result = repository.GetProject(dbProject.Id);
 
             var expected = new DbProject
             {
@@ -66,7 +67,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             };
 
             SerializerAssert.AreEqual(expected, result);
-            Assert.That(provider.Projects, Is.EquivalentTo(new List<DbProject> {dbProject}));
+            Assert.That(provider.Projects, Is.EquivalentTo(new List<DbProject> { dbProject }));
         }
     }
 }
