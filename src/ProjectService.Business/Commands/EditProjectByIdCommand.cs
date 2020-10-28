@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
+using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -38,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             request.Id = projectId;
 
-            validator.ValidateAndThrow(request);
+            validator.ValidateAndThrowCustom(request);
             var dbProject = mapper.Map(request);
 
             return repository.EditProjectById(dbProject);

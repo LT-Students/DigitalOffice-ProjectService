@@ -3,15 +3,15 @@ using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Moq;
 using NUnit.Framework;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
 {
-    class CreateNewProjectCommandTests
+    public class CreateNewProjectCommandTests
     {
         private ICreateNewProjectCommand command;
 
@@ -26,7 +26,9 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         public void SetUp()
         {
             validatorMock = new Mock<IValidator<NewProjectRequest>>();
+
             repositoryMock = new Mock<IProjectRepository>();
+
             mapperMock = new Mock<IMapper<NewProjectRequest, DbProject>>();
 
             command = new CreateNewProjectCommand(repositoryMock.Object, validatorMock.Object, mapperMock.Object);
@@ -47,7 +49,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 Name = newRequest.Name,
                 DepartmentId = newRequest.DepartmentId,
                 Description = newRequest.Description,
-                Deferred = false,
                 IsActive = newRequest.IsActive,
             };
         }

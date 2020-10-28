@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
+using Microsoft.AspNetCore.Mvc;
 using System;
-using LT.DigitalOffice.ProjectService.Models.Dto;
-using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
@@ -9,12 +11,21 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [ApiController]
     public class ProjectController : ControllerBase
     {
-        [HttpGet("getProjectInfoById")]
-        public Project GetProjectInfoById(
-            [FromServices] IGetProjectInfoByIdCommand command,
-            [FromQuery] Guid projectId)
+        [HttpGet("getProjects")]
+        public IEnumerable<ProjectResponse> GetProjects(
+            [FromServices] IGetProjectsCommand command,
+            [FromQuery] bool showNotActive = false)
         {
-            return command.Execute(projectId);
+            return command.Execute(showNotActive);
+        }
+
+        [HttpGet("getProject")]
+        public ProjectExpandedResponse GetProject(
+            [FromServices] IGetProjectCommand command,
+            [FromQuery] Guid projectId,
+            [FromQuery] bool showNotActiveUsers = false)
+        {
+            return command.Execute(projectId, showNotActiveUsers).Result;
         }
 
         [HttpPost("createNewProject")]

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project>
+  <PropertyGroup>
+    <AssemblyName>LT.DigitalOffice.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>LT.DigitalOffice.$(MSBuildProjectName)</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;RELEASE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.0.15" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests')) != 'true'">
+
+  </ItemGroup>
+
+  <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests'))">
+    <PackageReference Include="LT.DigitalOffice.UnitTestKernel" Version="1.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+  </ItemGroup>
+
+</Project>

@@ -1,19 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
+
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.0.2" />
-    <PackageReference Include="nunit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0"/>
-    <PackageReference Include="FluentValidation" Version="9.0.1" />
-    <PackageReference Include="Moq" Version="4.14.5" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ProjectService.Business\ProjectService.Business.csproj" />

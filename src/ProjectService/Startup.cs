@@ -4,14 +4,16 @@ using LT.DigitalOffice.Kernel;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Configuration;
 using LT.DigitalOffice.ProjectService.Data;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Mappers;
-using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers;
+using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
+using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -36,15 +38,13 @@ namespace LT.DigitalOffice.ProjectService
         {
             services.AddHealthChecks();
 
-            services.Configure<RabbitMQOptions>(Configuration);
-
             services.AddDbContext<ProjectServiceDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("SQLConnectionString"));
             });
 
             services.AddControllers();
-            services.AddKernelExtensions(Configuration);
+            services.AddKernelExtensions();
 
             ConfigureCommands(services);
             ConfigureRepositories(services);
@@ -56,9 +56,7 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureMassTransit(IServiceCollection services)
         {
-            const string serviceSection = "RabbitMQ";
-            string serviceName = Configuration.GetSection(serviceSection)["Username"];
-            string servicePassword = Configuration.GetSection(serviceSection)["Password"];
+            var rabbitMqConfig = Configuration.GetSection(BaseRabbitMqOptions.RabbitMqSectionName).Get<RabbitMqConfig>();
 
             services.AddMassTransit(x =>
             {
@@ -66,13 +64,16 @@ namespace LT.DigitalOffice.ProjectService
                 {
                     cfg.Host("localhost", "/", host =>
                     {
-                        host.Username($"{serviceName}_{servicePassword}");
-                        host.Password(servicePassword);
+                        host.Username($"{rabbitMqConfig.Username}_{rabbitMqConfig.Password}");
+                        host.Password(rabbitMqConfig.Password);
                     });
                 });
 
-                x.AddRequestClient<IGetFileRequest>(
-                  new Uri("rabbitmq://localhost/FileService"));
+                x.AddRequestClient<IGetFileRequest>(new Uri(rabbitMqConfig.FileServiceUrl));
+                x.AddRequestClient<IGetUserRequest>(new Uri(rabbitMqConfig.UserServiceUsersUrl), RequestTimeout.After(ms: 100));
+                x.AddRequestClient<IGetDepartmentRequest>(new Uri(rabbitMqConfig.CompanyServiceDepartmentsUrl), RequestTimeout.After(ms: 100));
+
+                x.ConfigureKernelMassTransit(rabbitMqConfig);
             });
 
             services.AddMassTransitHostedService();
@@ -80,10 +81,11 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureCommands(IServiceCollection services)
         {
-            services.AddTransient<IGetProjectInfoByIdCommand, GetProjectByIdCommand>();
+            services.AddTransient<IGetProjectCommand, GetProjectCommand>();
             services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
             services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
             services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
+            services.AddTransient<IGetProjectsCommand, GetProjectsCommand>();
         }
 
         private void ConfigureRepositories(IServiceCollection services)
@@ -98,9 +100,12 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureMappers(IServiceCollection services)
         {
-            services.AddTransient<IMapper<DbProject, Project>, ProjectMapper>();
-            services.AddTransient<IMapper<NewProjectRequest, DbProject>, ProjectMapper>();
-            services.AddTransient<IMapper<EditProjectRequest, DbProject>, ProjectMapper>();
+            services.AddTransient<IProjectMapper, ProjectMapper>();
+            services.AddTransient<IProjectUserMapper, ProjectUserMapper>();
+            services.AddTransient<IRoleMapper, RoleMapper>();
+
+            services.AddTransient<IProjectResponseMapper, ProjectResponseMapper>();
+            services.AddTransient<IProjectExpandedResponseMapper, ProjectExpandedResponseMapper>();
         }
 
         private void ConfigureValidators(IServiceCollection services)
@@ -117,6 +122,8 @@ namespace LT.DigitalOffice.ProjectService
             app.UseExceptionHandler(tempApp => tempApp.Run(CustomExceptionHandler.HandleCustomException));
 
             UpdateDatabase(app);
+
+            //app.UseMiddleware<TokenMiddleware>();
 
 #if RELEASE
             app.UseHttpsRedirection();
