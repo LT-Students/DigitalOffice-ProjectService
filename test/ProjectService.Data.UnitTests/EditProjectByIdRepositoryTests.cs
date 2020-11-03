@@ -1,8 +1,8 @@
-﻿using LT.DigitalOffice.Kernel.UnitTestLibrary;
-using LT.DigitalOffice.ProjectService.Data;
+﻿using LT.DigitalOffice.ProjectService.Data;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
@@ -39,8 +39,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 ShortName = "Test",
                 DepartmentId = departmentId,
                 Description = "Description",
-                IsActive = true,
-                Deferred = false
+                IsActive = true
             };
 
             editProject = new DbProject
@@ -49,8 +48,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 ShortName = "Test",
                 DepartmentId = Guid.NewGuid(),
                 Description = "Is different too",
-                IsActive = false,
-                Deferred = false
+                IsActive = false
             };
         }
 
@@ -64,10 +62,10 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             editProject.Id = dbProject.Id;
 
             provider.Projects.Add(dbProject);
-            provider.SaveModelsChanges();
+            provider.Save();
 
             provider.MakeEntityDetached(dbProject);
-            provider.SaveModelsChanges();
+            provider.Save();
 
             existingProject = provider.Projects
                 .AsNoTracking()
@@ -75,7 +73,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 
             repository.EditProjectById(editProject);
             provider.MakeEntityDetached(editProject);
-            provider.SaveModelsChanges();
+            provider.Save();
 
             editedProject = provider.Projects
                 .AsNoTracking()
@@ -97,13 +95,12 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             editProject.Name = dbProject.Name;
             editProject.IsActive = dbProject.IsActive;
             editProject.Description = dbProject.Description;
-            editProject.Deferred = dbProject.Deferred;
             editProject.DepartmentId = dbProject.DepartmentId;
 
             provider.Projects.Add(dbProject);
-            provider.SaveModelsChanges();
+            provider.Save();
             provider.MakeEntityDetached(dbProject);
-            provider.SaveModelsChanges();
+            provider.Save();
 
             var existingProject = provider.Projects
                 .AsNoTracking()
@@ -112,7 +109,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 
             repository.EditProjectById(editProject);
             provider.MakeEntityDetached(editProject);
-            provider.SaveModelsChanges();
+            provider.Save();
 
             var editedProject = provider.Projects
                 .AsNoTracking()

@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Db.Entities;
+﻿using LT.DigitalOffice.ProjectService.Models.Db;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -9,42 +9,42 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
     /// </summary>
     public class ProjectServiceDbContext : DbContext, IDataProvider
     {
-        public ProjectServiceDbContext (DbContextOptions<ProjectServiceDbContext> options)
-            :base(options)
-        {
-        }
-
         public DbSet<DbProject> Projects { get; set; }
-
+        public DbSet<DbProjectFile> ProjectsFiles { get; set; }
+        public DbSet<DbProjectUser> ProjectsUsers { get; set; }
         public DbSet<DbRole> Roles { get; set; }
 
-        // Fluent API is written here.
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(
                 Assembly.Load("LT.DigitalOffice.ProjectService.Models.Db"));
         }
 
-        public void SaveModelsChanges()
+        public ProjectServiceDbContext (DbContextOptions<ProjectServiceDbContext> options)
+            :base(options)
         {
-            this.SaveChanges();
+        }
+
+        public void Save()
+        {
+            SaveChanges();
         }
 
         public object MakeEntityDetached(object obj)
         {
-            this.Entry(obj).State = EntityState.Detached;
+            Entry(obj).State = EntityState.Detached;
 
-            return this.Entry(obj).State;
+            return Entry(obj).State;
         }
 
         public void EnsureDeleted()
         {
-            this.Database.EnsureDeleted();
+            Database.EnsureDeleted();
         }
 
         public bool IsInMemory()
         {
-            return this.Database.IsInMemory();
+            return Database.IsInMemory();
         }
     }
 }
