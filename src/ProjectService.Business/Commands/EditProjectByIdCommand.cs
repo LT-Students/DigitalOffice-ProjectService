@@ -3,6 +3,7 @@ using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +13,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
     public class EditProjectByIdCommand : IEditProjectByIdCommand
     {
-        private readonly IMapper<EditProjectRequest, DbProject> mapper;
+        private readonly IProjectMapper mapper;
         private readonly IValidator<EditProjectRequest> validator;
         private readonly IProjectRepository repository;
 
         public EditProjectByIdCommand(
-            [FromServices] IMapper<EditProjectRequest, DbProject> mapper,
+            [FromServices] IProjectMapper mapper,
             [FromServices] IValidator<EditProjectRequest> validator,
             [FromServices] IProjectRepository repository)
         {

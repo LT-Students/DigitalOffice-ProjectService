@@ -3,6 +3,7 @@ using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +15,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     {
         private readonly IProjectRepository repository;
         private readonly IValidator<NewProjectRequest> validator;
-        private readonly IMapper<NewProjectRequest, DbProject> mapper;
+        private readonly IProjectMapper mapper;
 
         public CreateNewProjectCommand(
             [FromServices] IProjectRepository repository,
             [FromServices] IValidator<NewProjectRequest> validator,
-            [FromServices] IMapper<NewProjectRequest, DbProject> mapper)
+            [FromServices] IProjectMapper mapper)
         {
             this.repository = repository;
             this.validator = validator;
