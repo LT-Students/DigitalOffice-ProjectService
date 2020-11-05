@@ -51,11 +51,12 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         }
 
         [HttpGet("getUserProjects")]
-        public IEnumerable<Project> GetUserProjects(
-            [FromServices] GetUserProjectsCommand command,
-            [FromQuery] Guid userId)
+        public IEnumerable<ProjectResponse> GetUserProjects(
+            [FromServices] IGetUserProjectsCommand command,
+            [FromQuery] Guid userId,
+            [FromQuery] bool showNotActive = false)
         {
-            return command.Execute(userId);
+            return command.Execute(userId, showNotActive);
         }
     }
 }

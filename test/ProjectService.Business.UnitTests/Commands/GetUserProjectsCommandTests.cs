@@ -1,9 +1,7 @@
-﻿using LT.DigitalOffice.Kernel.UnitTestLibrary;
-using LT.DigitalOffice.ProjectService.Business.Commands;
+﻿using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -15,22 +13,21 @@ namespace ProjectService.Business.UnitTests.Commands
     {
         private GetUserProjectsCommand command;
         private Mock<IProjectRepository> repositoryMock;
+        private Mock<IProjectResponseMapper> mapperMock;
         private Guid userId;
-        private List<DbProject> projectsList;
-
+        private IEnumerable<ProjectResponse> projectsEnum;
+    
         [OneTimeSetUp]
         public void SetUp()
         {
             repositoryMock = new Mock<IProjectRepository>();
+            mapperMock = new Mock<IProjectResponseMapper>();
+            command = new GetUserProjectsCommand(repositoryMock.Object, mapperMock.Object);
 
-            command = new GetUserProjectsCommand(
-                repositoryMock.Object,
-                new ProjectMapper());
-
-            projectsList = new List<DbProject>();
-            projectsList.Add(new DbProject());
-            projectsList.Add(new DbProject());
-
+            projectsEnum {
+                new ProjectResponse(), 
+                new ProjectResponse()
+            };
             userId = Guid.NewGuid();
         }
 
@@ -43,23 +40,22 @@ namespace ProjectService.Business.UnitTests.Commands
                 new Project()
             };
 
-            repositoryMock
-                .Setup(x => x.GetUserProjects(It.IsAny<Guid>()))
-                .Returns(projectsList);
+        repositoryMock
+            .Setup(x => x.GetUserProjects(It.IsAny<Guid>()))
+            .Returns(projectsList);
 
-            var result = command.Execute(userId);
+        var result = command.Execute(userId);
 
-            SerializerAssert.AreEqual(expected, result);
-        }
+        SerializerAssert.AreEqual(expected, result);
+    }
 
-        [Test]
-        public void ShouldThrowExceptionWhenRepositoryThrowsIt()
-        {
-            repositoryMock
-                .Setup(x => x.GetUserProjects(It.IsAny<Guid>()))
-                .Throws(new Exception());
+    [Test]
+    public void ShouldThrowExceptionWhenRepositoryThrowsIt()
+    {
+        repositoryMock
+            .Setup(x => x.GetUserProjects(It.IsAny<Guid>()))
+            .Throws(new Exception());
 
-            Assert.Throws<Exception>(() => command.Execute(userId));
-        }
+        Assert.Throws<Exception>(() => command.Execute(userId));
     }
 }

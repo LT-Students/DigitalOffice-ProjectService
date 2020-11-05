@@ -119,19 +119,15 @@ namespace LT.DigitalOffice.ProjectService.Data
             return result;
         }
 
-        public IEnumerable<DbProject> GetUserProjects(Guid userId)
+        public IEnumerable<DbProject> GetUserProjects(Guid userId, bool showNotActive)
         {
-
-            if (userId == Guid.Empty)
+            var predicate = PredicateBuilder.New<DbProject>(p => p.IsActive);
+            if (showNotActive)
             {
-                throw new BadRequestException("This user does not exist.");
+                predicate.Or(p => !p.IsActive);
             }
 
-            List<DbProject> projectsList = provider.Projects.Where(
-                p => p.WorkersUsersIds.Any(
-                    w => w.WorkerUserId == userId)).ToList();
-
-            return projectsList;
+            return provider.Projects.Include(p => p.Users.Where(u => u.UserId == Guid.Empty)).Where(predicate).ToList();
         }
     }
 }

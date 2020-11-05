@@ -43,7 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// </summary>
         /// <param name="userId">Specified id of user.</param>
         /// <returns>list of projects where is the userId.</returns>
-        IEnumerable<DbProject> GetUserProjects(Guid userId);
+        IEnumerable<DbProject> GetUserProjects(Guid userId, bool showNotActive);
 
         IEnumerable<DbProject> GetProjects(bool showNotActive);
 

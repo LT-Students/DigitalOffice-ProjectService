@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.0.11" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ProjectService.Data\ProjectService.Data.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Broker\ProjectService.Models.Broker.csproj" />
     <ProjectReference Include="..\ProjectService.Validation\ProjectService.Validation.csproj" />

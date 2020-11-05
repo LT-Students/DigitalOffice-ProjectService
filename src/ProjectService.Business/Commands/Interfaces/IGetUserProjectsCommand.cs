@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
@@ -15,6 +15,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
         /// </summary>
         /// <param name="userId">Specified id of user.</param>
         /// <returns>List of projects with specified user id.</returns>
-        IEnumerable<Project> Execute(Guid userId);
+        IEnumerable<ProjectResponse> Execute(Guid userId, bool showNotActive);
     }
 }

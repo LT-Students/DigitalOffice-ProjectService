@@ -1,8 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,20 +11,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
     public class GetUserProjectsCommand : IGetUserProjectsCommand
     {
-        private readonly IProjectRepository repository;
-        private readonly IMapper<DbProject, Project> mapper;
+        private readonly IProjectRepository _repository;
+        private readonly IProjectResponseMapper _mapper;
 
         public GetUserProjectsCommand(
             [FromServices] IProjectRepository repository,
-            [FromServices] IMapper<DbProject, Project> mapper)
+            [FromServices] IProjectResponseMapper mapper)
         {
-            this.repository = repository;
-            this.mapper = mapper;
+            _repository = repository;
+            _mapper = mapper;
         }
 
-        public IEnumerable<Project> Execute(Guid userId)
+        public IEnumerable<ProjectResponse> Execute(Guid userId, bool showNotActive)
         {
-            return repository.GetUserProjects(userId).Select(p => mapper.Map(p)).ToList();
+            return _repository.GetUserProjects(userId, showNotActive).Select(p => _mapper.Map(p));
         }
     }
 }
