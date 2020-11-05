@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
@@ -43,7 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             repository = new RoleRepository(provider);
 
             provider.Roles.Add(dbRole);
-            provider.SaveModelsChanges();
+            provider.Save();
         }
 
         [TearDown]

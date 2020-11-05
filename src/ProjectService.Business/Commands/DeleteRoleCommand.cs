@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.Kernel.AccessValidator.Interfaces;
+﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Exceptions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             if (!(accessValidator.IsAdmin() || accessValidator.HasRights(rightId)))
             {
-                throw new Exception("Not enough rights");
+                throw new ForbiddenException("Not enough rights");
             }
 
             return repository.DeleteRole(roleId);

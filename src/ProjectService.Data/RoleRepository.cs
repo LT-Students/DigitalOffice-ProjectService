@@ -1,12 +1,9 @@
 ﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
@@ -29,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             }
 
             provider.Roles.Remove(dbRole);
-            provider.SaveModelsChanges();
+            provider.Save();
 
             DbRole dbRoleDeleted = provider.Roles.FirstOrDefault(role => role.Id == roleId);
 
