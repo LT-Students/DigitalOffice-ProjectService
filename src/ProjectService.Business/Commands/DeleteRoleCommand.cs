@@ -22,9 +22,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         public bool Execute(Guid roleId)
         {
-            const int rightId = 2;
+            const int accessRightId = 2;
 
-            if (!(accessValidator.IsAdmin() || accessValidator.HasRights(rightId)))
+            if (!(accessValidator.IsAdmin() || accessValidator.HasRights(accessRightId)))
             {
                 throw new ForbiddenException("Not enough rights");
             }
