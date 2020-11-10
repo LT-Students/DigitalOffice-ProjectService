@@ -34,14 +34,16 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public Guid CreateRole(DbRole role)
         {
-            if ((provider.Roles.First(r => r.Id == role.Id)) != null)
-            {
-                throw new ArgumentException($"Role with this id is already exist");
-            }
             if (role == null)
             {
                 throw new ArgumentNullException(nameof(DbRole));
             }
+
+            if ((provider.Roles.FirstOrDefault(r => r.Id == role.Id)) != null)
+            {
+                throw new ArgumentException($"Role with this id is already exist");
+            }
+
             provider.Roles.Add(role);
             provider.Save();
 

@@ -38,17 +38,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="request">Contains workers id and project id.</param>
         void DisableWorkersInProject(WorkersIdsInProjectRequest request);
 
-        /// <summary>
-        /// Adds new role to the database. Returns the id of the added role.
-        /// </summary>
-        /// <param name="item">Role to add.</param>
-        /// <returns>Id of the added role.</returns>
-        Guid CreateRole(DbRole item);
-
         IEnumerable<DbProject> GetProjects(bool showNotActive);
 
         IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActiveUsers);
-
-        DbRole GetRole(Guid roleId);
     }
 }
