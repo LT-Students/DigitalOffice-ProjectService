@@ -3,8 +3,8 @@ using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
     {
         private ICreateRoleCommand command;
 
-        private Mock<IRoleRepository> repositoryMock;
+        private Mock<IProjectRepository> repositoryMock;
         private Mock<IValidator<CreateRoleRequest>> validatorMock;
         private Mock<IMapper<CreateRoleRequest, DbRole>> mapperMock;
 
@@ -26,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         public void SetUp()
         {
             validatorMock = new Mock<IValidator<CreateRoleRequest>>();
-            repositoryMock = new Mock<IRoleRepository>();
+            repositoryMock = new Mock<IProjectRepository>();
             mapperMock = new Mock<IMapper<CreateRoleRequest, DbRole>>();
 
             command = new CreateRoleCommand(repositoryMock.Object, validatorMock.Object, mapperMock.Object);

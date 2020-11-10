@@ -1,10 +1,13 @@
-﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
+﻿using LinqKit;
+using LT.DigitalOffice.Kernel.Exceptions;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Data
@@ -18,22 +21,33 @@ namespace LT.DigitalOffice.ProjectService.Data
             this.provider = provider;
         }
 
-        public DbProject GetProjectInfoById(Guid projectId)
+        public DbProject GetProject(Guid projectId)
         {
-            var dbProject = provider.Projects.FirstOrDefault(project => project.Id == projectId);
+            var dbProject = provider.Projects.FirstOrDefault(p => p.Id == projectId);
 
             if (dbProject == null)
             {
-                throw new Exception("Project with this id was not found.");
+                throw new NotFoundException($"Project with id: '{projectId}' was not found.");
             }
 
             return dbProject;
         }
 
+        public IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActive)
+        {
+            var predicate = PredicateBuilder.New<DbProjectUser>(u => u.ProjectId == projectId && u.IsActive);
+            if (showNotActive)
+            {
+                predicate.Or(u => !u.IsActive);
+            }
+
+            return provider.ProjectsUsers.Include(u => u.Role).Where(predicate).ToList();
+        }
+
         public Guid CreateNewProject(DbProject newProject)
         {
             provider.Projects.Add(newProject);
-            provider.SaveModelsChanges();
+            provider.Save();
 
             return newProject.Id;
         }
@@ -50,7 +64,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             }
 
             provider.Projects.Update(dbProject);
-            provider.SaveModelsChanges();
+            provider.Save();
 
             return dbProject.Id;
         }
@@ -67,8 +81,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             foreach (Guid workerId in request.WorkersIds)
             {
-                DbProjectWorkerUser dbProjectWorker = dbProject.WorkersUsersIds?
-                    .FirstOrDefault(w => w.WorkerUserId == workerId);
+                DbProjectUser dbProjectWorker = dbProject.Users?.FirstOrDefault(w => w.UserId == workerId);
 
                 if (dbProjectWorker == null)
                 {
@@ -79,7 +92,45 @@ namespace LT.DigitalOffice.ProjectService.Data
             }
 
             provider.Projects.Update(dbProject);
-            provider.SaveModelsChanges();
+            provider.Save();
+        }
+
+        public IEnumerable<DbProject> GetProjects(bool showNotActive)
+        {
+            var predicate = PredicateBuilder.New<DbProject>(p => p.IsActive);
+            if (showNotActive)
+            {
+                predicate.Or(p => !p.IsActive);
+            }
+
+            return provider.Projects.Where(predicate).ToList();
+        }
+
+        public DbRole GetRole(Guid roleId)
+        {
+            var result = provider.Roles.FirstOrDefault(r => r.Id == roleId);
+            if (result == null)
+            {
+                throw new NotFoundException($"Role with id: '{roleId}' was not found.");
+            }
+
+            return result;
+        }
+
+        public Guid CreateRole(DbRole role)
+        {
+            if ((provider.Roles.First(r => r.Id == role.Id)) != null)
+            {
+                throw new ArgumentException($"Role with this id is already exist");
+            }
+            if (role == null)
+            {
+                throw new ArgumentNullException(nameof(DbRole));
+            }
+            provider.Roles.Add(role);
+            provider.Save();
+
+            return role.Id;
         }
     }
 }

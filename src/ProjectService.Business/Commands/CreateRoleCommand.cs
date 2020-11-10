@@ -2,11 +2,12 @@
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
@@ -14,12 +15,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     {
         private readonly IRoleRepository repository;
         private readonly IValidator<CreateRoleRequest> validator;
-        private readonly IMapper<CreateRoleRequest, DbRole> mapper;
+        private readonly ICreateRoleRequestMapper mapper;
 
         public CreateRoleCommand(
             [FromServices] IRoleRepository repository,
             [FromServices] IValidator<CreateRoleRequest> validator,
-            [FromServices] IMapper<CreateRoleRequest, DbRole> mapper)
+            [FromServices] ICreateRoleRequestMapper mapper)
         {
             this.repository = repository;
             this.validator = validator;

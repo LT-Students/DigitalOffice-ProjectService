@@ -1,5 +1,6 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using System;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {

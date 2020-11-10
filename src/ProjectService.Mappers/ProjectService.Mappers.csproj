@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>LT.DigitalOffice.ProjectService.Mappers</AssemblyName>
@@ -7,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ProjectService.Models.Broker\ProjectService.Models.Broker.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />
   </ItemGroup>

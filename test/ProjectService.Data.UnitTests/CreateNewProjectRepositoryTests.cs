@@ -1,8 +1,8 @@
-﻿using LT.DigitalOffice.Kernel.UnitTestLibrary;
-using LT.DigitalOffice.ProjectService.Data.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
@@ -32,9 +32,9 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             {
                 Id = Guid.NewGuid(),
                 Name = "DigitalOffice",
+                ShortName = "DO",
                 DepartmentId = Guid.NewGuid(),
                 Description = "New project for Lanit-Tercom",
-                Deferred = false,
                 IsActive = true
             };
 

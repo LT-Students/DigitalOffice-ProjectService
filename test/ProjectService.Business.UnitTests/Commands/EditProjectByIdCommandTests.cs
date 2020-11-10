@@ -3,8 +3,8 @@ using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -36,6 +36,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
             {
                 Id = projectId,
                 Name = "DigitalOffice",
+                ShortName = "DO",
                 DepartmentId = Guid.NewGuid(),
                 Description = "A new description",
                 IsActive = false
@@ -45,6 +46,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
             {
                 Id = projectId,
                 Name = editRequest.Name,
+                ShortName = editRequest.ShortName,
                 DepartmentId = editRequest.DepartmentId,
                 Description = editRequest.Description,
                 IsActive = editRequest.IsActive
@@ -125,7 +127,8 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(projectId);
 
             Assert.Throws<ValidationException>(
-                () => command.Execute(projectId, editRequest), "Argument was not null");
+                () => command.Execute(projectId, editRequest),
+                "Argument was not null");
             validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
             mapperMock.Verify(m => m.Map(It.IsAny<EditProjectRequest>()), Times.Never);
             repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Never);

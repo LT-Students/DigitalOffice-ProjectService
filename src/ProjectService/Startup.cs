@@ -1,17 +1,21 @@
 using FluentValidation;
+using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Kernel;
 using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Configuration;
 using LT.DigitalOffice.ProjectService.Data;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Mappers;
-using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers;
+using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
+using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
+using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -36,8 +40,6 @@ namespace LT.DigitalOffice.ProjectService
         {
             services.AddHealthChecks();
 
-            services.Configure<RabbitMQOptions>(Configuration);
-
             services.AddDbContext<ProjectServiceDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("SQLConnectionString"));
@@ -56,7 +58,7 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureMassTransit(IServiceCollection services)
         {
-            var rabbitmqOptions = Configuration.GetSection(RabbitMQOptions.RabbitMQ).Get<RabbitMQOptions>();
+            var rabbitMqConfig = Configuration.GetSection(BaseRabbitMqOptions.RabbitMqSectionName).Get<RabbitMqConfig>();
 
             services.AddMassTransit(x =>
             {
@@ -64,15 +66,16 @@ namespace LT.DigitalOffice.ProjectService
                 {
                     cfg.Host("localhost", "/", host =>
                     {
-                        host.Username($"{rabbitmqOptions.Username}_{rabbitmqOptions.Password}");
-                        host.Password(rabbitmqOptions.Password);
+                        host.Username($"{rabbitMqConfig.Username}_{rabbitMqConfig.Password}");
+                        host.Password(rabbitMqConfig.Password);
                     });
                 });
 
-                x.AddRequestClient<IGetFileRequest>(
-                  new Uri("rabbitmq://localhost/FileService"));
+                x.AddRequestClient<IGetFileRequest>(new Uri(rabbitMqConfig.FileServiceUrl));
+                x.AddRequestClient<IGetUserRequest>(new Uri(rabbitMqConfig.UserServiceUsersUrl), RequestTimeout.After(ms: 100));
+                x.AddRequestClient<IGetDepartmentRequest>(new Uri(rabbitMqConfig.CompanyServiceDepartmentsUrl), RequestTimeout.After(ms: 100));
 
-                x.ConfigureKernelMassTransit(rabbitmqOptions);
+                x.ConfigureKernelMassTransit(rabbitMqConfig);
             });
 
             services.AddMassTransitHostedService();
@@ -80,11 +83,12 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureCommands(IServiceCollection services)
         {
-            services.AddTransient<IGetProjectInfoByIdCommand, GetProjectByIdCommand>();
+            services.AddTransient<IGetProjectCommand, GetProjectCommand>();
             services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
             services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
             services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
             services.AddTransient<ICreateRoleCommand, CreateRoleCommand>();
+            services.AddTransient<IGetProjectsCommand, GetProjectsCommand>();
         }
 
         private void ConfigureRepositories(IServiceCollection services)
@@ -100,28 +104,31 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureMappers(IServiceCollection services)
         {
-            services.AddTransient<IMapper<DbProject, Project>, ProjectMapper>();
-            services.AddTransient<IMapper<DbRole, Role>, RoleMapper>();
-            services.AddTransient<IMapper<NewProjectRequest, DbProject>, ProjectMapper>();
-            services.AddTransient<IMapper<EditProjectRequest, DbProject>, ProjectMapper>();
-            services.AddTransient<IMapper<CreateRoleRequest, DbRole>, RoleMapper>();
+            services.AddTransient<IProjectMapper, ProjectMapper>();
+            services.AddTransient<IProjectUserMapper, ProjectUserMapper>();
+            services.AddTransient<IRoleMapper, RoleMapper>();
+            services.AddTransient<ICreateRoleRequestMapper, CreateRoleRequestMapper>();
+            services.AddTransient<IProjectResponseMapper, ProjectResponseMapper>();
+            services.AddTransient<IProjectExpandedResponseMapper, ProjectExpandedResponseMapper>();
         }
 
         private void ConfigureValidators(IServiceCollection services)
         {
-            services.AddTransient<IValidator<NewProjectRequest>, NewProjectValidator>();
+            services.AddTransient<IValidator<NewProjectRequest>, ProjectValidator>();
             services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
             services.AddTransient<IValidator<WorkersIdsInProjectRequest>, WorkersProjectIdsValidator>();
-            services.AddTransient<IValidator<CreateRoleRequest>, CreateRoleValidator>();
+            services.AddTransient<IValidator<CreateRoleRequest>, RoleValidator>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseHealthChecks("/api/healthcheck");
 
             app.UseExceptionHandler(tempApp => tempApp.Run(CustomExceptionHandler.HandleCustomException));
 
             UpdateDatabase(app);
+
+            //app.UseMiddleware<TokenMiddleware>();
 
 #if RELEASE
             app.UseHttpsRedirection();

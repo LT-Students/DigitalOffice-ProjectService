@@ -1,10 +1,9 @@
-﻿using LT.DigitalOffice.Kernel.UnitTestLibrary;
-using LT.DigitalOffice.ProjectService.Data;
+﻿using LT.DigitalOffice.ProjectService.Data;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
@@ -21,7 +20,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 
         private DbProject newProject;
         private List<Guid> workersIds;
-        private List<DbProjectWorkerUser> workersProject;
+        private List<DbProjectUser> workersProject;
         private WorkersIdsInProjectRequest workersIdsInProjectRequest;
         #endregion
 
@@ -39,38 +38,38 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         public void OneTimeSetUp()
         {
             var projectId = Guid.NewGuid();
-            workersIds = new List<Guid>();
-            workersProject = new List<DbProjectWorkerUser>();
-            workersIdsInProjectRequest = new WorkersIdsInProjectRequest();
-
-            for (int i = 0; i < 3; i++)
-            {
-                var worker = new DbProjectWorkerUser
-                {
-                    ProjectId = projectId,
-                    WorkerUserId = Guid.NewGuid(),
-                    AddedOn = DateTime.Today,
-                    RemovedOn = DateTime.Today,
-                    IsManager = false,
-                    IsActive = true
-                };
-
-                workersProject.Add(worker);
-                workersIds.Add(worker.WorkerUserId);
-            }
 
             newProject = new DbProject
             {
                 Id = projectId,
                 Name = "DigitalOffice",
+                ShortName = "DO",
                 DepartmentId = Guid.NewGuid(),
                 Description = "New project for Lanit-Tercom",
-                Deferred = false,
                 IsActive = true,
-                WorkersUsersIds = new List<DbProjectWorkerUser>()
+                Users = new List<DbProjectUser>()
             };
 
-            newProject.WorkersUsersIds.AddRange(workersProject);
+            workersIds = new List<Guid>();
+            workersProject = new List<DbProjectUser>();
+            workersIdsInProjectRequest = new WorkersIdsInProjectRequest();
+
+            for (int i = 0; i < 3; i++)
+            {
+                var worker = new DbProjectUser
+                {
+                    ProjectId = projectId,
+                    UserId = Guid.NewGuid(),
+                    AddedOn = DateTime.Today,
+                    RemovedOn = DateTime.Today,
+                    IsActive = true
+                };
+
+                workersProject.Add(worker);
+                workersIds.Add(worker.UserId);
+
+                newProject.Users.Add(worker);
+            }
         }
 
         [SetUp]
@@ -81,7 +80,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             repository = new ProjectRepository(provider);
 
             provider.Projects.Add(newProject);
-            provider.SaveModelsChanges();
+            provider.Save();
         }
         #endregion
 
@@ -99,13 +98,17 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 
             Assert.Multiple(() =>
             {
-                for(int i = 0; i < project.WorkersUsersIds.Count; i++)
+                foreach (var user in project.Users)
                 {
-                    workersProject[i].Project = null;
-                    project.WorkersUsersIds[i].Project = null;
+                    user.Project = null;
 
-                    Assert.That(project.WorkersUsersIds[i].IsActive, Is.False);
-                    SerializerAssert.AreEqual(workersProject[i], project.WorkersUsersIds[i]);
+                    Assert.IsFalse(user.IsActive);
+
+                }
+
+                for (int i = 0; i < project.Users.Count; i++)
+                {
+
                 }
             });
         }

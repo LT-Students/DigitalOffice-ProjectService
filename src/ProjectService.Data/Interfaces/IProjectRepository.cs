@@ -1,6 +1,7 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+﻿using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using System;
+using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
@@ -15,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// </summary>
         /// <param name="projectId">Specified id of project.</param>
         /// <returns>Project with specified id.</returns>
-        DbProject GetProjectInfoById(Guid projectId);
+        DbProject GetProject(Guid projectId);
 
         /// <summary>
         /// Adds new project to the database. Returns the id of the added project.
@@ -36,5 +37,18 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// </summary>
         /// <param name="request">Contains workers id and project id.</param>
         void DisableWorkersInProject(WorkersIdsInProjectRequest request);
+
+        /// <summary>
+        /// Adds new role to the database. Returns the id of the added role.
+        /// </summary>
+        /// <param name="item">Role to add.</param>
+        /// <returns>Id of the added role.</returns>
+        Guid CreateRole(DbRole item);
+
+        IEnumerable<DbProject> GetProjects(bool showNotActive);
+
+        IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActiveUsers);
+
+        DbRole GetRole(Guid roleId);
     }
 }

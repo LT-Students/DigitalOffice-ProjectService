@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
 using FluentValidation.TestHelper;
-using LT.DigitalOffice.ProjectService.Models.Dto;
-using LT.DigitalOffice.ProjectService.Validation;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using NUnit.Framework;
 using System;
 
-namespace LT.DigitalOffice.ProjectServiceUnitTests.Validators
+namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
     public class CreateRoleRequestValidatorTests
     {
@@ -15,7 +14,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Validators
         [SetUp]
         public void SetUp()
         {
-            validator = new CreateRoleValidator();
+            validator = new RoleValidator();
 
             roleRequest = new CreateRoleRequest
             {

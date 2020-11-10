@@ -1,88 +1,59 @@
-﻿using LT.DigitalOffice.Kernel.UnitTestLibrary;
-using LT.DigitalOffice.ProjectService.Mappers;
-using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
-using LT.DigitalOffice.ProjectService.Models.Dto;
+﻿using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers;
+using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace LT.DigitalOffice.ProjectServiceUnitTests.Mappers
 {
     public class RoleMapperTests
     {
-        private IMapper<DbRole, Role> dbToDtoMapper;
-        private IMapper<CreateRoleRequest, DbRole> createRoleRequestToDbMapper;
+        private const string Name = "Test Role";
+        private const string Description = "Role in DigitalOffice project. The students do the work. Sometimes. Never (c) Spartak. I would like to give the one who did it a medal (c) Spartak";
 
-        private const string NAME = "Role";
-        private const string DESCRIPTION = "Role in DigitalOffice. From a student who does a work, sometimes.";
+        private IRoleMapper mapper;
 
         private Guid roleId;
 
         private DbRole dbRole;
-        private CreateRoleRequest roleRequest;
+
 
         [SetUp]
         public void SetUp()
         {
-            dbToDtoMapper = new RoleMapper();
-            createRoleRequestToDbMapper = new RoleMapper();
+            mapper = new RoleMapper();
 
             roleId = Guid.NewGuid();
 
             dbRole = new DbRole
             {
-                Id = roleId
-            };
-
-            roleRequest = new CreateRoleRequest
-            {
-                Name = NAME,
-                Description = DESCRIPTION
+                Id = roleId,
+                Name = Name,
+                Description = Description
             };
         }
 
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenDbRoleIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => dbToDtoMapper.Map(null));
+            Assert.Throws<ArgumentNullException>(() => mapper.Map(null));
         }
 
         [Test]
-        public void ShouldThrowArgumentNullExceptionWhenCreateRoleRequestIsNull()
+        public void ShouldReturnProjectModelWhenDbProjectIsMapped()
         {
-            Assert.Throws<ArgumentNullException>(() => createRoleRequestToDbMapper.Map(null));
-        }
-
-        [Test]
-        public void ShouldReturnRoleModelWhenDbRoleIsMapped()
-        {
-            var result = dbToDtoMapper.Map(dbRole);
+            var result = mapper.Map(dbRole);
 
             var expected = new Role
             {
-                Name = dbRole.Name,
-                Description = dbRole.Description
+                Id = roleId,
+                Name = Name,
+                Description = Description
             };
 
             SerializerAssert.AreEqual(expected, result);
-        }
-
-        [Test]
-        public void ShouldReturnDbRoleModelWhenCreateRoleRequestIsMapped()
-        {
-            var role = createRoleRequestToDbMapper.Map(roleRequest);
-
-            var expectedDbRole = new DbRole
-            {
-                Id = role.Id,
-                Name = roleRequest.Name,
-                Description = roleRequest.Description
-            };
-
-            Assert.IsInstanceOf<Guid>(role.Id);
-            SerializerAssert.AreEqual(expectedDbRole, role);
         }
     }
 }

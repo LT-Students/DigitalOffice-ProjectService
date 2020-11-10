@@ -1,12 +1,10 @@
-﻿using LT.DigitalOffice.Kernel.UnitTestLibrary;
-using LT.DigitalOffice.ProjectService.Data.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Models.Db.Entities;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
-using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
@@ -41,13 +39,10 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         [Test]
         public void ShouldAddRoleSuccessfully()
         {
-            var roleId = Guid.NewGuid();
+            role.Name = "Name";
+            role.Id = Guid.NewGuid();
 
-            var dbRole = new DbRole();
-            dbRole.Id = roleId;
-            dbRole.Name = "Name";
-
-            Assert.AreEqual(roleId, repository.CreateRole(dbRole));
+            Assert.AreEqual(role.Id, repository.CreateRole(role));
         }
 
         [Test]
