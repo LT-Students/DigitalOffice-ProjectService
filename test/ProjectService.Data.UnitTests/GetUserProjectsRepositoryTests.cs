@@ -1,8 +1,8 @@
-﻿using LT.DigitalOffice.Kernel.Exceptions;
-using LT.DigitalOffice.ProjectService.Data;
+﻿using LT.DigitalOffice.ProjectService.Data;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
@@ -10,101 +10,86 @@ using System.Collections.Generic;
 
 namespace ProjectService.Data.UnitTests
 {
-    /*public class GetUserProjectsRepositoryTests
+    public class GetUserProjectsRepositoryTests
     {
         private IDataProvider provider;
         private IProjectRepository repository;
 
-        private DbProject dbProjectOne;
+        private DbProject dbProject1;
+        private DbProject dbProject2;
 
-        private DbProject dbProjectTwo;
-        private List<DbProjectWorkerUser> listWorkersUsersIdsTwo;
+        private DbProjectUser userWithOneProject;
+        private DbProjectUser userWithTwoProjects;
+        private DbProjectUser userWithoutProject;
 
-        private DbProjectWorkerUser user1;
-        private DbProjectWorkerUser user2;
-        private DbProjectWorkerUser userWithoutProject;
-    }
-    /*[OneTimeSetUp]
+    [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            user1 = new DbProjectWorkerUser
+            userWithOneProject = new DbProjectUser
             {
-                WorkerUserId = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
                 IsActive = true
             };
 
-            user2 = new DbProjectWorkerUser
+            userWithTwoProjects = new DbProjectUser
             {
-                WorkerUserId = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
                 IsActive = true
             };
 
-            userWithoutProject = new DbProjectWorkerUser
+            userWithoutProject = new DbProjectUser
             {
-                WorkerUserId = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
                 IsActive = true
             };
-
-            listWorkersUsersIdsTwo = new List<DbProjectWorkerUser> { user1, user2 };
-
-            dbProjectOne = new DbProject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Project1",
-                WorkersUsersIds = new List<DbProjectWorkerUser> { user1 }
-            };
-
-            dbProjectTwo = new DbProject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Project2",
-                WorkersUsersIds = listWorkersUsersIdsTwo
-            };
-        }
-
-        [SetUp]
-        public void SetUp()
-        {
             var dbOptions = new DbContextOptionsBuilder<ProjectServiceDbContext>()
-                .UseInMemoryDatabase("InMemoryDatabase").Options;
+                .UseInMemoryDatabase("InMemoryDatabase")
+                .Options;
 
             provider = new ProjectServiceDbContext(dbOptions);
             repository = new ProjectRepository(provider);
 
-            provider.Projects.Add(dbProjectOne);
-            provider.Projects.Add(dbProjectTwo);
-            provider.SaveModelsChanges();
-        }
-
-        [TearDown]
-        public void Clean()
-        {
-            if (provider.IsInMemory())
+            dbProject1 = new DbProject
             {
-                provider.EnsureDeleted();
-            }
+                Id = Guid.NewGuid(),
+                Name = "Prroject1",
+                Users = new List<DbProjectUser> { userWithOneProject, userWithTwoProjects }
+            };
+
+            dbProject2 = new DbProject
+            {
+                Id = Guid.NewGuid(),
+                Name = "Project2",
+                Users = new List<DbProjectUser> { userWithTwoProjects }
+            };
+
+            provider.Projects.Add(dbProject1);
+            provider.Projects.Add(dbProject2);
+            provider.Save();
         }
 
         [Test]
         public void ShouldReturnProjectListWithOneProject()
         {
-            var result = repository.GetUserProjects(user2.WorkerUserId);
+            var result = repository.GetUserProjects(userWithOneProject.UserId, true);
 
-            Assert.That(result, Is.EquivalentTo(new List<DbProject> { dbProjectTwo }));
+            Assert.That(result, Is.EquivalentTo(new List<DbProject> { dbProject1 }));
+        }
+
+        [Test]
+        public void ShouldReturnProjectListWithTwoProjects()
+        {
+            var result = repository.GetUserProjects(userWithTwoProjects.UserId, true);
+
+            Assert.That(result, Is.EquivalentTo(new List<DbProject> { dbProject1, dbProject2 }));
         }
 
         [Test]
         public void ShouldReturnEmptyListWhenUserHaveNotProjects()
         {
-            var result = repository.GetUserProjects(userWithoutProject.WorkerUserId);
+            var result = repository.GetUserProjects(userWithoutProject.UserId, true);
 
             Assert.That(result, Is.EquivalentTo(new List<DbProject>()));
         }
-
-        [Test]
-        public void ShouldThrowBadRequestException()
-        {
-            Assert.Throws<BadRequestException>(() => repository.GetUserProjects(Guid.Empty));
-        }
-    }*/
+    }
 }

@@ -127,7 +127,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                 predicate.Or(p => !p.IsActive);
             }
 
-            return provider.Projects.Include(p => p.Users.Where(u => u.UserId == Guid.Empty)).Where(predicate).ToList();
+            return provider.Projects.Include(p => p.Users.Where(u => u.UserId == userId)).Where(predicate).ToList();
         }
     }
 }
