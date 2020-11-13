@@ -19,7 +19,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Mappers
 
         private DbRole dbRole;
 
-
         [SetUp]
         public void SetUp()
         {

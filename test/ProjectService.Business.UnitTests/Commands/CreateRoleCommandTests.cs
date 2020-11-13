@@ -60,7 +60,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         }
 
         [Test]
-        public void ShouldThrowsExceptionWhenRepositoryThrowsException()
+        public void ShouldThrowExceptionWhenRepositoryThrowsException()
         {
             validatorMock
                  .Setup(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
@@ -103,6 +103,13 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             mapperMock.Verify();
             repositoryMock.Verify();
             validatorMock.Verify(validator => validator.Validate(It.IsAny<IValidationContext>()), Times.Once);
+        }
+
+        [Test]
+        public void ShouldThrowExceptionWhenMapperThrowsException()
+        {
+            mapperMock.Setup(x => x.Map(It.IsAny<CreateRoleRequest>())).Throws(new Exception());
+            Assert.Throws<Exception>(() => command.Execute(null));
         }
     }
 }

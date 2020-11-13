@@ -32,19 +32,17 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [Test]
         public void ShouldHaveValidationErrorForWhenRoleNameIsTooLong()
         {
-            roleRequest.Name += roleRequest.Name.PadLeft(81);
+            var name = roleRequest.Name.PadLeft(81);
 
-            validator.TestValidate(roleRequest).ShouldHaveValidationErrorFor(request => request.Name)
-                .WithErrorMessage("Role name is too long.");
+            validator.ShouldHaveValidationErrorFor(er => er.Name, name);
         }
 
         [Test]
         public void ShouldHaveValidationErrorForWhenRoleDescriptionIsTooLong()
         {
-            roleRequest.Description += roleRequest.Description.PadLeft(612);
+            var description =  roleRequest.Description.PadLeft(612);
 
-            validator.TestValidate(roleRequest).ShouldHaveValidationErrorFor(request => request.Description)
-                .WithErrorMessage("Role description is too long.");
+            validator.ShouldHaveValidationErrorFor(er => er.Description, description);
         }
 
         [Test]

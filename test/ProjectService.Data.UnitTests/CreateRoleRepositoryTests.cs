@@ -43,6 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             role.Id = Guid.NewGuid();
 
             Assert.AreEqual(role.Id, repository.CreateRole(role));
+            Assert.That(provider.Roles.Find(role.Id), Is.EqualTo(role));
         }
 
         [Test]

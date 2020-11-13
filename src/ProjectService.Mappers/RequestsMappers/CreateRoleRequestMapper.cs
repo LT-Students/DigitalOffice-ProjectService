@@ -23,9 +23,10 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 
         public DbRole Map(CreateRoleRequest value)
         {
-            return new DbRole() {
-            Name = value.Name,
-            Description = value.Description
+            return new DbRole()
+            {
+                Name = value.Name,
+                Description = value.Description
             };
         }
     }
