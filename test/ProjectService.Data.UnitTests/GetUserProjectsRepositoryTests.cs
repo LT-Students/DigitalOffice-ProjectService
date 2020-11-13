@@ -1,14 +1,13 @@
-﻿using LT.DigitalOffice.ProjectService.Data;
+﻿using System;
+using System.Collections.Generic;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 
-namespace ProjectService.Data.UnitTests
+namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
     public class GetUserProjectsRepositoryTests
     {
