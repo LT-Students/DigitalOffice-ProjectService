@@ -22,7 +22,7 @@ namespace ProjectService.Data.UnitTests
         private DbProjectUser userWithTwoProjects;
         private DbProjectUser userWithoutProject;
 
-    [OneTimeSetUp]
+        [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             userWithOneProject = new DbProjectUser
