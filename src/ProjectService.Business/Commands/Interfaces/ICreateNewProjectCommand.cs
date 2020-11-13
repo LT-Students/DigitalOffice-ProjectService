@@ -1,5 +1,4 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
