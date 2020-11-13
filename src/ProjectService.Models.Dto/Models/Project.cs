@@ -1,5 +1,4 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using System;
+﻿using System;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
 {
