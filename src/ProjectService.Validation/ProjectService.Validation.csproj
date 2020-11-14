@@ -4,8 +4,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>LT.DigitalOffice.ProjectService.Validation</AssemblyName>
-    <RootNamespace>LT.DigitalOffice.ProjectService.Validation</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
