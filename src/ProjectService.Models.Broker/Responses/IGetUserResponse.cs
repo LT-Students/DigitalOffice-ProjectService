@@ -8,5 +8,6 @@ namespace LT.DigitalOffice.Broker.Responses
         string FirstName { get; }
         string MiddleName { get; }
         string LastName { get; set; }
+        bool IsActive { get; set; }
     }
 }
