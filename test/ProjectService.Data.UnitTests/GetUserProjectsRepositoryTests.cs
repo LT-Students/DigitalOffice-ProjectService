@@ -57,9 +57,9 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 IsActive = true,
                 Name = "Prroject1"
             };
-
-            dbProject1.Users.Add(userWithOneProject);
             dbProject1.Users.Add(userWithTwoProjects);
+            dbProject1.Users.Add(userWithOneProject);
+
 
             dbProject2 = new DbProject
             {

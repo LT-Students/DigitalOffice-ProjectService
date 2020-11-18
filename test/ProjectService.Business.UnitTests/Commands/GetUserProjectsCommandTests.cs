@@ -16,13 +16,15 @@ namespace ProjectService.Business.UnitTests.Commands
         private GetUserProjectsCommand command;
         private Mock<IProjectRepository> repositoryMock;
         private Mock<IProjectResponseMapper> mapperMock;
-        private List<DbProject> projectsEnum;
 
         private Guid userId;
 
         private DbProject project1;
         private DbProject project2;
+        private List<DbProject> projectsEnum;
 
+        private ProjectResponse response1;
+        private ProjectResponse response2;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -31,35 +33,37 @@ namespace ProjectService.Business.UnitTests.Commands
             mapperMock = new Mock<IProjectResponseMapper>();
             command = new GetUserProjectsCommand(repositoryMock.Object, mapperMock.Object);
 
+            userId = Guid.NewGuid();
+
             project1 = new DbProject();
             project2 = new DbProject();
-
-            projectsEnum = new List<DbProject>{
-                project1,
-                project2
-            };
-            Guid userId = Guid.NewGuid();
-
-
+            projectsEnum = new List<DbProject>();
+            projectsEnum.Add(project1);
+            projectsEnum.Add(project2);
+  
+            response1 = new ProjectResponse();
+            response2 = new ProjectResponse();
         }
         
         [Test]
         public void ShouldReturnListOfProjects()
         {
-            var expected = new List<ProjectResponse> {new ProjectResponse (), new ProjectResponse ()};
+            var expected = new List<ProjectResponse>();
+            expected.Add(response1);
+            expected.Add(response2);
 
             repositoryMock
-                .Setup(x => x.GetUserProjects(It.IsAny<Guid>(), true))
+                .Setup(x => x.GetUserProjects(It.IsAny<Guid>(), false))
                 .Returns(projectsEnum)
                 .Verifiable();
 
             mapperMock
                 .Setup(x => x.Map(It.IsAny<DbProject>()))
-                .Returns(new ProjectResponse ())
+                .Returns(new ProjectResponse())
                 .Verifiable();
    
 
-            var result = command.Execute(userId, true);
+            var result = command.Execute(userId, false);
 
             SerializerAssert.AreEqual(expected, result);
             mapperMock.Verify();
