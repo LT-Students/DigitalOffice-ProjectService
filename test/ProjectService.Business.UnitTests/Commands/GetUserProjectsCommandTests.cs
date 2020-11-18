@@ -75,7 +75,13 @@ namespace ProjectService.Business.UnitTests.Commands
         {
             repositoryMock
                 .Setup(x => x.GetUserProjects(It.IsAny<Guid>(), true))
-                .Throws(new Exception());
+                .Throws(new Exception())
+                .Verifiable();
+
+            mapperMock
+                .Setup(x => x.Map(It.IsAny<DbProject>()))
+                .Returns(new ProjectResponse())
+                .Verifiable();
 
             Assert.Throws<Exception>(() => command.Execute(userId, true));
         }
