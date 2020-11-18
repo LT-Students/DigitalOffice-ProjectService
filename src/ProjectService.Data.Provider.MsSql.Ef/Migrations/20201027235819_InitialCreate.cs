@@ -43,12 +43,13 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 name: DbProjectFile.TableName,
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(nullable: false),
                     ProjectId = table.Column<Guid>(nullable: false),
                     FileId = table.Column<Guid>(nullable: false),
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProjectFile", x => new { x.ProjectId, x.FileId });
+                    table.PrimaryKey("PK_ProjectFile", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ProjectFile_Projects",
                         column: x => x.ProjectId,
@@ -64,6 +65,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 name: DbProjectUser.TableName,
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(nullable: false),
                     ProjectId = table.Column<Guid>(nullable: false),
                     UserId = table.Column<Guid>(nullable: false),
                     RoleId = table.Column<Guid>(nullable: false),
@@ -73,7 +75,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProjectUser", x => new { x.ProjectId, x.UserId });
+                    table.PrimaryKey("PK_ProjectUser", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ProjectUser_Projects",
                         column: x => x.ProjectId,

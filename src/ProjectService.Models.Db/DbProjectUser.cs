@@ -8,6 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     {
         public const string TableName = "ProjectsUsers";
 
+        public Guid Id { get; set; }
         public Guid ProjectId { get; set; }
         public Guid UserId { get; set; }
         public Guid RoleId { get; set; }
@@ -27,7 +28,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .ToTable(DbProjectUser.TableName);
 
             builder
-                .HasKey(pu => new { pu.ProjectId, pu.UserId });
+                .HasKey(pu => pu.Id);
 
             builder
                 .HasOne(pu => pu.Project)
