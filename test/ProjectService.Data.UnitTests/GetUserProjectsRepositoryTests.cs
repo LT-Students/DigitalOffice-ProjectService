@@ -21,8 +21,8 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private DbProjectUser userWithTwoProjects;
         private DbProjectUser userWithoutProject;
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
+        [SetUp]
+        public void SetUp()
         {
             userWithOneProject = new DbProjectUser
             {
@@ -72,7 +72,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             provider.Projects.Add(dbProject2);
             provider.Projects.Add(dbProject1);
             provider.Save();
-
         }
 
         [Test]
@@ -100,6 +99,14 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             var result = repository.GetUserProjects(userWithoutProject.UserId, true);
 
             Assert.That(result, Is.EquivalentTo(new List<DbProject>()));
+        }
+        [TearDown]
+        public void Clean()
+        {
+            if (provider.IsInMemory())
+            {
+                provider.EnsureDeleted();
+            }
         }
     }
 }
