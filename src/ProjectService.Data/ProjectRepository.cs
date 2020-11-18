@@ -121,13 +121,13 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public IEnumerable<DbProject> GetUserProjects(Guid userId, bool showNotActive)
         {
-            var predicate = PredicateBuilder.New<DbProject>(p => p.IsActive);
+            var predicate = PredicateBuilder.New<DbProject>(p => p.Users.Any(u => u.UserId == userId) && p.IsActive);
             if (showNotActive)
             {
                 predicate.Or(p => !p.IsActive);
             }
 
-            return provider.Projects.Include(p => p.Users.Where(u => u.UserId == userId)).Where(predicate).ToList();
+            return new List<DbProject>(provider.Projects.Include(p => p.Users).Where(predicate));
         }
     }
 }
