@@ -26,7 +26,7 @@ namespace ProjectService.Business.UnitTests.Commands
         private ProjectResponse response1;
         private ProjectResponse response2;
 
-        [OneTimeSetUp]
+        [SetUp]
         public void SetUp()
         {
             repositoryMock = new Mock<IProjectRepository>();
@@ -78,10 +78,7 @@ namespace ProjectService.Business.UnitTests.Commands
                 .Throws(new Exception())
                 .Verifiable();
 
-            mapperMock
-                .Setup(x => x.Map(It.IsAny<DbProject>()))
-                .Returns(new ProjectResponse())
-                .Verifiable();
+            mapperMock.Verify(x => x.Map(It.IsAny<DbProject>()), Times.Never);
 
             Assert.Throws<Exception>(() => command.Execute(userId, true));
         }
