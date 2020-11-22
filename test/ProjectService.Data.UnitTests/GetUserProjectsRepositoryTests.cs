@@ -16,14 +16,16 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
         private Guid userIdWithOneProject;
         private Guid userIdWithTwoProjects;
-        private Guid userIdWithoutProjects;
+        private Guid userIdWithoutActiveProjects;
 
         private DbProject dbProject1;
         private DbProject dbProject2;
+        private DbProject dbNotActiveProject;
 
         private DbProjectUser dbUserWithOneProject;
         private DbProjectUser dbUserWithTwoProjects1;
         private DbProjectUser dbUserWithTwoProjects2;
+        private DbProjectUser dbUserWithoutActiveProject;
 
         [SetUp]
         public void SetUp()
@@ -37,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
             userIdWithOneProject = Guid.NewGuid();
             userIdWithTwoProjects = Guid.NewGuid();
-            userIdWithoutProjects = Guid.NewGuid();
+            userIdWithoutActiveProjects = Guid.NewGuid();
 
             dbUserWithOneProject = new DbProjectUser
             {
@@ -60,6 +62,13 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 IsActive = true
             };
 
+            dbUserWithoutActiveProject = new DbProjectUser
+            {
+                Id = Guid.NewGuid(),
+                UserId = userIdWithoutActiveProjects,
+                IsActive = true
+            };
+
             dbProject1 = new DbProject
             {
                 Id = Guid.NewGuid(),
@@ -77,15 +86,24 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             };
             dbProject2.Users.Add(dbUserWithTwoProjects2);
 
+            dbNotActiveProject = new DbProject
+            {
+                Id = Guid.NewGuid(),
+                IsActive = false,
+                Name = "Project3",
+            };
+            dbNotActiveProject.Users.Add(dbUserWithoutActiveProject);
+
             provider.Projects.Add(dbProject2);
             provider.Projects.Add(dbProject1);
+            provider.Projects.Add(dbNotActiveProject);
             provider.Save();
         }
 
         [Test]
         public void ShouldReturnProjectListWithOneProject()
         {
-            var result = repository.GetUserProjects(userIdWithOneProject, true);
+            var result = repository.GetUserProjects(userIdWithOneProject, false);
 
             Assert.That(result, Is.EquivalentTo(new List<DbProject> { dbProject1 }));
         }
@@ -93,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         [Test]
         public void ShouldReturnProjectListWithTwoProjects()
         {
-            var result = repository.GetUserProjects(userIdWithTwoProjects, true);
+            var result = repository.GetUserProjects(userIdWithTwoProjects, false);
 
             Assert.That(result, Is.EquivalentTo(new List<DbProject> { 
                 dbProject1,
@@ -102,12 +120,21 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }
 
         [Test]
-        public void ShouldReturnEmptyListWhenUserHaveNotProjects()
+        public void ShouldReturnEmptyListWhenUserHaveNotActiveProjects()
         {
-            var result = repository.GetUserProjects(userIdWithoutProjects, true);
+            var result = repository.GetUserProjects(userIdWithoutActiveProjects, false);
 
             Assert.That(result, Is.EquivalentTo(new List<DbProject>()));
         }
+
+        [Test]
+        public void ShouldReturnOneNotActiveProjectWhenShowNotActiveIsTrue()
+        {
+            var result = repository.GetUserProjects(userIdWithoutActiveProjects, true);
+
+            Assert.That(result, Is.EquivalentTo(new List<DbProject> { dbNotActiveProject }));
+        }
+
         [TearDown]
         public void Clean()
         {
