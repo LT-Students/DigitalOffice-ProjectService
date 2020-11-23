@@ -82,9 +82,9 @@ namespace LT.DigitalOffice.ProjectService
         private void ConfigureCommands(IServiceCollection services)
         {
             services.AddTransient<IGetProjectCommand, GetProjectCommand>();
-            services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
-            services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
-            services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
+            //services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
+            //services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
+            //services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
             services.AddTransient<IGetProjectsCommand, GetProjectsCommand>();
         }
 
