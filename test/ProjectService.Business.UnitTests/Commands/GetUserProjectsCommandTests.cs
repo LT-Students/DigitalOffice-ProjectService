@@ -19,12 +19,12 @@ namespace ProjectService.Business.UnitTests.Commands
 
         private Guid userId;
 
-        private DbProject project1;
-        private DbProject project2;
+        private DbProject projectOne;
+        private DbProject projectTwo;
         private List<DbProject> projectsEnum;
 
-        private ProjectResponse response1;
-        private ProjectResponse response2;
+        private ProjectResponse responseOne;
+        private ProjectResponse responseTwo;
 
         [SetUp]
         public void SetUp()
@@ -35,22 +35,22 @@ namespace ProjectService.Business.UnitTests.Commands
 
             userId = Guid.NewGuid();
 
-            project1 = new DbProject();
-            project2 = new DbProject();
+            projectOne = new DbProject();
+            projectTwo = new DbProject();
             projectsEnum = new List<DbProject>();
-            projectsEnum.Add(project1);
-            projectsEnum.Add(project2);
+            projectsEnum.Add(projectOne);
+            projectsEnum.Add(projectTwo);
   
-            response1 = new ProjectResponse();
-            response2 = new ProjectResponse();
+            responseOne = new ProjectResponse();
+            responseTwo = new ProjectResponse();
         }
         
         [Test]
         public void ShouldReturnListOfProjects()
         {
             var expected = new List<ProjectResponse>();
-            expected.Add(response1);
-            expected.Add(response2);
+            expected.Add(responseOne);
+            expected.Add(responseTwo);
 
             repositoryMock
                 .Setup(x => x.GetUserProjects(It.IsAny<Guid>(), false))
@@ -62,7 +62,6 @@ namespace ProjectService.Business.UnitTests.Commands
                 .Returns(new ProjectResponse())
                 .Verifiable();
    
-
             var result = command.Execute(userId, false);
 
             SerializerAssert.AreEqual(expected, result);
