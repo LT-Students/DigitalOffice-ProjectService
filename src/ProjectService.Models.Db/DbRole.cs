@@ -12,6 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public bool IsActive { get; set; }
 
         public ICollection<DbProjectUser> Users { get; set; }
     }

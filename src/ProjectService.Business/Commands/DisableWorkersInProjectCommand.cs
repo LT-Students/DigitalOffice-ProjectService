@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
@@ -21,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         public void Execute(WorkersIdsInProjectRequest request)
         {
-            validator.ValidateAndThrow(request);
+            validator.ValidateAndThrowCustom(request);
 
             repository.DisableWorkersInProject(request);
         }
