@@ -1,4 +1,6 @@
-﻿namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
+﻿using System;
+
+namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
 {
     public class ProjectUser
     {

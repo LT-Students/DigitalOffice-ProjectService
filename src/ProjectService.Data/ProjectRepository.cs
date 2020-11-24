@@ -3,6 +3,7 @@ using LT.DigitalOffice.Kernel.Exceptions;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -69,19 +70,19 @@ namespace LT.DigitalOffice.ProjectService.Data
             return dbProject.Id;
         }
 
-        public void DisableWorkersInProject(WorkersIdsInProjectRequest request)
+        public void DisableWorkersInProject(ProjectRequest request)
         {
             DbProject dbProject = provider.Projects
-                .FirstOrDefault(p => p.Id == request.ProjectId);
+                .FirstOrDefault(p => p.Id == request.Project.Id);
 
             if (dbProject == null)
             {
                 throw new NullReferenceException("Project with this Id does not exist.");
             }
 
-            foreach (Guid workerId in request.WorkersIds)
+            foreach (ProjectUser projectUser in request.Users)
             {
-                DbProjectUser dbProjectWorker = dbProject.Users?.FirstOrDefault(w => w.UserId == workerId);
+                DbProjectUser dbProjectWorker = dbProject.Users?.FirstOrDefault(w => w.UserId == projectUser.User.Id);
 
                 if (dbProjectWorker == null)
                 {
