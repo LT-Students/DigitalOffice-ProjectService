@@ -86,11 +86,14 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
             services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
             services.AddTransient<IGetProjectsCommand, GetProjectsCommand>();
+            services.AddTransient<IGetRoleCommand, GetRoleCommand>();
+            services.AddTransient<IGetRolesCommand, GetRolesCommand>();
         }
 
         private void ConfigureRepositories(IServiceCollection services)
         {
             services.AddTransient<IProjectRepository, ProjectRepository>();
+            services.AddTransient<IRoleRepository, RoleRepository>();
         }
 
         private void ConfigureProvider(IServiceCollection services)
@@ -106,6 +109,8 @@ namespace LT.DigitalOffice.ProjectService
 
             services.AddTransient<IProjectResponseMapper, ProjectResponseMapper>();
             services.AddTransient<IProjectExpandedResponseMapper, ProjectExpandedResponseMapper>();
+            services.AddTransient<IRolesResponseMapper, RolesResponseMapper>();
+            services.AddTransient<IRoleExpandedResponseMapper, RoleExpandedResponseMapper>();
         }
 
         private void ConfigureValidators(IServiceCollection services)

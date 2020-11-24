@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces
 {
     public interface IRoleExpandedResponseMapper
     {
-        RoleExpandedResponse Map(DbRole dbRole, IEnumerable<DbProjectUser> dbProjectUsers);
+        RoleExpandedResponse Map(DbRole dbRole);
     }
 }

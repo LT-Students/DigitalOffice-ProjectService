@@ -24,13 +24,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _mapper = mapper;
         }
 
-        public RoleExpandedResponse Execute(Guid roleId, bool showNotActiveUsers)
+        public RoleExpandedResponse Execute(Guid roleId)
         {
             var dbRole = _repository.GetRole(roleId);
 
-            var dbProjectUsers = _repository.GetProjectUsers(roleId);
-
-            return _mapper.Map(dbRole, dbProjectUsers);
+            return _mapper.Map(dbRole);
         }
     }
 }

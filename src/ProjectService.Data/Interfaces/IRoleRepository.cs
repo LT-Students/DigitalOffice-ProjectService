@@ -20,10 +20,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         DbRole GetRole(Guid roleId);
 
         /// <summary>
-        /// Return the enumerable users with the specified id of role from database. 
+        /// Return the specified number of roles from database. 
         /// </summary>
-        /// <param name="roleId">Specified id of role.</param>
-        /// <returns>Users with specified id role.</returns>
-        IEnumerable<DbProjectUser> GetProjectUsers(Guid roleId);
+        /// <param name="skip">First number of roles to skip.</param>
+        /// <param name="take">Number of roles to take.</param>
+        /// <returns>Enumerable roles.</returns>
+        IEnumerable<DbRole> GetRoles(int skip, int take);
     }
 }

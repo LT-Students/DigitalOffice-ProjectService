@@ -3,7 +3,6 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
@@ -20,9 +19,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _mapper = mapper;
         }
 
-        public IEnumerable<RolesResponse> Execute()
+        public RolesResponse Execute(int skip, int take)
         {
-            
+            var dbRoles = _repository.GetRoles(skip, take);
+
+            return _mapper.Map(dbRoles);
         }
     }
 }

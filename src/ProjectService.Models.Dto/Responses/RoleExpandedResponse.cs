@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
     public class RoleExpandedResponse
     {
         public Role Role { get; set; }
-        public IEnumerable<User> Users { get; set; }
+        //public IEnumerable<User> Users { get; set; }
     }
 }

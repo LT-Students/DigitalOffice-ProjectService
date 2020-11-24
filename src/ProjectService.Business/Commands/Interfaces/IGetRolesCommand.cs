@@ -1,7 +1,4 @@
 ﻿using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
@@ -14,7 +11,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
         /// <summary>
         /// Returns role models.
         /// </summary>
+        /// <param name="skip">First number of roles to skip.</param>
+        /// <param name="take">Number of roles to take.</param>
         /// <returns>Role models.</returns>
-        IEnumerable<RolesResponse> Execute();
+        RolesResponse Execute(int skip, int take);
     }
 }

@@ -32,9 +32,12 @@ namespace LT.DigitalOffice.ProjectService.Data
             return result;
         }
 
-        public IEnumerable<DbProjectUser> GetProjectUsers(Guid roleId)
+        public IEnumerable<DbRole> GetRoles(int skip, int take)
         {
-            return provider.ProjectsUsers.Include(u => u.Role).Where(u => u.RoleId == roleId).ToList();
+            return provider.Roles
+                .Skip(skip)
+                .Take(take)
+                .ToList();
         }
     }
 }
