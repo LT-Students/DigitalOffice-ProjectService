@@ -6,7 +6,7 @@ using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
 
-namespace LT.DigitalOffice.ProjectServiceUnitTests.Mappers
+namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests
 {
     public class ProjectMapperTests
     {
