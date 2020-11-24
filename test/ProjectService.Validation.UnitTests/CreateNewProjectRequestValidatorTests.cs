@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using FluentValidation.TestHelper;
-using LT.DigitalOffice.ProjectService.Models.Dto;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using NUnit.Framework;
 using System;

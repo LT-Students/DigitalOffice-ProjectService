@@ -8,6 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     {
         public const string TableName = "ProjectsFiles";
 
+        public Guid Id { get; set; }
         public Guid ProjectId { get; set; }
         public Guid FileId { get; set; }
 
@@ -22,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .ToTable(DbProjectFile.TableName);
 
             builder
-                .HasKey(projectFile => new { projectFile.ProjectId, projectFile.FileId });
+                .HasKey(pf => pf.Id);
 
             builder
                 .HasOne(pf => pf.Project)
