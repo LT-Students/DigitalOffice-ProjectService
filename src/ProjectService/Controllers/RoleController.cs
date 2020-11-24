@@ -13,9 +13,9 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [ApiController]
     public class RoleController : ControllerBase
     {
-        [HttpDelete("deleteUserRoleInProject")]
-        public bool DeleteUserRoleInProject(
-            [FromServices] IDeleteRoleCommand command,
+        [HttpDelete("disableUserRoleInProject")]
+        public bool DisableUserRoleInProject(
+            [FromServices] IDisableRoleCommand command,
             [FromQuery] Guid roleId)
         {
             return command.Execute(roleId);

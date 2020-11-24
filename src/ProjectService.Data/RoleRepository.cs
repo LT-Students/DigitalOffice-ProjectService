@@ -16,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             this.provider = provider;
         }
 
-        public bool DeleteRole(Guid roleId)
+        public bool DisableRole(Guid roleId)
         {
             DbRole dbRole = provider.Roles.FirstOrDefault(role => role.Id == roleId);
 
@@ -25,12 +25,14 @@ namespace LT.DigitalOffice.ProjectService.Data
                 throw new NullReferenceException("Role with this Id does not exist.");
             }
 
-            provider.Roles.Remove(dbRole);
+            dbRole.IsActive = false;
+
+            provider.Roles.Update(dbRole);
             provider.Save();
 
-            DbRole dbRoleDeleted = provider.Roles.FirstOrDefault(role => role.Id == roleId);
+            DbRole dbRoleRemoved = provider.Roles.FirstOrDefault(role => role.Id == roleId);
 
-            return dbRoleDeleted == null;
+            return dbRoleRemoved.IsActive == false;
         }
     }
 }

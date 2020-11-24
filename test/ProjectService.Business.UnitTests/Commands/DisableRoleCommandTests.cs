@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+﻿using FluentValidation.Results;
+using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -8,9 +9,9 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 {
-    class DeleteRoleCommandTests
+    class DisableRoleCommandTests
     {
-        private IDeleteRoleCommand command;
+        private IDisableRoleCommand command;
 
         private Mock<IRoleRepository> repositoryMock;
         private Mock<IAccessValidator> accessValidatorMock;
@@ -28,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         {
             repositoryMock = new Mock<IRoleRepository>();
             accessValidatorMock = new Mock<IAccessValidator>();
-            command = new DeleteRoleCommand(repositoryMock.Object, accessValidatorMock.Object);
+            command = new DisableRoleCommand(repositoryMock.Object, accessValidatorMock.Object);
         }
 
         [Test]
@@ -43,11 +44,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(true);
 
             repositoryMock
-                .Setup(x => x.DeleteRole(roleId))
+                .Setup(x => x.DisableRole(roleId))
                 .Throws(new NullReferenceException());
 
             Assert.Throws<NullReferenceException>(() => command.Execute(roleId));
-            repositoryMock.Verify(repository => repository.DeleteRole(It.IsAny<Guid>()), Times.Once);
+            repositoryMock.Verify(repository => repository.DisableRole(It.IsAny<Guid>()), Times.Once);
         }
 
         [Test]
@@ -62,11 +63,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(true);
 
             repositoryMock
-                .Setup(x => x.DeleteRole(roleId))
+                .Setup(x => x.DisableRole(roleId))
                 .Returns(true);
 
             Assert.DoesNotThrow(() => command.Execute(roleId));
-            repositoryMock.Verify(repository => repository.DeleteRole(It.IsAny<Guid>()), Times.Once);
+            repositoryMock.Verify(repository => repository.DisableRole(It.IsAny<Guid>()), Times.Once);
         }
 
         [Test]
@@ -77,11 +78,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(true);
 
             repositoryMock
-                .Setup(x => x.DeleteRole(roleId))
+                .Setup(x => x.DisableRole(roleId))
                 .Returns(true);
 
             Assert.DoesNotThrow(() => command.Execute(roleId));
-            repositoryMock.Verify(repository => repository.DeleteRole(It.IsAny<Guid>()), Times.Once);
+            repositoryMock.Verify(repository => repository.DisableRole(It.IsAny<Guid>()), Times.Once);
         }
 
         [Test]
@@ -96,11 +97,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(true);
 
             repositoryMock
-                .Setup(x => x.DeleteRole(roleId))
+                .Setup(x => x.DisableRole(roleId))
                 .Returns(true);
 
             Assert.DoesNotThrow(() => command.Execute(roleId));
-            repositoryMock.Verify(repository => repository.DeleteRole(It.IsAny<Guid>()), Times.Once);
+            repositoryMock.Verify(repository => repository.DisableRole(It.IsAny<Guid>()), Times.Once);
         }
 
         [Test]
@@ -117,7 +118,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             Assert.That(() => command.Execute(roleId),
                 Throws.InstanceOf<Exception>().And
                 .Message.EqualTo("Not enough rights"));
-            repositoryMock.Verify(repository => repository.DeleteRole(It.IsAny<Guid>()), Times.Never);
+            repositoryMock.Verify(repository => repository.DisableRole(It.IsAny<Guid>()), Times.Never);
         }
     }
 }

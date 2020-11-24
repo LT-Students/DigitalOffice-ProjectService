@@ -7,12 +7,12 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
-    public class DeleteRoleCommand : IDeleteRoleCommand
+    public class DisableRoleCommand : IDisableRoleCommand
     {
         private readonly IRoleRepository repository;
         private readonly IAccessValidator accessValidator;
 
-        public DeleteRoleCommand(
+        public DisableRoleCommand(
             [FromServices] IRoleRepository repository,
             [FromServices] IAccessValidator accessValidator)
         {
@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 throw new ForbiddenException("Not enough rights");
             }
 
-            return repository.DeleteRole(roleId);
+            return repository.DisableRole(roleId);
         }
     }
 }

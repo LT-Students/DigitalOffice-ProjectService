@@ -8,7 +8,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
-    class DeleteRoleRepositoryTests
+    class DisableRoleRepositoryTests
     {
         private IDataProvider provider;
         private IRoleRepository repository;
@@ -56,11 +56,11 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }
 
         [Test]
-        public void ShouldDeleteRoleSuccessfully()
+        public void ShouldDisableRoleSuccessfully()
         {
             var deleteId = dbRole.Id;
 
-            Assert.IsTrue(repository.DeleteRole(deleteId));
+            Assert.IsTrue(repository.DisableRole(deleteId));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         {
             var deleteId = Guid.NewGuid();
 
-            Assert.That(() => repository.DeleteRole(deleteId),
+            Assert.That(() => repository.DisableRole(deleteId),
                 Throws.InstanceOf<NullReferenceException>().And
                 .Message.EqualTo("Role with this Id does not exist."));
         }

@@ -13,6 +13,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// </summary>
         /// <param name="roleId">Id of role to be deleted.</param>
         /// <returns>Success of delete.</returns>
-        bool DeleteRole(Guid roleId); 
+        bool DisableRole(Guid roleId); 
     }
 }
