@@ -1,8 +1,7 @@
-﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
@@ -14,5 +13,12 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         public Guid CreateRole(
             [FromServices] ICreateRoleCommand command,
             [FromBody] CreateRoleRequest request) => command.Execute(request);
+        [HttpDelete("disableUserRoleInProject")]
+        public bool DisableUserRoleInProject(
+            [FromServices] IDisableRoleCommand command,
+            [FromQuery] Guid roleId)
+        {
+            return command.Execute(roleId);
+        }
     }
 }

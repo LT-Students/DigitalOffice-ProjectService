@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using LT.DigitalOffice.ProjectService.Models.Dto;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 
 namespace LT.DigitalOffice.ProjectService.Validation

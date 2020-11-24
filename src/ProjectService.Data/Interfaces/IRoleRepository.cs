@@ -1,7 +1,5 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using System;
-using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
@@ -24,5 +22,12 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="roleId"> Role to find. </param>
         /// <returns> Role with specified id. </returns>
         DbRole GetRole(Guid roleId);
+
+        /// <summary>
+        /// Deleting role. 
+        /// </summary>
+        /// <param name="roleId">Id of role to be deleted.</param>
+        /// <returns>Success of delete.</returns>
+        bool DisableRole(Guid roleId); 
     }
 }
