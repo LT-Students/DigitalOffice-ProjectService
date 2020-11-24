@@ -1,5 +1,4 @@
-﻿using LT.DigitalOffice.Broker.Responses;
-using LT.DigitalOffice.ProjectService.Models.Db;
+﻿using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using System.Collections.Generic;
 using System.Threading.Tasks;

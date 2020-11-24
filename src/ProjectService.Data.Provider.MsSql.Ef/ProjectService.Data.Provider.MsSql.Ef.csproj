@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef</AssemblyName>
-    <RootNamespace>LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
