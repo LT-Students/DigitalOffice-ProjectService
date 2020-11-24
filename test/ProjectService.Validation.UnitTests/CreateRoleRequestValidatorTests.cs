@@ -2,7 +2,6 @@
 using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using NUnit.Framework;
-using System;
 
 namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
@@ -11,16 +10,20 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         private IValidator<CreateRoleRequest> validator;
         private CreateRoleRequest roleRequest;
 
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            validator = new RoleValidator();
-
             roleRequest = new CreateRoleRequest
             {
                 Name = "Lead Tester Grand Manager 2nd",
                 Description = "New role in DigitalOffice"
             };
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            validator = new RoleValidator();
         }
 
         [Test]

@@ -19,11 +19,9 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Mappers
 
         private DbRole dbRole;
 
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            mapper = new RoleMapper();
-
             roleId = Guid.NewGuid();
 
             dbRole = new DbRole
@@ -32,6 +30,12 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Mappers
                 Name = Name,
                 Description = Description
             };
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            mapper = new RoleMapper();
         }
 
         [Test]

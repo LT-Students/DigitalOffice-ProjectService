@@ -21,8 +21,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <summary>
         /// Returns roleId from database.
         /// </summary>
-        /// <param name="roleId"> Role to find </param>
-        /// <returns> Role </returns>
+        /// <param name="roleId"> Role to find. </param>
+        /// <returns> Role with specified id. </returns>
         DbRole GetRole(Guid roleId);
     }
 }
