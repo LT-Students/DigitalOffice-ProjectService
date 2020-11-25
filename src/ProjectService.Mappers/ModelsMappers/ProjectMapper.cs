@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 Description = value.Description,
                 ClosedAt = value.ClosedAt,
                 CreatedAt = value.CreatedAt,
-                ClosedReason = value.ClosedReason.HasValue ? ((ProjectClosedReason)value.ClosedReason).ToString() : null,
+                ClosedReason = value.ClosedReason ?? null,
                 IsActive = value.IsActive
             };
         }
