@@ -88,13 +88,16 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<IGetProjectCommand, GetProjectCommand>();
             //services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
             //services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
+
             services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
             services.AddTransient<IGetProjectsCommand, GetProjectsCommand>();
+            services.AddTransient<IDisableRoleCommand, DisableRoleCommand>();
         }
 
         private void ConfigureRepositories(IServiceCollection services)
         {
             services.AddTransient<IProjectRepository, ProjectRepository>();
+            services.AddTransient<IRoleRepository, RoleRepository>();
         }
 
         private void ConfigureProvider(IServiceCollection services)
