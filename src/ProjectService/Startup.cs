@@ -17,6 +17,7 @@ using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -115,9 +116,9 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureValidators(IServiceCollection services)
         {
-            services.AddTransient<IValidator<ProjectRequest>, ProjectValidator>();
+            services.AddTransient<IValidator<ProjectExpandedRequest>, ProjectValidator>();
             services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
-            services.AddTransient<IValidator<ProjectUser>, WorkersProjectValidator>();
+            services.AddTransient<IValidator<ProjectUserRequest>, WorkersProjectValidator>();
         }
 
         public void Configure(IApplicationBuilder app)

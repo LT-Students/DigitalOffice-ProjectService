@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
             _projectUserMapper = projectUserMapper;
         }
 
-        public DbProject Map(ProjectRequest project)
+        public DbProject Map(ProjectExpandedRequest project)
         {
             if (project == null)
             {
@@ -30,8 +30,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 ShortName = project.Project.ShortName,
                 Description = project.Project.Description,
                 DepartmentId = project.Project.DepartmentId,
-                CreatedAt = project.Project.CreatedAt,
-                ClosedAt = project.Project.ClosedAt,
                 IsActive = project.Project.IsActive,
                 Users = project.Users
                     .Select(u => _projectUserMapper.Map(u))

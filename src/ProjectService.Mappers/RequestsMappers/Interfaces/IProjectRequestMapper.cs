@@ -4,7 +4,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces
 {
-    public interface IProjectRequestMapper : IMapper<ProjectRequest, DbProject>
+    public interface IProjectRequestMapper : IMapper<ProjectExpandedRequest, DbProject>
     {
     }
 }

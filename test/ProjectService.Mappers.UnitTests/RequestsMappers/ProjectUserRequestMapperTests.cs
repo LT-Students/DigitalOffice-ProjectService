@@ -1,10 +1,9 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
 {
@@ -12,37 +11,32 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
     {
         private IProjectUserRequestMapper _projectUserRequestMapper;
 
-        private ProjectUser _projectUser;
+        private ProjectUserRequest _projectUser;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _projectUserRequestMapper = new ProjectUserRequestMapper();
 
-            _projectUser = new ProjectUser
+            _projectUser = new ProjectUserRequest
             {
-                User = new User
+                User = new UserRequest
                 {
                     Id = Guid.NewGuid()
                 },
-
-                Role = new Role
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Manager"
-                }
+                RoleId = Guid.NewGuid()
             };
         }
 
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenProjectUserRequestIsNull()
         {
-            ProjectUser projectRequest = null;
+            ProjectUserRequest projectRequest = null;
 
             var expectedDbProjectUser = new DbProjectUser
             {
                 UserId = _projectUser.User.Id,
-                RoleId = _projectUser.Role.Id,
+                RoleId = _projectUser.RoleId,
             };
 
             Assert.Throws<ArgumentNullException>(() => _projectUserRequestMapper.Map(projectRequest));
@@ -54,7 +48,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
             var expectedDbProjectUser = new DbProjectUser
             {
                 UserId = _projectUser.User.Id,
-                RoleId = _projectUser.Role.Id,
+                RoleId = _projectUser.RoleId,
             };
 
             var dbProjectUser = _projectUserRequestMapper.Map(_projectUser);

@@ -2,6 +2,7 @@
 using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -10,15 +11,15 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
     public class CreateNewProjectRequestValidatorTests
     {
-        private IValidator<ProjectRequest> validator;
-        private ProjectRequest projectRequest;
+        private IValidator<ProjectExpandedRequest> validator;
+        private ProjectExpandedRequest projectRequest;
 
         [SetUp]
         public void SetUp()
         {
             validator = new ProjectValidator();
 
-            projectRequest = new ProjectRequest
+            projectRequest = new ProjectExpandedRequest
             {
                 Project = new Project
                 {
@@ -28,11 +29,11 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     IsActive = true,
                     Name = "12DigitalOffice24322525"
                 },
-                Users = new List<ProjectUser>
+                Users = new List<ProjectUserRequest>
                 {
-                    new ProjectUser
+                    new ProjectUserRequest
                     {
-                        User = new User
+                        User = new UserRequest
                         {
                             Id = Guid.NewGuid()
                         }
@@ -91,7 +92,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [Test]
         public void ShouldHaveValidationErrorForWhenUserIsNull()
         {
-            List<ProjectUser> projectUser = null;
+            List<ProjectUserRequest> projectUser = null;
 
             validator.ShouldNotHaveValidationErrorFor(x => x.Users, projectUser);
         }

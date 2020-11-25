@@ -3,7 +3,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-    public class ProjectValidator : AbstractValidator<ProjectRequest>
+    public class ProjectValidator : AbstractValidator<ProjectExpandedRequest>
     {
         public ProjectValidator()
         {

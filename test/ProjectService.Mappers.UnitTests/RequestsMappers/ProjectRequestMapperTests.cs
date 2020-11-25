@@ -2,6 +2,7 @@
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.UnitTestKernel;
 using Moq;
 using NUnit.Framework;
@@ -16,7 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         private IProjectRequestMapper _projectRequestMapper;
         private Mock<IProjectUserRequestMapper> _projectUserRequestMapperMock;
 
-        private ProjectRequest _projectRequest;
+        private ProjectExpandedRequest _projectRequest;
         private List<DbProjectUser> _expectedDbProjectUser;
 
         [OneTimeSetUp]
@@ -25,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
             _projectUserRequestMapperMock = new Mock<IProjectUserRequestMapper>();
             _projectRequestMapper = new ProjectRequestMapper(_projectUserRequestMapperMock.Object);
 
-            _projectRequest = new ProjectRequest
+            _projectRequest = new ProjectExpandedRequest
             {
                 Project = new Project
                 {
@@ -36,18 +37,18 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
                     IsActive = true,
                     Name = "12DigitalOffice24322525"
                 },
-                Users = new List<ProjectUser>
+                Users = new List<ProjectUserRequest>
                 {
-                    new ProjectUser
+                    new ProjectUserRequest
                     {
-                        User = new User
+                        User = new UserRequest
                         {
                             Id = Guid.NewGuid()
                         }
                     },
-                    new ProjectUser
+                    new ProjectUserRequest
                     {
-                        User = new User
+                        User = new UserRequest
                         {
                             Id = Guid.NewGuid()
                         }
@@ -72,7 +73,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         public void SetUp()
         {
             _projectUserRequestMapperMock
-                .SetupSequence(x => x.Map(It.IsAny<ProjectUser>()))
+                .SetupSequence(x => x.Map(It.IsAny<ProjectUserRequest>()))
                 .Returns(new DbProjectUser
                 {
                     UserId = _projectRequest.Users.ElementAt(0).User.Id
@@ -94,7 +95,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
                 DepartmentId = _projectRequest.Project.DepartmentId,
                 Name = _projectRequest.Project.Name,
                 Description = _projectRequest.Project.Description,
-                CreatedAt = _projectRequest.Project.CreatedAt,
                 IsActive = _projectRequest.Project.IsActive,
                 Users = _expectedDbProjectUser,
             };
@@ -111,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenProjectRequestIsNull()
         {
-            ProjectRequest projectRequest = null;
+            ProjectExpandedRequest projectRequest = null;
 
             Assert.Throws<ArgumentNullException>(() => _projectRequestMapper.Map(projectRequest));
         }
@@ -129,7 +129,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
                 DepartmentId = _projectRequest.Project.DepartmentId,
                 Name = _projectRequest.Project.Name,
                 Description = _projectRequest.Project.Description,
-                CreatedAt = _projectRequest.Project.CreatedAt,
                 IsActive = _projectRequest.Project.IsActive,
                 Users = _expectedDbProjectUser,
             };

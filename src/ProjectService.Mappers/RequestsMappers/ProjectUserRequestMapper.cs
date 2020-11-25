@@ -1,13 +1,13 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 {
     public class ProjectUserRequestMapper : IProjectUserRequestMapper
     {
-        public DbProjectUser Map(ProjectUser projectUser)
+        public DbProjectUser Map(ProjectUserRequest projectUser)
         {
             if (projectUser == null)
             {
@@ -17,9 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
             return new DbProjectUser
             {
                 UserId = projectUser.User.Id,
-                RoleId = projectUser.Role.Id,
-                AddedOn = projectUser.User.AddedOn,
-                RemovedOn = projectUser.User.RemovedOn,
+                RoleId = projectUser.RoleId,
                 IsActive = projectUser.User.IsActive
             };
         }

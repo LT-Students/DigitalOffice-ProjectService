@@ -2,6 +2,7 @@
 using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -10,17 +11,17 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
     class WorkersProjectIdsValidatorTests
     {
-        private IValidator<ProjectUser> validator;
-        private ProjectUser workersProjectRequest;
+        private IValidator<ProjectUserRequest> validator;
+        private ProjectUserRequest workersProjectRequest;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             validator = new WorkersProjectValidator();
 
-            workersProjectRequest = new ProjectUser
+            workersProjectRequest = new ProjectUserRequest
             {
-                User = new User
+                User = new UserRequest
                 {
                     Id = Guid.NewGuid()
                 }

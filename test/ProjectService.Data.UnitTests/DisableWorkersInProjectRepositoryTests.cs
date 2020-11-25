@@ -5,6 +5,7 @@ using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
@@ -20,9 +21,9 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         private IProjectRepository repository;
 
         private DbProject newProject;
-        private List<ProjectUser> projectUsersIds;
+        private List<ProjectUserRequest> projectUsersIds;
         private List<DbProjectUser> dbProjectUsers;
-        private ProjectRequest workersIdsInProjectRequest;
+        private ProjectExpandedRequest workersIdsInProjectRequest;
         #endregion
 
         #region setup
@@ -51,10 +52,10 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 Users = new List<DbProjectUser>()
             };
 
-            projectUsersIds = new List<ProjectUser>();
+            projectUsersIds = new List<ProjectUserRequest>();
 
             dbProjectUsers = new List<DbProjectUser>();
-            workersIdsInProjectRequest = new ProjectRequest();
+            workersIdsInProjectRequest = new ProjectExpandedRequest();
 
             for (int i = 0; i < 3; i++)
             {
@@ -69,9 +70,9 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 
                 dbProjectUsers.Add(dbProjectUser);
 
-                projectUsersIds.Add(new ProjectUser
+                projectUsersIds.Add(new ProjectUserRequest
                 {
-                    User = new User
+                    User = new UserRequest
                     {
                         Id = dbProjectUser.UserId
                     }
@@ -138,11 +139,11 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         public void ShouldThrowNullReferenceExceptionWhenWorkerIdNotFound()
         {
             workersIdsInProjectRequest.Project.Id = newProject.Id;
-            workersIdsInProjectRequest.Users = new List<ProjectUser>
+            workersIdsInProjectRequest.Users = new List<ProjectUserRequest>
             {
-                new ProjectUser
+                new ProjectUserRequest
                 {
-                    User = new User
+                    User = new UserRequest
                     {
                         Id = Guid.NewGuid()
                     }

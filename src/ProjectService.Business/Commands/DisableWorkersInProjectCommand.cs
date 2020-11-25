@@ -9,17 +9,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     public class DisableWorkersInProjectCommand : IDisableWorkersInProjectCommand
     {
         private readonly IProjectRepository repository;
-        private readonly IValidator<ProjectRequest> validator;
+        private readonly IValidator<ProjectExpandedRequest> validator;
 
         public DisableWorkersInProjectCommand(
             [FromServices] IProjectRepository repository,
-            [FromServices] IValidator<ProjectRequest> validator)
+            [FromServices] IValidator<ProjectExpandedRequest> validator)
         {
             this.repository = repository;
             this.validator = validator;
         }
 
-        public void Execute(ProjectRequest request)
+        public void Execute(ProjectExpandedRequest request)
         {
             validator.ValidateAndThrow(request);
 

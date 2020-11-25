@@ -8,7 +8,20 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests
 {
-    public class ProjectMapperTests
+    internal class ProjectModelTests
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string ShortName { get; set; }
+        public int? ClosedReason { get; set; }
+        public string Description { get; set; }
+        public Guid DepartmentId { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? ClosedAt { get; set; }
+    }
+
+    internal class ProjectMapperTests
     {
         private const string Name = "Test Project";
         private const string Description = "DigitalOffice project. The students do the work. Sometimes. Never (c) Spartak";
@@ -53,7 +66,17 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests
         {
             var result = mapper.Map(dbProject);
 
-            var expected = new Project
+            var resultProjectModel = new ProjectModelTests
+            {
+                Id = result.Id,
+                Name = result.Name,
+                Description = result.Description,
+                ShortName = result.ShortName,
+                CreatedAt = result.CreatedAt,
+                IsActive = result.IsActive
+            };
+
+            var expected = new ProjectModelTests
             {
                 Id = projectId,
                 Name = Name,
@@ -63,7 +86,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests
                 IsActive = false
             };
 
-            SerializerAssert.AreEqual(expected, result);
+            SerializerAssert.AreEqual(expected, resultProjectModel);
         }
     }
 }
