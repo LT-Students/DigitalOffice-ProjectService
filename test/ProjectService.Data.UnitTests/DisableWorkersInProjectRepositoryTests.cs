@@ -56,6 +56,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 
             dbProjectUsers = new List<DbProjectUser>();
             workersIdsInProjectRequest = new ProjectExpandedRequest();
+            workersIdsInProjectRequest.Project = new Project();
 
             for (int i = 0; i < 3; i++)
             {

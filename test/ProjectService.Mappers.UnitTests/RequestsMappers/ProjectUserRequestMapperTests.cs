@@ -45,13 +45,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         [Test]
         public void ShouldReturnDbProjectWhenProjectUserRequestIsMapped()
         {
+            var dbProjectUser = _projectUserRequestMapper.Map(_projectUser);
+
             var expectedDbProjectUser = new DbProjectUser
             {
                 UserId = _projectUser.User.Id,
                 RoleId = _projectUser.RoleId,
+                AddedOn = dbProjectUser.AddedOn
             };
-
-            var dbProjectUser = _projectUserRequestMapper.Map(_projectUser);
 
             SerializerAssert.AreEqual(expectedDbProjectUser, dbProjectUser);
         }

@@ -18,6 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
             {
                 UserId = projectUser.User.Id,
                 RoleId = projectUser.RoleId,
+                AddedOn = DateTime.Now,
                 IsActive = projectUser.User.IsActive
             };
         }
