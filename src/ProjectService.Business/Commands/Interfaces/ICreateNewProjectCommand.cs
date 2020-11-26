@@ -14,6 +14,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
         /// </summary>
         /// <param name="request">Project data.</param>
         /// <returns>Id of the added project.</returns>
-        Guid Execute(NewProjectRequest request);
+        Guid Execute(ProjectExpandedRequest request);
     }
 }

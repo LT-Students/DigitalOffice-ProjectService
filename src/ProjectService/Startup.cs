@@ -15,7 +15,6 @@ using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation;
@@ -110,7 +109,7 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<IProjectMapper, ProjectMapper>();
             services.AddTransient<IProjectUserMapper, ProjectUserMapper>();
             services.AddTransient<IRoleMapper, RoleMapper>();
-            
+
             services.AddTransient<IProjectRequestMapper, ProjectRequestMapper>();
             services.AddTransient<IProjectResponseMapper, ProjectResponseMapper>();
             services.AddTransient<IProjectUserRequestMapper, ProjectUserRequestMapper>();
