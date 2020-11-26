@@ -1,30 +1,36 @@
-﻿using FluentValidation;
-using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Exceptions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
     public class DisableWorkersInProjectCommand : IDisableWorkersInProjectCommand
     {
         private readonly IProjectRepository repository;
-        private readonly IValidator<ProjectExpandedRequest> validator;
+        private readonly IAccessValidator accessValidator;
 
         public DisableWorkersInProjectCommand(
             [FromServices] IProjectRepository repository,
-            [FromServices] IValidator<ProjectExpandedRequest> validator)
+            [FromServices] IAccessValidator accessValidator)
         {
             this.repository = repository;
-            this.validator = validator;
+            this.accessValidator = accessValidator;
         }
 
-        public void Execute(ProjectExpandedRequest request)
+        public void Execute(Guid projectId, IEnumerable<Guid> userIds)
         {
-            validator.ValidateAndThrowCustom(request);
+            const int rightId = 2;
 
-            repository.DisableWorkersInProject(request);
+            if (!(accessValidator.IsAdmin() || accessValidator.HasRights(rightId)))
+            {
+                throw new ForbiddenException("Not enough rights.");
+            }
+
+            repository.DisableWorkersInProject(projectId, userIds);
         }
     }
 }

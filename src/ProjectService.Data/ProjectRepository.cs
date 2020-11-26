@@ -3,8 +3,6 @@ using LT.DigitalOffice.Kernel.Exceptions;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -70,26 +68,26 @@ namespace LT.DigitalOffice.ProjectService.Data
             return dbProject.Id;
         }
 
-        public void DisableWorkersInProject(ProjectExpandedRequest request)
+        public void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds)
         {
             DbProject dbProject = provider.Projects
-                .FirstOrDefault(p => p.Id == request.Project.Id);
+                .FirstOrDefault(p => p.Id == projectId);
 
             if (dbProject == null)
             {
-                throw new NullReferenceException("Project with this Id does not exist.");
+                throw new NotFoundException($"Project with Id {projectId} does not exist.");
             }
 
-            foreach (ProjectUserRequest projectUser in request.Users)
+            foreach (var userId in userIds)
             {
-                DbProjectUser dbProjectWorker = dbProject.Users?.FirstOrDefault(w => w.UserId == projectUser.User.Id);
+                DbProjectUser dbProjectUser = dbProject.Users?.FirstOrDefault(w => w.UserId == userId);
 
-                if (dbProjectWorker == null)
+                if (dbProjectUser == null)
                 {
-                    throw new NullReferenceException("Worker with this Id does not exist.");
+                    throw new NotFoundException($"Worker with Id {userId} does not exist.");
                 }
 
-                dbProjectWorker.IsActive = false;
+                dbProjectUser.IsActive = false;
             }
 
             provider.Projects.Update(dbProject);
