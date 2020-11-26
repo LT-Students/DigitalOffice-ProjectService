@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto.ResponseModels;
 using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses

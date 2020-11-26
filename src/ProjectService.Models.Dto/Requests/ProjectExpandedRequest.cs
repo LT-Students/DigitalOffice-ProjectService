@@ -1,5 +1,5 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto.ResponseModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestModels;
 using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests

@@ -9,15 +9,14 @@ using LT.DigitalOffice.ProjectService.Data;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers;
-using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
-using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Mappers.ModelMappers;
+using LT.DigitalOffice.ProjectService.Mappers.ModelMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.RequestMappers;
+using LT.DigitalOffice.ProjectService.Mappers.RequestMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.ResponseMappers;
+using LT.DigitalOffice.ProjectService.Mappers.ResponseMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestModels;
 using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -110,7 +109,7 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<IProjectMapper, ProjectMapper>();
             services.AddTransient<IProjectUserMapper, ProjectUserMapper>();
             services.AddTransient<IRoleMapper, RoleMapper>();
-            
+
             services.AddTransient<IProjectRequestMapper, ProjectRequestMapper>();
             services.AddTransient<IProjectResponseMapper, ProjectResponseMapper>();
             services.AddTransient<IProjectUserRequestMapper, ProjectUserRequestMapper>();

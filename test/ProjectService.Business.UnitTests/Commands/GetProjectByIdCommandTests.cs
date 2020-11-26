@@ -1,7 +1,7 @@
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.ResponseMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using Moq;
 using NUnit.Framework;
