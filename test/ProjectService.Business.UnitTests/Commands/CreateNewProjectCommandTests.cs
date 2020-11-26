@@ -22,8 +22,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         private DbProject newProject;
         private NewProjectRequest newRequest;
 
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             validatorMock = new Mock<IValidator<NewProjectRequest>>();
 

@@ -122,6 +122,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         public IEnumerable<DbProject> GetUserProjects(Guid userId, bool showNotActive)
         {
             var predicate = PredicateBuilder.New<DbProject>(p => p.Users.Any(u => u.UserId == userId) && p.IsActive);
+
             if (showNotActive)
             {
                 predicate.Or(p => !p.IsActive);
