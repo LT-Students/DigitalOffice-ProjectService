@@ -15,7 +15,6 @@ using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation;
@@ -110,8 +109,8 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<IProjectMapper, ProjectMapper>();
             services.AddTransient<IProjectUserMapper, ProjectUserMapper>();
             services.AddTransient<IRoleMapper, RoleMapper>();
-            
-            services.AddTransient<IProjectRequestMapper, ProjectRequestMapper>();
+
+            services.AddTransient<IProjectExpandedRequestMapper, ProjectExpandedRequestMapper>();
             services.AddTransient<IProjectResponseMapper, ProjectResponseMapper>();
             services.AddTransient<IProjectUserRequestMapper, ProjectUserRequestMapper>();
             services.AddTransient<IProjectExpandedResponseMapper, ProjectExpandedResponseMapper>();
@@ -119,9 +118,9 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureValidators(IServiceCollection services)
         {
-            services.AddTransient<IValidator<ProjectExpandedRequest>, ProjectValidator>();
+            services.AddTransient<IValidator<ProjectExpandedRequest>, ProjectExpandedRequestValidator>();
             services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
-            services.AddTransient<IValidator<ProjectUserRequest>, WorkersProjectValidator>();
+            services.AddTransient<IValidator<ProjectUserRequest>, ProjectUserRequestValidator>();
         }
 
         public void Configure(IApplicationBuilder app)
