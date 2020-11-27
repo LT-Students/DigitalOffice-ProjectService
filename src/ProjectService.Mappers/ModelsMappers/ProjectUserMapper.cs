@@ -34,15 +34,28 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 throw new ArgumentNullException(nameof(dbProjectUser));
             }
 
+            return new ProjectUser
+            {
+                AddedOn = dbProjectUser.AddedOn,
+                RemovedOn = dbProjectUser.RemovedOn,
+                IsActive = dbProjectUser.IsActive,
+                ProjectId = dbProjectUser.ProjectId,
+                User = await GetUserFromUserServiceAsync(dbProjectUser.UserId),
+                Role = _roleMapper.Map(dbProjectUser.Role)
+            };
+        }
+
+        private async Task<User> GetUserFromUserServiceAsync(Guid userId)
+        {
             var user = new User
             {
-                Id = dbProjectUser.UserId,
+                Id = userId,
             };
 
             try
             {
                 var userInfoResponse = await _requestClient.GetResponse<IOperationResult<IGetUserResponse>>(
-                    IGetUserRequest.CreateObj(dbProjectUser.UserId));
+                    IGetUserRequest.CreateObj(userId));
 
                 if (userInfoResponse.Message.IsSuccess)
                 {
@@ -56,11 +69,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 _logger.LogError(exc, "Exception on get user information.");
             }
 
-            return new ProjectUser
-            {
-                User = user,
-                Role = _roleMapper.Map(dbProjectUser.Role)
-            };
+            return user;
         }
     }
 }
