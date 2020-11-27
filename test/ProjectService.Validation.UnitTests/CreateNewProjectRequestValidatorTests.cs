@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.TestHelper;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using NUnit.Framework;
@@ -17,7 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [SetUp]
         public void SetUp()
         {
-            validator = new ProjectValidator();
+            validator = new ProjectExpandedRequestValidator();
 
             projectRequest = new ProjectExpandedRequest
             {

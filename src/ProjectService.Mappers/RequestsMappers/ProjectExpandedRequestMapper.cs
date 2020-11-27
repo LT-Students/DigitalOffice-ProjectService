@@ -6,10 +6,10 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 {
-    public class ProjectRequestMapper : IProjectRequestMapper
+    public class ProjectExpandedRequestMapper : IProjectExpandedRequestMapper
     {
         private readonly IProjectUserRequestMapper _projectUserMapper;
-        public ProjectRequestMapper(IProjectUserRequestMapper projectUserMapper)
+        public ProjectExpandedRequestMapper(IProjectUserRequestMapper projectUserMapper)
         {
             _projectUserMapper = projectUserMapper;
         }

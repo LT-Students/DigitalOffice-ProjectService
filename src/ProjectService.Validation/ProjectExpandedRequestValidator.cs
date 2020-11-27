@@ -3,21 +3,21 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-    public class ProjectValidator : AbstractValidator<ProjectExpandedRequest>
+    public class ProjectExpandedRequestValidator : AbstractValidator<ProjectExpandedRequest>
     {
-        public ProjectValidator()
+        public ProjectExpandedRequestValidator()
         {
             RuleFor(project => project.Project.Name)
-                    .NotEmpty()
-                    .WithMessage("Project must have a name.")
-                    .MaximumLength(80)
-                    .WithMessage("Project name is too long.");
+                .NotEmpty()
+                .WithMessage("Project must have a name.")
+                .MaximumLength(80)
+                .WithMessage("Project name is too long.");
 
             When(project => project.Project.ShortName != null, () =>
             {
                 RuleFor(project => project.Project.ShortName)
-                    .MaximumLength(32)
-                    .WithMessage("Project short name is too long.");
+                .MaximumLength(32)
+                .WithMessage("Project short name is too long.");
             });
 
             When(project => project.Project.Description != null, () =>
@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
             When(project => project.Users != null, () =>
             {
-                RuleForEach(project => project.Users).SetValidator(new WorkersProjectValidator());
+                RuleForEach(project => project.Users).SetValidator(new ProjectUserRequestValidator());
             });
         }
     }

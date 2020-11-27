@@ -1,0 +1,19 @@
+﻿using FluentValidation;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+
+namespace LT.DigitalOffice.ProjectService.Validation
+{
+    public class ProjectUserRequestValidator : AbstractValidator<ProjectUserRequest>
+    {
+        public ProjectUserRequestValidator()
+        {
+            RuleFor(pu => pu.User.Id)
+                .NotEmpty()
+                .WithMessage("Each user id.");
+
+            RuleFor(pu => pu.RoleId)
+                .NotEmpty()
+                .WithMessage("Each role id.");
+        }
+    }
+}
