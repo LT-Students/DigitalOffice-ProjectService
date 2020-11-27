@@ -6,6 +6,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
@@ -27,15 +28,17 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     ShortName = "DO",
                     Description = "New project for Lanit-Tercom",
                     IsActive = true,
-                    Name = "12DigitalOffice24322525"
+                    Name = "12DigitalOffice24322525",
                 },
                 Users = new List<ProjectUserRequest>
                 {
                     new ProjectUserRequest
                     {
+                        RoleId = Guid.NewGuid(),
                         User = new UserRequest
                         {
-                            Id = Guid.NewGuid()
+                            Id = Guid.NewGuid(),
+                            IsActive = true
                         }
                     }
                 }
@@ -103,6 +106,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             projectRequest.Project.Name = "12DigitalOffice24322525";
 
             validator.TestValidate(projectRequest).ShouldNotHaveAnyValidationErrors();
+        }
+
+        [Test]
+        public void ShouldHaveValidationErrorWhenRoleIdIsNull()
+        {
+            projectRequest.Users.First().RoleId = Guid.Empty;
+            validator.ShouldNotHaveValidationErrorFor(x => x.Users, projectRequest.Users);
         }
     }
 }

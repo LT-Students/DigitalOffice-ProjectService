@@ -9,11 +9,11 @@ namespace LT.DigitalOffice.ProjectService.Validation
         {
             RuleFor(pu => pu.User.Id)
                 .NotEmpty()
-                .WithMessage("Each user id.");
+                .WithMessage("Not specified user id.");
 
             RuleFor(pu => pu.RoleId)
                 .NotEmpty()
-                .WithMessage("Each role id.");
+                .WithMessage("Not specified role id.");
         }
     }
 }

@@ -12,15 +12,16 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
     class WorkersProjectIdsValidatorTests
     {
         private IValidator<ProjectUserRequest> validator;
-        private ProjectUserRequest workersProjectRequest;
+        private ProjectUserRequest userProjectRequest;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             validator = new ProjectUserRequestValidator();
 
-            workersProjectRequest = new ProjectUserRequest
+            userProjectRequest = new ProjectUserRequest
             {
+                RoleId = Guid.NewGuid(),
                 User = new UserRequest
                 {
                     Id = Guid.NewGuid()
@@ -31,20 +32,23 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [Test]
         public void ShouldNotHaveValidationErrorsWhenRequestIsValid()
         {
-            var workerId = Guid.NewGuid();
-
-            workersProjectRequest.User.Id = workerId;
-            validator.TestValidate(workersProjectRequest).ShouldNotHaveAnyValidationErrors();
+            validator.TestValidate(userProjectRequest).ShouldNotHaveAnyValidationErrors();
         }
 
         [Test]
-        public void ShouldHaveValidationErrorWhenWorkerIdEmpty()
+        public void ShouldHaveValidationErrorWhenUserIdIsEmpty()
         {
-            var workerId = Guid.Empty;
+            userProjectRequest.User.Id = Guid.Empty;
 
-            workersProjectRequest.User.Id = workerId;
+            validator.TestValidate(userProjectRequest).ShouldHaveValidationErrorFor(r => r.User.Id);
+        }
 
-            validator.TestValidate(workersProjectRequest).ShouldHaveValidationErrorFor(r => r.User.Id);
+        [Test]
+        public void ShouldHaveValidationErrorWhenRoleIdIsEmpty()
+        {
+            userProjectRequest.RoleId = Guid.Empty;
+
+            validator.TestValidate(userProjectRequest).ShouldHaveValidationErrorFor(r => r.RoleId);
         }
     }
 }
