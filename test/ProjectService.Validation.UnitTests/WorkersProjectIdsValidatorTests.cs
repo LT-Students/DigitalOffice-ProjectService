@@ -15,7 +15,11 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void OneTimeSetUp()
         {
             validator = new ProjectUserRequestValidator();
+        }
 
+        [SetUp]
+        public void SetUp()
+        {
             userProjectRequest = new ProjectUserRequest
             {
                 RoleId = Guid.NewGuid(),
