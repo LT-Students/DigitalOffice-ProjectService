@@ -1,11 +1,12 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
+using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
+namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
 {
     internal class ProjectUserRequestMapperTests
     {

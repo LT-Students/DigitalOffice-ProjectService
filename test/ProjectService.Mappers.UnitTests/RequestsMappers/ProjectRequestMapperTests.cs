@@ -9,8 +9,9 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
+namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
 {
     internal class ProjectRequestMapperTests
     {
