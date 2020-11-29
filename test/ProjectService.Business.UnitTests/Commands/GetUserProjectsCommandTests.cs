@@ -26,13 +26,9 @@ namespace ProjectService.Business.UnitTests.Commands
         private ProjectResponse responseOne;
         private ProjectResponse responseTwo;
 
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            repositoryMock = new Mock<IProjectRepository>();
-            mapperMock = new Mock<IProjectResponseMapper>();
-            command = new GetUserProjectsCommand(repositoryMock.Object, mapperMock.Object);
-
             userId = Guid.NewGuid();
 
             projectOne = new DbProject();
@@ -45,6 +41,14 @@ namespace ProjectService.Business.UnitTests.Commands
             responseTwo = new ProjectResponse();
         }
         
+        [SetUp]
+        public void SetUp()
+        {
+            repositoryMock = new Mock<IProjectRepository>();
+            mapperMock = new Mock<IProjectResponseMapper>();
+            command = new GetUserProjectsCommand(repositoryMock.Object, mapperMock.Object);
+        }
+
         [Test]
         public void ShouldReturnListOfProjects()
         {

@@ -27,8 +27,8 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private DbProjectUser dbUserWithTwoProjects2;
         private DbProjectUser dbUserWithoutActiveProject;
 
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             var dbOptions = new DbContextOptionsBuilder<ProjectServiceDbContext>()
                 .UseInMemoryDatabase("InMemoryDatabase")
@@ -40,6 +40,11 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             userIdWithOneProject = Guid.NewGuid();
             userIdWithTwoProjects = Guid.NewGuid();
             userIdWithoutActiveProjects = Guid.NewGuid();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
 
             dbUserWithOneProject = new DbProjectUser
             {
@@ -68,7 +73,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 UserId = userIdWithoutActiveProjects,
                 IsActive = true
             };
- 
+
             dbProject1 = new DbProject
             {
                 Id = Guid.NewGuid(),
@@ -93,7 +98,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = "Project3",
             };
             dbNotActiveProject.Users.Add(dbUserWithoutActiveProject);
-            
+
             provider.Projects.Add(dbProject2);
             provider.Projects.Add(dbProject1);
             provider.Projects.Add(dbNotActiveProject);
