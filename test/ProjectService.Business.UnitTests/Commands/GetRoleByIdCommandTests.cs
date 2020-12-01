@@ -23,7 +23,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
         private Guid _roleIdRequest;
         private DbRole _dbRole;
-        private RoleExpandedResponse _roleResponse;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -37,16 +36,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 Description = "Role description test",
                 IsActive = true,
                 Users = new List<DbProjectUser>()
-            };
-
-            _roleResponse = new RoleExpandedResponse
-            {
-                Role = new Role
-                {
-                    Id = _roleIdRequest,
-                    Name = "Role name test",
-                    Description = "Role description test"
-                }
             };
         }
 
@@ -67,7 +56,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             _mapperMock
                 .Setup(m => m.Map(It.IsAny<DbRole>()))
-                .Returns(_roleResponse);
+                .Returns(new RoleExpandedResponse());
 
             Assert.Throws<NotFoundException>(() => _command.Execute(Guid.NewGuid()));
             _roleRepositoryMock.Verify(repository => repository.GetRole(It.IsAny<Guid>()), Times.Once);
@@ -93,11 +82,14 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [Test]
         public void ShouldReturnRoleInfo()
         {
-            var expectedRole = new Role
+            var expected = new RoleExpandedResponse
             {
-                Id = _roleIdRequest,
-                Name = "Role name test",
-                Description = "Role description test"
+                Role = new Role
+                {
+                    Id = _dbRole.Id,
+                    Name = _dbRole.Name,
+                    Description = _dbRole.Description
+                }
             };
 
             _roleRepositoryMock
@@ -106,11 +98,13 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             _mapperMock
                 .Setup(m => m.Map(It.IsAny<DbRole>()))
-                .Returns(_roleResponse);
+                .Returns(expected);
 
             var result = _command.Execute(_roleIdRequest);
 
-            SerializerAssert.AreEqual(expectedRole, result.Role);
+            SerializerAssert.AreEqual(expected, result);
+            _roleRepositoryMock.Verify(repository => repository.GetRole(It.IsAny<Guid>()), Times.Once);
+            _mapperMock.Verify(mapper => mapper.Map(It.IsAny<DbRole>()), Times.Once);
         }
     }
 }

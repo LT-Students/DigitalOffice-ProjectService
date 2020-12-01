@@ -20,8 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private Mock<IRoleRepository> _roleRepositoryMock;
         private Mock<IRolesResponseMapper> _mapperMock;
 
-        private RolesResponse _rolesResponse;
-        private List<Guid> _rolesIds;
+        private List<DbRole> _dbRoles;
         private int _skip;
         private int _take;
         private int _totalCount;
@@ -33,27 +32,18 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _take = 3;
             _totalCount = 3;
 
-            var roles = new List<Role>();
-            _rolesIds = new List<Guid>();
+            _dbRoles = new List<DbRole>();
 
             for (int i=0; i <3; i++)
             {
-                _rolesIds.Add(Guid.NewGuid());
-
-                roles.Add(
-                    new Role
+                _dbRoles.Add(
+                    new DbRole
                     {
-                        Id = _rolesIds[i],
-                        Name = "Role name test",
-                        Description = "Role description test"
+                        Id = Guid.NewGuid(),
+                        Name = $"Role name test {i}",
+                        Description = $"Role description test {i}"
                     });
             }
-
-            _rolesResponse = new RolesResponse
-            {
-                Roles = roles,
-                TotalCount = _totalCount
-            };
         }
 
         [SetUp]
@@ -90,11 +80,17 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 expectedRoles.Add(
                     new Role
                     {
-                        Id = _rolesIds[i],
-                        Name = "Role name test",
-                        Description = "Role description test"
+                        Id = _dbRoles[i].Id,
+                        Name = _dbRoles[i].Name,
+                        Description = _dbRoles[i].Description
                     });
             }
+
+            var expected = new RolesResponse
+            {
+                Roles = expectedRoles,
+                TotalCount = _totalCount
+            };
 
             _roleRepositoryMock
                 .Setup(r => r.GetRoles(It.IsAny<int>(), It.IsAny<int>()))
@@ -102,11 +98,13 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             _mapperMock
                 .Setup(m => m.Map(It.IsAny<List<DbRole>>()))
-                .Returns(_rolesResponse);
+                .Returns(expected);
 
             var result = _command.Execute(_skip, _take);
 
-            SerializerAssert.AreEqual(expectedRoles, result.Roles);
+            SerializerAssert.AreEqual(expected, result);
+            _roleRepositoryMock.Verify(repository => repository.GetRoles(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            _mapperMock.Verify(mapper => mapper.Map(It.IsAny<List<DbRole>>()), Times.Once);
         }
     }
 }
