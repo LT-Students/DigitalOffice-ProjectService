@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using System;
 
-namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
+namespace LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels
 {
     public class User : UserRequest
     {

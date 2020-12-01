@@ -1,6 +1,6 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.UnitTestKernel;
@@ -9,12 +9,13 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
+namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
 {
     internal class ProjectRequestMapperTests
     {
-        private IProjectRequestMapper _projectRequestMapper;
+        private IProjectExpandedRequestMapper _projectRequestMapper;
         private Mock<IProjectUserRequestMapper> _projectUserRequestMapperMock;
 
         private ProjectExpandedRequest _projectRequest;
@@ -24,7 +25,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         public void OneTimeSetUp()
         {
             _projectUserRequestMapperMock = new Mock<IProjectUserRequestMapper>();
-            _projectRequestMapper = new ProjectRequestMapper(_projectUserRequestMapperMock.Object);
+            _projectRequestMapper = new ProjectExpandedRequestMapper(_projectUserRequestMapperMock.Object);
 
             _projectRequest = new ProjectExpandedRequest
             {

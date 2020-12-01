@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
