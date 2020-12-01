@@ -36,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// Disable active workers, which were previously assigned to the project.
         /// </summary>
         /// <param name="request">Contains workers id and project id.</param>
-        void DisableWorkersInProject(WorkersIdsInProjectRequest request);
+        void DisableWorkersInProject(ProjectExpandedRequest request);
 
         IEnumerable<DbProject> GetProjects(bool showNotActive);
 

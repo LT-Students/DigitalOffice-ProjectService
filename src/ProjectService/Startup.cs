@@ -11,9 +11,12 @@ using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers;
 using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
+using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -82,12 +85,14 @@ namespace LT.DigitalOffice.ProjectService
         private void ConfigureCommands(IServiceCollection services)
         {
             services.AddTransient<IGetProjectCommand, GetProjectCommand>();
-            services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
-            services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
+            //services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
+            //services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
+
             services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
             services.AddTransient<IGetProjectsCommand, GetProjectsCommand>();
             services.AddTransient<IGetRoleCommand, GetRoleCommand>();
             services.AddTransient<IGetRolesCommand, GetRolesCommand>();
+            services.AddTransient<IDisableRoleCommand, DisableRoleCommand>();
         }
 
         private void ConfigureRepositories(IServiceCollection services)
@@ -106,8 +111,10 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<IProjectMapper, ProjectMapper>();
             services.AddTransient<IProjectUserMapper, ProjectUserMapper>();
             services.AddTransient<IRoleMapper, RoleMapper>();
-
+            
+            services.AddTransient<IProjectRequestMapper, ProjectRequestMapper>();
             services.AddTransient<IProjectResponseMapper, ProjectResponseMapper>();
+            services.AddTransient<IProjectUserRequestMapper, ProjectUserRequestMapper>();
             services.AddTransient<IProjectExpandedResponseMapper, ProjectExpandedResponseMapper>();
             services.AddTransient<IRolesResponseMapper, RolesResponseMapper>();
             services.AddTransient<IRoleExpandedResponseMapper, RoleExpandedResponseMapper>();
@@ -115,9 +122,9 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureValidators(IServiceCollection services)
         {
-            services.AddTransient<IValidator<NewProjectRequest>, ProjectValidator>();
+            services.AddTransient<IValidator<ProjectExpandedRequest>, ProjectValidator>();
             services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
-            services.AddTransient<IValidator<WorkersIdsInProjectRequest>, WorkersProjectIdsValidator>();
+            services.AddTransient<IValidator<ProjectUserRequest>, WorkersProjectValidator>();
         }
 
         public void Configure(IApplicationBuilder app)

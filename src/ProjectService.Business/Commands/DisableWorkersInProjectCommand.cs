@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
@@ -9,19 +10,19 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     public class DisableWorkersInProjectCommand : IDisableWorkersInProjectCommand
     {
         private readonly IProjectRepository repository;
-        private readonly IValidator<WorkersIdsInProjectRequest> validator;
+        private readonly IValidator<ProjectExpandedRequest> validator;
 
         public DisableWorkersInProjectCommand(
             [FromServices] IProjectRepository repository,
-            [FromServices] IValidator<WorkersIdsInProjectRequest> validator)
+            [FromServices] IValidator<ProjectExpandedRequest> validator)
         {
             this.repository = repository;
             this.validator = validator;
         }
 
-        public void Execute(WorkersIdsInProjectRequest request)
+        public void Execute(ProjectExpandedRequest request)
         {
-            validator.ValidateAndThrow(request);
+            validator.ValidateAndThrowCustom(request);
 
             repository.DisableWorkersInProject(request);
         }

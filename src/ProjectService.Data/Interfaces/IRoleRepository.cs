@@ -1,8 +1,6 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
@@ -26,5 +24,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="take">Number of roles to take.</param>
         /// <returns>Enumerable roles.</returns>
         IEnumerable<DbRole> GetRoles(int skip, int take);
+
+        /// Deleting role. 
+        /// </summary>
+        /// <param name="roleId">Id of role to be deleted.</param>
+        /// <returns>Success of delete.</returns>
+        bool DisableRole(Guid roleId); 
     }
 }

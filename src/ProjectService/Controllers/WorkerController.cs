@@ -11,7 +11,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         [HttpDelete("disableWorkersInProject")]
         public void DisableWorkersInProject(
                     [FromServices] IDisableWorkersInProjectCommand command,
-                    [FromQuery] WorkersIdsInProjectRequest request)
+                    [FromQuery] ProjectExpandedRequest request)
         {
             command.Execute(request);
         }

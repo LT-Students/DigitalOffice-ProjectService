@@ -11,6 +11,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
         /// Call repository for disabling workers from project.
         /// </summary>
         /// <param name="request"></param>
-        void Execute(WorkersIdsInProjectRequest request);
+        void Execute(ProjectExpandedRequest request);
     }
 }
