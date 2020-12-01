@@ -1,7 +1,4 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
 {

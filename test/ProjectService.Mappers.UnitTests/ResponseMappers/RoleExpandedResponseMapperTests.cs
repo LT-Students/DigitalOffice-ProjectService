@@ -2,8 +2,8 @@
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
+using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;

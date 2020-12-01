@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using System.Collections.Generic;
 using System.Linq;
 
