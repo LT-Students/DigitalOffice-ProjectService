@@ -15,13 +15,14 @@ using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -110,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<IProjectMapper, ProjectMapper>();
             services.AddTransient<IProjectUserMapper, ProjectUserMapper>();
             services.AddTransient<IRoleMapper, RoleMapper>();
-            
+
             services.AddTransient<IProjectRequestMapper, ProjectRequestMapper>();
             services.AddTransient<IProjectResponseMapper, ProjectResponseMapper>();
             services.AddTransient<IProjectUserRequestMapper, ProjectUserRequestMapper>();

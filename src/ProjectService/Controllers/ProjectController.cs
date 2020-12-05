@@ -1,7 +1,9 @@
 ﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -32,15 +34,17 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         [HttpPost("createNewProject")]
         public Guid CreateNewProject(
             [FromServices] ICreateNewProjectCommand command,
-            [FromBody] NewProjectRequest request) => command.Execute(request);
+            [FromBody] NewProjectRequest request)
+        {
+            return command.Execute(request);
+        }
 
         [HttpPut("editProjectById")]
         public Guid EditProjectById(
             [FromServices] IEditProjectByIdCommand command,
-            [FromQuery] Guid projectId,
             [FromBody] EditProjectRequest request)
         {
-            return command.Execute(projectId, request);
+            return command.Execute(request);
         }
     }
 }
