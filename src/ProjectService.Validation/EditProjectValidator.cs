@@ -91,7 +91,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
                             When(x => GetOperationByPath(x.Patch, ClosedReasonPath).op != "remove", () =>
                             {
-                                RuleFor(x => CastClosedReasonIfPossible(GetOperationByPath(x.Patch, ClosedReasonPath).value))
+                                RuleFor(x => CastIfNotNull<ProjectClosedReason>(GetOperationByPath(x.Patch, ClosedReasonPath).value))
                                 .Null()
                                 .WithMessage($"If the project is open, then you need to update its {ClosedReasonPath} field to null.");
                             });
@@ -106,7 +106,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                                 RuleFor(x => x.Patch.Operations)
                                 .UniqueOperationWithAllowedOp(ClosedReasonPath, "add", "replace");
 
-                                RuleFor(x => CastClosedReasonIfPossible(GetOperationByPath(x.Patch, ClosedReasonPath).value))
+                                RuleFor(x => CastIfNotNull<ProjectClosedReason>(GetOperationByPath(x.Patch, ClosedReasonPath).value))
                                 .NotNull()
                                 .WithMessage($"If the project is closed, then you need to update its {ClosedReasonPath} field.")
                                 .IsInEnum()
@@ -148,7 +148,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                                     .UniqueOperationWithAllowedOp(ClosedReasonPath, "add", "replace");
 
                                     // If actual IsActive == false => reason for closing can be replace
-                                    RuleFor(x => CastClosedReasonIfPossible(GetOperationByPath(x.Patch, ClosedReasonPath).value))
+                                    RuleFor(x => CastIfNotNull<ProjectClosedReason>(GetOperationByPath(x.Patch, ClosedReasonPath).value))
                                     .NotNull()
                                     .WithMessage($"Project is closed, then you need to update its {ClosedReasonPath} field.")
                                     .IsInEnum()
@@ -160,14 +160,14 @@ namespace LT.DigitalOffice.ProjectService.Validation
                 });
         }
 
-        private ProjectClosedReason? CastClosedReasonIfPossible(object reason)
+        private T? CastIfNotNull<T>(object value) where T : struct
         {
-            if (reason == null)
+            if (value == null)
             {
                 return null;
             }
 
-            return (ProjectClosedReason)reason;
+            return (T)value;
         }
     }
 }
