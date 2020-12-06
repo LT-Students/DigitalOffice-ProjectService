@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using System.Collections.Generic;
 
