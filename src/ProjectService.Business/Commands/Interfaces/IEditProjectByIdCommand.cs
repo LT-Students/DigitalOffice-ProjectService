@@ -1,6 +1,4 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using Microsoft.AspNetCore.JsonPatch;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
