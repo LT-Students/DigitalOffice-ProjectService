@@ -7,18 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="9.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ProjectService.Data\ProjectService.Data.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="LT.DigitalOffice.Kernel" Version="1.0.16" />
   </ItemGroup>
 
 </Project>

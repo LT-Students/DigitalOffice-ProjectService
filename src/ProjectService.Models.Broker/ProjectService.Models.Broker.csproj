@@ -6,8 +6,4 @@
     <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Update="LT.DigitalOffice.Kernel" Version="1.0.16" />
-  </ItemGroup>
-
 </Project>
