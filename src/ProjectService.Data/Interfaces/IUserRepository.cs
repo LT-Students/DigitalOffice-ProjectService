@@ -1,4 +1,7 @@
-﻿using System;
+﻿using LT.DigitalOffice.ProjectService.Models.Db;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
@@ -6,13 +9,13 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     /// Represents interface of repository in repository pattern.
     /// Provides methods for working with the database of ProjectService.
     /// </summary>
-    public interface IRoleRepository
+    public interface IUserRepository
     {
         /// <summary>
-        /// Deleting role.
+        /// Add users to project.
         /// </summary>
-        /// <param name="roleId">Id of role to be deleted.</param>
+        /// <param name="dbProjectUser">Id of role to be deleted.</param>
         /// <returns>Success of delete.</returns>
-        bool DisableRole(Guid roleId);
+        void AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUser);
     }
 }

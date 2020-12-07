@@ -88,6 +88,7 @@ namespace LT.DigitalOffice.ProjectService
             //services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
             //services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
 
+            services.AddTransient<IAddUsersToProjectCommand, AddUsersToProjectCommand>();
             services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
             services.AddTransient<IGetProjectsCommand, GetProjectsCommand>();
             services.AddTransient<IDisableRoleCommand, DisableRoleCommand>();
@@ -96,6 +97,7 @@ namespace LT.DigitalOffice.ProjectService
         private void ConfigureRepositories(IServiceCollection services)
         {
             services.AddTransient<IProjectRepository, ProjectRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IRoleRepository, RoleRepository>();
         }
 
@@ -118,6 +120,7 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureValidators(IServiceCollection services)
         {
+            services.AddTransient<IValidator<AddUsersToProjectRequest>, AddUsersToProjectValidator>();
             services.AddTransient<IValidator<ProjectExpandedRequest>, ProjectExpandedRequestValidator>();
             services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
             services.AddTransient<IValidator<ProjectUserRequest>, ProjectUserRequestValidator>();

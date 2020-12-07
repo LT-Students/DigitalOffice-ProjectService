@@ -37,6 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         public IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActive)
         {
             var predicate = PredicateBuilder.New<DbProjectUser>(u => u.ProjectId == projectId && u.IsActive);
+
             if (showNotActive)
             {
                 predicate.Or(u => !u.IsActive);
@@ -99,6 +100,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         public IEnumerable<DbProject> GetProjects(bool showNotActive)
         {
             var predicate = PredicateBuilder.New<DbProject>(p => p.IsActive);
+
             if (showNotActive)
             {
                 predicate.Or(p => !p.IsActive);
@@ -110,6 +112,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         public DbRole GetRole(Guid roleId)
         {
             var result = provider.Roles.FirstOrDefault(r => r.Id == roleId);
+
             if (result == null)
             {
                 throw new NotFoundException($"Role with id: '{roleId}' was not found.");

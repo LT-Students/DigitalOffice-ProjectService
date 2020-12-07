@@ -8,6 +8,14 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [ApiController]
     public class WorkersController : ControllerBase
     {
+        [HttpPost("addUsersToProject")]
+        public void AddUsersToProject(
+            [FromServices] IAddUsersToProjectCommand command,
+            [FromQuery] AddUsersToProjectRequest request)
+        {
+            command.Execute(request);
+        }
+
         [HttpDelete("disableWorkersInProject")]
         public void DisableWorkersInProject(
                     [FromServices] IDisableWorkersInProjectCommand command,
