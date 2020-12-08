@@ -72,14 +72,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }
 
         [Test]
-        public void ShouldArgumentNullExceptionWhenListDbProjectUserIsNull()
-        {
-            List<DbProjectUser> newProjectUsers = null;
-
-            Assert.Throws<ArgumentNullException>(() => _userRepository.AddUsersToProject(newProjectUsers, projectId));
-        }
-
-        [Test]
         public void ShouldAddNewUsersToProjectSuccessful()
         {
             Assert.DoesNotThrow(() => _userRepository.AddUsersToProject(_newProjectUsers, projectId));
