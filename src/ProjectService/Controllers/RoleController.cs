@@ -13,6 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         public Guid CreateRole(
             [FromServices] ICreateRoleCommand command,
             [FromBody] CreateRoleRequest request) => command.Execute(request);
+        
         [HttpDelete("disableUserRoleInProject")]
         public bool DisableUserRoleInProject(
             [FromServices] IDisableRoleCommand command,

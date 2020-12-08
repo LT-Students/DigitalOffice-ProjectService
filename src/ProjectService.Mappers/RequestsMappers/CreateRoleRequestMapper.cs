@@ -25,6 +25,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
         {
             return new DbRole()
             {
+                Id = value.Id,
                 Name = value.Name,
                 Description = value.Description
             };
