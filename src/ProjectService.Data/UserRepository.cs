@@ -1,10 +1,11 @@
-﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
+﻿using LT.DigitalOffice.Kernel.Exceptions;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
@@ -17,14 +18,19 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
-        public void AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUser)
+        public void AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUsers , Guid projectId)
         {
-            if (dbProjectUser == null)
+            if (dbProjectUsers == null)
             {
                 throw new ArgumentNullException("List project users is null");
             }
 
-            _provider.ProjectsUsers.AddRange(dbProjectUser);
+            if (!_provider.Projects.Any(p => p.Id == projectId))
+            {
+                throw new BadRequestException("Project with this Id does not exist.");
+            }
+
+            _provider.ProjectsUsers.AddRange(dbProjectUsers);
         }
     }
 }

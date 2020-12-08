@@ -1,7 +1,6 @@
 ﻿using LT.DigitalOffice.ProjectService.Models.Db;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
@@ -14,8 +13,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <summary>
         /// Add users to project.
         /// </summary>
-        /// <param name="dbProjectUser">Id of role to be deleted.</param>
-        /// <returns>Success of delete.</returns>
-        void AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUser);
+        /// <param name="dbProjectUsers">List project users to add.</param>
+        /// <param name="projectId">Project id from request.</param>
+        void AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUsers, Guid projectId);
     }
 }

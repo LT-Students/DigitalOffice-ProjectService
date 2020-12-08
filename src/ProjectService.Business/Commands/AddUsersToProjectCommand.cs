@@ -49,7 +49,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 GetDbProjectUsers(user, request.ProjectId)
             ).ToList();
 
-            _repository.AddUsersToProject(dbProjectUser);
+            _repository.AddUsersToProject(dbProjectUser, request.ProjectId);
         }
 
         public DbProjectUser GetDbProjectUsers(ProjectUserRequest projectUser, Guid projectId)

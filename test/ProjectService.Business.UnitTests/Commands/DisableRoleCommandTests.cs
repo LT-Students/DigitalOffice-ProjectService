@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         {
             roleId = Guid.NewGuid();
         }
-        
+
         [SetUp]
         public void SetUp()
         {
