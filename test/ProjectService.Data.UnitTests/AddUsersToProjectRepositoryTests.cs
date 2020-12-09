@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
+﻿using LT.DigitalOffice.Kernel.Exceptions;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -16,19 +17,18 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private IProjectRepository _projectRepository;
 
         private List<DbProjectUser> _newProjectUsers;
+        private DbContextOptions<ProjectServiceDbContext> _dbOptionsProjectService;
 
-        private Guid projectId;
+        private Guid _projectId;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            projectId = Guid.NewGuid();
+            _projectId = Guid.NewGuid();
 
-            var dbOptionsProjectService = new DbContextOptionsBuilder<ProjectServiceDbContext>()
+            _dbOptionsProjectService = new DbContextOptionsBuilder<ProjectServiceDbContext>()
                 .UseInMemoryDatabase("ProjectServiceTest")
                 .Options;
-
-            _provider = new ProjectServiceDbContext(dbOptionsProjectService);
 
             _userRepository = new UserRepository(_provider);
             _projectRepository = new ProjectRepository(_provider);
@@ -38,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 new DbProjectUser
                 {
                     Id = Guid.NewGuid(),
-                    ProjectId = projectId,
+                    ProjectId = _projectId,
                     UserId = Guid.NewGuid(),
                     RoleId = Guid.NewGuid(),
                     AddedOn = DateTime.Now,
@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 new DbProjectUser
                 {
                     Id = Guid.NewGuid(),
-                    ProjectId = projectId,
+                    ProjectId = _projectId,
                     UserId = Guid.NewGuid(),
                     RoleId = Guid.NewGuid(),
                     AddedOn = DateTime.Now,
@@ -60,21 +60,48 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         [SetUp]
         public void SetUp()
         {
+            _provider = new ProjectServiceDbContext(_dbOptionsProjectService);
+
             _userRepository = new UserRepository(_provider);
             _projectRepository = new ProjectRepository(_provider);
 
             var newProject = new DbProject
             {
-                Id = projectId
+                Id = _projectId
             };
 
             _projectRepository.CreateNewProject(newProject);
         }
 
         [Test]
+        public void ShouldArgumentNullExceptionWhenListDbProjectUserIsNull()
+        {
+            List<DbProjectUser> newProjectUsers = null;
+
+            Assert.Throws<ArgumentNullException>(() => _userRepository.AddUsersToProject(newProjectUsers, _projectId));
+        }
+
+        [Test]
+        public void ShouldBadRequestExceptionWhenProjectIdNotExist()
+        {
+            var projectId = Guid.NewGuid();
+
+            Assert.Throws<BadRequestException>(() => _userRepository.AddUsersToProject(_newProjectUsers, projectId));
+        }
+
+        [Test]
         public void ShouldAddNewUsersToProjectSuccessful()
         {
-            Assert.DoesNotThrow(() => _userRepository.AddUsersToProject(_newProjectUsers, projectId));
+            Assert.DoesNotThrow(() => _userRepository.AddUsersToProject(_newProjectUsers, _projectId));
+        }
+
+        [TearDown]
+        public void CleanMemoryDb()
+        {
+            if (_provider.IsInMemory())
+            {
+                _provider.EnsureDeleted();
+            }
         }
     }
 }
