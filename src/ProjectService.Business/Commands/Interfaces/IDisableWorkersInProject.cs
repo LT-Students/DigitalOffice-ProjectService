@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
@@ -10,7 +11,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
         /// <summary>
         /// Call repository for disabling workers from project.
         /// </summary>
-        /// <param name="request"></param>
-        void Execute(ProjectExpandedRequest request);
+        /// <param name="projectId">Project id.</param>
+        /// <param name="userIds">User ids.</param>
+        void Execute(Guid projectId, IEnumerable<Guid> userIds);
     }
 }
