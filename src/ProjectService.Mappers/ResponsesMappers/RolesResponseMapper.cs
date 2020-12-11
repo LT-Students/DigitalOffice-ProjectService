@@ -2,6 +2,7 @@
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,6 +20,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
 
         public RolesResponse Map(IEnumerable<DbRole> dbRoles)
         {
+            if (dbRoles == null)
+            {
+                throw new ArgumentNullException(nameof(dbRoles));
+            }
+
             return new RolesResponse
             {
                 Roles = dbRoles.Select(r => _roleMapper.Map(r)).ToList(),

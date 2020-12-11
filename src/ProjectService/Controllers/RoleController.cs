@@ -16,6 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         {
             return command.Execute(roleId);
         }
+
         [HttpDelete("disableUserRoleInProject")]
         public bool DisableUserRoleInProject(
             [FromServices] IDisableRoleCommand command,

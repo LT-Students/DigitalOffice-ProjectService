@@ -1,12 +1,10 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Db;
+﻿using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces
 {
-    public interface IRoleExpandedResponseMapper
+    public interface IRoleExpandedResponseMapper : IMapper<DbRole, RoleExpandedResponse>
     {
         RoleExpandedResponse Map(DbRole dbRole);
     }
