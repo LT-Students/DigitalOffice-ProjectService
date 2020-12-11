@@ -21,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
 
         private Mock<IProjectRepository> repositoryMock;
         private Mock<IValidator<ProjectExpandedRequest>> validatorMock;
-        private Mock<IProjectRequestMapper> mapperMock;
+        private Mock<IProjectExpandedRequestMapper> mapperMock;
         private Mock<IAccessValidator> accessValidator;
 
         private DbProject newProject;
@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         {
             validatorMock = new Mock<IValidator<ProjectExpandedRequest>>();
             repositoryMock = new Mock<IProjectRepository>();
-            mapperMock = new Mock<IProjectRequestMapper>();
+            mapperMock = new Mock<IProjectExpandedRequestMapper>();
             accessValidator = new Mock<IAccessValidator>();
 
             command = new CreateNewProjectCommand(repositoryMock.Object, validatorMock.Object, mapperMock.Object, accessValidator.Object);

@@ -15,13 +15,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     {
         private readonly IProjectRepository repository;
         private readonly IValidator<ProjectExpandedRequest> validator;
-        private readonly IProjectRequestMapper mapper;
+        private readonly IProjectExpandedRequestMapper mapper;
         private readonly IAccessValidator accessValidator;
 
         public CreateNewProjectCommand(
             [FromServices] IProjectRepository repository,
             [FromServices] IValidator<ProjectExpandedRequest> validator,
-            [FromServices] IProjectRequestMapper mapper,
+            [FromServices] IProjectExpandedRequestMapper mapper,
             [FromServices] IAccessValidator accessValidator)
         {
             this.repository = repository;
