@@ -27,19 +27,9 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         private DbProject newProject;
         private ProjectExpandedRequest newRequest;
 
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            validatorMock = new Mock<IValidator<ProjectExpandedRequest>>();
-
-            repositoryMock = new Mock<IProjectRepository>();
-
-            mapperMock = new Mock<IProjectRequestMapper>();
-
-            accessValidator = new Mock<IAccessValidator>();
-
-            command = new CreateNewProjectCommand(repositoryMock.Object, validatorMock.Object, mapperMock.Object, accessValidator.Object);
-
             newRequest = new ProjectExpandedRequest
             {
                 Project = new ProjectRequest(),
@@ -50,26 +40,42 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             {
                 Id = Guid.NewGuid()
             };
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            validatorMock = new Mock<IValidator<ProjectExpandedRequest>>();
+            repositoryMock = new Mock<IProjectRepository>();
+            mapperMock = new Mock<IProjectRequestMapper>();
+            accessValidator = new Mock<IAccessValidator>();
+
+            command = new CreateNewProjectCommand(repositoryMock.Object, validatorMock.Object, mapperMock.Object, accessValidator.Object);
 
             validatorMock
                  .Setup(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
-                 .Returns(true);
+                 .Returns(true)
+                 .Verifiable();
 
             mapperMock
                 .Setup(x => x.Map(It.IsAny<ProjectExpandedRequest>()))
-                .Returns(newProject);
+                .Returns(newProject)
+                .Verifiable();
 
             repositoryMock
                 .Setup(x => x.CreateNewProject(It.IsAny<DbProject>()))
-                .Returns(newProject.Id);
+                .Returns(newProject.Id)
+                .Verifiable();
 
             accessValidator
                 .Setup(x => x.IsAdmin())
-                .Returns(true);
+                .Returns(true)
+                .Verifiable();
 
             accessValidator
                 .Setup(x => x.HasRights(It.IsAny<int>()))
-                .Returns(true);
+                .Returns(true)
+                .Verifiable();
         }
 
         [Test]
