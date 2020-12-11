@@ -5,6 +5,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
@@ -23,6 +24,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         public void Execute(Guid projectId, IEnumerable<Guid> userIds)
         {
+            if (userIds == null || userIds.Count() == 0)
+            {
+                throw new BadRequestException("Users not specified.");
+            }
+
             const int rightId = 2;
 
             if (!(accessValidator.IsAdmin() || accessValidator.HasRights(rightId)))
