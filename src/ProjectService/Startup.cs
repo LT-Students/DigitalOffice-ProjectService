@@ -2,6 +2,7 @@ using FluentValidation;
 using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Kernel;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.ProjectService.Broker;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Configuration;
@@ -63,12 +64,19 @@ namespace LT.DigitalOffice.ProjectService
 
             services.AddMassTransit(x =>
             {
+                x.AddConsumer<GetProjectInfoConsumer>();
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host("localhost", "/", host =>
                     {
                         host.Username($"{rabbitMqConfig.Username}_{rabbitMqConfig.Password}");
                         host.Password(rabbitMqConfig.Password);
+                    });
+
+                    cfg.ReceiveEndpoint("ProjectService", ep =>
+                    {
+                        ep.ConfigureConsumer<GetProjectInfoConsumer>(context);
                     });
                 });
 
