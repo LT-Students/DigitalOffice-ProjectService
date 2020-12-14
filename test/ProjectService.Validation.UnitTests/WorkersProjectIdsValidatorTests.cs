@@ -1,68 +1,55 @@
 ﻿using FluentValidation;
 using FluentValidation.TestHelper;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
     class WorkersProjectIdsValidatorTests
     {
-        private List<Guid> workerIds;
-
-        private IValidator<WorkersIdsInProjectRequest> validator;
-        private WorkersIdsInProjectRequest workersProjectRequest;
+        private IValidator<ProjectUserRequest> validator;
+        private ProjectUserRequest userProjectRequest;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            validator = new WorkersProjectIdsValidator();
-            workerIds = new List<Guid>();
+            validator = new ProjectUserRequestValidator();
+        }
 
-            workersProjectRequest = new WorkersIdsInProjectRequest
+        [SetUp]
+        public void SetUp()
+        {
+            userProjectRequest = new ProjectUserRequest
             {
-                ProjectId = new Guid(),
-                WorkersIds = workerIds
+                RoleId = Guid.NewGuid(),
+                User = new UserRequest
+                {
+                    Id = Guid.NewGuid()
+                }
             };
         }
 
         [Test]
         public void ShouldNotHaveValidationErrorsWhenRequestIsValid()
         {
-            workerIds = new List<Guid>
-            {
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-                Guid.NewGuid()
-            };
-
-            workersProjectRequest.WorkersIds = workerIds;
-            validator.TestValidate(workersProjectRequest).ShouldNotHaveAnyValidationErrors();
+            validator.TestValidate(userProjectRequest).ShouldNotHaveAnyValidationErrors();
         }
 
         [Test]
-        public void ShouldHaveValidationErrorWhenProjectIdEmpty()
+        public void ShouldHaveValidationErrorWhenUserIdIsEmpty()
         {
-            workersProjectRequest.ProjectId = Guid.Empty;
+            userProjectRequest.User.Id = Guid.Empty;
 
-            validator.TestValidate(workersProjectRequest).ShouldHaveValidationErrorFor(r => r.ProjectId);
+            validator.TestValidate(userProjectRequest).ShouldHaveValidationErrorFor(r => r.User.Id);
         }
 
         [Test]
-        public void ShouldHaveValidationErrorWhenWorkerIdEmpty()
+        public void ShouldHaveValidationErrorWhenRoleIdIsEmpty()
         {
-            workerIds = new List<Guid>
-            {
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-                Guid.Empty
-            };
+            userProjectRequest.RoleId = Guid.Empty;
 
-            workersProjectRequest.ProjectId = Guid.NewGuid();
-            workersProjectRequest.WorkersIds = workerIds;
-
-            validator.TestValidate(workersProjectRequest).ShouldHaveValidationErrorFor(r => r.WorkersIds);
+            validator.TestValidate(userProjectRequest).ShouldHaveValidationErrorFor(r => r.RoleId);
         }
     }
 }

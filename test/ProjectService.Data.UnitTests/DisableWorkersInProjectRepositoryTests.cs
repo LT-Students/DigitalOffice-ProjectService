@@ -1,9 +1,12 @@
-﻿using LT.DigitalOffice.ProjectService.Data;
+﻿using LT.DigitalOffice.Kernel.Exceptions;
+using LT.DigitalOffice.ProjectService.Data;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
@@ -19,9 +22,9 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         private IProjectRepository repository;
 
         private DbProject newProject;
-        private List<Guid> workersIds;
-        private List<DbProjectUser> workersProject;
-        private WorkersIdsInProjectRequest workersIdsInProjectRequest;
+        private List<DbProjectUser> dbProjectUsers;
+        private Guid projectIdRequest;
+        private IEnumerable<Guid> userIdsRequest;
         #endregion
 
         #region setup
@@ -50,14 +53,13 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 Users = new List<DbProjectUser>()
             };
 
-            workersIds = new List<Guid>();
-            workersProject = new List<DbProjectUser>();
-            workersIdsInProjectRequest = new WorkersIdsInProjectRequest();
+            dbProjectUsers = new List<DbProjectUser>();
 
             for (int i = 0; i < 3; i++)
             {
-                var worker = new DbProjectUser
+                var dbProjectUser = new DbProjectUser
                 {
+                    Id = Guid.NewGuid(),
                     ProjectId = projectId,
                     UserId = Guid.NewGuid(),
                     AddedOn = DateTime.Today,
@@ -65,11 +67,13 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                     IsActive = true
                 };
 
-                workersProject.Add(worker);
-                workersIds.Add(worker.UserId);
-
-                newProject.Users.Add(worker);
+                dbProjectUsers.Add(dbProjectUser);
             }
+
+            newProject.Users = dbProjectUsers;
+
+            projectIdRequest = newProject.Id;
+            userIdsRequest = newProject.Users.Select(x => x.UserId);
         }
 
         [SetUp]
@@ -88,13 +92,10 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         [Test]
         public void ShouldDisableWorkersSuccessfully()
         {
-            workersIdsInProjectRequest.ProjectId = newProject.Id;
-            workersIdsInProjectRequest.WorkersIds = workersIds;
-
-            repository.DisableWorkersInProject(workersIdsInProjectRequest);
+            repository.DisableWorkersInProject(projectIdRequest, userIdsRequest);
 
             var project = provider.Projects
-                .FirstOrDefault(p => p.Id == workersIdsInProjectRequest.ProjectId);
+                .FirstOrDefault(p => p.Id == projectIdRequest);
 
             Assert.Multiple(() =>
             {
@@ -118,22 +119,16 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         [Test]
         public void ShouldThrowNullReferenceExceptionWhenProjectIdNotFound()
         {
-            workersIdsInProjectRequest.ProjectId = Guid.NewGuid();
-
-            Assert.That(() => repository.DisableWorkersInProject(workersIdsInProjectRequest),
-                Throws.InstanceOf<NullReferenceException>().And
-                .Message.EqualTo("Project with this Id does not exist."));
+            Assert.That(() => repository.DisableWorkersInProject(Guid.NewGuid(), userIdsRequest),
+                Throws.InstanceOf<NotFoundException>());
         }
 
         [Test]
         public void ShouldThrowNullReferenceExceptionWhenWorkerIdNotFound()
         {
-            workersIdsInProjectRequest.ProjectId = newProject.Id;
-            workersIdsInProjectRequest.WorkersIds = new List<Guid> { Guid.NewGuid() };
-
-            Assert.That(() => repository.DisableWorkersInProject(workersIdsInProjectRequest),
-                Throws.InstanceOf<NullReferenceException>().And
-                .Message.EqualTo("Worker with this Id does not exist."));
+            var randomUsers = new List<Guid> { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+            Assert.That(() => repository.DisableWorkersInProject(projectIdRequest, randomUsers),
+                Throws.InstanceOf<NotFoundException>());
         }
         #endregion
 

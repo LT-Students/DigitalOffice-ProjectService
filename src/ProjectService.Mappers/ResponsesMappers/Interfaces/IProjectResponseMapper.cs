@@ -1,8 +1,8 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
+using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces
 {
-    public interface IProjectResponseMapper : IMapper<DbProject, ProjectResponse> { }
+    public interface IProjectResponseMapper : IMapper<DbProject, Project> { }
 }

@@ -1,7 +1,6 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
@@ -23,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 Description = value.Description,
                 ClosedAt = value.ClosedAt,
                 CreatedAt = value.CreatedAt,
-                ClosedReason = value.ClosedReason.HasValue ? ((ProjectClosedReason)value.ClosedReason).ToString() : null,
+                ClosedReason = value.ClosedReason ?? null,
                 IsActive = value.IsActive
             };
         }

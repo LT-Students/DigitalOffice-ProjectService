@@ -1,19 +1,20 @@
 ﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class WorkersController : ControllerBase
+    public class UserController : ControllerBase
     {
-        [HttpDelete("disableWorkersInProject")]
-        public void DisableWorkersInProject(
+        [HttpDelete("removeUsersFromProject")]
+        public void RemoveUsersFromProject(
                     [FromServices] IDisableWorkersInProjectCommand command,
-                    [FromQuery] WorkersIdsInProjectRequest request)
+                    [FromQuery] Guid projectId,
+                    [FromQuery] Guid[] userIds)
         {
-            command.Execute(request);
+            command.Execute(projectId, userIds);
         }
     }
 }

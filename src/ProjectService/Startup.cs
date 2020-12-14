@@ -16,6 +16,7 @@ using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -87,7 +88,8 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<ICreateRoleCommand, CreateRoleCommand>();
             //services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
             //services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
-            //services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
+
+            services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
             services.AddTransient<IGetProjectsCommand, GetProjectsCommand>();
             services.AddTransient<IDisableRoleCommand, DisableRoleCommand>();
         }
@@ -109,16 +111,18 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<IProjectUserMapper, ProjectUserMapper>();
             services.AddTransient<IRoleMapper, RoleMapper>();
             services.AddTransient<ICreateRoleRequestMapper, CreateRoleRequestMapper>();
+            services.AddTransient<IProjectExpandedRequestMapper, ProjectExpandedRequestMapper>();
             services.AddTransient<IProjectResponseMapper, ProjectResponseMapper>();
+            services.AddTransient<IProjectUserRequestMapper, ProjectUserRequestMapper>();
             services.AddTransient<IProjectExpandedResponseMapper, ProjectExpandedResponseMapper>();
-        }
+    }
 
         private void ConfigureValidators(IServiceCollection services)
         {
-            services.AddTransient<IValidator<NewProjectRequest>, ProjectValidator>();
+            services.AddTransient<IValidator<ProjectExpandedRequest>, ProjectExpandedRequestValidator>();
             services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
-            services.AddTransient<IValidator<WorkersIdsInProjectRequest>, WorkersProjectIdsValidator>();
             services.AddTransient<IValidator<CreateRoleRequest>, RoleValidator>();
+            services.AddTransient<IValidator<ProjectUserRequest>, ProjectUserRequestValidator>();
         }
 
         public void Configure(IApplicationBuilder app)

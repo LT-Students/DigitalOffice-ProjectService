@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     public class ProjectController : ControllerBase
     {
         [HttpGet("getProjects")]
-        public IEnumerable<ProjectResponse> GetProjects(
+        public IEnumerable<Project> GetProjects(
             [FromServices] IGetProjectsCommand command,
             [FromQuery] bool showNotActive = false)
         {
@@ -31,7 +32,10 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         [HttpPost("createNewProject")]
         public Guid CreateNewProject(
             [FromServices] ICreateNewProjectCommand command,
-            [FromBody] NewProjectRequest request) => command.Execute(request);
+            [FromBody] ProjectExpandedRequest request)
+        {
+            return command.Execute(request);
+        }
 
         [HttpPut("editProjectById")]
         public Guid EditProjectById(
