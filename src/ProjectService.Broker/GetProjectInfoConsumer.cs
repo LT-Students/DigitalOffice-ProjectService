@@ -7,15 +7,16 @@ using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Broker
 {
     /// <summary>
-    /// Consumer for getting information about the user.
+    /// Consumer for getting information about the user on project.
     /// </summary>
-    public class GetProjectInfoConsumer : IConsumer<IGetProjectRequest>
+    public class GetProjectInfoConsumer : IConsumer<IGetProjectUserRequest>
     {
         private readonly IProjectRepository repository;
 
@@ -25,23 +26,24 @@ namespace LT.DigitalOffice.ProjectService.Broker
             this.repository = repository;
         }
 
-        public async Task Consume(ConsumeContext<IGetProjectRequest> context)
+        public async Task Consume(ConsumeContext<IGetProjectUserRequest> context)
         {
             var response = OperationResultWrapper.CreateResponse(GetProjectInfo, context.Message);
 
-            await context.RespondAsync<IOperationResult<IGetProjectResponse>>(response);
+            await context.RespondAsync<IOperationResult<IGetProjectUserResponse>>(response);
         }
 
-        private object GetProjectInfo(IGetProjectRequest request)
+        private object GetProjectInfo(IGetProjectUserRequest request)
         {
-            var dbProject = repository.GetProject(request.ProjectId);
+            var dbProjectUser = repository.GetProjectUsers(request.ProjectId, true)
+                .FirstOrDefault(x => x.UserId == request.UserId);
 
-            if (dbProject == null)
+            if (dbProjectUser == null)
             {
                 throw new NotFoundException();
             }
 
-            return IGetProjectResponse.CreateObj(dbProject.Id, dbProject.IsActive);
+            return IGetProjectUserResponse.CreateObj(dbProjectUser.Id, dbProjectUser.IsActive);
         }
     }
 }

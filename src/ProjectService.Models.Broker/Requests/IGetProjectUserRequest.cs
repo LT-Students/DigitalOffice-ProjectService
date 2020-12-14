@@ -2,8 +2,9 @@
 
 namespace LT.DigitalOffice.Broker.Requests
 {
-    public interface IGetProjectRequest
+    public interface IGetProjectUserRequest
     {
         Guid ProjectId { get; }
+        Guid UserId { get; }
     }
 }

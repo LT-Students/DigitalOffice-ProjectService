@@ -2,16 +2,16 @@
 
 namespace LT.DigitalOffice.Broker.Responses
 {
-    public interface IGetProjectResponse
+    public interface IGetProjectUserResponse
     {
         Guid Id { get; }
         bool IsActive { get; }
 
-        static object CreateObj(Guid projectId, bool isActive)
+        static object CreateObj(Guid projectUserId, bool isActive)
         {
             return new
             {
-                Id = projectId,
+                Id = projectUserId,
                 IsActive = isActive
             };
         }
