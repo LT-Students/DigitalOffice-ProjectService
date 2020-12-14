@@ -74,7 +74,7 @@ namespace LT.DigitalOffice.ProjectService
                         host.Password(rabbitMqConfig.Password);
                     });
 
-                    cfg.ReceiveEndpoint("ProjectService", ep =>
+                    cfg.ReceiveEndpoint("ProjectService_ProjectUser", ep =>
                     {
                         ep.ConfigureConsumer<GetProjectInfoConsumer>(context);
                     });
