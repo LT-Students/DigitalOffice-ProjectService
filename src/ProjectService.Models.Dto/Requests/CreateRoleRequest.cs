@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
