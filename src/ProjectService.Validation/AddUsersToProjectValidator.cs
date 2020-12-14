@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
@@ -11,7 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                .NotEmpty()
                .WithMessage("Request must have a project Id");
 
-            When(project => project.Users != null, () =>
+            When(project => project.Users != null && project.Users.Count() != 0, () =>
             {
                 RuleForEach(project => project.Users).SetValidator(new ProjectUserRequestValidator());
             });

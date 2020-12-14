@@ -2,7 +2,6 @@
 using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -64,9 +63,32 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
-        public void ShouldHaveValidationErrorForWhenUserIsNull()
+        public void ShouldHaveValidationErrorForWhenUsersIsNull()
         {
             List<ProjectUserRequest> projectUser = null;
+
+            validator.ShouldNotHaveValidationErrorFor(x => x.Users, projectUser);
+        }
+
+        [Test]
+        public void ShouldHaveValidationErrorForWhenListOfUsersIsEmpty()
+        {
+            List<ProjectUserRequest> projectUser = new List<ProjectUserRequest>();
+
+            validator.ShouldNotHaveValidationErrorFor(x => x.Users, projectUser);
+        }
+
+        [Test]
+        public void ShouldHaveValidationErrorForWhenUserDataNotValid()
+        {
+            List<ProjectUserRequest> projectUser = new List<ProjectUserRequest>
+            {
+                new ProjectUserRequest
+                {
+                    RoleId = Guid.NewGuid(),
+                    User = new UserRequest()
+                }
+            };
 
             validator.ShouldNotHaveValidationErrorFor(x => x.Users, projectUser);
         }
