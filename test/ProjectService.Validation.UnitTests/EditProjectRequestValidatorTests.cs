@@ -2,7 +2,6 @@
 using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
@@ -18,15 +17,14 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
     public class EditProjectRequestValidatorTests
     {
         private IValidator<EditProjectRequest> validator;
-        private Mock<IProjectRepository> mockRepository;
         private EditProjectRequest editRequest;
+        private IContractResolver resolver;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            mockRepository = new Mock<IProjectRepository>();
-
-            validator = new EditProjectValidator(mockRepository.Object);
+            validator = new EditProjectValidator();
+            resolver = new CamelCasePropertyNamesContractResolver();
         }
 
         [SetUp]
@@ -39,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     new Operation<DbProject>("replace", "/Name", "", "New Project Name"),
                     new Operation<DbProject>("replace", "/ShortName", "", "NPN"),
                     new Operation<DbProject>("replace", "/Description", "", "New project description"),
-                }, new CamelCasePropertyNamesContractResolver()),
+                }, resolver),
                 ProjectId = Guid.NewGuid()
             };
         }
@@ -78,11 +76,34 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 
         #region field validations
         [Test]
+        public void ShouldValidateEditProjectRequestWhenNameIsValid()
+        {
+            editRequest.Patch.Operations.Find(x => x.path == "/Name").op = "add";
+            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
+
+            editRequest.Patch.Operations.Find(x => x.path == "/Name").op = "replace";
+            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
+        }
+
+        [Test]
         public void ShouldThrowValidationExceptionWhenNameIsTooLong()
         {
             editRequest.Patch.Operations.Find(x => x.path == "/Name").value = "".PadLeft(81);
 
             validator.TestValidate(editRequest).ShouldHaveAnyValidationError();
+        }
+
+        [Test]
+        public void ShouldValidateEditProjectRequestWhenShortNameIsValid()
+        {
+            editRequest.Patch.Operations.Find(x => x.path == "/ShortName").op = "add";
+            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
+
+            editRequest.Patch.Operations.Find(x => x.path == "/ShortName").op = "replace";
+            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
+
+            editRequest.Patch.Operations.Find(x => x.path == "/ShortName").op = "remove";
+            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
         }
 
         [Test]
@@ -94,65 +115,22 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
-        public void ShouldThrowValidationExceptionWhenDescriptionIsTooLong()
+        public void ShouldValidateEditProjectRequestWhenDescriptionIsValid()
         {
-            editRequest.Patch.Operations.Find(x => x.path == "/Description").value = "".PadLeft(501);
+            editRequest.Patch.Operations.Find(x => x.path == "/Description").op = "add";
+            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
 
-            validator.TestValidate(editRequest).ShouldHaveAnyValidationError();
-        }
+            editRequest.Patch.Operations.Find(x => x.path == "/Description").op = "replace";
+            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
 
-        [Test]
-        public void ShouldThrowValidationExceptionWhenIsActiveAndClosedReasonIsNotValid1()
-        {
-            editRequest.Patch.Operations.Add(new Operation<DbProject>("replace", "/IsActive", "", true));
-            editRequest.Patch.Operations.Add(new Operation<DbProject>("replace", "/ClosedReason", "", ProjectClosedReason.Completed));
-
-            validator.TestValidate(editRequest).ShouldHaveAnyValidationError();
-        }
-
-        [Test]
-        public void ShouldThrowValidationExceptionWhenIsActiveAndClosedReasonIsNotValid2()
-        {
-            editRequest.Patch.Operations.Add(new Operation<DbProject>("replace", "/IsActive", "", false));
-            editRequest.Patch.Operations.Add(new Operation<DbProject>("replace", "/ClosedReason", "",(ProjectClosedReason)10000));
-
-            validator.TestValidate(editRequest).ShouldHaveAnyValidationError();
-        }
-
-        [Test]
-        public void ShouldThrowValidationExceptionWhenIsActiveAndClosedReasonIsNotValid3() //CastClosedReasonIfPossible
-        {
-            editRequest.Patch.Operations.Add(new Operation<DbProject>("replace", "/IsActive", "", false));
-            editRequest.Patch.Operations.Add(new Operation<DbProject>("replace", "/ClosedReason", "", null));
-
-            validator.TestValidate(editRequest).ShouldHaveAnyValidationError();
-        }
-
-        [Test]
-        public void ShouldThrowValidationExceptionWhenIsActiveAndClosedReasonIsNotValid4()
-        {
-            editRequest.Patch.Operations.Add(new Operation<DbProject>("replace", "/ClosedReason", "", ProjectClosedReason.Failed));
-
-            mockRepository.Setup(x => x.GetProject(editRequest.ProjectId)).Returns(new DbProject { IsActive = true });
-
-            validator.TestValidate(editRequest).ShouldHaveAnyValidationError();
-        }
-
-        [Test]
-        public void ShouldValidateEditProjectRequestWhenIsActiveAndClosedReasonIsCorrect1()
-        {
-            editRequest.Patch.Operations.Add(new Operation<DbProject>("replace", "/IsActive", "", false));
-            editRequest.Patch.Operations.Add(new Operation<DbProject>("replace", "/ClosedReason", "", ProjectClosedReason.Completed));
-
+            editRequest.Patch.Operations.Find(x => x.path == "/Description").op = "remove";
             validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
         }
 
         [Test]
-        public void ShouldValidateEditProjectRequestWhenIsActiveAndClosedReasonIsCorrect2()
+        public void ShouldThrowValidationExceptionWhenDescriptionIsTooLong()
         {
-            editRequest.Patch.Operations.Add(new Operation<DbProject>("replace", "/ClosedReason", "", ProjectClosedReason.Failed));
-
-            mockRepository.Setup(x => x.GetProject(editRequest.ProjectId)).Returns(new DbProject { IsActive = false });
+            editRequest.Patch.Operations.Find(x => x.path == "/Description").value = "".PadLeft(501);
 
             validator.TestValidate(editRequest).ShouldHaveAnyValidationError();
         }
