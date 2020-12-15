@@ -64,7 +64,7 @@ namespace LT.DigitalOffice.ProjectService
 
             services.AddMassTransit(x =>
             {
-                x.AddConsumer<GetProjectInfoConsumer>();
+                x.AddConsumer<GetProjectUserInfoConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -76,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService
 
                     cfg.ReceiveEndpoint("ProjectService_ProjectUser", ep =>
                     {
-                        ep.ConfigureConsumer<GetProjectInfoConsumer>(context);
+                        ep.ConfigureConsumer<GetProjectUserInfoConsumer>(context);
                     });
                 });
 

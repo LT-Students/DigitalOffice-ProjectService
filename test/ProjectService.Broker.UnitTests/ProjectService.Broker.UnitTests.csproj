@@ -8,4 +8,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ProjectService.Broker\ProjectService.Broker.csproj" />
+    <ProjectReference Include="..\..\src\ProjectService.Data\ProjectService.Data.csproj" />
+    <ProjectReference Include="..\..\src\ProjectService.Models.Broker\ProjectService.Models.Broker.csproj" />
+  </ItemGroup>
+
 </Project>

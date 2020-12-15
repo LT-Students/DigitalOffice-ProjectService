@@ -13,11 +13,11 @@ namespace LT.DigitalOffice.ProjectService.Broker
     /// <summary>
     /// Consumer for getting information about the user on project.
     /// </summary>
-    public class GetProjectInfoConsumer : IConsumer<IGetProjectUserRequest>
+    public class GetProjectUserInfoConsumer : IConsumer<IGetProjectUserRequest>
     {
         private readonly IProjectRepository repository;
 
-        public GetProjectInfoConsumer(
+        public GetProjectUserInfoConsumer(
             [FromServices] IProjectRepository repository)
         {
             this.repository = repository;
