@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -15,6 +16,14 @@ namespace LT.DigitalOffice.ProjectService.Controllers
                     [FromQuery] Guid[] userIds)
         {
             command.Execute(projectId, userIds);
+        }
+
+        [HttpPost("editProjectUserById")]
+        public void EditProjectUserById(
+                    [FromServices] IEditProjectUserByIdCommand command,
+                    [FromBody] EditProjectUserRequest request)
+        {
+            command.Execute(request);
         }
     }
 }

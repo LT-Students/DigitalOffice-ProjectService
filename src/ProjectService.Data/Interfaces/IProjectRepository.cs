@@ -39,6 +39,20 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbProjectUser"></param>
+        /// <returns></returns>
+        Guid EditProjectUserById(DbProjectUser dbProjectUser);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="projectUserId"></param>
+        /// <returns></returns>
+        DbProjectUser GetProjectUserById(Guid projectUserId);
+
+        /// <summary>
         /// Returns all projects.
         /// </summary>
         /// <param name="showNotActive">Do you want to show inactive projects?</param>

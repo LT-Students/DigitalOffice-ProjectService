@@ -115,5 +115,33 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             return result;
         }
+
+        public Guid EditProjectUserById(DbProjectUser dbProjectUser)
+        {
+            var projectToEdit = provider.ProjectsUsers
+                .AsNoTracking()
+                .FirstOrDefault(p => p.Id == dbProjectUser.Id);
+
+            if (projectToEdit == null)
+            {
+                throw new NotFoundException($"ProjectUser with this Id {dbProjectUser.Id} was not found.");
+            }
+
+            provider.ProjectsUsers.Update(dbProjectUser);
+            provider.Save();
+
+            return dbProjectUser.Id;
+        }
+
+        public DbProjectUser GetProjectUserById(Guid projectUserId)
+        {
+            var result = provider.ProjectsUsers.FirstOrDefault(r => r.Id == projectUserId);
+            if (result == null)
+            {
+                throw new NotFoundException($"ProjectUser with id: '{projectUserId}' was not found.");
+            }
+
+            return result;
+        }
     }
 }
