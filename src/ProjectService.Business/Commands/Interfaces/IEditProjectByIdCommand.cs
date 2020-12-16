@@ -12,9 +12,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
         /// <summary>
         /// Calls methods to edit the existing project. Returns the Id of the edited project.
         /// </summary>
-        /// <param name="projectId">Id of the project to edit.</param>
-        /// <param name="request">New data to update the project with.</param>
+        /// <param name="request">Data to update the project.</param>
         /// <returns></returns>
-        Guid Execute(Guid projectId, EditProjectRequest request);
+        Guid Execute(EditProjectRequest request);
     }
 }

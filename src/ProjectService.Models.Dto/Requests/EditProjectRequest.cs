@@ -1,14 +1,12 @@
-﻿using System;
+﻿using LT.DigitalOffice.ProjectService.Models.Db;
+using Microsoft.AspNetCore.JsonPatch;
+using System;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
     public class EditProjectRequest
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string ShortName { get; set; }
-        public string Description { get; set; }
-        public Guid DepartmentId { get; set; }
-        public bool IsActive { get; set; }
+        public JsonPatchDocument<DbProject> Patch { get; set; }
+        public Guid ProjectId { get; set; }
     }
 }
