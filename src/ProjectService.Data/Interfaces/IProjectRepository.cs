@@ -1,5 +1,4 @@
 ﻿using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using System;
 using System.Collections.Generic;
 
@@ -35,13 +34,30 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <summary>
         /// Disable active workers, which were previously assigned to the project.
         /// </summary>
-        /// <param name="request">Contains workers id and project id.</param>
-        void DisableWorkersInProject(ProjectExpandedRequest request);
+        /// <param name="projectId">Project id.</param>
+        /// <param name="userIds">User ids.</param>
+        void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds);
 
+        /// <summary>
+        /// Returns all projects.
+        /// </summary>
+        /// <param name="showNotActive">Do you want to show inactive projects?</param>
+        /// <returns>All projects.</returns>
         IEnumerable<DbProject> GetProjects(bool showNotActive);
 
+        /// <summary>
+        /// Returns all users from project with specified id.
+        /// </summary>
+        /// <param name="projectId">Project id.</param>
+        /// <param name="showNotActiveUsers">Do you want to show inactive users?</param>
+        /// <returns>All users from project..</returns>
         IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActiveUsers);
 
+        /// <summary>
+        /// Return role by id.
+        /// </summary>
+        /// <param name="roleId">Role id.</param>
+        /// <returns>Role with specified id.</returns>
         DbRole GetRole(Guid roleId);
     }
 }

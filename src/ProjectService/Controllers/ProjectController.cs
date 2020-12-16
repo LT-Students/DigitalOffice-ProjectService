@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         [HttpPost("createNewProject")]
         public Guid CreateNewProject(
             [FromServices] ICreateNewProjectCommand command,
-            [FromBody] NewProjectRequest request)
+            [FromBody] ProjectExpandedRequest request)
         {
             return command.Execute(request);
         }
