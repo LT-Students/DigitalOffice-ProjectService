@@ -15,41 +15,48 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         private IDataProvider provider;
         private ProjectRepository repository;
 
-        private Guid departmentId;
-
         private DbProject dbProject;
         private DbProject editProject;
         private DbContextOptions<ProjectServiceDbContext> dbOptionsProjectService;
 
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             dbOptionsProjectService = new DbContextOptionsBuilder<ProjectServiceDbContext>()
                 .UseInMemoryDatabase(databaseName: "ProjectServiceTest")
                 .Options;
+        }
 
+        [SetUp]
+        public void SetUp()
+        {
             provider = new ProjectServiceDbContext(dbOptionsProjectService);
             repository = new ProjectRepository(provider);
 
-            departmentId = Guid.NewGuid();
-
             dbProject = new DbProject
             {
+                Id = Guid.NewGuid(),
                 Name = "A test name",
                 ShortName = "Test",
-                DepartmentId = departmentId,
+                DepartmentId = Guid.NewGuid(),
                 Description = "Description",
                 IsActive = true
             };
 
             editProject = new DbProject
             {
+                Id = dbProject.Id,
                 Name = "Is different",
                 ShortName = "Test",
                 DepartmentId = Guid.NewGuid(),
                 Description = "Is different too",
                 IsActive = false
             };
+
+            provider.Projects.Add(dbProject);
+            provider.Save();
+            provider.MakeEntityDetached(dbProject);
+            provider.Save();
         }
 
         [Test]
@@ -57,15 +64,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         {
             DbProject existingProject;
             DbProject editedProject;
-
-            dbProject.Id = Guid.NewGuid();
-            editProject.Id = dbProject.Id;
-
-            provider.Projects.Add(dbProject);
-            provider.Save();
-
-            provider.MakeEntityDetached(dbProject);
-            provider.Save();
 
             existingProject = provider.Projects
                 .AsNoTracking()
@@ -89,18 +87,10 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         [Test]
         public void ShouldThrowNoExceptionsWhenNoChangesMadeToDbProject()
         {
-            this.dbProject.Id = Guid.NewGuid();
-
-            editProject.Id = dbProject.Id;
             editProject.Name = dbProject.Name;
             editProject.IsActive = dbProject.IsActive;
             editProject.Description = dbProject.Description;
             editProject.DepartmentId = dbProject.DepartmentId;
-
-            provider.Projects.Add(dbProject);
-            provider.Save();
-            provider.MakeEntityDetached(dbProject);
-            provider.Save();
 
             var existingProject = provider.Projects
                 .AsNoTracking()
@@ -121,14 +111,9 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         }
 
         [Test]
-        public void ShouldThrowNullReferenceExceptionWhenNoGuidIsPassedIn()
+        public void ShouldThrowNullReferenceExceptionWhenProjectUserIsNotFound()
         {
-            Assert.Throws<NullReferenceException>(() => repository.EditProjectById(editProject));
-        }
-
-        [Test]
-        public void ShouldThrowNullReferenceExceptionWhenGuidIsNull()
-        {
+            editProject.Id = Guid.Empty;
             Assert.Throws<NullReferenceException>(() => repository.EditProjectById(editProject));
         }
 

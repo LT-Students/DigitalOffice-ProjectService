@@ -76,6 +76,8 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
 
             Assert.Throws<ValidationException>(() => command.Execute(editRequest));
 
+            accessValidatorMock.Verify(r => r.HasRights(It.IsAny<int>()), Times.Never);
+            repositoryMock.Verify(r => r.GetProject(It.IsAny<Guid>()), Times.Never);
             repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Never);
         }
 
@@ -90,21 +92,30 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                .Setup(x => x.IsAdmin())
                .Returns(false);
 
-            Assert.Throws<ForbiddenException>(
-                () => command.Execute(editRequest), "Project with this ID has been found");
-            validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
+            Assert.Throws<ForbiddenException>(() => command.Execute(editRequest));
+            repositoryMock.Verify(r => r.GetProject(It.IsAny<Guid>()), Times.Never);
+            repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Never);
         }
 
         [Test]
-        public void ShouldThrowNullReferenceExceptionWhenDbProjectWasNotFound()
+        public void ShouldThrowNullReferenceExceptionWhenDbProjectWasNotFound1()
+        {
+            repositoryMock
+                .Setup(x => x.GetProject(It.IsAny<Guid>()))
+                .Throws(new NullReferenceException());
+
+            Assert.Throws<NullReferenceException>(() => command.Execute(editRequest));
+            repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Never);
+        }
+
+        [Test]
+        public void ShouldThrowNullReferenceExceptionWhenDbProjectWasNotFound2()
         {
             repositoryMock
                 .Setup(x => x.EditProjectById(It.IsAny<DbProject>()))
                 .Throws(new NullReferenceException());
 
-            Assert.Throws<NullReferenceException>(
-                () => command.Execute(editRequest), "Project with this ID has been found");
-            validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
+            Assert.Throws<NullReferenceException>(() => command.Execute(editRequest));
         }
 
         [Test]
@@ -124,9 +135,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(false);
 
             Assert.AreEqual(editRequest.ProjectId, command.Execute(editRequest));
-            validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
-            repositoryMock.Verify(r => r.GetProject(dbProject.Id), Times.Once);
-            repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Once);
         }
 
         [Test]
@@ -137,8 +145,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(false);
 
             Assert.AreEqual(editRequest.ProjectId, command.Execute(editRequest));
-            validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
-            repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Once);
         }
     }
 }

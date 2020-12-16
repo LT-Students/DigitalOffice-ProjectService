@@ -1,13 +1,9 @@
-﻿using FluentValidation;
-using LT.DigitalOffice.ProjectService.Data;
-using LT.DigitalOffice.ProjectService.Data.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Data;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -16,121 +12,113 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 {
     public class EditProjectUserByIdRepositoryTests
     {
-        private DbProjectUser dbProject;
-        private EditProjectUserRequest editRequest;
-        private IEditProjectUserByIdCommand command;
-        private Mock<IProjectRepository> repositoryMock;
-        private Mock<IValidator<EditProjectUserRequest>> validatorMock;
+        private IDataProvider provider;
+        private ProjectRepository repository;
 
-        [SetUp]
-        public void SetUp()
+        private DbProjectUser dbProjectUser;
+        private DbProjectUser editProjectUser;
+        private DbContextOptions<ProjectServiceDbContext> dbOptionsProjectService;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             dbOptionsProjectService = new DbContextOptionsBuilder<ProjectServiceDbContext>()
                 .UseInMemoryDatabase(databaseName: "ProjectServiceTest")
                 .Options;
+        }
 
+        [SetUp]
+        public void SetUp()
+        {
             provider = new ProjectServiceDbContext(dbOptionsProjectService);
             repository = new ProjectRepository(provider);
 
-            departmentId = Guid.NewGuid();
-
-            dbProject = new DbProject
+            dbProjectUser = new DbProjectUser
             {
-                Name = "A test name",
-                ShortName = "Test",
-                DepartmentId = departmentId,
-                Description = "Description",
+                Id = Guid.NewGuid(),
+                RoleId = Guid.NewGuid(),
+                ProjectId = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
+                AddedOn = new DateTime(2020, 12, 23),
+                RemovedOn = new DateTime(2021, 12, 23),
                 IsActive = true
             };
 
-            editProject = new DbProject
+            editProjectUser = new DbProjectUser
             {
-                Name = "Is different",
-                ShortName = "Test",
-                DepartmentId = Guid.NewGuid(),
-                Description = "Is different too",
+                Id = dbProjectUser.Id,
+                RoleId = Guid.NewGuid(),
+                ProjectId = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
+                AddedOn = new DateTime(2020, 1, 23),
+                RemovedOn = new DateTime(2021, 1, 23),
                 IsActive = false
             };
+
+            provider.ProjectsUsers.Add(dbProjectUser);
+            provider.Save();
+            provider.MakeEntityDetached(dbProjectUser);
+            provider.Save();
         }
 
         [Test]
-        public void ShouldReturnProjectGuidWhenProjectIsEdited()
+        public void ShouldReturnProjectUserGuidWhenProjectIsEdited()
         {
-            DbProject existingProject;
-            DbProject editedProject;
+            DbProjectUser existingProjectUser;
+            DbProjectUser editedProjectUser;
 
-            dbProject.Id = Guid.NewGuid();
-            editProject.Id = dbProject.Id;
-
-            provider.Projects.Add(dbProject);
-            provider.Save();
-
-            provider.MakeEntityDetached(dbProject);
-            provider.Save();
-
-            existingProject = provider.Projects
+            existingProjectUser = provider.ProjectsUsers
                 .AsNoTracking()
-                .SingleOrDefault(p => p.Id == dbProject.Id);
+                .SingleOrDefault(p => p.Id == dbProjectUser.Id);
 
-            repository.EditProjectById(editProject);
-            provider.MakeEntityDetached(editProject);
+            repository.EditProjectUserById(editProjectUser);
+            provider.MakeEntityDetached(editProjectUser);
             provider.Save();
 
-            editedProject = provider.Projects
+            editedProjectUser = provider.ProjectsUsers
                 .AsNoTracking()
-                .SingleOrDefault(p => p.Id == editProject.Id);
+                .SingleOrDefault(p => p.Id == editProjectUser.Id);
 
-            Assert.IsNotNull(existingProject);
-            Assert.IsNotNull(editedProject);
-            Assert.AreEqual(existingProject.Id, editedProject.Id);
-            SerializerAssert.AreNotEqual(existingProject, editedProject);
-            SerializerAssert.AreEqual(editedProject, editProject);
+            Assert.IsNotNull(existingProjectUser);
+            Assert.IsNotNull(editedProjectUser);
+            Assert.AreEqual(existingProjectUser.Id, editedProjectUser.Id);
+            SerializerAssert.AreNotEqual(existingProjectUser, editedProjectUser);
+            SerializerAssert.AreEqual(editedProjectUser, editProjectUser);
         }
 
         [Test]
-        public void ShouldThrowNoExceptionsWhenNoChangesMadeToDbProject()
+        public void ShouldThrowNoExceptionsWhenNoChangesMadeToDbProjectUser()
         {
-            this.dbProject.Id = Guid.NewGuid();
+            editProjectUser.RoleId = dbProjectUser.RoleId;
+            editProjectUser.ProjectId = dbProjectUser.ProjectId;
+            editProjectUser.UserId = dbProjectUser.UserId;
+            editProjectUser.AddedOn = dbProjectUser.AddedOn;
+            editProjectUser.RemovedOn = dbProjectUser.RemovedOn;
+            editProjectUser.IsActive = dbProjectUser.IsActive;
 
-            editProject.Id = dbProject.Id;
-            editProject.Name = dbProject.Name;
-            editProject.IsActive = dbProject.IsActive;
-            editProject.Description = dbProject.Description;
-            editProject.DepartmentId = dbProject.DepartmentId;
-
-            provider.Projects.Add(dbProject);
-            provider.Save();
-            provider.MakeEntityDetached(dbProject);
-            provider.Save();
-
-            var existingProject = provider.Projects
+            var existingProjectUser = provider.Projects
                 .AsNoTracking()
-                .SingleOrDefault(p => p.Id == dbProject.Id);
-            Assert.IsNotNull(existingProject);
+                .SingleOrDefault(p => p.Id == dbProjectUser.Id);
+            Assert.IsNotNull(existingProjectUser);
 
-            repository.EditProjectById(editProject);
-            provider.MakeEntityDetached(editProject);
+            repository.EditProjectUserById(editProjectUser);
+            provider.MakeEntityDetached(editProjectUser);
             provider.Save();
 
-            var editedProject = provider.Projects
+            var editedProjectUser = provider.ProjectsUsers
                 .AsNoTracking()
-                .SingleOrDefault(p => p.Id == editProject.Id);
-            Assert.IsNotNull(editedProject);
+                .SingleOrDefault(p => p.Id == editProjectUser.Id);
+            Assert.IsNotNull(editedProjectUser);
 
-            Assert.AreEqual(existingProject.Id, editedProject.Id);
-            SerializerAssert.AreEqual(existingProject, editedProject);
+            Assert.AreEqual(existingProjectUser.Id, editedProjectUser.Id);
+            SerializerAssert.AreEqual(existingProjectUser, editedProjectUser);
         }
 
         [Test]
-        public void ShouldThrowNullReferenceExceptionWhenNoGuidIsPassedIn()
+        public void ShouldThrowNullReferenceExceptionWhenProjectUserIsNotFound()
         {
-            Assert.Throws<NullReferenceException>(() => repository.EditProjectById(editProject));
-        }
-
-        [Test]
-        public void ShouldThrowNullReferenceExceptionWhenGuidIsNull()
-        {
-            Assert.Throws<NullReferenceException>(() => repository.EditProjectById(editProject));
+            editProjectUser.Id = Guid.Empty;
+            Assert.Throws<NullReferenceException>(() => repository.EditProjectUserById(editProjectUser));
         }
 
         [TearDown]
