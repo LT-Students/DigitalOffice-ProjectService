@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
             return command.Execute(request);
         }
 
-        [HttpPut("editProjectById")]
+        [HttpPost("editProjectById")]
         public Guid EditProjectById(
             [FromServices] IEditProjectByIdCommand command,
             [FromBody] EditProjectRequest request)

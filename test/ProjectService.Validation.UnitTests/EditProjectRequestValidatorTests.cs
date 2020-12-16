@@ -42,6 +42,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             };
         }
 
+        Func<string, Operation> GetOperationByPath =>
+            (path) => editRequest.Patch.Operations.Find(x => x.path == path);
+
         [Test]
         public void ShouldValidateEditProjectRequestWhenRequestIsCorrect()
         {
@@ -78,17 +81,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [Test]
         public void ShouldValidateEditProjectRequestWhenNameIsValid()
         {
-            editRequest.Patch.Operations.Find(x => x.path == "/Name").op = "add";
-            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
-
-            editRequest.Patch.Operations.Find(x => x.path == "/Name").op = "replace";
-            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
+            SuccessTestsWithOperationsForPath(EditProjectValidator.NamePath, false);
         }
 
         [Test]
         public void ShouldThrowValidationExceptionWhenNameIsTooLong()
         {
-            editRequest.Patch.Operations.Find(x => x.path == "/Name").value = "".PadLeft(81);
+            GetOperationByPath(EditProjectValidator.NamePath).value = "".PadLeft(81);
 
             validator.TestValidate(editRequest).ShouldHaveAnyValidationError();
         }
@@ -96,20 +95,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [Test]
         public void ShouldValidateEditProjectRequestWhenShortNameIsValid()
         {
-            editRequest.Patch.Operations.Find(x => x.path == "/ShortName").op = "add";
-            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
-
-            editRequest.Patch.Operations.Find(x => x.path == "/ShortName").op = "replace";
-            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
-
-            editRequest.Patch.Operations.Find(x => x.path == "/ShortName").op = "remove";
-            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
+            SuccessTestsWithOperationsForPath(EditProjectValidator.ShortNamePath, true);
         }
 
         [Test]
         public void ShouldThrowValidationExceptionWhenShortNameIsTooLong()
         {
-            editRequest.Patch.Operations.Find(x => x.path == "/ShortName").value = "".PadLeft(33);
+            GetOperationByPath(EditProjectValidator.ShortNamePath).value = "".PadLeft(33);
 
             validator.TestValidate(editRequest).ShouldHaveAnyValidationError();
         }
@@ -117,22 +109,30 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [Test]
         public void ShouldValidateEditProjectRequestWhenDescriptionIsValid()
         {
-            editRequest.Patch.Operations.Find(x => x.path == "/Description").op = "add";
-            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
-
-            editRequest.Patch.Operations.Find(x => x.path == "/Description").op = "replace";
-            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
-
-            editRequest.Patch.Operations.Find(x => x.path == "/Description").op = "remove";
-            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
+            SuccessTestsWithOperationsForPath(EditProjectValidator.DescriptionPath, true);
         }
 
         [Test]
         public void ShouldThrowValidationExceptionWhenDescriptionIsTooLong()
         {
-            editRequest.Patch.Operations.Find(x => x.path == "/Description").value = "".PadLeft(501);
+            GetOperationByPath(EditProjectValidator.DescriptionPath).value = "".PadLeft(501);
 
             validator.TestValidate(editRequest).ShouldHaveAnyValidationError();
+        }
+
+        public void SuccessTestsWithOperationsForPath(string path, bool nullable)
+        {
+            GetOperationByPath(path).op = "add";
+            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
+
+            GetOperationByPath(path).op = "replace";
+            validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
+
+            if (nullable)
+            {
+                GetOperationByPath(path).op = "remove";
+                validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
+            }
         }
         #endregion
     }

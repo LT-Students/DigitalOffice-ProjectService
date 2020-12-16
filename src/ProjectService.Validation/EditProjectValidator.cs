@@ -17,9 +17,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
         private static List<string> Paths
             => new List<string> { NamePath, ShortNamePath, DescriptionPath };
 
-        private static string NamePath => $"/{nameof(DbProject.Name)}";
-        private static string ShortNamePath => $"/{nameof(DbProject.ShortName)}";
-        private static string DescriptionPath => $"/{nameof(DbProject.Description)}";
+        public static string NamePath => $"/{nameof(DbProject.Name)}";
+        public static string ShortNamePath => $"/{nameof(DbProject.ShortName)}";
+        public static string DescriptionPath => $"/{nameof(DbProject.Description)}";
 
         Func<JsonPatchDocument<DbProject>, string, Operation> GetOperationByPath =>
             (x, path) => x.Operations.FirstOrDefault(x => x.path == path);
@@ -65,7 +65,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     When(x => GetOperationByPath(x.Patch, DescriptionPath) != null, () =>
                     {
                         RuleFor(x => x.Patch.Operations)
-                        .UniqueOperationWithAllowedOp(DescriptionPath, "add", "replace");
+                        .UniqueOperationWithAllowedOp(DescriptionPath, "add", "replace", "remove");
 
                         When(x => GetOperationByPath(x.Patch, DescriptionPath).op != "remove", () =>
                         {
