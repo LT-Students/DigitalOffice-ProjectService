@@ -37,7 +37,8 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
             if (dbProjectUser == null)
             {
-                throw new NotFoundException();
+                throw new NotFoundException(
+                    $"User with id {request.UserId} on project with id {request.ProjectId} was not found.");
             }
 
             return IGetProjectUserResponse.CreateObj(dbProjectUser.Id, dbProjectUser.IsActive);
