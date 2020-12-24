@@ -96,7 +96,7 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureRepositories(IServiceCollection services)
         {
-            services.AddTransient<IProjectRepository, ProjectRepository>();
+            services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IRoleRepository, RoleRepository>();
         }

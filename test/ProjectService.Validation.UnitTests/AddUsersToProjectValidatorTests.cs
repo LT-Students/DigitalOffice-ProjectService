@@ -1,7 +1,10 @@
 ﻿using FluentValidation;
 using FluentValidation.TestHelper;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -9,15 +12,42 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
-    public class AddUsersToProjectValidatorTests
+    internal class AddUsersToProjectValidatorTests
     {
         private IValidator<AddUsersToProjectRequest> validator;
+
+        private Mock<IProjectRepository> _repository;
+
         private AddUsersToProjectRequest _request;
+        private IEnumerable<DbProjectUser> _dbProjectUsers;
 
         [SetUp]
         public void SetUp()
         {
-            validator = new AddUsersToProjectValidator();
+            _repository = new Mock<IProjectRepository>();
+            validator = new AddUsersToProjectValidator(_repository.Object);
+
+            var projectId = Guid.NewGuid();
+
+            _dbProjectUsers = new List<DbProjectUser>
+            {
+                new DbProjectUser
+                {
+                    Id = Guid.NewGuid(),
+                    ProjectId = projectId,
+                    UserId = Guid.NewGuid(),
+                    RoleId = Guid.NewGuid(),
+                    IsActive = true
+                },
+                new DbProjectUser
+                {
+                    Id = Guid.NewGuid(),
+                    ProjectId = projectId,
+                    UserId = Guid.NewGuid(),
+                    RoleId = Guid.NewGuid(),
+                    IsActive = true
+                }
+            };
 
             var users = new List<UserRequest>
             {
@@ -43,13 +73,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 new ProjectUserRequest
                 {
                     RoleId = Guid.NewGuid(),
-                    User = users.ElementAt(0)
+                    User = users.ElementAt(1)
                 }
             };
 
             _request = new AddUsersToProjectRequest
             {
-                ProjectId = Guid.NewGuid(),
+                ProjectId = projectId,
                 Users = projectUsers
             };
         }
@@ -63,34 +93,72 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
+        public void ShouldHaveValidationErrorWhenProjectIdDoesNotExist()
+        {
+            var showNotActiveUsers = false;
+
+            _repository
+                .Setup(x => x.GetProjectUsers(_request.ProjectId, showNotActiveUsers))
+                .Returns<IEnumerable<DbProjectUser>>(null)
+                .Verifiable();
+
+            validator.ShouldHaveValidationErrorFor(x => x.ProjectId, _request.ProjectId);
+            _repository.Verify();
+        }
+
+        [Test]
         public void ShouldHaveValidationErrorForWhenUsersIsNull()
         {
-            List<ProjectUserRequest> projectUser = null;
+            AddUsersToProjectRequest projectUser = new AddUsersToProjectRequest
+            {
+                ProjectId = Guid.NewGuid(),
+                Users = null
+            };
 
-            validator.ShouldNotHaveValidationErrorFor(x => x.Users, projectUser);
+            validator.ShouldHaveValidationErrorFor(x => x.Users, projectUser);
         }
 
         [Test]
         public void ShouldHaveValidationErrorForWhenListOfUsersIsEmpty()
         {
-            List<ProjectUserRequest> projectUser = new List<ProjectUserRequest>();
+            AddUsersToProjectRequest projectUser = new AddUsersToProjectRequest
+            {
+                ProjectId = Guid.NewGuid(),
+                Users = new List<ProjectUserRequest>()
+            };
 
-            validator.ShouldNotHaveValidationErrorFor(x => x.Users, projectUser);
+            validator.ShouldHaveValidationErrorFor(x => x.Users, projectUser);
         }
 
         [Test]
-        public void ShouldHaveValidationErrorForWhenUserDataNotValid()
+        public void ShouldHaveValidationErrorWhenUserAlreadyExist()
         {
-            List<ProjectUserRequest> projectUser = new List<ProjectUserRequest>
+            var showNotActiveUsers = false;
+
+            _repository
+                .Setup(x => x.GetProjectUsers(_request.ProjectId, showNotActiveUsers))
+                .Returns(_dbProjectUsers);
+
+            AddUsersToProjectRequest newRequest = new AddUsersToProjectRequest
             {
-                new ProjectUserRequest
+                ProjectId = Guid.NewGuid(),
+                Users = new List<ProjectUserRequest>
                 {
-                    RoleId = Guid.NewGuid(),
-                    User = new UserRequest()
+
+                    new ProjectUserRequest
+                    {
+                        RoleId = Guid.NewGuid(),
+                        User = new UserRequest
+                        {
+                            Id = _dbProjectUsers.ElementAt(0).UserId,
+                            IsActive = true
+                        }
+                    }
                 }
             };
 
-            validator.ShouldNotHaveValidationErrorFor(x => x.Users, projectUser);
+            validator.TestValidate(newRequest).ShouldNotHaveAnyValidationErrors();
+            _repository.Verify();
         }
 
         [Test]
