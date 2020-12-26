@@ -8,7 +8,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 {
-    class DisableRoleCommandTests
+    internal class DisableRoleCommandTests
     {
         private IDisableRoleCommand command;
 
@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         {
             roleId = Guid.NewGuid();
         }
-        
+
         [SetUp]
         public void SetUp()
         {

@@ -1,17 +1,16 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.UnitTestKernel;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
+namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
 {
     internal class ProjectRequestMapperTests
     {

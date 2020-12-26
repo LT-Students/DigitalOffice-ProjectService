@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
-    public class GetProjectCommand : IGetProjectCommand
+    public class GetProjectByIdCommand : IGetProjectByIdCommand
     {
         private readonly IProjectRepository _repository;
         private readonly IProjectExpandedResponseMapper _mapper;
 
-        public GetProjectCommand(
+        public GetProjectByIdCommand(
             [FromServices] IProjectRepository repository,
             [FromServices] IProjectExpandedResponseMapper mapper)
         {

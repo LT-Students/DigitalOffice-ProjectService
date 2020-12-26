@@ -20,9 +20,9 @@ namespace LT.DigitalOffice.ProjectService.Controllers
             return command.Execute(showNotActive);
         }
 
-        [HttpGet("getProject")]
-        public ProjectExpandedResponse GetProject(
-            [FromServices] IGetProjectCommand command,
+        [HttpGet("getProjectById")]
+        public ProjectExpandedResponse GetProjectById(
+            [FromServices] IGetProjectByIdCommand command,
             [FromQuery] Guid projectId,
             [FromQuery] bool showNotActiveUsers = false)
         {

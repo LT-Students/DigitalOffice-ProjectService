@@ -24,7 +24,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void OneTimeSetUp()
         {
             projectId = Guid.NewGuid();
-            userIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+            userIds = new List<Guid>
+            {
+                Guid.NewGuid(),
+                Guid.NewGuid()
+            };
         }
 
         [SetUp]

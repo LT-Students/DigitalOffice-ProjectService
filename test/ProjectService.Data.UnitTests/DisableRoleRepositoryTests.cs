@@ -8,7 +8,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
-    class DisableRoleRepositoryTests
+    internal class DisableRoleRepositoryTests
     {
         private IDataProvider provider;
         private IRoleRepository repository;
