@@ -8,7 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     /// Represents interface for a command in command pattern.
     /// Provides method for getting project model by id.
     /// </summary>
-    public interface IGetProjectCommand
+    public interface IGetProjectByIdCommand
     {
         /// <summary>
         /// Returns the project model with the specified id.

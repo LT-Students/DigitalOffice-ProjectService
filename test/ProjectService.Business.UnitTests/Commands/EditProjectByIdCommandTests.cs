@@ -13,7 +13,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
 {
-    public class EditProjectByIdCommandTests
+    internal class EditProjectByIdCommandTests
     {
         private DbProject dbProject;
         private EditProjectRequest editRequest;

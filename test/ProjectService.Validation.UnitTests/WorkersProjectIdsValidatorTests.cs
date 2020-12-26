@@ -6,7 +6,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
-    class WorkersProjectIdsValidatorTests
+    internal class WorkersProjectIdsValidatorTests
     {
         private IValidator<ProjectUserRequest> validator;
         private ProjectUserRequest userProjectRequest;

@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 {
-    class DisableWorkersInProjectRepositoryTests
+    internal class DisableWorkersInProjectRepositoryTests
     {
         #region variables declaration
         private IDataProvider provider;

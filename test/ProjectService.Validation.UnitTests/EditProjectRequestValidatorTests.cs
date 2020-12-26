@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
-    public class EditProjectRequestValidatorTests
+    internal class EditProjectRequestValidatorTests
     {
         private IValidator<EditProjectRequest> validator;
         private EditProjectRequest editRequest;

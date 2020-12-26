@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
 {
-    public class CreateNewProjectCommandTests
+    internal class CreateNewProjectCommandTests
     {
         private ICreateNewProjectCommand command;
 
