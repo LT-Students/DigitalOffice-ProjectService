@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 {
-    public class EditProjectByIdRepositoryTests
+    internal class EditProjectByIdRepositoryTests
     {
         private IDataProvider provider;
         private ProjectRepository repository;

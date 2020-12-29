@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 {
-    public class GetProjectByIdRepositoryTests
+    internal class GetProjectByIdRepositoryTests
     {
         private IDataProvider provider;
         private IProjectRepository repository;

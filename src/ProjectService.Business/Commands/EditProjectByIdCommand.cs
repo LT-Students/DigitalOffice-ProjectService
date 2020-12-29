@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
+using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Exceptions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -12,35 +12,38 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
     public class EditProjectByIdCommand : IEditProjectByIdCommand
     {
-        private readonly IMapper<EditProjectRequest, DbProject> mapper;
         private readonly IValidator<EditProjectRequest> validator;
         private readonly IProjectRepository repository;
+        private readonly IAccessValidator accessValidator;
 
         public EditProjectByIdCommand(
-            [FromServices] IMapper<EditProjectRequest, DbProject> mapper,
             [FromServices] IValidator<EditProjectRequest> validator,
-            [FromServices] IProjectRepository repository)
+            [FromServices] IProjectRepository repository,
+            [FromServices] IAccessValidator accessValidator)
         {
-            this.mapper = mapper;
             this.validator = validator;
             this.repository = repository;
+            this.accessValidator = accessValidator;
         }
 
-        /// <summary>
-        /// Contains null request check. If request is null, throws ArgumentNullException. This prevents NullReferenceException
-        /// throwing when assigning Guid to null request instance.
-        /// </summary>
-        public Guid Execute(Guid projectId, EditProjectRequest request)
+        public Guid Execute(EditProjectRequest request)
         {
-            if (request == null)
+            validator.ValidateAndThrowCustom(request);
+
+            const int rightId = 2;
+
+            if (!(accessValidator.IsAdmin() || accessValidator.HasRights(rightId)))
             {
-                throw new ArgumentNullException();
+                throw new ForbiddenException("Not enough rights.");
             }
 
-            request.Id = projectId;
+            var dbProject = repository.GetProject(request.ProjectId);
+            if (dbProject == null)
+            {
+                throw new NotFoundException($"Project with id {request.ProjectId} is not found.");
+            }
 
-            validator.ValidateAndThrowCustom(request);
-            var dbProject = mapper.Map(request);
+            request.Patch.ApplyTo(dbProject);
 
             return repository.EditProjectById(dbProject);
         }

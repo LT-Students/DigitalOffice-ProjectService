@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
-    public class CreateNewProjectRequestValidatorTests
+    internal class CreateNewProjectRequestValidatorTests
     {
         private IValidator<ProjectExpandedRequest> validator;
         private ProjectExpandedRequest projectRequest;

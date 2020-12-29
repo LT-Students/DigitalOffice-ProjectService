@@ -20,9 +20,9 @@ namespace LT.DigitalOffice.ProjectService.Controllers
             return command.Execute(showNotActive);
         }
 
-        [HttpGet("getProject")]
-        public ProjectExpandedResponse GetProject(
-            [FromServices] IGetProjectCommand command,
+        [HttpGet("getProjectById")]
+        public ProjectExpandedResponse GetProjectById(
+            [FromServices] IGetProjectByIdCommand command,
             [FromQuery] Guid projectId,
             [FromQuery] bool showNotActiveUsers = false)
         {
@@ -32,15 +32,17 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         [HttpPost("createNewProject")]
         public Guid CreateNewProject(
             [FromServices] ICreateNewProjectCommand command,
-            [FromBody] NewProjectRequest request) => command.Execute(request);
+            [FromBody] ProjectExpandedRequest request)
+        {
+            return command.Execute(request);
+        }
 
-        [HttpPut("editProjectById")]
+        [HttpPost("editProjectById")]
         public Guid EditProjectById(
             [FromServices] IEditProjectByIdCommand command,
-            [FromQuery] Guid projectId,
             [FromBody] EditProjectRequest request)
         {
-            return command.Execute(projectId, request);
+            return command.Execute(request);
         }
     }
 }
