@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -8,6 +9,14 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        [HttpPost("addUsersToProject")]
+        public void AddUsersToProject(
+            [FromServices] IAddUsersToProjectCommand command,
+            [FromQuery] AddUsersToProjectRequest request)
+        {
+            command.Execute(request);
+        }
+
         [HttpDelete("removeUsersFromProject")]
         public void RemoveUsersFromProject(
                     [FromServices] IDisableWorkersInProjectCommand command,

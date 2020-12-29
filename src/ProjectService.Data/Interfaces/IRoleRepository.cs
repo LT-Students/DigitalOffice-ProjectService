@@ -9,10 +9,10 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     public interface IRoleRepository
     {
         /// <summary>
-        /// Deleting role. 
+        /// Deleting role.
         /// </summary>
         /// <param name="roleId">Id of role to be deleted.</param>
         /// <returns>Success of delete.</returns>
-        bool DisableRole(Guid roleId); 
+        bool DisableRole(Guid roleId);
     }
 }

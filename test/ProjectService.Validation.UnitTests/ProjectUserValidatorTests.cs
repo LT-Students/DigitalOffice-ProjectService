@@ -6,7 +6,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
-    internal class WorkersProjectIdsValidatorTests
+    internal class ProjectUserValidatorTests
     {
         private IValidator<ProjectUserRequest> validator;
         private ProjectUserRequest userProjectRequest;
@@ -28,6 +28,17 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     Id = Guid.NewGuid()
                 }
             };
+        }
+
+        [Test]
+        public void ShouldNotHaveValidationErrorsWhenUserIsNull()
+        {
+            ProjectUserRequest newProjectUser = new ProjectUserRequest()
+            {
+                User = null
+            };
+
+            validator.TestValidate(newProjectUser).ShouldHaveValidationErrorFor(r => r.User);
         }
 
         [Test]
