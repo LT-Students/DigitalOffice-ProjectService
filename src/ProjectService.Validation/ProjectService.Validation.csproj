@@ -2,10 +2,6 @@
 
   <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ProjectService.Data\ProjectService.Data.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />

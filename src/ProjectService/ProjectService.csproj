@@ -2,10 +2,6 @@
 
   <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ProjectService.Broker\ProjectService.Broker.csproj" />
     <ProjectReference Include="..\ProjectService.Business\ProjectService.Business.csproj" />
