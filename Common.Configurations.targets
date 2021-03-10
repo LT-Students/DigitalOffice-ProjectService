@@ -21,6 +21,10 @@
     <DefineConstants>TRACE;RELEASE</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="$(AssemblyName.Contains('.UnitTests'))">
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests')) != 'true'">
     <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.0.20" />
   </ItemGroup>
