@@ -2,6 +2,7 @@
 
 <Project>
   <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>LT.DigitalOffice.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>LT.DigitalOffice.$(MSBuildProjectName)</RootNamespace>
   </PropertyGroup>
@@ -20,8 +21,12 @@
     <DefineConstants>TRACE;RELEASE</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="$(AssemblyName.Contains('.UnitTests'))">
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests')) != 'true'">
-    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.0.16" />
+    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.0.20" />
   </ItemGroup>
 
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests'))">

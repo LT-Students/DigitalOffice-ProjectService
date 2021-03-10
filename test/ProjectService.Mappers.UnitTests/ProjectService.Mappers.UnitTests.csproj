@@ -2,11 +2,6 @@
 
   <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\ProjectService.Mappers\ProjectService.Mappers.csproj" />
     <ProjectReference Include="..\..\src\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />

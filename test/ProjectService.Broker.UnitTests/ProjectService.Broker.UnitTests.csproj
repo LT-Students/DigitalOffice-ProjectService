@@ -2,10 +2,4 @@
 
   <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-
 </Project>
