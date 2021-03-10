@@ -2,10 +2,6 @@
 
   <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
 
-  <PropertyGroup>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\ProjectService.Business\ProjectService.Business.csproj" />
   </ItemGroup>
