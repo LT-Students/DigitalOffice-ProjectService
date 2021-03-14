@@ -57,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             newProject.Name = "Any name";
             newProject.Id = Guid.NewGuid();
 
-            Assert.AreEqual(newProject.Id, repository.CreateNewProject(newProject));
+            Assert.AreEqual(Guid.Empty, repository.CreateNewProject(newProject));
             Assert.That(provider.Projects.Find(newProject.Id), Is.EqualTo(newProject));
         }
 
