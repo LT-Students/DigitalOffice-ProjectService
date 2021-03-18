@@ -20,6 +20,8 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
+using MassTransit.RabbitMqTransport;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -73,22 +75,29 @@ namespace LT.DigitalOffice.ProjectService
                     });
                 });
 
-                x.AddRequestClient<IGetFileRequest>(
-                    new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.FileServiceUrl}"));
-
-                x.AddRequestClient<IGetUserRequest>(
-                    new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.UserServiceUsersUrl}"),
-                    RequestTimeout.After(ms: 100));
-
-                x.AddRequestClient<IGetDepartmentRequest>(
-                    new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.CompanyServiceDepartmentsUrl}"),
-                    RequestTimeout.After(ms: 100));
+                RegisterRequestClients(x, rabbitMqConfig);
 
                 x.ConfigureKernelMassTransit(rabbitMqConfig);
             });
 
             services.AddMassTransitHostedService();
 	    }
+
+        private void RegisterRequestClients(
+            IServiceCollectionBusConfigurator busConfigurator,
+            RabbitMqConfig rabbitMqConfig)
+        {
+            busConfigurator.AddRequestClient<IGetFileRequest>(
+                    new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.GetFileEndpoint}"));
+
+            busConfigurator.AddRequestClient<IGetUserRequest>(
+                new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.GetUserDataEndpoint}"),
+                RequestTimeout.After(ms: 100));
+
+            busConfigurator.AddRequestClient<IGetDepartmentRequest>(
+                new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.GetDepartmentDataEndpoint}"),
+                RequestTimeout.After(ms: 100));
+        }
 
         private void ConfigureCommands(IServiceCollection services)
         {

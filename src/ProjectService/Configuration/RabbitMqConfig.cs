@@ -4,8 +4,8 @@ namespace LT.DigitalOffice.ProjectService.Configuration
 {
     public class RabbitMqConfig : BaseRabbitMqOptions
     {
-        public string FileServiceUrl { get; set; }
-        public string UserServiceUsersUrl { get; set; }
-        public string CompanyServiceDepartmentsUrl { get; set; }
+        public string GetFileEndpoint { get; set; }
+        public string GetUserDataEndpoint { get; set; }
+        public string GetDepartmentDataEndpoint { get; set; }
     }
 }
