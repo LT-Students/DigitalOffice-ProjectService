@@ -21,7 +21,6 @@ using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
-using MassTransit.RabbitMqTransport;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
