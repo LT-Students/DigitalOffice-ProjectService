@@ -2,6 +2,7 @@ using FluentValidation;
 using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Kernel;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.Middlewares.Token;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Configuration;
@@ -65,16 +66,23 @@ namespace LT.DigitalOffice.ProjectService
             {
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host("localhost", "/", host =>
+                    cfg.Host(rabbitMqConfig.Host, "/", host =>
                     {
                         host.Username($"{rabbitMqConfig.Username}_{rabbitMqConfig.Password}");
                         host.Password(rabbitMqConfig.Password);
                     });
                 });
 
-                x.AddRequestClient<IGetFileRequest>(new Uri(rabbitMqConfig.FileServiceUrl));
-                x.AddRequestClient<IGetUserRequest>(new Uri(rabbitMqConfig.UserServiceUsersUrl), RequestTimeout.After(ms: 100));
-                x.AddRequestClient<IGetDepartmentRequest>(new Uri(rabbitMqConfig.CompanyServiceDepartmentsUrl), RequestTimeout.After(ms: 100));
+                x.AddRequestClient<IGetFileRequest>(
+                    new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.FileServiceUrl}"));
+
+                x.AddRequestClient<IGetUserRequest>(
+                    new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.UserServiceUsersUrl}"),
+                    RequestTimeout.After(ms: 100));
+
+                x.AddRequestClient<IGetDepartmentRequest>(
+                    new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.CompanyServiceDepartmentsUrl}"),
+                    RequestTimeout.After(ms: 100));
 
                 x.ConfigureKernelMassTransit(rabbitMqConfig);
             });
@@ -134,7 +142,7 @@ namespace LT.DigitalOffice.ProjectService
 
             UpdateDatabase(app);
 
-            //app.UseMiddleware<TokenMiddleware>();
+            app.UseMiddleware<TokenMiddleware>();
 
 #if RELEASE
             app.UseHttpsRedirection();
