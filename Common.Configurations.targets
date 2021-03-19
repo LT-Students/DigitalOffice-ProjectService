@@ -26,11 +26,11 @@
   </PropertyGroup>
 
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests')) != 'true'">
-    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.0.20" />
+    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.1.8" />
   </ItemGroup>
 
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests'))">
-    <PackageReference Include="LT.DigitalOffice.UnitTestKernel" Version="1.0.0" />
+    <PackageReference Include="LT.DigitalOffice.UnitTestKernel" Version="1.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
   </ItemGroup>

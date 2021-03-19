@@ -2,6 +2,7 @@ using FluentValidation;
 using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Kernel;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.Middlewares.Token;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Configuration;
@@ -19,6 +20,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -65,22 +67,36 @@ namespace LT.DigitalOffice.ProjectService
             {
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host("localhost", "/", host =>
+                    cfg.Host(rabbitMqConfig.Host, "/", host =>
                     {
                         host.Username($"{rabbitMqConfig.Username}_{rabbitMqConfig.Password}");
                         host.Password(rabbitMqConfig.Password);
                     });
                 });
 
-                x.AddRequestClient<IGetFileRequest>(new Uri(rabbitMqConfig.FileServiceUrl));
-                x.AddRequestClient<IGetUserRequest>(new Uri(rabbitMqConfig.UserServiceUsersUrl), RequestTimeout.After(ms: 100));
-                x.AddRequestClient<IGetDepartmentRequest>(new Uri(rabbitMqConfig.CompanyServiceDepartmentsUrl), RequestTimeout.After(ms: 100));
+                RegisterRequestClients(x, rabbitMqConfig);
 
                 x.ConfigureKernelMassTransit(rabbitMqConfig);
             });
 
             services.AddMassTransitHostedService();
 	    }
+
+        private void RegisterRequestClients(
+            IServiceCollectionBusConfigurator busConfigurator,
+            RabbitMqConfig rabbitMqConfig)
+        {
+            busConfigurator.AddRequestClient<IGetFileRequest>(
+                    new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.GetFileEndpoint}"));
+
+            busConfigurator.AddRequestClient<IGetUserRequest>(
+                new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.GetUserDataEndpoint}"),
+                RequestTimeout.After(ms: 100));
+
+            busConfigurator.AddRequestClient<IGetDepartmentRequest>(
+                new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.GetDepartmentDataEndpoint}"),
+                RequestTimeout.After(ms: 100));
+        }
 
         private void ConfigureCommands(IServiceCollection services)
         {
@@ -134,7 +150,7 @@ namespace LT.DigitalOffice.ProjectService
 
             UpdateDatabase(app);
 
-            //app.UseMiddleware<TokenMiddleware>();
+            app.UseMiddleware<TokenMiddleware>();
 
 #if RELEASE
             app.UseHttpsRedirection();
