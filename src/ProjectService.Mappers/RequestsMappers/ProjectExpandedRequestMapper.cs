@@ -31,9 +31,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 Description = project.Project.Description,
                 DepartmentId = project.Project.DepartmentId,
                 IsActive = project.Project.IsActive,
-                Users = project.Users
-                    .Select(u => _projectUserMapper.Map(u))
-                    .Select(dbU => { dbU.ProjectId = projectId; return dbU; })
+                Users = project.Users?
+                    .Select(u =>
+                    {
+                        var dbProjectUser = _projectUserMapper.Map(u);
+                        dbProjectUser.ProjectId = projectId;
+
+                        return dbProjectUser;
+                    })
                     .ToList()
             };
 

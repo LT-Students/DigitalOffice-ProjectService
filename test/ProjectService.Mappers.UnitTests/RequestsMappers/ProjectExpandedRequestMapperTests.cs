@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
 {
-    internal class ProjectRequestMapperTests
+    internal class ProjectExpandedRequestMapperTests
     {
         private IProjectExpandedRequestMapper _projectRequestMapper;
         private Mock<IProjectUserRequestMapper> _projectUserRequestMapperMock;
@@ -20,23 +20,27 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         private ProjectExpandedRequest _projectRequest;
         private List<DbProjectUser> _expectedDbProjectUser;
 
+        private Project _newProject;
+
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _projectUserRequestMapperMock = new Mock<IProjectUserRequestMapper>();
             _projectRequestMapper = new ProjectExpandedRequestMapper(_projectUserRequestMapperMock.Object);
 
+            _newProject = new Project
+            {
+                DepartmentId = Guid.NewGuid(),
+                ShortName = "DO",
+                Description = "New project for Lanit-Tercom",
+                CreatedAt = DateTime.Now,
+                IsActive = true,
+                Name = "12DigitalOffice24322525"
+            };
+
             _projectRequest = new ProjectExpandedRequest
             {
-                Project = new Project
-                {
-                    DepartmentId = Guid.NewGuid(),
-                    ShortName = "DO",
-                    Description = "New project for Lanit-Tercom",
-                    CreatedAt = DateTime.Now,
-                    IsActive = true,
-                    Name = "12DigitalOffice24322525"
-                },
+                Project = _newProject,
                 Users = new List<ProjectUserRequest>
                 {
                     new ProjectUserRequest
@@ -114,6 +118,31 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
             ProjectExpandedRequest projectRequest = null;
 
             Assert.Throws<ArgumentNullException>(() => _projectRequestMapper.Map(projectRequest));
+        }
+
+        [Test]
+        public void ShouldReturnDbProjectWhenProjectRequestIsMappedWithoutUsers()
+        {
+            var projectRequest = new ProjectExpandedRequest
+            {
+                Project = _newProject
+            };
+
+            var expectedDbProject = new DbProject
+            {
+                ShortName = projectRequest.Project.ShortName,
+                DepartmentId = projectRequest.Project.DepartmentId,
+                Name = projectRequest.Project.Name,
+                Description = projectRequest.Project.Description,
+                IsActive = projectRequest.Project.IsActive,
+                Users = null
+            };
+
+            var dbProject = _projectRequestMapper.Map(projectRequest);
+
+            expectedDbProject.Id = dbProject.Id;
+
+            SerializerAssert.AreEqual(expectedDbProject, dbProject);
         }
 
         [Test]
