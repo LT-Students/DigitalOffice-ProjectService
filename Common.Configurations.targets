@@ -25,6 +25,13 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <ItemGroup Condition="($(AssemblyName.Contains('.Provider')) Or $(AssemblyName.Contains('.Models.Db'))) And $(AssemblyName.Contains('.UnitTests')) != 'true'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.4" />
+  </ItemGroup>
+
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests')) != 'true'">
     <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.1.8" />
   </ItemGroup>

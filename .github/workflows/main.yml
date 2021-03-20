@@ -1,12 +1,10 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
+name: Build & Test ProjectService
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the develop branch
 on:
   push:
-    branches: 
+    branches:
       - develop
   pull_request:
     branches: [ develop, master ]
@@ -23,13 +21,13 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Setup .NET
+      - name: Setup .NET 5
         uses: actions/setup-dotnet@v1
-        with: 
+        with:
           dotnet-version: 5.0.200
       - name: Restore
         run: dotnet restore
-      - name: Build 
+      - name: Build
         run: dotnet build --no-restore --configuration Release
       - name: Test
         run: dotnet test --no-restore --verbosity normal
