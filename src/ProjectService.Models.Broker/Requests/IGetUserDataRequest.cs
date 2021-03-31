@@ -2,7 +2,7 @@
 
 namespace LT.DigitalOffice.Broker.Requests
 {
-    public interface IGetUserRequest
+    public interface IGetUserDataRequest
     {
         Guid UserId { get; }
 

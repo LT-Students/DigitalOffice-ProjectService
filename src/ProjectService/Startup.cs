@@ -97,7 +97,7 @@ namespace LT.DigitalOffice.ProjectService
             busConfigurator.AddRequestClient<IGetFileRequest>(
                     new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.GetFileEndpoint}"));
 
-            busConfigurator.AddRequestClient<IGetUserRequest>(
+            busConfigurator.AddRequestClient<IGetUserDataRequest>(
                 new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.GetUserDataEndpoint}"),
                 RequestTimeout.After(ms: 100));
 
