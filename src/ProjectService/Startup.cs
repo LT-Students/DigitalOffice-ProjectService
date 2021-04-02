@@ -1,4 +1,5 @@
 using FluentValidation;
+using HealthChecks.UI.Client;
 using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Kernel;
 using LT.DigitalOffice.Kernel.Broker;
@@ -22,6 +23,7 @@ using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -41,8 +43,6 @@ namespace LT.DigitalOffice.ProjectService
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHealthChecks();
-
             string connStr = Environment.GetEnvironmentVariable("ConnectionString");
             if (string.IsNullOrEmpty(connStr))
             {
@@ -56,6 +56,7 @@ namespace LT.DigitalOffice.ProjectService
                 options.UseSqlServer(connStr);
             });
 
+            services.AddHealthChecks().AddSqlServer(connStr);
             services.AddControllers();
             services.AddKernelExtensions();
 
@@ -174,9 +175,19 @@ namespace LT.DigitalOffice.ProjectService
                     .AllowAnyHeader()
                     .AllowAnyMethod());
 
+            var rabbitMqConfig = Configuration
+                .GetSection(BaseRabbitMqOptions.RabbitMqSectionName)
+                .Get<RabbitMqConfig>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                endpoints.MapHealthChecks($"/{rabbitMqConfig.Password}/hc", new HealthCheckOptions
+                {
+                    Predicate = _ => true,
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
             });
         }
 
