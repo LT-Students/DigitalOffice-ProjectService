@@ -1,4 +1,5 @@
 using FluentValidation;
+using HealthChecks.UI.Client;
 using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Kernel;
 using LT.DigitalOffice.Kernel.Broker;
@@ -22,6 +23,7 @@ using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -34,6 +36,8 @@ namespace LT.DigitalOffice.ProjectService
     {
         public IConfiguration Configuration { get; }
 
+        private RabbitMqConfig _rabbitMqConfig;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -41,8 +45,6 @@ namespace LT.DigitalOffice.ProjectService
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHealthChecks();
-
             string connStr = Environment.GetEnvironmentVariable("ConnectionString");
             if (string.IsNullOrEmpty(connStr))
             {
@@ -56,6 +58,7 @@ namespace LT.DigitalOffice.ProjectService
                 options.UseSqlServer(connStr);
             });
 
+            services.AddHealthChecks().AddSqlServer(connStr);
             services.AddControllers();
             services.AddKernelExtensions();
 
@@ -69,22 +72,24 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureMassTransit(IServiceCollection services)
         {
-            var rabbitMqConfig = Configuration.GetSection(BaseRabbitMqOptions.RabbitMqSectionName).Get<RabbitMqConfig>();
+            _rabbitMqConfig = Configuration
+                .GetSection(BaseRabbitMqOptions.RabbitMqSectionName)
+                .Get<RabbitMqConfig>();
 
             services.AddMassTransit(x =>
             {
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host(rabbitMqConfig.Host, "/", host =>
+                    cfg.Host(_rabbitMqConfig.Host, "/", host =>
                     {
-                        host.Username($"{rabbitMqConfig.Username}_{rabbitMqConfig.Password}");
-                        host.Password(rabbitMqConfig.Password);
+                        host.Username($"{_rabbitMqConfig.Username}_{_rabbitMqConfig.Password}");
+                        host.Password(_rabbitMqConfig.Password);
                     });
                 });
 
-                RegisterRequestClients(x, rabbitMqConfig);
+                RegisterRequestClients(x, _rabbitMqConfig);
 
-                x.ConfigureKernelMassTransit(rabbitMqConfig);
+                x.ConfigureKernelMassTransit(_rabbitMqConfig);
             });
 
             services.AddMassTransitHostedService();
@@ -177,6 +182,12 @@ namespace LT.DigitalOffice.ProjectService
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                endpoints.MapHealthChecks($"/{_rabbitMqConfig.Password}/hc", new HealthCheckOptions
+                {
+                    Predicate = _ => true,
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
             });
         }
 
