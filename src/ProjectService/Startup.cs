@@ -36,6 +36,8 @@ namespace LT.DigitalOffice.ProjectService
     {
         public IConfiguration Configuration { get; }
 
+        private RabbitMqConfig _rabbitMqConfig;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -70,22 +72,24 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureMassTransit(IServiceCollection services)
         {
-            var rabbitMqConfig = Configuration.GetSection(BaseRabbitMqOptions.RabbitMqSectionName).Get<RabbitMqConfig>();
+            _rabbitMqConfig = Configuration
+                .GetSection(BaseRabbitMqOptions.RabbitMqSectionName)
+                .Get<RabbitMqConfig>();
 
             services.AddMassTransit(x =>
             {
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host(rabbitMqConfig.Host, "/", host =>
+                    cfg.Host(_rabbitMqConfig.Host, "/", host =>
                     {
-                        host.Username($"{rabbitMqConfig.Username}_{rabbitMqConfig.Password}");
-                        host.Password(rabbitMqConfig.Password);
+                        host.Username($"{_rabbitMqConfig.Username}_{_rabbitMqConfig.Password}");
+                        host.Password(_rabbitMqConfig.Password);
                     });
                 });
 
-                RegisterRequestClients(x, rabbitMqConfig);
+                RegisterRequestClients(x, _rabbitMqConfig);
 
-                x.ConfigureKernelMassTransit(rabbitMqConfig);
+                x.ConfigureKernelMassTransit(_rabbitMqConfig);
             });
 
             services.AddMassTransitHostedService();
@@ -175,15 +179,11 @@ namespace LT.DigitalOffice.ProjectService
                     .AllowAnyHeader()
                     .AllowAnyMethod());
 
-            var rabbitMqConfig = Configuration
-                .GetSection(BaseRabbitMqOptions.RabbitMqSectionName)
-                .Get<RabbitMqConfig>();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
 
-                endpoints.MapHealthChecks($"/{rabbitMqConfig.Password}/hc", new HealthCheckOptions
+                endpoints.MapHealthChecks($"/{_rabbitMqConfig.Password}/hc", new HealthCheckOptions
                 {
                     Predicate = _ => true,
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
