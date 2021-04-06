@@ -15,12 +15,12 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
     {
         private readonly ILogger<ProjectUserMapper> _logger;
         private readonly IRoleMapper _roleMapper;
-        private readonly IRequestClient<IGetUserRequest> _requestClient;
+        private readonly IRequestClient<IGetUserDataRequest> _requestClient;
 
         public ProjectUserMapper(
             ILogger<ProjectUserMapper> logger,
             IRoleMapper roleMapper,
-            IRequestClient<IGetUserRequest> requestClient)
+            IRequestClient<IGetUserDataRequest> requestClient)
         {
             _logger = logger;
             _roleMapper = roleMapper;
@@ -41,14 +41,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
 
             try
             {
-                var userInfoResponse = await _requestClient.GetResponse<IOperationResult<IGetUserResponse>>(
-                    IGetUserRequest.CreateObj(dbProjectUser.UserId));
+                var userDataResponse = await _requestClient.GetResponse<IOperationResult<IGetUserDataResponse>>(
+                    IGetUserDataRequest.CreateObj(dbProjectUser.UserId));
 
-                if (userInfoResponse.Message.IsSuccess)
+                if (userDataResponse.Message.IsSuccess)
                 {
-                    user.FirstName = userInfoResponse.Message.Body.FirstName;
-                    user.MiddleName = userInfoResponse.Message.Body.MiddleName;
-                    user.LastName = userInfoResponse.Message.Body.LastName;
+                    user.FirstName = userDataResponse.Message.Body.FirstName;
+                    user.MiddleName = userDataResponse.Message.Body.MiddleName;
+                    user.LastName = userDataResponse.Message.Body.LastName;
                 }
             }
             catch (Exception exc)
