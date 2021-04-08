@@ -7,8 +7,4 @@
     <ProjectReference Include="..\ProjectService.Data.Provider\ProjectService.Data.Provider.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Update="LT.DigitalOffice.Kernel" Version="1.1.21" />
-  </ItemGroup>
-
 </Project>

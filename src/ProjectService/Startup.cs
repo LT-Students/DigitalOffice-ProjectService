@@ -107,9 +107,9 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureMassTransit(IServiceCollection services)
         {
-            services.AddMassTransit(x =>
+            services.AddMassTransit(busConfigurator =>
             {
-                x.UsingRabbitMq((context, cfg) =>
+                busConfigurator.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(_rabbitMqConfig.Host, "/", host =>
                     {
@@ -118,9 +118,9 @@ namespace LT.DigitalOffice.ProjectService
                     });
                 });
 
-                RegisterRequestClients(x);
+                RegisterRequestClients(busConfigurator);
 
-                x.AddRequestClients(_rabbitMqConfig, _logger);
+                busConfigurator.AddRequestClients(_rabbitMqConfig, _logger);
             });
 
             services.AddMassTransitHostedService();
@@ -129,9 +129,6 @@ namespace LT.DigitalOffice.ProjectService
         private void RegisterRequestClients(
             IServiceCollectionBusConfigurator busConfigurator)
         {
-            busConfigurator.AddRequestClient<IGetFileRequest>(
-                    new Uri($"{_rabbitMqConfig.BaseUrl}/{_rabbitMqConfig.GetFileEndpoint}"));
-
             busConfigurator.AddRequestClient<IGetUserDataRequest>(
                 new Uri($"{_rabbitMqConfig.BaseUrl}/{_rabbitMqConfig.GetUserDataEndpoint}"),
                 RequestTimeout.After(ms: 100));

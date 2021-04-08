@@ -9,8 +9,4 @@
     <ProjectReference Include="..\..\src\ProjectService.Data.Provider.MsSql.Ef\ProjectService.Data.Provider.MsSql.Ef.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Update="LT.DigitalOffice.UnitTestKernel" Version="1.0.2" />
-  </ItemGroup>
-
 </Project>
