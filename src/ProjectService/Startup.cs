@@ -1,6 +1,5 @@
 using FluentValidation;
 using HealthChecks.UI.Client;
-using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Kernel.Middlewares.Token;
@@ -22,7 +21,6 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
-using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +40,8 @@ namespace LT.DigitalOffice.ProjectService
         private readonly RabbitMqConfig _rabbitMqConfig;
         private readonly BaseServiceInfoConfig _serviceInfoConfig;
         private readonly ILogger<Startup> _logger;
+
+        #region public methods
 
         public Startup(IConfiguration configuration)
         {
@@ -97,75 +97,8 @@ namespace LT.DigitalOffice.ProjectService
                 .AddSqlServer(connStr)
                 .AddRabbitMqCheck();
 
-            ConfigureCommands(services);
-            ConfigureRepositories(services);
-            ConfigureProvider(services);
-            ConfigureMappers(services);
             ConfigureValidators(services);
             ConfigureMassTransit(services);
-        }
-
-        private void ConfigureMassTransit(IServiceCollection services)
-        {
-            services.AddMassTransit(busConfigurator =>
-            {
-                busConfigurator.UsingRabbitMq((context, cfg) =>
-                {
-                    cfg.Host(_rabbitMqConfig.Host, "/", host =>
-                    {
-                        host.Username($"{_serviceInfoConfig.Name}_{_serviceInfoConfig.Id}");
-                        host.Password(_serviceInfoConfig.Id);
-                    });
-                });
-
-                busConfigurator.AddRequestClients(_rabbitMqConfig, _logger);
-            });
-
-            services.AddMassTransitHostedService();
-	    }
-
-        private void ConfigureCommands(IServiceCollection services)
-        {
-            services.AddTransient<IGetProjectByIdCommand, GetProjectByIdCommand>();
-            //services.AddTransient<ICreateNewProjectCommand, CreateNewProjectCommand>();
-            //services.AddTransient<IEditProjectByIdCommand, EditProjectByIdCommand>();
-
-            services.AddTransient<IAddUsersToProjectCommand, AddUsersToProjectCommand>();
-            services.AddTransient<IDisableWorkersInProjectCommand, DisableWorkersInProjectCommand>();
-            services.AddTransient<IGetProjectsCommand, GetProjectsCommand>();
-            services.AddTransient<IDisableRoleCommand, DisableRoleCommand>();
-        }
-
-        private void ConfigureRepositories(IServiceCollection services)
-        {
-            services.AddScoped<IProjectRepository, ProjectRepository>();
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IRoleRepository, RoleRepository>();
-        }
-
-        private void ConfigureProvider(IServiceCollection services)
-        {
-            services.AddTransient<IDataProvider, ProjectServiceDbContext>();
-        }
-
-        private void ConfigureMappers(IServiceCollection services)
-        {
-            services.AddTransient<IProjectMapper, ProjectMapper>();
-            services.AddTransient<IProjectUserMapper, ProjectUserMapper>();
-            services.AddTransient<IRoleMapper, RoleMapper>();
-
-            services.AddTransient<IProjectExpandedRequestMapper, ProjectExpandedRequestMapper>();
-            services.AddTransient<IProjectResponseMapper, ProjectResponseMapper>();
-            services.AddTransient<IProjectUserRequestMapper, ProjectUserRequestMapper>();
-            services.AddTransient<IProjectExpandedResponseMapper, ProjectExpandedResponseMapper>();
-    }
-
-        private void ConfigureValidators(IServiceCollection services)
-        {
-            services.AddTransient<IValidator<AddUsersToProjectRequest>, AddUsersToProjectValidator>();
-            services.AddTransient<IValidator<ProjectExpandedRequest>, ProjectExpandedRequestValidator>();
-            services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
-            services.AddTransient<IValidator<ProjectUserRequest>, ProjectUserRequestValidator>();
         }
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
@@ -210,6 +143,10 @@ namespace LT.DigitalOffice.ProjectService
             });
         }
 
+        #endregion
+
+        #region private methods
+
         private void UpdateDatabase(IApplicationBuilder app)
         {
             using var serviceScope = app.ApplicationServices
@@ -219,6 +156,39 @@ namespace LT.DigitalOffice.ProjectService
             using var context = serviceScope.ServiceProvider.GetService<ProjectServiceDbContext>();
 
             context.Database.Migrate();
+        }
+
+        #region configure masstransit
+
+        private void ConfigureMassTransit(IServiceCollection services)
+        {
+            services.AddMassTransit(busConfigurator =>
+            {
+                busConfigurator.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(_rabbitMqConfig.Host, "/", host =>
+                    {
+                        host.Username($"{_serviceInfoConfig.Name}_{_serviceInfoConfig.Id}");
+                        host.Password(_serviceInfoConfig.Id);
+                    });
+                });
+
+                busConfigurator.AddRequestClients(_rabbitMqConfig, _logger);
+            });
+
+            services.AddMassTransitHostedService();
+        }
+
+        #endregion
+
+        #endregion
+
+        private void ConfigureValidators(IServiceCollection services)
+        {
+            services.AddTransient<IValidator<AddUsersToProjectRequest>, AddUsersToProjectValidator>();
+            services.AddTransient<IValidator<ProjectExpandedRequest>, ProjectExpandedRequestValidator>();
+            services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
+            services.AddTransient<IValidator<ProjectUserRequest>, ProjectUserRequestValidator>();
         }
     }
 }

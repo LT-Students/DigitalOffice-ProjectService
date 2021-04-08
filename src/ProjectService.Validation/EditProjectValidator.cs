@@ -2,6 +2,7 @@
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using System;
@@ -10,7 +11,7 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-    public class EditProjectValidator : AbstractValidator<EditProjectRequest>
+    public class EditProjectValidator : AbstractValidator<EditProjectRequest>, IEditProjectValidator
     {
         private static List<string> Paths
             => new List<string> { NamePath, ShortNamePath, DescriptionPath };

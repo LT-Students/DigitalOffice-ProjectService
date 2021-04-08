@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LT.DigitalOffice.Kernel.Attributes;
+using System;
 using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
@@ -6,6 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     /// <summary>
     /// Represents interface for a command in command pattern.
     /// </summary>
+    [AutoInject]
     public interface IDisableWorkersInProjectCommand
     {
         /// <summary>

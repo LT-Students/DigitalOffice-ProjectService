@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LT.DigitalOffice.Kernel.Attributes;
+using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
@@ -6,6 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     /// Represents interface for a command in command pattern.
     /// Provides method for disabling user role in project.
     /// </summary>
+    [AutoInject]
     public interface IDisableRoleCommand
     {
         /// <summary>

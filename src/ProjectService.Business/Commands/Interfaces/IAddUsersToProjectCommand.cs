@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+﻿using LT.DigitalOffice.Kernel.Attributes;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
@@ -6,6 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     /// Represents interface for a command in command pattern.
     /// Provides method for adding a new users to project.
     /// </summary>
+    [AutoInject]
     public interface IAddUsersToProjectCommand
     {
         /// <summary>

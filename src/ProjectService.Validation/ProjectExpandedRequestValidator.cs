@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-    public class ProjectExpandedRequestValidator : AbstractValidator<ProjectExpandedRequest>
+    public class ProjectExpandedRequestValidator : AbstractValidator<ProjectExpandedRequest>, IProjectExpandedRequestValidator
     {
         public ProjectExpandedRequestValidator()
         {
