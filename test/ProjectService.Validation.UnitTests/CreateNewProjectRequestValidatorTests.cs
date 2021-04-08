@@ -18,7 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [SetUp]
         public void SetUp()
         {
-            validator = new ProjectExpandedRequestValidator();
+            validator = new ProjectExpandedValidator();
 
             projectRequest = new ProjectExpandedRequest
             {

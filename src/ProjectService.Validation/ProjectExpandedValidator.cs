@@ -4,9 +4,9 @@ using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-    public class ProjectExpandedRequestValidator : AbstractValidator<ProjectExpandedRequest>, IProjectExpandedRequestValidator
+    public class ProjectExpandedValidator : AbstractValidator<ProjectExpandedRequest>, IProjectExpandedValidator
     {
-        public ProjectExpandedRequestValidator()
+        public ProjectExpandedValidator()
         {
             RuleFor(project => project.Project.Name)
                 .NotEmpty()
@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
             When(project => project.Users != null, () =>
             {
-                RuleForEach(project => project.Users).SetValidator(new ProjectUserRequestValidator());
+                RuleForEach(project => project.Users).SetValidator(new ProjectUserValidator());
             });
         }
     }

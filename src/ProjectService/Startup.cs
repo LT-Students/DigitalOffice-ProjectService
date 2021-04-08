@@ -4,19 +4,7 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Kernel.Middlewares.Token;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
-using LT.DigitalOffice.ProjectService.Business.Commands;
-using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
-using LT.DigitalOffice.ProjectService.Configuration;
-using LT.DigitalOffice.ProjectService.Data;
-using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers;
-using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
-using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation;
@@ -30,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
 
 namespace LT.DigitalOffice.ProjectService
 {
@@ -186,9 +175,9 @@ namespace LT.DigitalOffice.ProjectService
         private void ConfigureValidators(IServiceCollection services)
         {
             services.AddTransient<IValidator<AddUsersToProjectRequest>, AddUsersToProjectValidator>();
-            services.AddTransient<IValidator<ProjectExpandedRequest>, ProjectExpandedRequestValidator>();
+            services.AddTransient<IValidator<ProjectExpandedRequest>, ProjectExpandedValidator>();
             services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
-            services.AddTransient<IValidator<ProjectUserRequest>, ProjectUserRequestValidator>();
+            services.AddTransient<IValidator<ProjectUserRequest>, ProjectUserValidator>();
         }
     }
 }

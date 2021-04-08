@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                        .WithMessage("The request must contain users");
 
                    RuleForEach(projectUser => projectUser.Users)
-                       .SetValidator(new ProjectUserRequestValidator())
+                       .SetValidator(new ProjectUserValidator())
                        .Must(user => CheckTheUserForExistenceInDb(user))
                        .WithMessage("This user is already exist - list index: {CollectionIndex}");
                });

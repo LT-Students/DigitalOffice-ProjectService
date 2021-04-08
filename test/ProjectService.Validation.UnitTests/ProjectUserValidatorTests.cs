@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            validator = new ProjectUserRequestValidator();
+            validator = new ProjectUserValidator();
         }
 
         [SetUp]
