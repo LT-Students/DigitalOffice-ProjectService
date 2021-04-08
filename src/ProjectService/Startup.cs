@@ -1,13 +1,9 @@
-using FluentValidation;
 using HealthChecks.UI.Client;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Kernel.Middlewares.Token;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
-using LT.DigitalOffice.ProjectService.Validation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
