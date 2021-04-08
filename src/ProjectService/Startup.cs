@@ -1,9 +1,10 @@
 using FluentValidation;
 using HealthChecks.UI.Client;
 using LT.DigitalOffice.Broker.Requests;
-using LT.DigitalOffice.Kernel;
-using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Kernel.Middlewares.Token;
+using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Configuration;
@@ -24,43 +25,77 @@ using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace LT.DigitalOffice.ProjectService
 {
-    public class Startup
+    public class Startup : BaseApiInfo
     {
         public IConfiguration Configuration { get; }
 
-        private RabbitMqConfig _rabbitMqConfig;
+        private readonly RabbitMqConfig _rabbitMqConfig;
+        private readonly BaseServiceInfoConfig _serviceInfoConfig;
+        private readonly ILogger<Startup> _logger;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            _serviceInfoConfig = Configuration
+               .GetSection(BaseServiceInfoConfig.SectionName)
+               .Get<BaseServiceInfoConfig>();
+
+            _rabbitMqConfig = Configuration
+                .GetSection(BaseRabbitMqConfig.SectionName)
+                .Get<RabbitMqConfig>();
+
+            Version = "1.1.4";
+            Description = "ProjectService is an API intended to work with projects.";
+            StartTime = DateTime.UtcNow;
+            ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
+
+            using var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder
+                    .AddFilter("LT.DigitalOffice.ProjectService.Startup", LogLevel.Trace)
+                    .AddConsole();
+            });
+
+            _logger = loggerFactory.CreateLogger<Startup>();
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<TokenConfiguration>(Configuration.GetSection("CheckTokenMiddleware"));
+            services.Configure<BaseRabbitMqConfig>(Configuration.GetSection(BaseRabbitMqConfig.SectionName));
+            services.Configure<BaseServiceInfoConfig>(Configuration.GetSection(BaseServiceInfoConfig.SectionName));
+
+            services.AddHttpContextAccessor();
+
+            services.AddBusinessObjects(_logger);
+
             string connStr = Environment.GetEnvironmentVariable("ConnectionString");
             if (string.IsNullOrEmpty(connStr))
             {
                 connStr = Configuration.GetConnectionString("SQLConnectionString");
             }
 
-            Console.WriteLine(connStr);
-
             services.AddDbContext<ProjectServiceDbContext>(options =>
             {
                 options.UseSqlServer(connStr);
             });
 
-            services.AddHealthChecks().AddSqlServer(connStr);
             services.AddControllers();
-            services.AddKernelExtensions();
+            services
+                .AddHealthChecks()
+                .AddSqlServer(connStr)
+                .AddRabbitMqCheck();
 
             ConfigureCommands(services);
             ConfigureRepositories(services);
@@ -72,42 +107,37 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureMassTransit(IServiceCollection services)
         {
-            _rabbitMqConfig = Configuration
-                .GetSection(BaseRabbitMqOptions.RabbitMqSectionName)
-                .Get<RabbitMqConfig>();
-
             services.AddMassTransit(x =>
             {
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(_rabbitMqConfig.Host, "/", host =>
                     {
-                        host.Username($"{_rabbitMqConfig.Username}_{_rabbitMqConfig.Password}");
-                        host.Password(_rabbitMqConfig.Password);
+                        host.Username($"{_serviceInfoConfig.Name}_{_serviceInfoConfig.Id}");
+                        host.Password(_serviceInfoConfig.Id);
                     });
                 });
 
-                RegisterRequestClients(x, _rabbitMqConfig);
+                RegisterRequestClients(x);
 
-                x.ConfigureKernelMassTransit(_rabbitMqConfig);
+                x.AddRequestClients(_rabbitMqConfig, _logger);
             });
 
             services.AddMassTransitHostedService();
 	    }
 
         private void RegisterRequestClients(
-            IServiceCollectionBusConfigurator busConfigurator,
-            RabbitMqConfig rabbitMqConfig)
+            IServiceCollectionBusConfigurator busConfigurator)
         {
             busConfigurator.AddRequestClient<IGetFileRequest>(
-                    new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.GetFileEndpoint}"));
+                    new Uri($"{_rabbitMqConfig.BaseUrl}/{_rabbitMqConfig.GetFileEndpoint}"));
 
             busConfigurator.AddRequestClient<IGetUserDataRequest>(
-                new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.GetUserDataEndpoint}"),
+                new Uri($"{_rabbitMqConfig.BaseUrl}/{_rabbitMqConfig.GetUserDataEndpoint}"),
                 RequestTimeout.After(ms: 100));
 
             busConfigurator.AddRequestClient<IGetDepartmentRequest>(
-                new Uri($"{rabbitMqConfig.BaseUrl}/{rabbitMqConfig.GetDepartmentDataEndpoint}"),
+                new Uri($"{_rabbitMqConfig.BaseUrl}/{_rabbitMqConfig.GetDepartmentDataEndpoint}"),
                 RequestTimeout.After(ms: 100));
         }
 
@@ -155,15 +185,15 @@ namespace LT.DigitalOffice.ProjectService
             services.AddTransient<IValidator<ProjectUserRequest>, ProjectUserRequestValidator>();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            app.UseHealthChecks("/api/healthcheck");
-
-            app.UseExceptionHandler(tempApp => tempApp.Run(CustomExceptionHandler.HandleCustomException));
-
             UpdateDatabase(app);
 
+            app.UseExceptionsHandler(loggerFactory);
+
             app.UseMiddleware<TokenMiddleware>();
+
+            app.UseApiInformation();
 
 #if RELEASE
             app.UseHttpsRedirection();
@@ -183,9 +213,15 @@ namespace LT.DigitalOffice.ProjectService
             {
                 endpoints.MapControllers();
 
-                endpoints.MapHealthChecks($"/{_rabbitMqConfig.Password}/hc", new HealthCheckOptions
+                endpoints.MapHealthChecks($"/{_serviceInfoConfig.Id}/hc", new HealthCheckOptions
                 {
-                    Predicate = _ => true,
+                    ResultStatusCodes = new Dictionary<HealthStatus, int>
+                    {
+                        { HealthStatus.Unhealthy, 200 },
+                        { HealthStatus.Healthy, 200 },
+                        { HealthStatus.Degraded, 200 },
+                    },
+                    Predicate = check => check.Name != "masstransit-bus",
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
                 });
             });

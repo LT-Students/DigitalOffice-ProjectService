@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.Exceptions;
+using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using Microsoft.AspNetCore.Mvc;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
@@ -17,9 +16,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IAccessValidator accessValidator;
 
         public EditProjectByIdCommand(
-            [FromServices] IValidator<EditProjectRequest> validator,
-            [FromServices] IProjectRepository repository,
-            [FromServices] IAccessValidator accessValidator)
+            IValidator<EditProjectRequest> validator,
+            IProjectRepository repository,
+            IAccessValidator accessValidator)
         {
             this.validator = validator;
             this.repository = repository;

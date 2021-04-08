@@ -2,4 +2,8 @@
 
   <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
 
+  <ItemGroup>
+    <PackageReference Update="LT.DigitalOffice.UnitTestKernel" Version="1.0.2" />
+  </ItemGroup>
+
 </Project>

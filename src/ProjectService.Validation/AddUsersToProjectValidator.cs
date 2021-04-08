@@ -1,10 +1,8 @@
 ﻿using FluentValidation;
-using FluentValidation.Results;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
         private IEnumerable<DbProjectUser> _dbPrjectUsers;
 
-        public AddUsersToProjectValidator([FromServices] IProjectRepository repository)
+        public AddUsersToProjectValidator(IProjectRepository repository)
         {
             _repository = repository;
 

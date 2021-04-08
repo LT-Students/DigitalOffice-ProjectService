@@ -1,7 +1,6 @@
 ﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 
@@ -11,7 +10,7 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
         private readonly IDataProvider provider;
 
-        public RoleRepository([FromServices] IDataProvider provider)
+        public RoleRepository(IDataProvider provider)
         {
             this.provider = provider;
         }

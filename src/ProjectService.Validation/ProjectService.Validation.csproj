@@ -8,4 +8,8 @@
     <ProjectReference Include="..\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="LT.DigitalOffice.Kernel" Version="1.1.21" />
+  </ItemGroup>
+
 </Project>

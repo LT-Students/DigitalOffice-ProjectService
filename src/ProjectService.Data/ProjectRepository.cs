@@ -1,9 +1,8 @@
 ﻿using LinqKit;
-using LT.DigitalOffice.Kernel.Exceptions;
+using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
         private readonly IDataProvider provider;
 
-        public ProjectRepository([FromServices] IDataProvider provider)
+        public ProjectRepository(IDataProvider provider)
         {
             this.provider = provider;
         }
