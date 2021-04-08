@@ -118,25 +118,11 @@ namespace LT.DigitalOffice.ProjectService
                     });
                 });
 
-                RegisterRequestClients(busConfigurator);
-
                 busConfigurator.AddRequestClients(_rabbitMqConfig, _logger);
             });
 
             services.AddMassTransitHostedService();
 	    }
-
-        private void RegisterRequestClients(
-            IServiceCollectionBusConfigurator busConfigurator)
-        {
-            busConfigurator.AddRequestClient<IGetUserDataRequest>(
-                new Uri($"{_rabbitMqConfig.BaseUrl}/{_rabbitMqConfig.GetUserDataEndpoint}"),
-                RequestTimeout.After(ms: 100));
-
-            busConfigurator.AddRequestClient<IGetDepartmentRequest>(
-                new Uri($"{_rabbitMqConfig.BaseUrl}/{_rabbitMqConfig.GetDepartmentDataEndpoint}"),
-                RequestTimeout.After(ms: 100));
-        }
 
         private void ConfigureCommands(IServiceCollection services)
         {
