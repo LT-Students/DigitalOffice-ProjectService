@@ -4,6 +4,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -14,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
     internal class AddUsersToProjectValidatorTests
     {
-        private IValidator<AddUsersToProjectRequest> validator;
+        private IAddUsersToProjectValidator validator;
 
         private Mock<IProjectRepository> _repository;
 

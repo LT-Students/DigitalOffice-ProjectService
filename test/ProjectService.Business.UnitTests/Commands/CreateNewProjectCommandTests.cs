@@ -8,6 +8,7 @@ using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -20,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         private ICreateNewProjectCommand command;
 
         private Mock<IProjectRepository> repositoryMock;
-        private Mock<IValidator<ProjectExpandedRequest>> validatorMock;
+        private Mock<IProjectExpandedValidator> validatorMock;
         private Mock<IProjectExpandedRequestMapper> mapperMock;
         private Mock<IAccessValidator> accessValidator;
 
@@ -45,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         [SetUp]
         public void SetUp()
         {
-            validatorMock = new Mock<IValidator<ProjectExpandedRequest>>();
+            validatorMock = new Mock<IProjectExpandedValidator>();
             repositoryMock = new Mock<IProjectRepository>();
             mapperMock = new Mock<IProjectExpandedRequestMapper>();
             accessValidator = new Mock<IAccessValidator>();

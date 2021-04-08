@@ -8,6 +8,7 @@ using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,13 +22,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IUserRepository _repository;
         private readonly IProjectUserRequestMapper _mapper;
         private readonly IAccessValidator _accessValidator;
-        private readonly IValidator<AddUsersToProjectRequest> _validator;
+        private readonly IAddUsersToProjectValidator _validator;
 
         public AddUsersToProjectCommand(
             IUserRepository repository,
             IProjectUserRequestMapper mapper,
             IAccessValidator accessValidator,
-            IValidator<AddUsersToProjectRequest> validator)
+            IAddUsersToProjectValidator validator)
         {
             _mapper = mapper;
             _validator = validator;

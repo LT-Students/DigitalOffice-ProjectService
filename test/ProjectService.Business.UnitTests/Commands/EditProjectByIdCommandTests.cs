@@ -6,6 +6,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Moq;
 using NUnit.Framework;
@@ -19,7 +20,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         private EditProjectRequest editRequest;
         private IEditProjectByIdCommand command;
         private Mock<IProjectRepository> repositoryMock;
-        private Mock<IValidator<EditProjectRequest>> validatorMock;
+        private Mock<IEditProjectValidator> validatorMock;
         private Mock<IAccessValidator> accessValidatorMock;
 
         [OneTimeSetUp]
@@ -40,7 +41,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         [SetUp]
         public void SetUp()
         {
-            validatorMock = new Mock<IValidator<EditProjectRequest>>();
+            validatorMock = new Mock<IEditProjectValidator>();
             repositoryMock = new Mock<IProjectRepository>();
             accessValidatorMock = new Mock<IAccessValidator>();
 

@@ -1,22 +1,22 @@
-﻿using FluentValidation;
-using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
     public class EditProjectByIdCommand : IEditProjectByIdCommand
     {
-        private readonly IValidator<EditProjectRequest> validator;
+        private readonly IEditProjectValidator validator;
         private readonly IProjectRepository repository;
         private readonly IAccessValidator accessValidator;
 
         public EditProjectByIdCommand(
-            IValidator<EditProjectRequest> validator,
+            IEditProjectValidator validator,
             IProjectRepository repository,
             IAccessValidator accessValidator)
         {

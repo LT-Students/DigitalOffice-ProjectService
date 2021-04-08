@@ -86,7 +86,6 @@ namespace LT.DigitalOffice.ProjectService
                 .AddSqlServer(connStr)
                 .AddRabbitMqCheck();
 
-            ConfigureValidators(services);
             ConfigureMassTransit(services);
         }
 
@@ -171,13 +170,5 @@ namespace LT.DigitalOffice.ProjectService
         #endregion
 
         #endregion
-
-        private void ConfigureValidators(IServiceCollection services)
-        {
-            services.AddTransient<IValidator<AddUsersToProjectRequest>, AddUsersToProjectValidator>();
-            services.AddTransient<IValidator<ProjectExpandedRequest>, ProjectExpandedValidator>();
-            services.AddTransient<IValidator<EditProjectRequest>, EditProjectValidator>();
-            services.AddTransient<IValidator<ProjectUserRequest>, ProjectUserValidator>();
-        }
     }
 }

@@ -1,7 +1,7 @@
-﻿using FluentValidation;
-using FluentValidation.TestHelper;
+﻿using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Newtonsoft.Json.Serialization;
@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
     internal class EditProjectRequestValidatorTests
     {
-        private IValidator<EditProjectRequest> validator;
+        private IEditProjectValidator validator;
         private EditProjectRequest editRequest;
         private IContractResolver resolver;
 

@@ -1,6 +1,6 @@
-﻿using FluentValidation;
-using FluentValidation.TestHelper;
+﻿using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using NUnit.Framework;
 using System;
 
@@ -8,7 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
     internal class ProjectUserValidatorTests
     {
-        private IValidator<ProjectUserRequest> validator;
+        private IProjectUserValidator validator;
         private ProjectUserRequest userProjectRequest;
 
         [OneTimeSetUp]
