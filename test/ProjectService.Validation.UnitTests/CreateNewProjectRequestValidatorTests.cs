@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using FluentValidation.TestHelper;
+﻿using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
@@ -7,18 +6,19 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
     internal class CreateNewProjectRequestValidatorTests
     {
-        private IValidator<ProjectExpandedRequest> validator;
+        private IProjectExpandedValidator validator;
         private ProjectExpandedRequest projectRequest;
 
         [SetUp]
         public void SetUp()
         {
-            validator = new ProjectExpandedRequestValidator();
+            validator = new ProjectExpandedValidator();
 
             projectRequest = new ProjectExpandedRequest
             {

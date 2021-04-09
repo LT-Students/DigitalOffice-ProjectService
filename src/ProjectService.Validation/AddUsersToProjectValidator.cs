@@ -1,23 +1,22 @@
 ﻿using FluentValidation;
-using FluentValidation.Results;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
-using Microsoft.AspNetCore.Mvc;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-    public class AddUsersToProjectValidator : AbstractValidator<AddUsersToProjectRequest>
+    public class AddUsersToProjectValidator : AbstractValidator<AddUsersToProjectRequest>, IAddUsersToProjectValidator
     {
         private readonly IProjectRepository _repository;
 
         private IEnumerable<DbProjectUser> _dbPrjectUsers;
 
-        public AddUsersToProjectValidator([FromServices] IProjectRepository repository)
+        public AddUsersToProjectValidator(IProjectRepository repository)
         {
             _repository = repository;
 
@@ -33,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                        .WithMessage("The request must contain users");
 
                    RuleForEach(projectUser => projectUser.Users)
-                       .SetValidator(new ProjectUserRequestValidator())
+                       .SetValidator(new ProjectUserValidator())
                        .Must(user => CheckTheUserForExistenceInDb(user))
                        .WithMessage("This user is already exist - list index: {CollectionIndex}");
                });

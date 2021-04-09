@@ -1,8 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.Exceptions;
+using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
@@ -13,8 +12,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IAccessValidator accessValidator;
 
         public DisableRoleCommand(
-            [FromServices] IRoleRepository repository,
-            [FromServices] IAccessValidator accessValidator)
+            IRoleRepository repository,
+            IAccessValidator accessValidator)
         {
             this.repository = repository;
             this.accessValidator = accessValidator;

@@ -1,12 +1,13 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.Exceptions;
+using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -20,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private Mock<IUserRepository> _repositoryMock;
         private Mock<IProjectUserRequestMapper> _mapperMock;
         private Mock<IAccessValidator> _accessValidatorMock;
-        private Mock<IValidator<AddUsersToProjectRequest>> _validatorMock;
+        private Mock<IAddUsersToProjectValidator> _validatorMock;
 
         private AddUsersToProjectCommand _command;
         private AddUsersToProjectRequest _request;
@@ -93,7 +94,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _repositoryMock = new Mock<IUserRepository>();
             _mapperMock = new Mock<IProjectUserRequestMapper>();
             _accessValidatorMock = new Mock<IAccessValidator>();
-            _validatorMock = new Mock<IValidator<AddUsersToProjectRequest>>();
+            _validatorMock = new Mock<IAddUsersToProjectValidator>();
 
             _command = new AddUsersToProjectCommand(
                 _repositoryMock.Object,

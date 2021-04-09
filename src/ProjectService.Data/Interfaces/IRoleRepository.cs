@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LT.DigitalOffice.Kernel.Attributes;
+using System;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
@@ -6,6 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     /// Represents interface of repository in repository pattern.
     /// Provides methods for working with the database of ProjectService.
     /// </summary>
+    [AutoInject]
     public interface IRoleRepository
     {
         /// <summary>

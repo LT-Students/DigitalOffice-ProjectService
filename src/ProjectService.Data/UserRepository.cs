@@ -1,8 +1,7 @@
-﻿using LT.DigitalOffice.Kernel.Exceptions;
+﻿using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
         public readonly IDataProvider _provider;
 
-        public UserRepository([FromServices] IDataProvider provider)
+        public UserRepository(IDataProvider provider)
         {
             _provider = provider;
         }

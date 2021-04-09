@@ -1,8 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.Exceptions;
+using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +14,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IAccessValidator accessValidator;
 
         public DisableWorkersInProjectCommand(
-            [FromServices] IProjectRepository repository,
-            [FromServices] IAccessValidator accessValidator)
+            IProjectRepository repository,
+            IAccessValidator accessValidator)
         {
             this.repository = repository;
             this.accessValidator = accessValidator;

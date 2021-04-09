@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.Exceptions;
+using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -8,7 +8,7 @@ using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
-using Microsoft.AspNetCore.Mvc;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,13 +22,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IUserRepository _repository;
         private readonly IProjectUserRequestMapper _mapper;
         private readonly IAccessValidator _accessValidator;
-        private readonly IValidator<AddUsersToProjectRequest> _validator;
+        private readonly IAddUsersToProjectValidator _validator;
 
         public AddUsersToProjectCommand(
-            [FromServices] IUserRepository repository,
-            [FromServices] IProjectUserRequestMapper mapper,
-            [FromServices] IAccessValidator accessValidator,
-            [FromServices] IValidator<AddUsersToProjectRequest> validator)
+            IUserRepository repository,
+            IProjectUserRequestMapper mapper,
+            IAccessValidator accessValidator,
+            IAddUsersToProjectValidator validator)
         {
             _mapper = mapper;
             _validator = validator;

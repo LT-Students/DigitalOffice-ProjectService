@@ -2,7 +2,6 @@
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
@@ -14,8 +13,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IProjectExpandedResponseMapper _mapper;
 
         public GetProjectByIdCommand(
-            [FromServices] IProjectRepository repository,
-            [FromServices] IProjectExpandedResponseMapper mapper)
+            IProjectRepository repository,
+            IProjectExpandedResponseMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
