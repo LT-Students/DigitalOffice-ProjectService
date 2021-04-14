@@ -20,11 +20,12 @@ namespace LT.DigitalOffice.ProjectService
 {
     public class Startup : BaseApiInfo
     {
+        public const string CorsPolicyName = "LtDoCorsPolicy";
+
         public IConfiguration Configuration { get; }
 
         private readonly RabbitMqConfig _rabbitMqConfig;
         private readonly BaseServiceInfoConfig _serviceInfoConfig;
-        private readonly ILogger<Startup> _logger;
 
         #region public methods
 
@@ -40,30 +41,34 @@ namespace LT.DigitalOffice.ProjectService
                 .GetSection(BaseRabbitMqConfig.SectionName)
                 .Get<RabbitMqConfig>();
 
-            Version = "1.1.4";
+            Version = "1.1.5";
             Description = "ProjectService is an API intended to work with projects.";
             StartTime = DateTime.UtcNow;
             ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
-
-            using var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder
-                    .AddFilter("LT.DigitalOffice.ProjectService.Startup", LogLevel.Trace)
-                    .AddConsole();
-            });
-
-            _logger = loggerFactory.CreateLogger<Startup>();
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(
+                    CorsPolicyName,
+                    builder =>
+                    {
+                        builder
+                            .WithOrigins("http://*.ltdo.xyz", "http://ltdo.xyz", "http://ltdo.xyz:9802")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
+
             services.Configure<TokenConfiguration>(Configuration.GetSection("CheckTokenMiddleware"));
             services.Configure<BaseRabbitMqConfig>(Configuration.GetSection(BaseRabbitMqConfig.SectionName));
             services.Configure<BaseServiceInfoConfig>(Configuration.GetSection(BaseServiceInfoConfig.SectionName));
 
             services.AddHttpContextAccessor();
 
-            services.AddBusinessObjects(_logger);
+            services.AddBusinessObjects();
 
             string connStr = Environment.GetEnvironmentVariable("ConnectionString");
             if (string.IsNullOrEmpty(connStr))
@@ -101,17 +106,11 @@ namespace LT.DigitalOffice.ProjectService
 
             app.UseRouting();
 
-            string corsUrl = Configuration.GetSection("Settings")["CorsUrl"];
-
-            app.UseCors(builder =>
-                builder
-                    .WithOrigins(corsUrl)
-                    .AllowAnyHeader()
-                    .AllowAnyMethod());
+            app.UseCors(CorsPolicyName);
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllers().RequireCors(CorsPolicyName);
 
                 endpoints.MapHealthChecks($"/{_serviceInfoConfig.Id}/hc", new HealthCheckOptions
                 {
@@ -157,7 +156,7 @@ namespace LT.DigitalOffice.ProjectService
                     });
                 });
 
-                busConfigurator.AddRequestClients(_rabbitMqConfig, _logger);
+                busConfigurator.AddRequestClients(_rabbitMqConfig);
             });
 
             services.AddMassTransitHostedService();
