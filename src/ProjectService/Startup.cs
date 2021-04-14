@@ -56,7 +56,12 @@ namespace LT.DigitalOffice.ProjectService
                     builder =>
                     {
                         builder
-                            .WithOrigins("http://*.ltdo.xyz", "http://ltdo.xyz", "http://ltdo.xyz:9802")
+                            .WithOrigins(
+                                "http://*.ltdo.xyz",
+                                "http://ltdo.xyz",
+                                "http://ltdo.xyz:9804",
+                                "http://localhost:4200",
+                                "http://localhost:4500")
                             .AllowAnyHeader()
                             .AllowAnyMethod();
                     });
