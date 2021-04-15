@@ -4,7 +4,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class RoleController : ControllerBase
     {

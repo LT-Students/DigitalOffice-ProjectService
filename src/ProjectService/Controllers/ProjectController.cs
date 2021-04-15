@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ProjectController : ControllerBase
     {
