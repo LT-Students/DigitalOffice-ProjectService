@@ -100,17 +100,15 @@ namespace LT.DigitalOffice.ProjectService
         {
             UpdateDatabase(app);
 
-            app.UseExceptionsHandler(loggerFactory);
+            app.UseForwardedHeaders();
 
-            app.UseMiddleware<TokenMiddleware>();
+            app.UseExceptionsHandler(loggerFactory);
 
             app.UseApiInformation();
 
-#if RELEASE
-            app.UseHttpsRedirection();
-#endif
-
             app.UseRouting();
+
+            app.UseMiddleware<TokenMiddleware>();
 
             app.UseCors(CorsPolicyName);
 
