@@ -1,18 +1,17 @@
 ﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
-    public class GetProjectsCommand : IGetProjectsCommand
+    public class FindProjectsCommand : IFindProjectsCommand
     {
         private readonly IProjectRepository _repository;
         private readonly IProjectResponseMapper _mapper;
 
-        public GetProjectsCommand(
+        public FindProjectsCommand(
             IProjectRepository repository,
             IProjectResponseMapper mapper)
         {
@@ -20,9 +19,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _mapper = mapper;
         }
 
-        public IEnumerable<Project> Execute(bool showNotActive)
+        public ProjectsResponse Execute(FindProjectsFilter filter, int skipCount, int takeCount)
         {
-            return _repository.GetProjects(showNotActive).Select(p => _mapper.Map(p));
+            throw new System.NotImplementedException();
         }
     }
 }

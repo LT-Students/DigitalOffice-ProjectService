@@ -5,6 +5,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels.Filters;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
@@ -12,12 +13,14 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [ApiController]
     public class ProjectController : ControllerBase
     {
-        [HttpGet("getProjects")]
-        public IEnumerable<Project> GetProjects(
-            [FromServices] IGetProjectsCommand command,
-            [FromQuery] bool showNotActive = false)
+        [HttpGet("find")]
+        public ProjectsResponse Find(
+            [FromServices] IFindProjectsCommand command,
+            [FromQuery] FindProjectsFilter filter,
+            [FromQuery] int skipCount,
+            [FromQuery] int takeCount)
         {
-            return command.Execute(showNotActive);
+            return command.Execute(filter, skipCount, takeCount);
         }
 
         [HttpGet("getProjectById")]

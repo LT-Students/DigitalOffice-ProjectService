@@ -13,6 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public string Name { get; set; }
         public string ShortName { get; set; }
         public string Description { get; set; }
+        public string ShortDescription { get; set; }
         public Guid DepartmentId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
