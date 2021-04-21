@@ -32,14 +32,16 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
 {
     internal class CreateProjectCommandTests
     {
-        private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _operationResultBroker;
-
         private Guid _autorId;
         private AutoMocker _mocker;
         private DbProject _newDbProject;
         private ProjectRequest _newRequest;
         private ICreateProjectCommand _command;
         private OperationResultResponse<ProjectInfo> _response;
+
+        private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _operationResultBroker;
+
+        #region Setup
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -138,6 +140,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                     IGetDepartmentRequest.CreateObj(_newRequest.DepartmentId), default, default))
                 .Returns(Task.FromResult(_operationResultBroker.Object));
         }
+
+        #endregion
 
         [Test]
         public void ShouldThrowExceptionWhenCreatingNewProjectWithIncorrectProjectData()
