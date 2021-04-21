@@ -128,7 +128,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                     Id = dbProject.Id,
                     Name = "DigitalOffice"
                 },
-                Department = new Department
+                Department = new DepartmentInfo
                 {
                     Id = Guid.NewGuid()
                 }

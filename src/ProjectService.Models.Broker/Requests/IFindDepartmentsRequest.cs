@@ -1,19 +1,18 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
-using System;
 
 namespace LT.DigitalOffice.Broker.Requests
 {
     [AutoInjectRequest(nameof(RabbitMqConfig.FindDepartmentEndpoint))]
-    public interface IGetUserDataRequest
+    public interface IFindDepartmentsRequest
     {
-        Guid UserId { get; }
+        string DepartmentName { get; set; }
 
-        static object CreateObj(Guid userId)
+        static object CreateObj(string departmentName)
         {
             return new
             {
-                UserId = userId
+                DepartmentName = departmentName
             };
         }
     }

@@ -3,6 +3,7 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels.Filters;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,28 @@ namespace LT.DigitalOffice.ProjectService.Data
     public class ProjectRepository : IProjectRepository
     {
         private readonly IDataProvider provider;
+
+        private IQueryable<DbProject> CreateFindPredicates(
+            FindDbProjectsFilter filter,
+            IQueryable<DbProject> dbProjects)
+        {
+            if (!string.IsNullOrEmpty(filter.Name))
+            {
+                dbProjects = dbProjects.Where(u => u.Name.Contains(filter.Name));
+            }
+
+            if (!string.IsNullOrEmpty(filter.ShortName))
+            {
+                dbProjects = dbProjects.Where(u => u.ShortName.Contains(filter.ShortName));
+            }
+
+            if (filter.DepartmentIds != null)
+            {
+                dbProjects = dbProjects.Where(u => filter.DepartmentIds.Contains(u.DepartmentId));
+            }
+
+            return dbProjects;
+        }
 
         public ProjectRepository(IDataProvider provider)
         {
@@ -94,16 +117,33 @@ namespace LT.DigitalOffice.ProjectService.Data
             provider.Save();
         }
 
-        public IEnumerable<DbProject> GetProjects(bool showNotActive)
-        {
-            var predicate = PredicateBuilder.New<DbProject>(p => p.IsActive);
+        //public IEnumerable<DbProject> GetProjects(bool showNotActive)
+        //{
+        //    var predicate = PredicateBuilder.New<DbProject>(p => p.IsActive);
 
-            if (showNotActive)
+        //    if (showNotActive)
+        //    {
+        //        predicate.Or(p => !p.IsActive);
+        //    }
+
+        //    return provider.Projects.Where(predicate).ToList();
+        //}
+
+        public List<DbProject> FindProjects(FindDbProjectsFilter filter, int skipCount, int takeCount, out int totalCount)
+        {
+            if (filter == null)
             {
-                predicate.Or(p => !p.IsActive);
+                throw new ArgumentNullException(nameof(filter));
             }
 
-            return provider.Projects.Where(predicate).ToList();
+            var dbProjects = provider.Projects
+                .AsSingleQuery()
+                .AsQueryable();
+
+            var projects = CreateFindPredicates(filter, dbProjects).ToList();
+            totalCount = projects.Count;
+
+            return projects.Skip(skipCount * takeCount).Take(takeCount).ToList();
         }
 
         public DbRole GetRole(Guid roleId)

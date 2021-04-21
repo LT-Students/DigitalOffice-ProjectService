@@ -10,7 +10,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels.Filters
         [FromQuery(Name = "shortname")]
         public string ShortName { get; set; }
 
-        //[FromQuery(Name = "departmentname")]
-        //public string DepartmentName { get; set; }
+        [FromQuery(Name = "departmentname")]
+        public string DepartmentName { get; set; }
     }
 }

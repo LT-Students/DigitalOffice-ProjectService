@@ -1,5 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels.Filters;
 using System;
 using System.Collections.Generic;
 
@@ -45,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// </summary>
         /// <param name="showNotActive">Do you want to show inactive projects?</param>
         /// <returns>All projects.</returns>
-        IEnumerable<DbProject> GetProjects(bool showNotActive);
+        //IEnumerable<DbProject> GetProjects(bool showNotActive);
 
         /// <summary>
         /// Returns all users from project with specified id.
@@ -54,6 +55,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="showNotActiveUsers">Do you want to show inactive users?</param>
         /// <returns>All users from project..</returns>
         IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActiveUsers);
+        List<DbProject> FindProjects(FindDbProjectsFilter dbFilter, int skipCount, int takeCount, out int totalCount);
 
         /// <summary>
         /// Return role by id.
