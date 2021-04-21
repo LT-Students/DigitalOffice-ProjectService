@@ -1,6 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using System;
+using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
@@ -16,6 +17,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
         /// </summary>
         /// <param name="request">Project data.</param>
         /// <returns>Id of the added project.</returns>
-        Guid Execute(ProjectExpandedRequest request);
+        OperationResultResponse<ProjectInfo> Execute(ProjectRequest request);
     }
 }

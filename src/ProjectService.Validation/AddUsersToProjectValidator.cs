@@ -47,11 +47,11 @@ namespace LT.DigitalOffice.ProjectService.Validation
             return _dbPrjectUsers != null;
         }
 
-        private bool CheckTheUserForExistenceInDb(ProjectUserRequest user)
+        private bool CheckTheUserForExistenceInDb(ProjectUser user)
         {
             foreach (var dbUser in _dbPrjectUsers)
             {
-                if (user.User.Id == dbUser.Id)
+                if (user.Id == dbUser.Id)
                 {
                     return false;
                 }

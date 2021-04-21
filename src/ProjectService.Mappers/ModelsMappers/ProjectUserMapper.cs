@@ -14,16 +14,16 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
     public class ProjectUserMapper : IProjectUserMapper
     {
         private readonly ILogger<ProjectUserMapper> _logger;
-        private readonly IRoleMapper _roleMapper;
+        //private readonly IRoleMapper _roleMapper;
         private readonly IRequestClient<IGetUserDataRequest> _requestClient;
 
         public ProjectUserMapper(
             ILogger<ProjectUserMapper> logger,
-            IRoleMapper roleMapper,
+            //IRoleMapper roleMapper,
             IRequestClient<IGetUserDataRequest> requestClient)
         {
             _logger = logger;
-            _roleMapper = roleMapper;
+           // _roleMapper = roleMapper;
             _requestClient = requestClient;
         }
 
@@ -59,7 +59,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
             return new ProjectUser
             {
                 User = user,
-                Role = _roleMapper.Map(dbProjectUser.Role)
+               // Role = _roleMapper.Map(dbProjectUser.Role)
             };
         }
     }

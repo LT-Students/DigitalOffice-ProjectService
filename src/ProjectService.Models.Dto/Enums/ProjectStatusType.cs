@@ -1,6 +1,6 @@
 ﻿namespace LT.DigitalOffice.ProjectService.Models.Dto.Enums
 {
-    public enum ProjectClosedReason
+    public enum ProjectStatusType
     {
         Completed,
         Failed,

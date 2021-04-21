@@ -5,6 +5,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
@@ -29,10 +30,10 @@ namespace LT.DigitalOffice.ProjectService.Controllers
             return command.Execute(projectId, showNotActiveUsers).Result;
         }
 
-        [HttpPost("createNewProject")]
-        public Guid CreateNewProject(
+        [HttpPost("create")]
+        public OperationResultResponse<ProjectInfo> Create(
             [FromServices] ICreateNewProjectCommand command,
-            [FromBody] ProjectExpandedRequest request)
+            [FromBody] ProjectRequest request)
         {
             return command.Execute(request);
         }

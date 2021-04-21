@@ -5,7 +5,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 namespace LT.DigitalOffice.ProjectService.Validation.Interfaces
 {
     [AutoInject]
-    public interface IProjectUserValidator : IValidator<ProjectUserRequest>
+    public interface IProjectUserValidator : IValidator<ProjectUser>
     {
     }
 }

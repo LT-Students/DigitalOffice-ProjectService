@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
@@ -52,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _repository.AddUsersToProject(dbProjectUser, request.ProjectId);
         }
 
-        public DbProjectUser GetDbProjectUsers(ProjectUserRequest projectUser, Guid projectId)
+        public DbProjectUser GetDbProjectUsers(ProjectUser projectUser, Guid projectId)
         {
             DbProjectUser dbProjectUser = _mapper.Map(projectUser);
 

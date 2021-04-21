@@ -3,7 +3,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels
 {
-    public class Project : ProjectRequest
+    public class Project
     {
         public new Guid Id { get; set; }
         public DateTime CreatedAt { get; set; }

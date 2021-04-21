@@ -6,7 +6,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces
 {
     [AutoInject]
-    public interface IProjectUserRequestMapper : IMapper<ProjectUserRequest, DbProjectUser>
+    public interface IProjectUserRequestMapper : IMapper<ProjectUser, DbProjectUser>
     {
     }
 }

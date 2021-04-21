@@ -7,7 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 {
     public class ProjectUserRequestMapper : IProjectUserRequestMapper
     {
-        public DbProjectUser Map(ProjectUserRequest projectUser)
+        public DbProjectUser Map(ProjectUser projectUser)
         {
             if (projectUser == null)
             {
@@ -16,10 +16,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 
             return new DbProjectUser
             {
-                UserId = projectUser.User.Id,
-                RoleId = projectUser.RoleId,
+                Id = Guid.NewGuid(),
+                UserId = projectUser.Id,
+                Role = (int)projectUser.Role,
                 AddedOn = DateTime.Now,
-                IsActive = projectUser.User.IsActive
+                IsActive = true
             };
         }
     }

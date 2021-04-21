@@ -4,22 +4,22 @@ using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-    public class ProjectUserValidator : AbstractValidator<ProjectUserRequest>, IProjectUserValidator
+    public class ProjectUserValidator : AbstractValidator<ProjectUser>, IProjectUserValidator
     {
         public ProjectUserValidator()
         {
-            RuleFor(pu => pu.User)
+            RuleFor(pu => pu)
                 .Must(u => u != null)
                 .WithMessage("The request must contain user data")
                 .DependentRules(() =>
                 {
-                    RuleFor(pu => pu.User.Id)
+                    RuleFor(pu => pu.Id)
                     .NotEmpty()
                     .WithMessage("Not specified user id.");
 
-                    RuleFor(pu => pu.RoleId)
+                    /*RuleFor(pu => pu.)
                        .NotEmpty()
-                       .WithMessage("Not specified role id.");
+                       .WithMessage("Not specified role id.");*/
 
                 });
         }
