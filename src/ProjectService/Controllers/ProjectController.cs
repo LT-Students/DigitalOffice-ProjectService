@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
 
         [HttpPost("create")]
         public OperationResultResponse<ProjectInfo> Create(
-            [FromServices] ICreateNewProjectCommand command,
+            [FromServices] ICreateProjectCommand command,
             [FromBody] ProjectRequest request)
         {
             return command.Execute(request);

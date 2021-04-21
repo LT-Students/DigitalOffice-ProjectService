@@ -23,7 +23,7 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
-    public class CreateProjectCommand : ICreateNewProjectCommand
+    public class CreateProjectCommand : ICreateProjectCommand
     {
         private readonly IProjectRepository _repository;
         private readonly IDbProjectMapper _dbProjectMapper;

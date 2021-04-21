@@ -10,13 +10,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     /// Provides method for adding a new project.
     /// </summary>
     [AutoInject]
-    public interface ICreateNewProjectCommand
+    public interface ICreateProjectCommand
     {
         /// <summary>
-        /// Adds a new project. Returns id of the added project.
+        /// Adds a new project. Returns base info of project .
         /// </summary>
         /// <param name="request">Project data.</param>
-        /// <returns>Id of the added project.</returns>
+        /// <returns>Project info</returns>
         OperationResultResponse<ProjectInfo> Execute(ProjectRequest request);
     }
 }
