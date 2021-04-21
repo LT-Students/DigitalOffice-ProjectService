@@ -40,7 +40,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = _projectId,
                     UserId = Guid.NewGuid(),
-                    RoleId = Guid.NewGuid(),
                     AddedOn = DateTime.Now,
                     IsActive = true
                 },
@@ -49,7 +48,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = _projectId,
                     UserId = Guid.NewGuid(),
-                    RoleId = Guid.NewGuid(),
                     AddedOn = DateTime.Now,
                     IsActive = true
                 }

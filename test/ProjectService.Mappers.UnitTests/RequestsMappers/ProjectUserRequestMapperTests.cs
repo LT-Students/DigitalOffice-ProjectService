@@ -1,5 +1,6 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
@@ -11,33 +12,24 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
     {
         private IProjectUserRequestMapper _projectUserRequestMapper;
 
-        private ProjectUserRequest _projectUser;
+        private ProjectUser _projectUser;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _projectUserRequestMapper = new ProjectUserRequestMapper();
 
-            _projectUser = new ProjectUserRequest
+            _projectUser = new ProjectUser
             {
-                User = new UserRequest
-                {
-                    Id = Guid.NewGuid()
-                },
-                RoleId = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Role = UserRoleType.Admin
             };
         }
 
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenProjectUserRequestIsNull()
         {
-            ProjectUserRequest projectRequest = null;
-
-            var expectedDbProjectUser = new DbProjectUser
-            {
-                UserId = _projectUser.User.Id,
-                RoleId = _projectUser.RoleId,
-            };
+            ProjectUser projectRequest = null;
 
             Assert.Throws<ArgumentNullException>(() => _projectUserRequestMapper.Map(projectRequest));
         }
@@ -49,9 +41,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
 
             var expectedDbProjectUser = new DbProjectUser
             {
-                UserId = _projectUser.User.Id,
-                RoleId = _projectUser.RoleId,
-                AddedOn = dbProjectUser.AddedOn
+                Id = dbProjectUser.Id,
+                UserId = _projectUser.Id,
+                Role = (int)_projectUser.Role,
+                AddedOn = dbProjectUser.AddedOn,
+                IsActive = true
             };
 
             SerializerAssert.AreEqual(expectedDbProjectUser, dbProjectUser);

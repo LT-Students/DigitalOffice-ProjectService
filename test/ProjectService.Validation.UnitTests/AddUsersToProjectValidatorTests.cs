@@ -2,6 +2,7 @@
 using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
@@ -37,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = projectId,
                     UserId = Guid.NewGuid(),
-                    RoleId = Guid.NewGuid(),
+                    Role = (int)UserRoleType.Admin,
                     IsActive = true
                 },
                 new DbProjectUser
@@ -45,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = projectId,
                     UserId = Guid.NewGuid(),
-                    RoleId = Guid.NewGuid(),
+                    Role = (int)UserRoleType.Admin,
                     IsActive = true
                 }
             };
@@ -64,17 +65,17 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 }
             };
 
-            var projectUsers = new List<ProjectUserRequest>
+            var projectUsers = new List<ProjectUser>
             {
-                new ProjectUserRequest
+                new ProjectUser
                 {
-                    RoleId = Guid.NewGuid(),
-                    User = users.ElementAt(0)
+                    Role = (int)UserRoleType.Admin,
+                    Id = Guid.NewGuid()
                 },
-                new ProjectUserRequest
+                new ProjectUser
                 {
-                    RoleId = Guid.NewGuid(),
-                    User = users.ElementAt(1)
+                    Role = (int)UserRoleType.Admin,
+                    Id = Guid.NewGuid()
                 }
             };
 
@@ -125,7 +126,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             AddUsersToProjectRequest projectUser = new AddUsersToProjectRequest
             {
                 ProjectId = Guid.NewGuid(),
-                Users = new List<ProjectUserRequest>()
+                Users = new List<ProjectUser>()
             };
 
             validator.ShouldHaveValidationErrorFor(x => x.Users, projectUser);
@@ -143,17 +144,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             AddUsersToProjectRequest newRequest = new AddUsersToProjectRequest
             {
                 ProjectId = Guid.NewGuid(),
-                Users = new List<ProjectUserRequest>
+                Users = new List<ProjectUser>
                 {
 
-                    new ProjectUserRequest
+                    new ProjectUser
                     {
-                        RoleId = Guid.NewGuid(),
-                        User = new UserRequest
-                        {
-                            Id = _dbProjectUsers.ElementAt(0).UserId,
-                            IsActive = true
-                        }
+                        Role = (int)UserRoleType.Admin,
+                        Id = _dbProjectUsers.ElementAt(0).UserId
                     }
                 }
             };

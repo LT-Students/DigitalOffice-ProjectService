@@ -5,6 +5,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
@@ -45,17 +46,17 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 }
             };
 
-            var projectUsers = new List<ProjectUserRequest>
+            var projectUsers = new List<ProjectUser>
             {
-                new ProjectUserRequest
+                new ProjectUser
                 {
-                    RoleId = Guid.NewGuid(),
-                    User = users.ElementAt(0)
+                    Role = UserRoleType.Admin,
+                    Id = Guid.NewGuid()
                 },
-                new ProjectUserRequest
+                new ProjectUser
                 {
-                    RoleId = Guid.NewGuid(),
-                    User = users.ElementAt(0)
+                    Role = UserRoleType.Admin,
+                    Id = Guid.NewGuid()
                 }
             };
 
@@ -71,8 +72,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 {
                     Id = Guid.NewGuid(),
                     ProjectId = _request.ProjectId,
-                    UserId = projectUsers.ElementAt(0).User.Id,
-                    RoleId = projectUsers.ElementAt(0).RoleId,
+                    UserId = projectUsers.ElementAt(0).Id,
                     AddedOn = DateTime.Now,
                     IsActive = true
                 },
@@ -80,8 +80,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 {
                     Id = Guid.NewGuid(),
                     ProjectId = _request.ProjectId,
-                    UserId = projectUsers.ElementAt(1).User.Id,
-                    RoleId = projectUsers.ElementAt(1).RoleId,
+                    UserId = projectUsers.ElementAt(1).Id,
                     AddedOn = DateTime.Now,
                     IsActive = true
                 }
@@ -166,7 +165,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Verifiable();
 
             _mapperMock
-                .Setup(x => x.Map(It.IsAny<ProjectUserRequest>()))
+                .Setup(x => x.Map(It.IsAny<ProjectUser>()))
                 .Throws(new ArgumentNullException())
                 .Verifiable();
 
@@ -190,7 +189,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Verifiable();
 
             _mapperMock
-                .SetupSequence(x => x.Map(It.IsAny<ProjectUserRequest>()))
+                .SetupSequence(x => x.Map(It.IsAny<ProjectUser>()))
                 .Returns(_dbProjectUsers.ElementAt(0))
                 .Returns(_dbProjectUsers.ElementAt(1));
 
@@ -200,7 +199,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Verifiable();
 
             Assert.Throws<ArgumentNullException>(() => _command.Execute(_request));
-            _mapperMock.Verify(x => x.Map(It.IsAny<ProjectUserRequest>()), Times.Exactly(2));
+            _mapperMock.Verify(x => x.Map(It.IsAny<ProjectUser>()), Times.Exactly(2));
             _accessValidatorMock.Verify();
             _repositoryMock.Verify();
         }
@@ -219,7 +218,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Verifiable();
 
             _mapperMock
-                .SetupSequence(x => x.Map(It.IsAny<ProjectUserRequest>()))
+                .SetupSequence(x => x.Map(It.IsAny<ProjectUser>()))
                 .Returns(_dbProjectUsers.ElementAt(0))
                 .Returns(_dbProjectUsers.ElementAt(1));
 
@@ -229,7 +228,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Verifiable();
 
             Assert.Throws<BadRequestException>(() => _command.Execute(_request));
-            _mapperMock.Verify(x => x.Map(It.IsAny<ProjectUserRequest>()), Times.Exactly(2));
+            _mapperMock.Verify(x => x.Map(It.IsAny<ProjectUser>()), Times.Exactly(2));
             _accessValidatorMock.Verify();
             _repositoryMock.Verify();
         }
@@ -248,7 +247,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Verifiable();
 
             _mapperMock
-                .SetupSequence(x => x.Map(It.IsAny<ProjectUserRequest>()))
+                .SetupSequence(x => x.Map(It.IsAny<ProjectUser>()))
                 .Returns(_dbProjectUsers.ElementAt(0))
                 .Returns(_dbProjectUsers.ElementAt(1));
 
@@ -261,7 +260,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _accessValidatorMock.Verify();
             _validatorMock.Verify();
             _repositoryMock.Verify();
-            _mapperMock.Verify(x => x.Map(It.IsAny<ProjectUserRequest>()), Times.Exactly(2));
+            _mapperMock.Verify(x => x.Map(It.IsAny<ProjectUser>()), Times.Exactly(2));
         }
     }
 }

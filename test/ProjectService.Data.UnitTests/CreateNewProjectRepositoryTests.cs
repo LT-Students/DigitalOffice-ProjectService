@@ -2,20 +2,22 @@
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
     internal class CreateNewProjectRepositoryTests
     {
-        private IDataProvider provider;
-        private IProjectRepository repository;
+        private IDataProvider _provider;
+        private IProjectRepository _repository;
 
-        private DbProject newProject;
+        private DbProject _newProject;
 
         [SetUp]
         public void SetUp()
@@ -24,50 +26,49 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 .UseInMemoryDatabase("ProjectServiceTest")
                 .Options;
 
-            provider = new ProjectServiceDbContext(dbOptionsProjectService);
+            _provider = new ProjectServiceDbContext(dbOptionsProjectService);
 
-            repository = new ProjectRepository(provider);
+            _repository = new ProjectRepository(_provider);
 
-            newProject = new DbProject
+            _newProject = new DbProject
             {
                 Id = Guid.NewGuid(),
-                Name = "DigitalOffice",
-                ShortName = "DO",
-                DepartmentId = Guid.NewGuid(),
+                Name = "Project for Lanit-Tercom",
+                ShortName = "Project",
                 Description = "New project for Lanit-Tercom",
-                IsActive = true
+                ShortDescription = "Short description",
+                DepartmentId = Guid.NewGuid(),
+                Status = (int)ProjectStatusType.Abandoned,
+                Users = new List<DbProjectUser>
+                {
+                    new DbProjectUser
+                    {
+                        Id = Guid.NewGuid(),
+                        Role = (int)UserRoleType.Admin
+                    }
+                }
             };
 
-            repository.CreateNewProject(newProject);
-        }
-
-        [Test]
-        public void ShouldAddNewProjectWhenTheNameWasRepeated()
-        {
-            var newProjectWithRepeatedName = newProject;
-            newProjectWithRepeatedName.Id = Guid.NewGuid();
-
-            Assert.That(repository.CreateNewProject(newProject), Is.EqualTo(newProjectWithRepeatedName.Id));
-            SerializerAssert.AreEqual(newProjectWithRepeatedName, provider.Projects.FirstOrDefault(project => project.Id == newProjectWithRepeatedName.Id));
-        }
-
-        [Test]
-        public void ShouldAddNewProjectToDb()
-        {
-            newProject.Name = "Any name";
-            newProject.Id = Guid.NewGuid();
-
-            Assert.AreEqual(newProject.Id, repository.CreateNewProject(newProject));
-            Assert.That(provider.Projects.Find(newProject.Id), Is.EqualTo(newProject));
+            _provider.Projects.Add(_newProject);
+            _provider.Save();
         }
 
         [TearDown]
         public void CleanMemoryDb()
         {
-            if (provider.IsInMemory())
+            if (_provider.IsInMemory())
             {
-                provider.EnsureDeleted();
+                _provider.EnsureDeleted();
             }
+        }
+
+        [Test]
+        public void ShouldAddNewProjectWhenTheNameWasRepeated()
+        {
+            var dbProject = _provider.Projects.FirstOrDefault(project => project.Id == _newProject.Id);
+            dbProject.Users.ElementAt(0).Project = null;
+
+            SerializerAssert.AreEqual(_newProject, dbProject);
         }
     }
 }
