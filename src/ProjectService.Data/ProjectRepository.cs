@@ -21,15 +21,15 @@ namespace LT.DigitalOffice.ProjectService.Data
         {
             if (!string.IsNullOrEmpty(filter.Name))
             {
-                dbProjects = dbProjects.Where(u => u.Name.Contains(filter.Name));
+                dbProjects = dbProjects.Where(u => u.Name.ToUpper().Contains(filter.Name.ToUpper()));
             }
 
             if (!string.IsNullOrEmpty(filter.ShortName))
             {
-                dbProjects = dbProjects.Where(u => u.ShortName.Contains(filter.ShortName));
+                dbProjects = dbProjects.Where(u => u.ShortName.ToUpper().Contains(filter.ShortName.ToUpper()));
             }
 
-            if (filter.DepartmentIds != null)
+            if (filter.DepartmentIds != null && filter.DepartmentIds.Count != 0)
             {
                 dbProjects = dbProjects.Where(u => filter.DepartmentIds.Contains(u.DepartmentId));
             }
