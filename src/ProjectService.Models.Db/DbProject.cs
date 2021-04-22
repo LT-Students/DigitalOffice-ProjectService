@@ -48,13 +48,11 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .Property(p => p.ShortName)
                 .IsRequired();
 
+
+
             builder
                 .HasMany(p => p.Users)
                 .WithOne(u => u.Project);
-
-            builder
-                .Property(p => p.Name)
-                .IsRequired();
         }
     }
 }
