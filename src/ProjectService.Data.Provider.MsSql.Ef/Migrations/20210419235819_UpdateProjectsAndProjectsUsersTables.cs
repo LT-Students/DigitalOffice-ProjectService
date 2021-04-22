@@ -26,17 +26,19 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
             migrationBuilder.AlterColumn<string>(
                 name: nameof(DbProject.Name),
                 table: DbProject.TableName,
+                nullable: false,
                 maxLength: 150);
 
             migrationBuilder.AlterColumn<string>(
                 name: nameof(DbProject.ShortName),
                 table: DbProject.TableName,
+                nullable: false,
                 maxLength: 30);
 
             migrationBuilder.AddColumn<string>(
                 name: nameof(DbProject.ShortDescription),
                 table: DbProject.TableName,
-                nullable: false,
+                nullable: true,
                 maxLength: 300);
 
             migrationBuilder.AddColumn<Guid>(
