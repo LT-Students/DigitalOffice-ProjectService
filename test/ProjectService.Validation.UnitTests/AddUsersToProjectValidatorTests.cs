@@ -52,31 +52,17 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 }
             };
 
-            var users = new List<UserRequest>
-            {
-                new UserRequest
-                {
-                    Id = Guid.NewGuid(),
-                    IsActive = true
-                },
-                new UserRequest
-                {
-                    Id = Guid.NewGuid(),
-                    IsActive = true
-                }
-            };
-
             var projectUsers = new List<ProjectUserRequest>
             {
                 new ProjectUserRequest
                 {
                     Role = (int)UserRoleType.Admin,
-                    Id = Guid.NewGuid()
+                    UserId = Guid.NewGuid()
                 },
                 new ProjectUserRequest
                 {
                     Role = (int)UserRoleType.Admin,
-                    Id = Guid.NewGuid()
+                    UserId = Guid.NewGuid()
                 }
             };
 
@@ -151,7 +137,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     new ProjectUserRequest
                     {
                         Role = (int)UserRoleType.Admin,
-                        Id = _dbProjectUsers.ElementAt(0).UserId
+                        UserId = _dbProjectUsers.ElementAt(0).UserId
                     }
                 }
             };

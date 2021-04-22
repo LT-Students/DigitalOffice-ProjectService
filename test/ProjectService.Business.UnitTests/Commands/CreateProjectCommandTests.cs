@@ -70,7 +70,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 {
                     new ProjectUserRequest
                     {
-                        Id = Guid.NewGuid(),
+                        UserId = Guid.NewGuid(),
                         Role = UserRoleType.Admin
                     }
                 }

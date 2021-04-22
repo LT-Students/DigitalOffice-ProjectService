@@ -51,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         {
             foreach (var dbUser in _dbPrjectUsers)
             {
-                if (user.Id == dbUser.Id)
+                if (user.UserId == dbUser.Id)
                 {
                     return false;
                 }

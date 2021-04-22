@@ -21,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
 
             _projectUser = new ProjectUserRequest
             {
-                Id = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
                 Role = UserRoleType.Admin
             };
         }
@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
             var expectedDbProjectUser = new DbProjectUser
             {
                 Id = dbProjectUser.Id,
-                UserId = _projectUser.Id,
+                UserId = _projectUser.UserId,
                 Role = (int)_projectUser.Role,
                 AddedOn = dbProjectUser.AddedOn,
                 IsActive = true

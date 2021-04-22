@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// Edits the existing project in the database.
         /// </summary>
         /// <param name="dbProject">New data of the project.</param>
-        /// <returns>Id of the edited project.</returns>
+        /// <returns>UserId of the edited project.</returns>
         Guid EditProjectById(DbProject dbProject);
 
         /// <summary>

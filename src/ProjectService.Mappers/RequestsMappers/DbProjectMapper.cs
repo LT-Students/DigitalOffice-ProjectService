@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                     {
                         Id = Guid.NewGuid(),
                         ProjectId = projectId,
-                        UserId = user.Id,
+                        UserId = user.UserId,
                         Role = (int)user.Role,
                         AddedOn = DateTime.UtcNow,
                         IsActive = true
