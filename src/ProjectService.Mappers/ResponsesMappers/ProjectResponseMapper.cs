@@ -1,30 +1,31 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
 {
     public class ProjectResponseMapper : IProjectResponseMapper
     {
-        public Project Map(DbProject value)
+        public ProjectInfo Map(DbProject value)
         {
             if (value == null)
             {
                 throw new ArgumentNullException(nameof(value));
             }
 
-            return new Project
+            return new ProjectInfo
             {
                 Id = value.Id,
-                // = value.IsActive,
-                /*Name = value.Name,
+                Name = value.Name,
+                AuthorId = value.AuthorId,
                 ShortName = value.ShortName,
                 CreatedAt = value.CreatedAt,
-                //ClosedAt = value.ClosedAt,
                 DepartmentId = value.DepartmentId,
-               // ClosedReason = value.ClosedReason,
-                Description = value.Description*/
+                Status = (ProjectStatusType)value.Status,
+                Description = value.Description,
+                ShortDescription = value.ShortDescription
             };
         }
     }

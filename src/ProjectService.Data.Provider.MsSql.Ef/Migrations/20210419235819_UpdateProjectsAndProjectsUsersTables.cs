@@ -6,7 +6,7 @@ using System;
 namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
     [DbContext(typeof(ProjectServiceDbContext))]
-    [Migration("20210419235819_InitialCreate")]
+    [Migration("20210419235819_UpdateProjectsAndProjectsUsersTables")]
     class UpdateProjectsAndProjectsUsersTables : Migration
     {
         private void UpdateProjectsTable(MigrationBuilder migrationBuilder)

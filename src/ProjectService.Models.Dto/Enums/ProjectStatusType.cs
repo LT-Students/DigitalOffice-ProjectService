@@ -2,9 +2,11 @@
 {
     public enum ProjectStatusType
     {
-        Completed,
+        Active,
         Failed,
         Abandoned,
-        Rejected
+        Rejected,
+        Closed,
+        Suspend
     }
 }

@@ -3,6 +3,7 @@ using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -14,27 +15,24 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
     public class ProjectUserMapper : IProjectUserMapper
     {
         private readonly ILogger<ProjectUserMapper> _logger;
-        //private readonly IRoleMapper _roleMapper;
         private readonly IRequestClient<IGetUserDataRequest> _requestClient;
 
         public ProjectUserMapper(
             ILogger<ProjectUserMapper> logger,
-            //IRoleMapper roleMapper,
             IRequestClient<IGetUserDataRequest> requestClient)
         {
             _logger = logger;
-           // _roleMapper = roleMapper;
             _requestClient = requestClient;
         }
 
-        public async Task<ProjectUser> Map(DbProjectUser dbProjectUser)
+        public async Task<ProjectUserInfo> Map(DbProjectUser dbProjectUser)
         {
             if (dbProjectUser == null)
             {
                 throw new ArgumentNullException(nameof(dbProjectUser));
             }
 
-            var user = new User
+            var user = new UserInfo
             {
                 Id = dbProjectUser.UserId,
             };
@@ -56,10 +54,10 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 _logger.LogError(exc, "Exception on get user information.");
             }
 
-            return new ProjectUser
+            return new ProjectUserInfo
             {
                 User = user,
-               // Role = _roleMapper.Map(dbProjectUser.Role)
+                Role = (UserRoleType)dbProjectUser.Role
             };
         }
     }

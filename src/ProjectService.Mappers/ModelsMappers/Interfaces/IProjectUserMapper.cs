@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces
     [AutoInject]
     public interface IProjectUserMapper
     {
-        Task<ProjectUser> Map(DbProjectUser dbProjectUser);
+        Task<ProjectUserInfo> Map(DbProjectUser dbProjectUser);
     }
 }

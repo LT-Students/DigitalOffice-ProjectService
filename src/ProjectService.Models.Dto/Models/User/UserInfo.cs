@@ -3,7 +3,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels
 {
-    public class User : UserRequest
+    public class UserInfo : UserRequest
     {
         public string FirstName { get; set; }
         public string MiddleName { get; set; }

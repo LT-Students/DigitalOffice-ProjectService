@@ -35,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
             DbProject dbProject,
             IEnumerable<DbProjectUser> users)
         {
-            Department department = null;
+            DepartmentInfo department = null;
 
             try
             {
@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
 
                 if (departmentResponse.Message.IsSuccess)
                 {
-                    department = new Department
+                    department = new DepartmentInfo
                     {
                         Id = departmentResponse.Message.Body.Id,
                         Name = departmentResponse.Message.Body.Name

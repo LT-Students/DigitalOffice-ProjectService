@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,7 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _mapper = mapper;
         }
 
-        public IEnumerable<Project> Execute(bool showNotActive)
+        public IEnumerable<ProjectInfo> Execute(bool showNotActive)
         {
             return _repository.GetProjects(showNotActive).Select(p => _mapper.Map(p));
         }
