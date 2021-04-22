@@ -16,11 +16,6 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     RuleFor(pu => pu.Id)
                     .NotEmpty()
                     .WithMessage("Not specified user id.");
-
-                    /*RuleFor(pu => pu.)
-                       .NotEmpty()
-                       .WithMessage("Not specified role id.");*/
-
                 });
         }
     }
