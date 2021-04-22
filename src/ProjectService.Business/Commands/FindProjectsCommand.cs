@@ -12,6 +12,7 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
@@ -21,7 +22,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IProjectRepository _repository;
         private readonly IFindProjectsResponseMapper _responseMapper;
         private readonly IFindDbProjectFilterMapper _filterMapper;
-        private readonly IRequestClient<IFindDepartmentsRequest> _requestClient;
+        private readonly IRequestClient<IFindDepartmentsRequest> _findDepartmentsRequestClient;
+        private readonly IRequestClient<IGetDepartmentsNamesRequest> _getDepartmentsRequestClient;
 
         private List<Guid> FindDepartment(string departmentName, List<string> errors)
         {
@@ -32,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             try
             {
                 var findDepartmentRequest = IFindDepartmentsRequest.CreateObj(departmentName);
-                var response = _requestClient.GetResponse<IOperationResult<IDepartmentsResponse>>(findDepartmentRequest).Result;
+                var response = _findDepartmentsRequestClient.GetResponse<IOperationResult<IDepartmentsResponse>>(findDepartmentRequest).Result;
                 if (response.Message.IsSuccess)
                 {
                     departmentId.AddRange(response.Message.Body.DepartmentIds);
@@ -54,18 +56,53 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             return departmentId;
         }
 
+        private IDictionary<Guid, string> GetDepartmentName(List<DbProject> dbProjects, List<string> errors)
+        {
+            IDictionary<Guid, string> pairs = new Dictionary<Guid, string>();
+
+            string errorMessage = $"Can not find departments names now. Please try again later.";
+
+            try
+            {
+                var getDepartmentsRequest = IGetDepartmentsNamesRequest.CreateObj(
+                    dbProjects.Select(p => p.DepartmentId).ToList());
+                var response = _getDepartmentsRequestClient.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+                    getDepartmentsRequest).Result;
+                if (response.Message.IsSuccess)
+                {
+                    pairs = response.Message.Body.IdNamePairs;
+                }
+                else
+                {
+                    _logger.LogWarning(string.Join(", ", response.Message.Errors));
+
+                    errors.AddRange(response.Message.Errors);
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, errorMessage);
+
+                errors.Add(errorMessage);
+            }
+
+            return pairs;
+        }
+
         public FindProjectsCommand(
             ILogger<FindProjectsCommand> logger,
             IProjectRepository repository,
             IFindProjectsResponseMapper responseMapper,
             IFindDbProjectFilterMapper filterMapper,
-            IRequestClient<IFindDepartmentsRequest> requestClient)
+            IRequestClient<IFindDepartmentsRequest> findDepartmentsRequestClient,
+            IRequestClient<IGetDepartmentsNamesRequest> getDepartmentsRequestClient)
         {
             _logger = logger;
             _repository = repository;
             _responseMapper = responseMapper;
             _filterMapper = filterMapper;
-            _requestClient = requestClient;
+            _findDepartmentsRequestClient = findDepartmentsRequestClient;
+            _getDepartmentsRequestClient = getDepartmentsRequestClient;
         }
 
         public ProjectsResponse Execute(FindProjectsFilter filter, int skipCount, int takeCount)
@@ -88,7 +125,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             List<DbProject> dbProject = _repository.FindProjects(dbFilter, skipCount, takeCount, out int totalCount);
 
-            var response = _responseMapper.Map(dbProject, totalCount, filter.DepartmentName, errors);
+            var departmentsNames = GetDepartmentName(dbProject, errors);
+
+            var response = _responseMapper.Map(dbProject, totalCount, departmentsNames, errors);
 
             return response;
         }

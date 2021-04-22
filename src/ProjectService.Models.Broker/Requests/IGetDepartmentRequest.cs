@@ -7,12 +7,14 @@ namespace LT.DigitalOffice.Broker.Requests
     [AutoInjectRequest(nameof(RabbitMqConfig.GetDepartmentDataEndpoint))]
     public interface IGetDepartmentRequest
     {
-        Guid DepartmentId { get; }
+        Guid? UserId { get; }
+        Guid? DepartmentId { get; }
 
-        static object CreateObj(Guid departmentId)
+        static object CreateObj(Guid? userId, Guid? departmentId)
         {
             return new
             {
+                UserId = userId,
                 DepartmentId = departmentId
             };
         }

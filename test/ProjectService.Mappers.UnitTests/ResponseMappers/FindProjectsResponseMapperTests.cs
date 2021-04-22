@@ -23,6 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.ResponseMappers
         private DbProject _dbProject;
         private ProjectInfo _projectInfo;
         private ProjectsResponse _response;
+        private IDictionary<Guid, string> _idNameDepartment;
 
         private const int _totalCount = 1;
 
@@ -55,6 +56,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.ResponseMappers
                 }
             };
 
+            _idNameDepartment = new Dictionary<Guid, string>();
+            _idNameDepartment.Add(_dbProject.DepartmentId, _departmentName);
+
             _response = new ProjectsResponse
             {
                 TotalCount = _totalCount,
@@ -74,13 +78,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.ResponseMappers
         [Test]
         public void ShouldReturnProjectsResponse()
         {
-            SerializerAssert.AreEqual(_response, _mapper.Map(_dbProjects, _totalCount, _departmentName, errors));
+            SerializerAssert.AreEqual(_response, _mapper.Map(_dbProjects, _totalCount, _idNameDepartment, errors));
         }
 
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenListOfDbProjectIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _mapper.Map(null, _totalCount, _departmentName, errors));
+            Assert.Throws<ArgumentNullException>(() => _mapper.Map(null, _totalCount, _idNameDepartment, errors));
         }
     }
 }

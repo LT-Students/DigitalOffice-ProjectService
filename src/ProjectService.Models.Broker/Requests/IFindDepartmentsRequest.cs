@@ -6,7 +6,7 @@ namespace LT.DigitalOffice.Broker.Requests
     [AutoInjectRequest(nameof(RabbitMqConfig.FindDepartmentEndpoint))]
     public interface IFindDepartmentsRequest
     {
-        string DepartmentName { get; set; }
+        string DepartmentName { get; }
 
         static object CreateObj(string departmentName)
         {

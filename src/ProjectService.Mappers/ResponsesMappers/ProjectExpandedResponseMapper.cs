@@ -43,7 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
             try
             {
                 var departmentResponse = await _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(dbProject.DepartmentId));
+                    IGetDepartmentRequest.CreateObj(null, dbProject.DepartmentId));
 
                 if (departmentResponse.Message.IsSuccess)
                 {

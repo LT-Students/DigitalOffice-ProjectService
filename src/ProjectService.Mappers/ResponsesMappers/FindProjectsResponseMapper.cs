@@ -16,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
             _mapper = mapper;
         }
 
-        public ProjectsResponse Map(List<DbProject> dbProjects, int totalCount, string departmentName, List<string> errors)
+        public ProjectsResponse Map(List<DbProject> dbProjects, int totalCount, IDictionary<Guid, string> departmentsNames, List<string> errors)
         {
             if (dbProjects == null)
             {
@@ -26,6 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
             var projectInfos = new List<ProjectInfo>();
             foreach(var dbProject in dbProjects)
             {
+                departmentsNames.TryGetValue(dbProject.DepartmentId, out string departmentName);
                 projectInfos.Add(_mapper.Map(dbProject, departmentName));
             }
 
