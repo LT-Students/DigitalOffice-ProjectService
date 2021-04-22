@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
@@ -12,14 +12,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
     {
         private IProjectUserRequestMapper _projectUserRequestMapper;
 
-        private ProjectUser _projectUser;
+        private ProjectUserRequest _projectUser;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _projectUserRequestMapper = new ProjectUserRequestMapper();
 
-            _projectUser = new ProjectUser
+            _projectUser = new ProjectUserRequest
             {
                 Id = Guid.NewGuid(),
                 Role = UserRoleType.Admin
@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenProjectUserRequestIsNull()
         {
-            ProjectUser projectRequest = null;
+            ProjectUserRequest projectRequest = null;
 
             Assert.Throws<ArgumentNullException>(() => _projectUserRequestMapper.Map(projectRequest));
         }

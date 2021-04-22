@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-    public class ProjectUserValidator : AbstractValidator<ProjectUser>, IProjectUserValidator
+    public class ProjectUserValidator : AbstractValidator<ProjectUserRequest>, IProjectUserValidator
     {
         public ProjectUserValidator()
         {

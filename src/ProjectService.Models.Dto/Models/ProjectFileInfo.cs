@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels
+namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
 {
     public class ProjectFileInfo
     {

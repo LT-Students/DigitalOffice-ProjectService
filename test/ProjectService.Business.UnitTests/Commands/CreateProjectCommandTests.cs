@@ -13,8 +13,8 @@ using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using LT.DigitalOffice.UnitTestKernel;
@@ -66,9 +66,9 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
                 Status = ProjectStatusType.Abandoned,
-                Users = new List<ProjectUser>
+                Users = new List<ProjectUserRequest>
                 {
-                    new ProjectUser
+                    new ProjectUserRequest
                     {
                         Id = Guid.NewGuid(),
                         Role = UserRoleType.Admin

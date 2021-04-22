@@ -5,8 +5,8 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -51,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _repository.AddUsersToProject(dbProjectUser, request.ProjectId);
         }
 
-        public DbProjectUser GetDbProjectUsers(ProjectUser projectUser, Guid projectId)
+        public DbProjectUser GetDbProjectUsers(ProjectUserRequest projectUser, Guid projectId)
         {
             DbProjectUser dbProjectUser = _mapper.Map(projectUser);
 

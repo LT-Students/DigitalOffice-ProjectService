@@ -4,7 +4,6 @@ using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -152,7 +151,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             var result = command.Execute(projectId, SHOW_NOT_ACTIVE_USERS).Result;
 
             Assert.AreEqual(expectedResult.Project.Id, result.Project.Id);
-           // Assert.AreEqual(expectedResult.Project.Name, result.Project.Name);
+            Assert.AreEqual(expectedResult.Project.Name, result.Project.Name);
             Assert.AreEqual(expectedResult.Department.Id, result.Department.Id);
             repositoryMock.Verify();
             mapperMock.Verify();

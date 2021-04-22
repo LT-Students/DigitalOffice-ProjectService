@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
             return _dbPrjectUsers != null;
         }
 
-        private bool CheckTheUserForExistenceInDb(ProjectUser user)
+        private bool CheckTheUserForExistenceInDb(ProjectUserRequest user)
         {
             foreach (var dbUser in _dbPrjectUsers)
             {

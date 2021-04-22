@@ -3,8 +3,9 @@ using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.User;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Moq;
 using NUnit.Framework;
@@ -65,14 +66,14 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 }
             };
 
-            var projectUsers = new List<ProjectUser>
+            var projectUsers = new List<ProjectUserRequest>
             {
-                new ProjectUser
+                new ProjectUserRequest
                 {
                     Role = (int)UserRoleType.Admin,
                     Id = Guid.NewGuid()
                 },
-                new ProjectUser
+                new ProjectUserRequest
                 {
                     Role = (int)UserRoleType.Admin,
                     Id = Guid.NewGuid()
@@ -126,7 +127,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             AddUsersToProjectRequest projectUser = new AddUsersToProjectRequest
             {
                 ProjectId = Guid.NewGuid(),
-                Users = new List<ProjectUser>()
+                Users = new List<ProjectUserRequest>()
             };
 
             validator.ShouldHaveValidationErrorFor(x => x.Users, projectUser);
@@ -144,10 +145,10 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             AddUsersToProjectRequest newRequest = new AddUsersToProjectRequest
             {
                 ProjectId = Guid.NewGuid(),
-                Users = new List<ProjectUser>
+                Users = new List<ProjectUserRequest>
                 {
 
-                    new ProjectUser
+                    new ProjectUserRequest
                     {
                         Role = (int)UserRoleType.Admin,
                         Id = _dbProjectUsers.ElementAt(0).UserId

@@ -1,7 +1,7 @@
 ﻿using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using NUnit.Framework;
 using System;
@@ -28,9 +28,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
                 Status = ProjectStatusType.Abandoned,
-                Users = new List<ProjectUser>
+                Users = new List<ProjectUserRequest>
                 {
-                    new ProjectUser
+                    new ProjectUserRequest
                     {
                         Id = Guid.NewGuid(),
                         Role = UserRoleType.Admin
@@ -90,9 +90,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
                 Status = ProjectStatusType.Abandoned,
-                Users = new List<ProjectUser>
+                Users = new List<ProjectUserRequest>
                 {
-                    new ProjectUser
+                    new ProjectUserRequest
                     {
                         Id = Guid.Empty,
                         Role = UserRoleType.Admin
@@ -120,9 +120,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
                 Status = ProjectStatusType.Abandoned,
-                Users = new List<ProjectUser>
+                Users = new List<ProjectUserRequest>
                 {
-                    new ProjectUser
+                    new ProjectUserRequest
                     {
                         Id = Guid.NewGuid(),
                         Role = (UserRoleType)9

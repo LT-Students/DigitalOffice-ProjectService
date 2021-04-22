@@ -4,7 +4,8 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.User;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using System;
@@ -56,6 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
 
             return new ProjectUserInfo
             {
+                ProjectId = dbProjectUser.ProjectId,
                 User = user,
                 Role = (UserRoleType)dbProjectUser.Role
             };
