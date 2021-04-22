@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
     internal class EditProjectRequestValidatorTests
     {
-        private IEditProjectValidator validator;
+        /*private IEditProjectValidator validator;
         private EditProjectRequest editRequest;
         private IContractResolver resolver;
 
@@ -132,6 +132,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 validator.TestValidate(editRequest).ShouldNotHaveAnyValidationErrors();
             }
         }
-        #endregion
+        #endregion*/
     }
 }

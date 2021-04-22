@@ -16,9 +16,9 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
 {
     internal class EditProjectByIdCommandTests
     {
-        private DbProject dbProject;
+        /*private DbProject dbProject;
         private EditProjectRequest editRequest;
-        private IEditProjectByIdCommand command;
+        private IEditProjectCommand command;
         private Mock<IProjectRepository> repositoryMock;
         private Mock<IEditProjectValidator> validatorMock;
         private Mock<IAccessValidator> accessValidatorMock;
@@ -65,7 +65,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Setup(r => r.EditProjectById(dbProject))
                 .Returns(editRequest.ProjectId);
 
-            command = new EditProjectByIdCommand(validatorMock.Object, repositoryMock.Object, accessValidatorMock.Object);
+            command = new EditProjectCommand(validatorMock.Object, repositoryMock.Object, accessValidatorMock.Object);
         }
 
         [Test]
@@ -140,6 +140,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
             Assert.AreEqual(editRequest.ProjectId, command.Execute(editRequest));
             validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
             repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Once);
-        }
+        }*/
     }
 }

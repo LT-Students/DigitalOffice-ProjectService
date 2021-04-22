@@ -12,7 +12,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 {
     internal class EditProjectByIdRepositoryTests
     {
-        private IDataProvider provider;
+        /*private IDataProvider provider;
         private ProjectRepository repository;
 
         private Guid departmentId;
@@ -136,6 +136,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             {
                 provider.EnsureDeleted();
             }
-        }
+        }*/
     }
 }
