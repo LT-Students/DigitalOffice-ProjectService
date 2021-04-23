@@ -112,7 +112,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _repository.CreateNewProject(dbProject);
 
-            var projectInfo = _projectInfoMapper.Map(dbProject, department);
+            var projectInfo = _projectInfoMapper.Map(dbProject, department.Name);
 
             return new OperationResultResponse<ProjectInfo>
             {

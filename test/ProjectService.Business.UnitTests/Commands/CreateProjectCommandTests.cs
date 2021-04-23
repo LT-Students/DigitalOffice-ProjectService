@@ -266,7 +266,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 .Returns(_newDbProject);
 
             _mocker
-                .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(_newDbProject, _operationResultBroker.Object.Message.Body))
+                .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(
+                    _newDbProject, _operationResultBroker.Object.Message.Body.Name))
                 .Returns(_response.Body);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
@@ -288,7 +289,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 .Returns(_newDbProject);
 
             _mocker
-                .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(_newDbProject, _operationResultBroker.Object.Message.Body))
+                .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(
+                    _newDbProject, _operationResultBroker.Object.Message.Body.Name))
                 .Returns(_response.Body);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));

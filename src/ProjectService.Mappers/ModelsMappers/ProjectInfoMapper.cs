@@ -1,5 +1,4 @@
-﻿using LT.DigitalOffice.Broker.Responses;
-using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
@@ -9,16 +8,16 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
 {
     public class ProjectInfoMapper : IProjectInfoMapper
     {
-        public ProjectInfo Map(DbProject value, IGetDepartmentResponse department)
+        public ProjectInfo Map(DbProject value, string departmentName)
         {
             if (value == null)
             {
                 throw new ArgumentNullException(nameof(value));
             }
 
-            if (department == null)
+            if (string.IsNullOrEmpty(departmentName))
             {
-                throw new ArgumentNullException(nameof(department));
+                throw new ArgumentNullException(nameof(departmentName));
             }
 
             return new ProjectInfo
@@ -33,8 +32,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 ShortDescription = value.ShortDescription,
                 Department = new DepartmentInfo
                 {
-                    Id = department.Id,
-                    Name = department.Name
+                    Id = value.DepartmentId,
+                    Name = departmentName
                 }
             };
         }
