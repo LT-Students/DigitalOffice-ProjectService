@@ -25,19 +25,22 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IRequestClient<IFindDepartmentsRequest> _findDepartmentsRequestClient;
         private readonly IRequestClient<IGetDepartmentsNamesRequest> _getDepartmentsRequestClient;
 
-        private List<Guid> FindDepartment(string departmentName, List<string> errors)
+        private IDictionary<Guid, string> FindDepartment(string departmentName, List<string> errors)
         {
-            List<Guid> departmentId = new List<Guid>();
+            IDictionary<Guid, string> pairs = new Dictionary<Guid, string>();
 
             string errorMessage = $"Can not find departments now. Please try again later.";
 
             try
             {
                 var findDepartmentRequest = IFindDepartmentsRequest.CreateObj(departmentName);
-                var response = _findDepartmentsRequestClient.GetResponse<IOperationResult<IDepartmentsResponse>>(findDepartmentRequest).Result;
+                var response = _findDepartmentsRequestClient.GetResponse<IOperationResult<IGetDepartmentsResponse>>(findDepartmentRequest).Result;
                 if (response.Message.IsSuccess)
                 {
-                    departmentId.AddRange(response.Message.Body.DepartmentIds);
+                    foreach(var pair in response.Message.Body.IdNamePairs)
+                    {
+                        pairs.Add(pair);
+                    }
                 }
                 else
                 {
@@ -53,7 +56,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 errors.Add(errorMessage);
             }
 
-            return departmentId;
+            return pairs;
         }
 
         private IDictionary<Guid, string> GetDepartmentName(List<DbProject> dbProjects, List<string> errors)
@@ -114,18 +117,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             List<string> errors = new();
 
-            List<Guid> departmentIds = new List<Guid>();
+            IDictionary<Guid, string> pairs = null;
 
             if(filter.DepartmentName != null)
             {
-                departmentIds = FindDepartment(filter.DepartmentName, errors);
+                pairs = FindDepartment(filter.DepartmentName, errors);
             }
 
-            var dbFilter = _filterMapper.Map(filter, departmentIds);
+            var dbFilter = _filterMapper.Map(filter, pairs);
 
             List<DbProject> dbProject = _repository.FindProjects(dbFilter, skipCount, takeCount, out int totalCount);
 
-            var departmentsNames = GetDepartmentName(dbProject, errors);
+            var departmentsNames = pairs ?? GetDepartmentName(dbProject, errors);
 
             var response = _responseMapper.Map(dbProject, totalCount, departmentsNames, errors);
 

@@ -14,7 +14,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         private FindProjectsFilter _filter;
         private FindDbProjectsFilter _resultFilter;
         private Guid _departmentId;
-        private List<Guid> _departmentIds;
+        private Dictionary<Guid, string> _idNameDepartment;
+
+        private const string _name = "Name";
 
         [SetUp]
         public void SetUp()
@@ -23,32 +25,35 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
 
             _filter = new FindProjectsFilter
             {
-                Name = "Name",
+                Name = _name,
                 DepartmentName = "DepName",
                 ShortName = "SH"
             };
 
             _departmentId = Guid.NewGuid();
-            _departmentIds = new List<Guid> { _departmentId };
+
+            _idNameDepartment = new();
+            _idNameDepartment.Add(_departmentId, _name);
 
             _resultFilter = new FindDbProjectsFilter
             {
-                Name = "Name",
-                DepartmentIds = _departmentIds,
+                Name = _name,
+                IdNameDepartments = _idNameDepartment,
                 ShortName = "SH"
             };
+
         }
 
         [Test]
         public void ShouldReturnFindDbProjectsFilter()
         {
-            SerializerAssert.AreEqual(_resultFilter, _mapper.Map(_filter, _departmentIds));
+            SerializerAssert.AreEqual(_resultFilter, _mapper.Map(_filter, _idNameDepartment));
         }
 
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenFindProjectsFilterIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _mapper.Map(null, _departmentIds));
+            Assert.Throws<ArgumentNullException>(() => _mapper.Map(null, _idNameDepartment));
         }
     }
 }

@@ -145,13 +145,13 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         [Test]
         public void ShouldReturnProjectsByDepartmentName()
         {
+            var pairs = new Dictionary<Guid, string>();
+            pairs.Add(_dbProject3.DepartmentId, "");
+            pairs.Add(_dbProject4.DepartmentId, "");
+
             _filter = new FindDbProjectsFilter
             {
-                DepartmentIds = new List<Guid>
-                {
-                    _dbProject3.DepartmentId,
-                    _dbProject4.DepartmentId
-                }
+                IdNameDepartments = pairs
             };
 
             var expectedProjects = new List<DbProject>

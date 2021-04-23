@@ -29,9 +29,9 @@ namespace LT.DigitalOffice.ProjectService.Data
                 dbProjects = dbProjects.Where(u => u.ShortName.ToUpper().Contains(filter.ShortName.ToUpper()));
             }
 
-            if (filter.DepartmentIds != null && filter.DepartmentIds.Count != 0)
+            if (filter.IdNameDepartments != null && filter.IdNameDepartments.Count != 0)
             {
-                dbProjects = dbProjects.Where(u => filter.DepartmentIds.Contains(u.DepartmentId));
+                dbProjects = dbProjects.Where(u => filter.IdNameDepartments.Keys.Contains(u.DepartmentId));
             }
 
             return dbProjects;

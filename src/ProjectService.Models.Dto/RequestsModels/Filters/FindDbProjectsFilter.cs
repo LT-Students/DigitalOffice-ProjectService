@@ -7,6 +7,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels.Filters
     {
         public string Name { get; set; }
         public string ShortName { get; set; }
-        public List<Guid> DepartmentIds { get; set; }
+        public IDictionary<Guid, string> IdNameDepartments { get; set; }
     }
 }

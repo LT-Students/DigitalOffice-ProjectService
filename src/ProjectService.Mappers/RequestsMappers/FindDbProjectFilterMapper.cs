@@ -7,7 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 {
     public class FindDbProjectFilterMapper : IFindDbProjectFilterMapper
     {
-        public FindDbProjectsFilter Map(FindProjectsFilter projectsFilter, List<Guid> departmentIds)
+        public FindDbProjectsFilter Map(FindProjectsFilter projectsFilter, IDictionary<Guid, string> idNameDeaprtments)
         {
             if (projectsFilter == null)
             {
@@ -18,7 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
             {
                 Name = projectsFilter.Name,
                 ShortName = projectsFilter.ShortName,
-                DepartmentIds = departmentIds
+                IdNameDepartments = idNameDeaprtments
             };
         }
     }
