@@ -14,8 +14,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
                 .DependentRules(() =>
                 {
                     RuleFor(pu => pu.UserId)
-                    .NotEmpty()
-                    .WithMessage("Not specified user id.");
+                        .NotEmpty()
+                        .WithMessage("Not specified user id.");
                 });
         }
     }
