@@ -71,7 +71,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                     new ProjectUserRequest
                     {
                         UserId = Guid.NewGuid(),
-                        Role = UserRoleType.AdminProject
+                        Role = UserRoleType.ProjectAdmin
                     }
                 }
             };

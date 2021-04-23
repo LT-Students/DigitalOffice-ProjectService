@@ -39,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = projectId,
                     UserId = Guid.NewGuid(),
-                    Role = (int)UserRoleType.AdminProject,
+                    Role = (int)UserRoleType.ProjectAdmin,
                     IsActive = true
                 },
                 new DbProjectUser
@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = projectId,
                     UserId = Guid.NewGuid(),
-                    Role = (int)UserRoleType.AdminProject,
+                    Role = (int)UserRoleType.ProjectAdmin,
                     IsActive = true
                 }
             };
@@ -56,12 +56,12 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             {
                 new ProjectUserRequest
                 {
-                    Role = (int)UserRoleType.AdminProject,
+                    Role = (int)UserRoleType.ProjectAdmin,
                     UserId = Guid.NewGuid()
                 },
                 new ProjectUserRequest
                 {
-                    Role = (int)UserRoleType.AdminProject,
+                    Role = (int)UserRoleType.ProjectAdmin,
                     UserId = Guid.NewGuid()
                 }
             };
@@ -136,7 +136,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 
                     new ProjectUserRequest
                     {
-                        Role = (int)UserRoleType.AdminProject,
+                        Role = (int)UserRoleType.ProjectAdmin,
                         UserId = _dbProjectUsers.ElementAt(0).UserId
                     }
                 }
