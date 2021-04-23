@@ -37,12 +37,12 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             {
                 new ProjectUserRequest
                 {
-                    Role = UserRoleType.Admin,
+                    Role = UserRoleType.AdminProject,
                     UserId = Guid.NewGuid()
                 },
                 new ProjectUserRequest
                 {
-                    Role = UserRoleType.Admin,
+                    Role = UserRoleType.AdminProject,
                     UserId = Guid.NewGuid()
                 }
             };

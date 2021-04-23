@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
             _projectUser = new ProjectUserRequest
             {
                 UserId = Guid.NewGuid(),
-                Role = UserRoleType.Admin
+                Role = UserRoleType.AdminProject
             };
         }
 
