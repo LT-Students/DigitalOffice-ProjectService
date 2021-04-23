@@ -15,6 +15,9 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
+using MassTransit.RabbitMqTransport;
+using LT.DigitalOffice.ProjectService.Broker;
 
 namespace LT.DigitalOffice.ProjectService
 {
@@ -158,12 +161,38 @@ namespace LT.DigitalOffice.ProjectService
                         host.Username($"{_serviceInfoConfig.Name}_{_serviceInfoConfig.Id}");
                         host.Password(_serviceInfoConfig.Id);
                     });
+
+                    ConfigureEndpoints(context, cfg, _rabbitMqConfig);
                 });
+
+                ConfigureConsumers(busConfigurator);
 
                 busConfigurator.AddRequestClients(_rabbitMqConfig);
             });
 
             services.AddMassTransitHostedService();
+        }
+
+        private void ConfigureConsumers(IServiceCollectionBusConfigurator x)
+        {
+            x.AddConsumer<GetProjectIdsConsumer>();
+            x.AddConsumer<GetProjectInfoConsumer>();
+        }
+
+        private void ConfigureEndpoints(
+            IBusRegistrationContext context,
+            IRabbitMqBusFactoryConfigurator cfg,
+            RabbitMqConfig rabbitMqConfig)
+        {
+            cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectIdsEndpoint, ep =>
+            {
+                ep.ConfigureConsumer<GetProjectIdsConsumer>(context);
+            });
+
+            cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectInfoEndpoint, ep =>
+            {
+                ep.ConfigureConsumer<GetProjectInfoConsumer>(context);
+            });
         }
 
         #endregion
