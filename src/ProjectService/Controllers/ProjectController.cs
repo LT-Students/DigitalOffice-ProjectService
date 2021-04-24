@@ -3,9 +3,9 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {

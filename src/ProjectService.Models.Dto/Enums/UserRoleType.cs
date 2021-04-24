@@ -2,6 +2,6 @@
 {
     public enum UserRoleType
     {
-        ProjectAdmin  
+        ProjectAdmin
     }
 }

@@ -2,7 +2,7 @@
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;

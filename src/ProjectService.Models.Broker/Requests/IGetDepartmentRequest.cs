@@ -4,7 +4,7 @@ using System;
 
 namespace LT.DigitalOffice.Broker.Requests
 {
-    [AutoInjectRequest(nameof(RabbitMqConfig.GetDepartmentDataEndpoint))]
+    [AutoInjectRequest(nameof(RabbitMqConfig.GetDepartmentEndpoint))]
     public interface IGetDepartmentRequest
     {
         Guid? UserId { get; }

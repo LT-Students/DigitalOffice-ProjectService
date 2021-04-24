@@ -3,7 +3,7 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                 dbProjects = dbProjects.Where(u => u.ShortName.ToUpper().Contains(filter.ShortName.ToUpper()));
             }
 
-            if (filter.IdNameDepartments != null && filter.IdNameDepartments.Count != 0)
+            if (filter.IdNameDepartments != null)
             {
                 dbProjects = dbProjects.Where(u => filter.IdNameDepartments.Keys.Contains(u.DepartmentId));
             }
@@ -114,18 +114,6 @@ namespace LT.DigitalOffice.ProjectService.Data
             provider.Projects.Update(dbProject);
             provider.Save();
         }
-
-        //public IEnumerable<DbProject> GetProjects(bool showNotActive)
-        //{
-        //    var predicate = PredicateBuilder.New<DbProject>(p => p.IsActive);
-
-        //    if (showNotActive)
-        //    {
-        //        predicate.Or(p => !p.IsActive);
-        //    }
-
-        //    return provider.Projects.Where(predicate).ToList();
-        //}
 
         public List<DbProject> FindProjects(FindDbProjectsFilter filter, int skipCount, int takeCount, out int totalCount)
         {

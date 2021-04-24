@@ -9,7 +9,7 @@ using MassTransit;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using System.Collections.Generic;
 using Moq;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters;
 using System;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.Broker.Responses;
@@ -17,7 +17,7 @@ using LT.DigitalOffice.Kernel.Broker;
 using System.Threading.Tasks;
 using LT.DigitalOffice.UnitTestKernel;
 using LT.DigitalOffice.ProjectService.Business.Commands;
-using Microsoft.Extensions.Logging;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 
 namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 {
@@ -76,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 Name = _dbProject.Name,
                 ShortName = _dbProject.ShortName,
                 ShortDescription = _dbProject.ShortDescription,
-                DepartmentInfo = new DepartmentInfo
+                Department = new DepartmentInfo
                 {
                     Id = _departmentId,
                     Name = _departmentName
@@ -361,7 +361,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             //            IGetDepartmentsNamesRequest.CreateObj(It.Is<List<Guid>>(l => l.Count == 1 && l.Contains(_departmentId))), default, default))
             //    .Returns(Task.FromResult(_brokerGetResponseMock.Object));
 
-            _projectInfo.DepartmentInfo.Name = null;
+            _projectInfo.Department.Name = null;
 
             _projectsResponse = new ProjectsResponse
             {
