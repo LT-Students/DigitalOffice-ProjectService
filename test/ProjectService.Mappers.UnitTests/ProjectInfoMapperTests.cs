@@ -1,6 +1,6 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
@@ -36,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests
                 Name = "Name",
                 ShortName = "SH",
                 ShortDescription = "short description",
-                DepartmentInfo = new DepartmentInfo
+                Department = new DepartmentInfo
                 {
                     Id = _dbProject.DepartmentId,
                     Name = _departmentName

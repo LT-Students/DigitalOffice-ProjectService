@@ -2,6 +2,7 @@
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.UnitTestKernel;
 using Moq;
@@ -49,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.ResponseMappers
                 Name = "Name",
                 ShortName = "SH",
                 ShortDescription = "short description",
-                DepartmentInfo = new DepartmentInfo
+                Department = new DepartmentInfo
                 {
                     Id = _dbProject.DepartmentId,
                     Name = _departmentName
