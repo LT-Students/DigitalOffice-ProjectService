@@ -25,7 +25,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
     {
         private IFindProjectsCommand _command;
         private AutoMocker _mocker;
-        private Mock<Response<IOperationResult<IGetDepartmentsResponse>>> _brokerFindResponseMock;
+        private Mock<Response<IOperationResult<IFindDepartmentsResponse>>> _brokerFindResponseMock;
         private Mock<Response<IOperationResult<IGetDepartmentsNamesResponse>>> _brokerGetResponseMock;
 
         private int _totalCount;
@@ -45,8 +45,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
         #region Setup
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
+        public void SetUpModels()
         {
             _departmentId = Guid.NewGuid();
 
@@ -58,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 Id = Guid.NewGuid(),
                 Name = _name,
                 ShortName = _shortName,
-                Description = "description",
+                ShortDescription = "description",
                 DepartmentId = _departmentId,
                 CreatedAt = DateTime.UtcNow
             };
@@ -107,7 +106,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 Name = _findProjectsFilter.Name
             };
 
-            _brokerFindResponseMock = new Mock<Response<IOperationResult<IGetDepartmentsResponse>>>();
+            _brokerFindResponseMock = new Mock<Response<IOperationResult<IFindDepartmentsResponse>>>();
             _brokerFindResponseMock
                 .Setup(x => x.Message.Body.IdNamePairs)
                 .Returns(_idNameFind);
@@ -121,6 +120,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [SetUp]
         public void SetUp()
         {
+            SetUpModels();
             _mocker.GetMock<IProjectRepository>().Reset();
             _mocker.GetMock<IFindDbProjectFilterMapper>().Reset();
             _mocker.GetMock<IFindProjectsResponseMapper>().Reset();
@@ -140,15 +140,21 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(null as List<string>);
 
             _mocker
-                .Setup<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IGetDepartmentsResponse>>>>(
-                    x => x.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
+                .Setup<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
+                    x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
                         IFindDepartmentsRequest.CreateObj(_departmentName), default, default))
                 .Returns(Task.FromResult(_brokerFindResponseMock.Object));
 
+            //_mocker
+            //    .Setup<IRequestClient<IGetDepartmentsNamesRequest>, Task<Response<IOperationResult<IGetDepartmentsNamesResponse>>>>(
+            //        x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+            //            IGetDepartmentsNamesRequest.CreateObj(
+            //                It.IsAny<IList<Guid>>()), default, default))
+            //    .Returns(Task.FromResult(_brokerGetResponseMock.Object));
             _mocker
                 .Setup<IRequestClient<IGetDepartmentsNamesRequest>, Task<Response<IOperationResult<IGetDepartmentsNamesResponse>>>>(
                     x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
-                        IGetDepartmentsNamesRequest.CreateObj(new List<Guid> { _departmentId }), default, default))
+                        It.IsAny<object>(), default, default))
                 .Returns(Task.FromResult(_brokerGetResponseMock.Object));
         }
 
@@ -160,76 +166,76 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             Assert.Throws<ArgumentNullException>(() => _command.Execute(null, 0, 0));
         }
 
-        //[Test]
-        //public void ShouldReturnFoundProjectInfosByName()
-        //{
-        //    int skip = 0;
-        //    int take = 2;
+        [Test]
+        public void ShouldReturnFoundProjectInfosByName()
+        {
+            int skip = 0;
+            int take = 2;
 
-        //    _mocker
-        //        .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
-        //            _findProjectsFilter,
-        //            null))
-        //        .Returns(_findDbProjectsFilter);
+            _mocker
+                .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
+                    _findProjectsFilter,
+                    null))
+                .Returns(_findDbProjectsFilter);
 
-        //    _mocker
-        //        .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
-        //            _findDbProjectsFilter,
-        //            skip,
-        //            take,
-        //            out _totalCount))
-        //        .Returns(_dbProjects);
+            _mocker
+                .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
+                    _findDbProjectsFilter,
+                    skip,
+                    take,
+                    out _totalCount))
+                .Returns(_dbProjects);
 
-        //    _mocker
-        //        .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
-        //            _dbProjects,
-        //            It.IsAny<int>(),
-        //            _idNameGet,
-        //            It.IsAny<List<string>>()))
-        //        .Returns(_projectsResponse);
+            _mocker
+                .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
+                    _dbProjects,
+                    It.IsAny<int>(),
+                    _idNameGet,
+                    It.IsAny<List<string>>()))
+                .Returns(_projectsResponse);
 
-        //    SerializerAssert.AreEqual(_projectsResponse, _command.Execute(_findProjectsFilter, skip, take));
-        //}
+            SerializerAssert.AreEqual(_projectsResponse, _command.Execute(_findProjectsFilter, skip, take));
+        }
 
-        //[Test]
-        //public void ShouldReturnFoundProjectInfosByShortName()
-        //{
-        //    _findProjectsFilter = new FindProjectsFilter
-        //    {
-        //        ShortName = _shortName
-        //    };
-        //    _findDbProjectsFilter = new FindDbProjectsFilter
-        //    {
-        //        ShortName = _shortName
-        //    };
+        [Test]
+        public void ShouldReturnFoundProjectInfosByShortName()
+        {
+            _findProjectsFilter = new FindProjectsFilter
+            {
+                ShortName = _shortName
+            };
+            _findDbProjectsFilter = new FindDbProjectsFilter
+            {
+                ShortName = _shortName
+            };
 
-        //    int skip = 0;
-        //    int take = 2;
+            int skip = 0;
+            int take = 2;
 
-        //    _mocker
-        //        .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
-        //            _findProjectsFilter,
-        //            null))
-        //        .Returns(_findDbProjectsFilter);
+            _mocker
+                .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
+                    _findProjectsFilter,
+                    null))
+                .Returns(_findDbProjectsFilter);
 
-        //    _mocker
-        //        .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
-        //            _findDbProjectsFilter,
-        //            skip,
-        //            take,
-        //            out _totalCount))
-        //        .Returns(_dbProjects);
+            _mocker
+                .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
+                    _findDbProjectsFilter,
+                    skip,
+                    take,
+                    out _totalCount))
+                .Returns(_dbProjects);
 
-        //    _mocker
-        //        .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
-        //            _dbProjects,
-        //            It.IsAny<int>(),
-        //            _idNameGet,
-        //            It.IsAny<List<string>>()))
-        //        .Returns(_projectsResponse);
+            _mocker
+                .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
+                    _dbProjects,
+                    It.IsAny<int>(),
+                    _idNameGet,
+                    It.IsAny<List<string>>()))
+                .Returns(_projectsResponse);
 
-        //    SerializerAssert.AreEqual(_projectsResponse, _command.Execute(_findProjectsFilter, skip, take));
-        //}
+            SerializerAssert.AreEqual(_projectsResponse, _command.Execute(_findProjectsFilter, skip, take));
+        }
 
         [Test]
         public void ShouldReturnFoundProjectInfosByDepartmentName()
@@ -271,124 +277,131 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             SerializerAssert.AreEqual(_projectsResponse, _command.Execute(_findProjectsFilter, skip, take));
         }
 
-        //[Test]
-        //public void ShouldReturnEmptyListProjectsSearchedByDepartmentNameWhenFindDepartmentRequestIsUnsuccessful()
-        //{
-        //    var errors = new List<string> { "some error" };
+        [Test]
+        public void ShouldReturnEmptyListProjectsSearchedByDepartmentNameWhenFindDepartmentRequestIsUnsuccessful()
+        {
+            var errors = new List<string> { "some error" };
 
-        //    _brokerFindResponseMock
-        //        .Setup(x => x.Message.IsSuccess)
-        //        .Returns(false);
-        //    _brokerFindResponseMock
-        //        .Setup(x => x.Message.Errors)
-        //        .Returns(errors);
+            _brokerFindResponseMock
+                .Setup(x => x.Message.IsSuccess)
+                .Returns(false);
+            _brokerFindResponseMock
+                .Setup(x => x.Message.Errors)
+                .Returns(errors);
 
-        //    _mocker
-        //        .Setup<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IGetDepartmentsResponse>>>>(
-        //            x => x.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
-        //                IFindDepartmentsRequest.CreateObj(_departmentName), default, default))
-        //        .Returns(Task.FromResult(_brokerFindResponseMock.Object));
+            _mocker
+                .Setup<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
+                    x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
+                        IFindDepartmentsRequest.CreateObj(_departmentName), default, default))
+                .Returns(Task.FromResult(_brokerFindResponseMock.Object));
 
-        //    _findProjectsFilter = new FindProjectsFilter
-        //    {
-        //        DepartmentName = _departmentName
-        //    };
-        //    _findDbProjectsFilter = new FindDbProjectsFilter
-        //    {
-        //        IdNameDepartments = _idNameFind
-        //    };
+            _findProjectsFilter = new FindProjectsFilter
+            {
+                DepartmentName = _departmentName
+            };
+            _findDbProjectsFilter = new FindDbProjectsFilter
+            {
+                IdNameDepartments = new Dictionary<Guid, string>()
+            };
 
-        //    _mocker
-        //        .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
-        //            _findDbProjectsFilter,
-        //            It.IsAny<int>(),
-        //            It.IsAny<int>(),
-        //            out _totalCount))
-        //        .Returns(new List<DbProject>());
+            _mocker
+                .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
+                    _findProjectsFilter,
+                    It.Is<Dictionary<Guid, string>>(d => d.Count == 0)))
+                .Returns(_findDbProjectsFilter);
 
-        //    _projectsResponse = new ProjectsResponse
-        //    {
-        //        TotalCount = 1,
-        //        Errors = errors,
-        //        Projects = new List<ProjectInfo>()
-        //    };
+            _mocker
+                .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
+                    _findDbProjectsFilter,
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    out _totalCount))
+                .Returns(new List<DbProject>());
 
-        //    _mocker
-        //        .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
-        //            It.IsAny<List<DbProject>>(),
-        //            It.IsAny<int>(),
-        //            _idNameFind,
-        //            It.IsAny<List<string>>()))
-        //        .Returns(_projectsResponse);
+            _projectsResponse = new ProjectsResponse
+            {
+                TotalCount = 1,
+                Errors = errors,
+                Projects = new List<ProjectInfo>()
+            };
 
-        //    var response = _command.Execute(_findProjectsFilter, 0, 2);
+            _mocker
+                .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
+                    It.IsAny<List<DbProject>>(),
+                    It.IsAny<int>(),
+                    It.Is<IDictionary<Guid, string>>(d => d.Count == 0),
+                    It.IsAny<List<string>>()))
+                .Returns(_projectsResponse);
 
-        //    Assert.IsEmpty(response.Projects);
-        //    Assert.IsNotEmpty(response.Errors);
-        //    _mocker.Verify<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IGetDepartmentsResponse>>>>(
-        //        x => x.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
-        //            IFindDepartmentsRequest.CreateObj(_findProjectsFilter.DepartmentName), default, default), Times.Once);
-        //}
+            var response = _command.Execute(_findProjectsFilter, 0, 2);
 
-        //[Test]
-        //public void ShouldReturnResponseWithoutDepartmentsNamesIfGetDepartmentsNamesRequestIsUnsuccessful()
-        //{
-        //    int take = 2, skip = 0;
-        //    var errors = new List<string> { "some error" };
+            Assert.IsEmpty(response.Projects);
+            Assert.IsNotEmpty(response.Errors);
+            _mocker.Verify<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
+                x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
+                    IFindDepartmentsRequest.CreateObj(_findProjectsFilter.DepartmentName), default, default), Times.Once);
+        }
 
-        //    _brokerGetResponseMock
-        //        .Setup(x => x.Message.IsSuccess)
-        //        .Returns(false);
-        //    _brokerGetResponseMock
-        //        .Setup(x => x.Message.Errors)
-        //        .Returns(errors);
+        [Test]
+        public void ShouldReturnResponseWithoutDepartmentsNamesIfGetDepartmentsNamesRequestIsUnsuccessful()
+        {
+            int take = 2, skip = 0;
+            var errors = new List<string> { "some error" };
 
-        //    _mocker
-        //        .Setup<IRequestClient<IGetDepartmentsNamesRequest>, Task<Response<IOperationResult<IGetDepartmentsNamesResponse>>>>(
-        //            x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
-        //                IGetDepartmentsNamesRequest.CreateObj(new List<Guid> { _departmentId }), default, default))
-        //        .Returns(Task.FromResult(_brokerGetResponseMock.Object));
+            _brokerGetResponseMock
+                .Setup(x => x.Message.IsSuccess)
+                .Returns(false);
+            _brokerGetResponseMock
+                .Setup(x => x.Message.Errors)
+                .Returns(errors);
 
-        //    _projectInfo.DepartmentInfo.Name = null;
+            //_mocker
+            //    .Setup<IRequestClient<IGetDepartmentsNamesRequest>, Task<Response<IOperationResult<IGetDepartmentsNamesResponse>>>>(
+            //        x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+            //            IGetDepartmentsNamesRequest.CreateObj(It.Is<List<Guid>>(l => l.Count == 1 && l.Contains(_departmentId))), default, default))
+            //    .Returns(Task.FromResult(_brokerGetResponseMock.Object));
 
-        //    _projectsResponse = new ProjectsResponse
-        //    {
-        //        TotalCount = 1,
-        //        Errors = null,
-        //        Projects = new List<ProjectInfo>
-        //        {
-        //            _projectInfo
-        //        }
-        //    };
+            _projectInfo.DepartmentInfo.Name = null;
 
-        //    _mocker
-        //        .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
-        //            _findProjectsFilter,
-        //            null))
-        //        .Returns(_findDbProjectsFilter);
+            _projectsResponse = new ProjectsResponse
+            {
+                TotalCount = 1,
+                Errors = null,
+                Projects = new List<ProjectInfo>
+                {
+                    _projectInfo
+                }
+            };
 
-        //    _mocker
-        //        .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
-        //            _findDbProjectsFilter,
-        //            skip,
-        //            take,
-        //            out _totalCount))
-        //        .Returns(_dbProjects);
+            _mocker
+                .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
+                    _findProjectsFilter,
+                    null))
+                .Returns(_findDbProjectsFilter);
 
-        //    _mocker
-        //        .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
-        //            _dbProjects,
-        //            It.IsAny<int>(),
-        //            _idNameGet,
-        //            It.IsAny<List<string>>()))
-        //        .Returns(_projectsResponse);
+            _mocker
+                .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
+                    _findDbProjectsFilter,
+                    skip,
+                    take,
+                    out _totalCount))
+                .Returns(_dbProjects);
 
-        //    var response = _command.Execute(_findProjectsFilter, skip, take);
+            _mocker
+                .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
+                    _dbProjects,
+                    It.IsAny<int>(),
+                    It.Is<IDictionary<Guid, string>>(d => d.Count == 0),
+                    It.IsAny<List<string>>()))
+                .Returns(_projectsResponse);
 
-        //    SerializerAssert.AreEqual(_projectsResponse, response);
-        //    _mocker.Verify<IRequestClient<IGetDepartmentsNamesRequest>, Task<Response<IOperationResult<IGetDepartmentsNamesResponse>>>>(
-        //        x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
-        //            IGetDepartmentsNamesRequest.CreateObj(new List<Guid> { _departmentId }), default, default), Times.Once);
-        //}
+            var response = _command.Execute(_findProjectsFilter, skip, take);
+
+            SerializerAssert.AreEqual(_projectsResponse, response);
+            //_mocker.Verify<IRequestClient<IGetDepartmentsNamesRequest>, Task<Response<IOperationResult<IGetDepartmentsNamesResponse>>>>(
+            //    x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+            //        IGetDepartmentsNamesRequest.CreateObj(
+            //            It.Is<List<Guid>>(l => l.Count == 1 && l.Contains(_departmentId))), default, default), Times.Once);
+        }
     }
 }

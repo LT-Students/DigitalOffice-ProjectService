@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             try
             {
                 var findDepartmentRequest = IFindDepartmentsRequest.CreateObj(departmentName);
-                var response = _findDepartmentsRequestClient.GetResponse<IOperationResult<IGetDepartmentsResponse>>(findDepartmentRequest).Result;
+                var response = _findDepartmentsRequestClient.GetResponse<IOperationResult<IFindDepartmentsResponse>>(findDepartmentRequest).Result;
                 if (response.Message.IsSuccess)
                 {
                     foreach(var pair in response.Message.Body.IdNamePairs)
