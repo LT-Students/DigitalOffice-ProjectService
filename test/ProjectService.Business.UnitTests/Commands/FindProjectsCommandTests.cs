@@ -38,16 +38,16 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private FindDbProjectsFilter _findDbProjectsFilter;
         private ProjectInfo _projectInfo;
 
-        private const string _name = "Name";
-        private const string _shortName = "ShortName";
-        private const string _departmentName = "DepartmentName";
-        private Guid _departmentId;
+        private const string Name = "Name";
+        private const string ShortName = "ShortName";
+        private const string DepartmentName = "DepartmentName";
+        private Guid DepartmentId;
 
         #region Setup
 
         public void SetUpModels()
         {
-            _departmentId = Guid.NewGuid();
+            DepartmentId = Guid.NewGuid();
 
             _mocker = new AutoMocker();
             _command = _mocker.CreateInstance<FindProjectsCommand>();
@@ -55,15 +55,15 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _dbProject = new DbProject
             {
                 Id = Guid.NewGuid(),
-                Name = _name,
-                ShortName = _shortName,
+                Name = Name,
+                ShortName = ShortName,
                 ShortDescription = "description",
-                DepartmentId = _departmentId,
+                DepartmentId = DepartmentId,
                 CreatedAt = DateTime.UtcNow
             };
 
             _idNameFind = new();
-            _idNameFind.Add(_departmentId, _departmentName);
+            _idNameFind.Add(DepartmentId, DepartmentName);
 
             _dbProjects = new List<DbProject>
             {
@@ -78,8 +78,8 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 ShortDescription = _dbProject.ShortDescription,
                 Department = new DepartmentInfo
                 {
-                    Id = _departmentId,
-                    Name = _departmentName
+                    Id = DepartmentId,
+                    Name = DepartmentName
                 }
             };
 
@@ -94,11 +94,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             };
 
             _idNameGet = new Dictionary<Guid, string>();
-            _idNameGet.Add(_dbProject.DepartmentId, _departmentName);
+            _idNameGet.Add(_dbProject.DepartmentId, DepartmentName);
 
             _findProjectsFilter = new FindProjectsFilter
             {
-                Name = _name
+                Name = Name
             };
 
             _findDbProjectsFilter = new FindDbProjectsFilter
@@ -142,7 +142,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _mocker
                 .Setup<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
                     x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-                        IFindDepartmentsRequest.CreateObj(_departmentName), default, default))
+                        IFindDepartmentsRequest.CreateObj(DepartmentName), default, default))
                 .Returns(Task.FromResult(_brokerFindResponseMock.Object));
 
             //_mocker
@@ -202,11 +202,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         {
             _findProjectsFilter = new FindProjectsFilter
             {
-                ShortName = _shortName
+                ShortName = ShortName
             };
             _findDbProjectsFilter = new FindDbProjectsFilter
             {
-                ShortName = _shortName
+                ShortName = ShortName
             };
 
             int skip = 0;
@@ -245,7 +245,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             _findProjectsFilter = new FindProjectsFilter
             {
-                DepartmentName = _departmentName
+                DepartmentName = DepartmentName
             };
             _findDbProjectsFilter = new FindDbProjectsFilter
             {
@@ -292,12 +292,12 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _mocker
                 .Setup<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
                     x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-                        IFindDepartmentsRequest.CreateObj(_departmentName), default, default))
+                        IFindDepartmentsRequest.CreateObj(DepartmentName), default, default))
                 .Returns(Task.FromResult(_brokerFindResponseMock.Object));
 
             _findProjectsFilter = new FindProjectsFilter
             {
-                DepartmentName = _departmentName
+                DepartmentName = DepartmentName
             };
             _findDbProjectsFilter = new FindDbProjectsFilter
             {

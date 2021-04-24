@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests
         private DbProject _dbProject;
         private ProjectInfo _projectInfo;
 
-        private const string _departmentName = "department name";
+        private const string DepartmentName = "department name";
 
         [SetUp]
         public void SetUp()
@@ -39,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests
                 Department = new DepartmentInfo
                 {
                     Id = _dbProject.DepartmentId,
-                    Name = _departmentName
+                    Name = DepartmentName
                 }
             };
         }
@@ -47,13 +47,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests
         [Test]
         public void ShouldReturnProjectsInfo()
         {
-            SerializerAssert.AreEqual(_projectInfo, _mapper.Map(_dbProject, _departmentName));
+            SerializerAssert.AreEqual(_projectInfo, _mapper.Map(_dbProject, DepartmentName));
         }
 
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenDbProjectIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _mapper.Map(null, _departmentName));
+            Assert.Throws<ArgumentNullException>(() => _mapper.Map(null, DepartmentName));
         }
     }
 }
