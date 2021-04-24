@@ -85,7 +85,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
                     table.ForeignKey(
                         name: "FK_ProjectUser_Roles",
                         column: x => x.RoleId,
-                        principalTable: DbRole.TableName,
+                        principalTable: "Roles",
                         principalColumn: ColumnIdName,
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -94,7 +94,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
         private void CreateTableRoles(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: DbRole.TableName,
+                name: "Roles",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -126,7 +126,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Database.Migrat
 
             migrationBuilder.DropTable(DbProjectFile.TableName);
 
-            migrationBuilder.DropTable(DbRole.TableName);
+            migrationBuilder.DropTable("Roles");
 
             migrationBuilder.DropTable(DbProject.TableName);
         }

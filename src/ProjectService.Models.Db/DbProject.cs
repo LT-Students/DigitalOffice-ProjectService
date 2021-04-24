@@ -10,15 +10,14 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public const string TableName = "Projects";
 
         public Guid Id { get; set; }
+        public Guid DepartmentId { get; set; }
+        public Guid AuthorId { get; set; }
+        public int Status { get; set; }
         public string Name { get; set; }
         public string ShortName { get; set; }
         public string Description { get; set; }
         public string ShortDescription { get; set; }
-        public Guid DepartmentId { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime? ClosedAt { get; set; }
-        public int? ClosedReason { get; set; }
-        public bool IsActive { get; set; }
 
         public ICollection<DbProjectUser> Users { get; set; }
         public ICollection<DbProjectFile> Files { get; set; }
@@ -42,12 +41,28 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .HasKey(p => p.Id);
 
             builder
-                .HasMany(p => p.Users)
-                .WithOne(u => u.Project);
+                .Property(P => P.Name)
+                .IsRequired();
 
             builder
-                .Property(p => p.Name)
+                .Property(p => p.ShortName)
                 .IsRequired();
+
+            builder
+                .Property(P => P.Name)
+                .HasMaxLength(150);
+
+            builder
+                .Property(p => p.ShortName)
+                .HasMaxLength(30);
+
+            builder
+                .Property(p => p.ShortDescription)
+                .HasMaxLength(300);
+
+            builder
+                .HasMany(p => p.Users)
+                .WithOne(u => u.Project);
         }
     }
 }

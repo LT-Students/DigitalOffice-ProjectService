@@ -12,7 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     public interface IEditProjectByIdCommand
     {
         /// <summary>
-        /// Calls methods to edit the existing project. Returns the Id of the edited project.
+        /// Calls methods to edit the existing project. Returns the UserId of the edited project.
         /// </summary>
         /// <param name="request">Data to update the project.</param>
         /// <returns></returns>

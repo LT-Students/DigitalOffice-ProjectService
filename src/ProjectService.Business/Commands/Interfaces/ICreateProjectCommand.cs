@@ -1,6 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using System;
+using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
@@ -9,13 +10,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     /// Provides method for adding a new project.
     /// </summary>
     [AutoInject]
-    public interface ICreateNewProjectCommand
+    public interface ICreateProjectCommand
     {
         /// <summary>
-        /// Adds a new project. Returns id of the added project.
+        /// Adds a new project. Returns base info of project .
         /// </summary>
         /// <param name="request">Project data.</param>
-        /// <returns>Id of the added project.</returns>
-        Guid Execute(ProjectExpandedRequest request);
+        /// <returns>Project info</returns>
+        OperationResultResponse<ProjectInfo> Execute(ProjectRequest request);
     }
 }

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation
@@ -8,19 +8,14 @@ namespace LT.DigitalOffice.ProjectService.Validation
     {
         public ProjectUserValidator()
         {
-            RuleFor(pu => pu.User)
+            RuleFor(pu => pu)
                 .Must(u => u != null)
                 .WithMessage("The request must contain user data")
                 .DependentRules(() =>
                 {
-                    RuleFor(pu => pu.User.Id)
-                    .NotEmpty()
-                    .WithMessage("Not specified user id.");
-
-                    RuleFor(pu => pu.RoleId)
-                       .NotEmpty()
-                       .WithMessage("Not specified role id.");
-
+                    RuleFor(pu => pu.UserId)
+                        .NotEmpty()
+                        .WithMessage("Not specified user id.");
                 });
         }
     }

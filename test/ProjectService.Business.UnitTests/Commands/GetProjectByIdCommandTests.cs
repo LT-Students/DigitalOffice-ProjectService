@@ -2,8 +2,8 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -123,10 +123,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         {
             var expectedResult = new ProjectExpandedResponse
             {
-                Project = new Project
+                Project = new ProjectInfo
                 {
-                    Id = dbProject.Id,
-                    Name = "DigitalOffice"
+                    Id = dbProject.Id
                 },
                 Department = new DepartmentInfo
                 {

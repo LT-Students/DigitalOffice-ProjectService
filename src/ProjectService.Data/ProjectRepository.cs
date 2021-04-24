@@ -66,12 +66,10 @@ namespace LT.DigitalOffice.ProjectService.Data
             return provider.ProjectsUsers.Include(u => u.Role).Where(predicate).ToList();
         }
 
-        public Guid CreateNewProject(DbProject newProject)
+        public void CreateNewProject(DbProject newProject)
         {
             provider.Projects.Add(newProject);
             provider.Save();
-
-            return newProject.Id;
         }
 
         public Guid EditProjectById(DbProject dbProject)
@@ -144,18 +142,6 @@ namespace LT.DigitalOffice.ProjectService.Data
             totalCount = projects.Count;
 
             return projects.Skip(skipCount * takeCount).Take(takeCount).ToList();
-        }
-
-        public DbRole GetRole(Guid roleId)
-        {
-            var result = provider.Roles.FirstOrDefault(r => r.Id == roleId);
-
-            if (result == null)
-            {
-                throw new NotFoundException($"Role with id: '{roleId}' was not found.");
-            }
-
-            return result;
         }
     }
 }

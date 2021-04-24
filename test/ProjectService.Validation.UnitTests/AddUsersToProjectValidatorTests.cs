@@ -2,8 +2,10 @@
 using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.User;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Moq;
 using NUnit.Framework;
@@ -37,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = projectId,
                     UserId = Guid.NewGuid(),
-                    RoleId = Guid.NewGuid(),
+                    Role = (int)UserRoleType.ProjectAdmin,
                     IsActive = true
                 },
                 new DbProjectUser
@@ -45,21 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = projectId,
                     UserId = Guid.NewGuid(),
-                    RoleId = Guid.NewGuid(),
-                    IsActive = true
-                }
-            };
-
-            var users = new List<UserRequest>
-            {
-                new UserRequest
-                {
-                    Id = Guid.NewGuid(),
-                    IsActive = true
-                },
-                new UserRequest
-                {
-                    Id = Guid.NewGuid(),
+                    Role = (int)UserRoleType.ProjectAdmin,
                     IsActive = true
                 }
             };
@@ -68,13 +56,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             {
                 new ProjectUserRequest
                 {
-                    RoleId = Guid.NewGuid(),
-                    User = users.ElementAt(0)
+                    Role = (int)UserRoleType.ProjectAdmin,
+                    UserId = Guid.NewGuid()
                 },
                 new ProjectUserRequest
                 {
-                    RoleId = Guid.NewGuid(),
-                    User = users.ElementAt(1)
+                    Role = (int)UserRoleType.ProjectAdmin,
+                    UserId = Guid.NewGuid()
                 }
             };
 
@@ -148,12 +136,8 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 
                     new ProjectUserRequest
                     {
-                        RoleId = Guid.NewGuid(),
-                        User = new UserRequest
-                        {
-                            Id = _dbProjectUsers.ElementAt(0).UserId,
-                            IsActive = true
-                        }
+                        Role = (int)UserRoleType.ProjectAdmin,
+                        UserId = _dbProjectUsers.ElementAt(0).UserId
                     }
                 }
             };
