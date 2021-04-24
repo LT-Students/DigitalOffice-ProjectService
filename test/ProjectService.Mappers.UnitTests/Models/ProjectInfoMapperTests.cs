@@ -66,12 +66,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
         }
 
         [Test]
-        public void ShouldThrowExceptionWhenDepartmentIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => _mapper.Map(_dbProject, null));
-        }
-
-        [Test]
         public void ShouldReturnProjectInfoSuccessful()
         {
             SerializerAssert.AreEqual(_expectedProjectInfo, _mapper.Map(_dbProject, _department.Object.Name));

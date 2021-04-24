@@ -15,11 +15,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 throw new ArgumentNullException(nameof(value));
             }
 
-            if (string.IsNullOrEmpty(departmentName))
-            {
-                throw new ArgumentNullException(nameof(departmentName));
-            }
-
             return new ProjectInfo
             {
                 Id = value.Id,
