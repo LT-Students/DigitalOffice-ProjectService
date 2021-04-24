@@ -8,13 +8,13 @@ namespace LT.DigitalOffice.Broker.Requests
     [AutoInjectRequest(nameof(RabbitMqConfig.GetDepartmentsNamesEndpoint))]
     public interface IGetDepartmentsNamesRequest
     {
-        IList<Guid> Ids { get; }
+        IList<Guid> DepartmentIds { get; }
 
-        static object CreateObj(IList<Guid> ids)
+        static object CreateObj(IList<Guid> departmentIds)
         {
             return new
             {
-                Ids = ids
+                DepartmentIds = departmentIds
             };
         }
     }
