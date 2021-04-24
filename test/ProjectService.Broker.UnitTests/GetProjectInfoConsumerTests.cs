@@ -10,7 +10,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
@@ -46,7 +45,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
         }
 
         [Test]
-        public async Task ShouldResponseProjectIdsResponse()
+        public async Task ShouldResponseProjectInfoResponse()
         {
             _repository
                 .Setup(x => x.GetProject(_projectId))
@@ -88,7 +87,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
         }
 
         [Test]
-        public async Task ShouldThrowExceptionWhenUserIdWasNotFound()
+        public async Task ShouldThrowExceptionWhenProjectIdWasNotFound()
         {
             DbProject dbProject = null;
 
