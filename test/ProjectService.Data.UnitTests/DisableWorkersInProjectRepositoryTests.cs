@@ -46,7 +46,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 ShortName = "DO",
                 DepartmentId = Guid.NewGuid(),
                 Description = "New project for Lanit-Tercom",
-                IsActive = true,
                 Users = new List<DbProjectUser>()
             };
 

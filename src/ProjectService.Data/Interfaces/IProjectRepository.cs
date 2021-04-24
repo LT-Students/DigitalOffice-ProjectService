@@ -23,14 +23,13 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// Adds new project to the database. Returns the id of the added project.
         /// </summary>
         /// <param name="item">Project to add.</param>
-        /// <returns>Id of the added project.</returns>
-        Guid CreateNewProject(DbProject item);
+        void CreateNewProject(DbProject item);
 
         /// <summary>
         /// Edits the existing project in the database.
         /// </summary>
         /// <param name="dbProject">New data of the project.</param>
-        /// <returns>Id of the edited project.</returns>
+        /// <returns>UserId of the edited project.</returns>
         Guid EditProjectById(DbProject dbProject);
 
         /// <summary>
@@ -54,12 +53,5 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="showNotActiveUsers">Do you want to show inactive users?</param>
         /// <returns>All users from project..</returns>
         IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActiveUsers);
-
-        /// <summary>
-        /// Return role by id.
-        /// </summary>
-        /// <param name="roleId">Role id.</param>
-        /// <returns>Role with specified id.</returns>
-        DbRole GetRole(Guid roleId);
     }
 }
