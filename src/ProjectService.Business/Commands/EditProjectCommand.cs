@@ -12,24 +12,24 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
-    public class EditProjectCommand //: IEditProjectCommand
+    public class EditProjectCommand : IEditProjectCommand
     {
-        /*private readonly IEditProjectValidator _validator;
-        private readonly IProjectRepository _repository;
+        private readonly IEditProjectValidator _validator;
         private readonly IAccessValidator _accessValidator;
         private readonly IEditProjectMapper _mapper;
+        private readonly IProjectRepository _repository;
 
         public EditProjectCommand(
             IEditProjectValidator validator,
-            IProjectRepository repository,
             IAccessValidator accessValidator,
-            IEditProjectMapper mapper
+            IEditProjectMapper mapper,
+            IProjectRepository repository
           )
         {
             _validator = validator;
-            _repository = repository;
             _accessValidator = accessValidator;
             _mapper = mapper;
+            _repository = repository;
         }
 
         public bool Execute(Guid projectId, JsonPatchDocument<EditProjectRequest> request)
@@ -46,6 +46,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             JsonPatchDocument<DbProject> dbRequest = _mapper.Map(request);
 
             return _repository.EditProject(projectId, dbRequest);
-        }*/
+        }
     }
 }

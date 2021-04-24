@@ -4,11 +4,14 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.AspNetCore.JsonPatch;
 using Moq;
+using Moq.AutoMock;
 using NUnit.Framework;
 using System;
 
@@ -16,130 +19,85 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
 {
     internal class EditProjectByIdCommandTests
     {
-        /*private DbProject dbProject;
-        private EditProjectRequest editRequest;
-        private IEditProjectCommand command;
-        private Mock<IProjectRepository> repositoryMock;
-        private Mock<IEditProjectValidator> validatorMock;
-        private Mock<IAccessValidator> accessValidatorMock;
+        private AutoMocker _mocker;
+        private JsonPatchDocument<EditProjectRequest> _request;
+        private JsonPatchDocument<DbProject> _dbRequest;
+        private IEditProjectCommand _command;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            editRequest = new EditProjectRequest
-            {
-                ProjectId = Guid.NewGuid(),
-                Patch = new JsonPatchDocument<DbProject>()
-            };
-
-            dbProject = new DbProject
-            {
-                Id = editRequest.ProjectId
-            };
+            _request = new JsonPatchDocument<EditProjectRequest>();
+            _dbRequest = new JsonPatchDocument<DbProject>();
         }
 
         [SetUp]
         public void SetUp()
         {
-            validatorMock = new Mock<IEditProjectValidator>();
-            repositoryMock = new Mock<IProjectRepository>();
-            accessValidatorMock = new Mock<IAccessValidator>();
-
-            validatorMock
-                .Setup(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
+            _mocker = new AutoMocker();
+            _mocker
+                .Setup<IEditProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
                 .Returns(true);
 
-            accessValidatorMock
-                .Setup(x => x.IsAdmin())
+            _mocker
+                .Setup<IAccessValidator, bool>(x => x.IsAdmin())
                 .Returns(true);
 
-            accessValidatorMock
-                .Setup(x => x.HasRights(It.IsAny<int>()))
+            _mocker
+                .Setup<IEditProjectMapper, JsonPatchDocument<DbProject>>(x => x.Map(_request))
+                .Returns(_dbRequest);
+
+            _mocker
+                .Setup<IProjectRepository, bool>(x => x.EditProject(It.IsAny<Guid>(), _dbRequest))
                 .Returns(true);
 
-            repositoryMock
-                .Setup(x => x.GetProject(dbProject.Id))
-                .Returns(dbProject);
-
-            repositoryMock
-                .Setup(r => r.EditProjectById(dbProject))
-                .Returns(editRequest.ProjectId);
-
-            command = new EditProjectCommand(validatorMock.Object, repositoryMock.Object, accessValidatorMock.Object);
+            _command = _mocker.CreateInstance<EditProjectCommand>();
         }
 
         [Test]
-        public void ShouldThrowValidationExceptionWhenEditProjectRequestIsInvalid()
+        public void SusseccCommandExecute()
         {
-            validatorMock
-                .Setup(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
+            SerializerAssert.AreEqual(true, _command.Execute(It.IsAny<Guid>(), _request));
+        }
+
+        [Test]
+        public void ValidationExceptionWhenInvalidRequest()
+        {
+            _mocker
+                .Setup<IEditProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
                 .Returns(false);
 
-            Assert.Throws<ValidationException>(() => command.Execute(editRequest));
-
-            repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Never);
+            Assert.Throws<ValidationException>(() => _command.Execute(It.IsAny<Guid>(), _request));
         }
 
         [Test]
-        public void ShouldThrowNullReferenceExceptionWhenUserIsNotAdminAndHasNoRights()
+        public void ForbiddenExceptionWhenUserIsNotAdminAndHasNoRights()
         {
-            accessValidatorMock
-                .Setup(x => x.HasRights(It.IsAny<int>()))
+            _mocker
+                .Setup<IAccessValidator, bool>(x => x.IsAdmin())
                 .Returns(false);
 
-            accessValidatorMock
-               .Setup(x => x.IsAdmin())
-               .Returns(false);
-
-            Assert.Throws<ForbiddenException>(
-                () => command.Execute(editRequest), "Project with this ID has been found");
-            validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
+            Assert.Throws<ForbiddenException>(() => _command.Execute(It.IsAny<Guid>(), _request));
         }
 
         [Test]
-        public void ShouldThrowNullReferenceExceptionWhenDbProjectWasNotFound()
+        public void ArgumentNullExceptionWhenMapperThrowsIt()
         {
-            repositoryMock
-                .Setup(x => x.EditProjectById(It.IsAny<DbProject>()))
+            _mocker
+                .Setup<IEditProjectMapper, JsonPatchDocument<DbProject>>(x => x.Map(_request))
+                .Throws(new ArgumentNullException());
+
+            Assert.Throws<ArgumentNullException>(() => _command.Execute(It.IsAny<Guid>(), _request));
+        }
+
+        [Test]
+        public void NullReferenceExceptionWhenDbProjectNotFound()
+        {
+            _mocker
+                .Setup<IProjectRepository, bool>(x => x.EditProject(It.IsAny<Guid>(), _dbRequest))
                 .Throws(new NullReferenceException());
 
-            Assert.Throws<NullReferenceException>(
-                () => command.Execute(editRequest), "Project with this ID has been found");
-            validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
+            Assert.Throws<NullReferenceException>(() => _command.Execute(It.IsAny<Guid>(), _request));
         }
-
-        [Test]
-        public void ShouldReturnProjectGuidWhenEverythingIsRight()
-        {
-            Assert.AreEqual(editRequest.ProjectId, command.Execute(editRequest));
-            validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
-            repositoryMock.Verify(r => r.GetProject(dbProject.Id), Times.Once);
-            repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Once);
-        }
-
-        [Test]
-        public void ShouldReturnProjectGuidWhenUserIsOnlyAdmin()
-        {
-            accessValidatorMock
-                .Setup(x => x.HasRights(It.IsAny<int>()))
-                .Returns(false);
-
-            Assert.AreEqual(editRequest.ProjectId, command.Execute(editRequest));
-            validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
-            repositoryMock.Verify(r => r.GetProject(dbProject.Id), Times.Once);
-            repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Once);
-        }
-
-        [Test]
-        public void ShouldReturnProjectGuidWhenUserIsOnlyHasRights()
-        {
-            accessValidatorMock
-                .Setup(x => x.IsAdmin())
-                .Returns(false);
-
-            Assert.AreEqual(editRequest.ProjectId, command.Execute(editRequest));
-            validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
-            repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Once);
-        }*/
     }
 }

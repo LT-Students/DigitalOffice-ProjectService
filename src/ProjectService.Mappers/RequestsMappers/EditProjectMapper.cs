@@ -16,21 +16,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 throw new ArgumentNullException("Invalid request value");
             }
 
-            JsonPatchDocument<DbProject> patchDbProject = new();
+            JsonPatchDocument<DbProject> dbRequest = new();
 
             foreach (var item in request.Operations)
             {
-                if (item.op == "replace")
-                {
-                    patchDbProject.Operations.Add(new Operation<DbProject>(item.op, item.path, item.from, item.value));
-                }
-                else
-                {
-                    throw new ArgumentException("Invalid operation");
-                }
+                dbRequest.Operations.Add(new Operation<DbProject>(item.op, item.path, item.from, item.value));
             }
 
-            return patchDbProject;
+            return dbRequest;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
-using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
