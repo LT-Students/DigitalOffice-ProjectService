@@ -23,7 +23,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IFindProjectsResponseMapper _responseMapper;
         private readonly IFindDbProjectFilterMapper _filterMapper;
         private readonly IRequestClient<IFindDepartmentsRequest> _findDepartmentsRequestClient;
-        private readonly IRequestClient<IGetDepartmentsNamesRequest> _getDepartmentsRequestClient;
 
         private IDictionary<Guid, string> FindDepartment(string departmentName, List<string> errors)
         {
@@ -33,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             try
             {
-                var findDepartmentRequest = IFindDepartmentsRequest.CreateObj(departmentName);
+                var findDepartmentRequest = IFindDepartmentsRequest.CreateObj(departmentName, null);
                 var response = _findDepartmentsRequestClient.GetResponse<IOperationResult<IFindDepartmentsResponse>>(findDepartmentRequest).Result;
                 if (response.Message.IsSuccess)
                 {
@@ -67,9 +66,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             try
             {
-                var getDepartmentsRequest = IGetDepartmentsNamesRequest.CreateObj(
-                    dbProjects.Select(p => p.DepartmentId).ToList());
-                var response = _getDepartmentsRequestClient.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+                var getDepartmentsRequest = IFindDepartmentsRequest.CreateObj(
+                    null, dbProjects.Select(p => p.DepartmentId).ToList());
+                var response = _findDepartmentsRequestClient.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
                     getDepartmentsRequest).Result;
                 if (response.Message.IsSuccess)
                 {
@@ -97,15 +96,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             IProjectRepository repository,
             IFindProjectsResponseMapper responseMapper,
             IFindDbProjectFilterMapper filterMapper,
-            IRequestClient<IFindDepartmentsRequest> findDepartmentsRequestClient,
-            IRequestClient<IGetDepartmentsNamesRequest> getDepartmentsRequestClient)
+            IRequestClient<IFindDepartmentsRequest> findDepartmentsRequestClient)
         {
             _logger = logger;
             _repository = repository;
             _responseMapper = responseMapper;
             _filterMapper = filterMapper;
             _findDepartmentsRequestClient = findDepartmentsRequestClient;
-            _getDepartmentsRequestClient = getDepartmentsRequestClient;
         }
 
         public ProjectsResponse Execute(FindProjectsFilter filter, int skipCount, int takeCount)
