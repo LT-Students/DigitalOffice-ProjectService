@@ -36,9 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             _validator.ValidateAndThrowCustom(request);
 
-            const int rightId = 2;
-
-            if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(rightId)))
+            if (!(_accessValidator.IsAdmin() || !_accessValidator.HasRights(Kernel.Constants.Rights.AddEditRemoveProjects)))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
