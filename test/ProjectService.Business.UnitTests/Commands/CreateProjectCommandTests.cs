@@ -65,7 +65,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
-                Status = ProjectStatusType.Abandoned,
+                Status = ProjectStatusType.Active,
                 Users = new List<ProjectUserRequest>
                 {
                     new ProjectUserRequest
