@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
                 throw new NotFoundException($"Project with id: {projectId} was not found.");
             }
 
-            return IProjectResponse.CreateObj(dbProject.Id, dbProject.Name, dbProject.IsActive);
+            return IProjectResponse.CreateObj(dbProject.Id, dbProject.Name, (int)dbProject.Status);
         }
 
         public GetProjectInfoConsumer(IProjectRepository repository)

@@ -3,6 +3,7 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Broker.Requests;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.UnitTestKernel;
 using MassTransit.Testing;
 using Moq;
@@ -40,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 ShortName = "DO",
                 DepartmentId = Guid.NewGuid(),
                 Description = "New project for Lanit-Tercom",
-                IsActive = true
+                Status = (int)ProjectStatusType.Active
             };
         }
 
@@ -69,7 +70,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                     {
                         Id = _dbProject.Id,
                         Name = _dbProject.Name,
-                        IsActive = _dbProject.IsActive
+                        IsActive = _dbProject.Status
                     }
                 };
 

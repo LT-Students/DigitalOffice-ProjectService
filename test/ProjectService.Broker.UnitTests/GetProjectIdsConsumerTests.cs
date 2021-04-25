@@ -40,7 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = Guid.NewGuid(),
                     UserId = _userId,
-                    RoleId = Guid.NewGuid(),
+                    Role = 2,
                     AddedOn = DateTime.Now,
                     IsActive = true
                 },
@@ -49,7 +49,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = Guid.NewGuid(),
                     UserId = _userId,
-                    RoleId = Guid.NewGuid(),
+                    Role = 1,
                     AddedOn = DateTime.Now,
                     IsActive = true
                 },
@@ -67,8 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
 
             _repository
                 .Setup(x => x.Get(_userId))
-                .Returns(_dbProjectUsers)
-                .Verifiable();
+                .Returns(_dbProjectUsers);
 
             await _harness.Start();
 
