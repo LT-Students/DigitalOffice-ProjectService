@@ -7,6 +7,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces
     [AutoInject]
     public interface IProjectInfoMapper
     {
-        ProjectInfo Map(DbProject dbProject, string departmetnName);
+        ProjectInfo Map(DbProject dbProject, string departmentName);
     }
 }
