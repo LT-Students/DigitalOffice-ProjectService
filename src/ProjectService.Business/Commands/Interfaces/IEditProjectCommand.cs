@@ -13,8 +13,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     public interface IEditProjectCommand
     {
         /// <summary>
-        /// Calls methods to edit the existing project. Returns the UserId of the edited project.
+        /// Calls methods to edit the existing project. Returns true if project edited.
         /// </summary>
+        /// <param name="projectId">Project id to update the project.</param>
         /// <param name="request">Data to update the project.</param>
         /// <returns></returns>
         bool Execute(Guid projectId, JsonPatchDocument<EditProjectRequest> request);
