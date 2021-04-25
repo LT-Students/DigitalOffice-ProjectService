@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
@@ -34,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
 
-        private bool? IsExistDepartment(Guid departmentId, List<string> errors)
+        private IGetDepartmentResponse GetDepartment(Guid departmentId, List<string> errors)
         {
             string errorMessage = "Cannot add project. Please try again later.";
 
@@ -45,13 +46,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
                 if (response.Message.IsSuccess)
                 {
-                    return true;
+                    return response.Message.Body;
                 }
 
                 _logger.LogWarning($"Can not find department with this id '{departmentId}': " +
                     $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
-
-                return false;
             }
             catch (Exception exc)
             {
@@ -94,12 +93,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _validator.ValidateAndThrowCustom(request);
 
-            bool? isExist = IsExistDepartment(request.DepartmentId, errors);
-            if (isExist.HasValue && !isExist.Value)
+            IGetDepartmentResponse department = GetDepartment(request.DepartmentId, errors);
+            if (!errors.Any() && department == null)
             {
                 throw new BadRequestException("Project department not found.");
             }
-            else if(!isExist.HasValue)
+            else if(errors.Any())
             {
                 return new OperationResultResponse<ProjectInfo>
                 {
@@ -113,7 +112,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _repository.CreateNewProject(dbProject);
 
-            var projectInfo = _projectInfoMapper.Map(dbProject);
+            var projectInfo = _projectInfoMapper.Map(dbProject, department.Name);
 
             return new OperationResultResponse<ProjectInfo>
             {

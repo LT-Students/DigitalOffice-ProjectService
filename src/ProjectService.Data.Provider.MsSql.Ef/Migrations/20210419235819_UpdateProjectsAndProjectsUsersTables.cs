@@ -75,9 +75,5 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 
             migrationBuilder.DropTable("Roles");
         }
-
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-        }
     }
 }

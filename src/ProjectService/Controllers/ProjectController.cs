@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using Microsoft.AspNetCore.JsonPatch;
 
 namespace LT.DigitalOffice.ProjectService.Controllers

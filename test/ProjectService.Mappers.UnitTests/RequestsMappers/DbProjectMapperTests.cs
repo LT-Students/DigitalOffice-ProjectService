@@ -34,8 +34,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
                 {
                     new ProjectUserRequest
                     {
-                        Id = Guid.NewGuid(),
-                        Role = UserRoleType.Admin
+                        UserId = Guid.NewGuid(),
+                        Role = UserRoleType.ProjectAdmin
                     }
                 }
             };
@@ -75,7 +75,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
                         Role = (int)_newProject.Users.ElementAt(0).Role,
                         AddedOn = dbProject.Users.ElementAt(0).AddedOn,
                         ProjectId = dbProject.Id,
-                        UserId = _newProject.Users.ElementAt(0).Id,
+                        UserId = _newProject.Users.ElementAt(0).UserId,
                         IsActive = true
                     }
                 }

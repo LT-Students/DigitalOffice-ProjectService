@@ -13,9 +13,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
                 .WithMessage("The request must contain user data")
                 .DependentRules(() =>
                 {
-                    RuleFor(pu => pu.Id)
-                    .NotEmpty()
-                    .WithMessage("Not specified user id.");
+                    RuleFor(pu => pu.UserId)
+                        .NotEmpty()
+                        .WithMessage("Not specified user id.");
                 });
         }
     }

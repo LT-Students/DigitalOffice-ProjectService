@@ -70,8 +70,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 {
                     new ProjectUserRequest
                     {
-                        Id = Guid.NewGuid(),
-                        Role = UserRoleType.Admin
+                        UserId = Guid.NewGuid(),
+                        Role = UserRoleType.ProjectAdmin
                     }
                 }
             };
@@ -103,12 +103,16 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 Id = Guid.NewGuid(),
                 AuthorId = _autorId,
                 ShortName = _newRequest.ShortName,
-                DepartmentId = _newRequest.DepartmentId,
                 Name = _newRequest.Name,
                 Description = _newRequest.Description,
                 CreatedAt = DateTime.UtcNow,
                 ShortDescription = _newRequest.ShortDescription,
                 Status = _newRequest.Status,
+                Department = new DepartmentInfo
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Some department"
+                }
             };
 
             _response = new OperationResultResponse<ProjectInfo>
@@ -118,7 +122,12 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 Errors = new List<string>()
             };
 
+            var department = new Mock<IGetDepartmentResponse>();
+            department.Setup(x => x.Id).Returns(projectInfo.Department.Id);
+            department.Setup(x => x.Name).Returns(projectInfo.Department.Name);
+
             _operationResultBroker = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
+            _operationResultBroker.Setup(x => x.Message.Body).Returns(department.Object);
         }
 
         [SetUp]
@@ -257,7 +266,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 .Returns(_newDbProject);
 
             _mocker
-                .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(_newDbProject))
+                .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(
+                    _newDbProject, _operationResultBroker.Object.Message.Body.Name))
                 .Returns(_response.Body);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
@@ -279,7 +289,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 .Returns(_newDbProject);
 
             _mocker
-                .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(_newDbProject))
+                .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(
+                    _newDbProject, _operationResultBroker.Object.Message.Body.Name))
                 .Returns(_response.Body);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));

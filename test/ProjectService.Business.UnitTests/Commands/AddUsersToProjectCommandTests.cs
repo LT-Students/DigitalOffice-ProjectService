@@ -33,31 +33,17 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            var users = new List<UserRequest>
-            {
-                new UserRequest
-                {
-                    Id = Guid.NewGuid(),
-                    IsActive = true
-                },
-                new UserRequest
-                {
-                    Id = Guid.NewGuid(),
-                    IsActive = true
-                }
-            };
-
             var projectUsers = new List<ProjectUserRequest>
             {
                 new ProjectUserRequest
                 {
-                    Role = UserRoleType.Admin,
-                    Id = Guid.NewGuid()
+                    Role = UserRoleType.ProjectAdmin,
+                    UserId = Guid.NewGuid()
                 },
                 new ProjectUserRequest
                 {
-                    Role = UserRoleType.Admin,
-                    Id = Guid.NewGuid()
+                    Role = UserRoleType.ProjectAdmin,
+                    UserId = Guid.NewGuid()
                 }
             };
 
@@ -73,7 +59,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 {
                     Id = Guid.NewGuid(),
                     ProjectId = _request.ProjectId,
-                    UserId = projectUsers.ElementAt(0).Id,
+                    UserId = projectUsers.ElementAt(0).UserId,
                     AddedOn = DateTime.Now,
                     IsActive = true
                 },
@@ -81,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 {
                     Id = Guid.NewGuid(),
                     ProjectId = _request.ProjectId,
-                    UserId = projectUsers.ElementAt(1).Id,
+                    UserId = projectUsers.ElementAt(1).UserId,
                     AddedOn = DateTime.Now,
                     IsActive = true
                 }

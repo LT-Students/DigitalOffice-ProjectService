@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
             {
                 RuleForEach(project => project.Users).ChildRules(user =>
                 {
-                    user.RuleFor(user => user.Id)
+                    user.RuleFor(user => user.UserId)
                         .NotEmpty();
 
                     user.RuleFor(user => user.Role)

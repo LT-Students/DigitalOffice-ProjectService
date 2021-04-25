@@ -17,7 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
             return new DbProjectUser
             {
                 Id = Guid.NewGuid(),
-                UserId = projectUser.Id,
+                UserId = projectUser.UserId,
                 Role = (int)projectUser.Role,
                 AddedOn = DateTime.Now,
                 IsActive = true
