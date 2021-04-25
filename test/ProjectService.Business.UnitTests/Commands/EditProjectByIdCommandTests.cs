@@ -44,6 +44,10 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(true);
 
             _mocker
+                .Setup<IAccessValidator, bool>(x => x.HasRights(It.IsAny<int>()))
+                .Returns(true);
+
+            _mocker
                 .Setup<IEditProjectMapper, JsonPatchDocument<DbProject>>(x => x.Map(_request))
                 .Returns(_dbRequest);
 
@@ -71,10 +75,34 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         }
 
         [Test]
+        public void ForbiddenExceptionWhenUserIsNotAdmin()
+        {
+            _mocker
+                .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+                .Returns(false);
+
+            Assert.Throws<ForbiddenException>(() => _command.Execute(It.IsAny<Guid>(), _request));
+        }
+
+        [Test]
+        public void ForbiddenExceptionWhenUserHasNoRights()
+        {
+            _mocker
+                .Setup<IAccessValidator, bool>(x => x.HasRights(It.IsAny<int>()))
+                .Returns(false);
+
+            Assert.Throws<ForbiddenException>(() => _command.Execute(It.IsAny<Guid>(), _request));
+        }
+
+        [Test]
         public void ForbiddenExceptionWhenUserIsNotAdminAndHasNoRights()
         {
             _mocker
                 .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+                .Returns(false);
+
+            _mocker
+                .Setup<IAccessValidator, bool>(x => x.HasRights(It.IsAny<int>()))
                 .Returns(false);
 
             Assert.Throws<ForbiddenException>(() => _command.Execute(It.IsAny<Guid>(), _request));
