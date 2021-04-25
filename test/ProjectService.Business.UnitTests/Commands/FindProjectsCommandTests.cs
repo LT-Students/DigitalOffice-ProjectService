@@ -145,12 +145,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                         IFindDepartmentsRequest.CreateObj(DepartmentName), default, default))
                 .Returns(Task.FromResult(_brokerFindResponseMock.Object));
 
-            //_mocker
-            //    .Setup<IRequestClient<IGetDepartmentsNamesRequest>, Task<Response<IOperationResult<IGetDepartmentsNamesResponse>>>>(
-            //        x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
-            //            IGetDepartmentsNamesRequest.CreateObj(
-            //                It.IsAny<IList<Guid>>()), default, default))
-            //    .Returns(Task.FromResult(_brokerGetResponseMock.Object));
             _mocker
                 .Setup<IRequestClient<IGetDepartmentsNamesRequest>, Task<Response<IOperationResult<IGetDepartmentsNamesResponse>>>>(
                     x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
@@ -355,12 +349,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Setup(x => x.Message.Errors)
                 .Returns(errors);
 
-            //_mocker
-            //    .Setup<IRequestClient<IGetDepartmentsNamesRequest>, Task<Response<IOperationResult<IGetDepartmentsNamesResponse>>>>(
-            //        x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
-            //            IGetDepartmentsNamesRequest.CreateObj(It.Is<List<Guid>>(l => l.Count == 1 && l.Contains(_departmentId))), default, default))
-            //    .Returns(Task.FromResult(_brokerGetResponseMock.Object));
-
             _projectInfo.Department.Name = null;
 
             _projectsResponse = new ProjectsResponse
@@ -398,10 +386,10 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             var response = _command.Execute(_findProjectsFilter, skip, take);
 
             SerializerAssert.AreEqual(_projectsResponse, response);
-            //_mocker.Verify<IRequestClient<IGetDepartmentsNamesRequest>, Task<Response<IOperationResult<IGetDepartmentsNamesResponse>>>>(
-            //    x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
-            //        IGetDepartmentsNamesRequest.CreateObj(
-            //            It.Is<List<Guid>>(l => l.Count == 1 && l.Contains(_departmentId))), default, default), Times.Once);
+            _mocker.Verify<IRequestClient<IGetDepartmentsNamesRequest>>(x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+                It.IsAny<object>(),
+                default,
+                default));
         }
     }
 }
