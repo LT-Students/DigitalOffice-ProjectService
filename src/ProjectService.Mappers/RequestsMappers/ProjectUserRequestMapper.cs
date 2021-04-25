@@ -1,6 +1,6 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
@@ -16,10 +16,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 
             return new DbProjectUser
             {
-                UserId = projectUser.User.Id,
-                RoleId = projectUser.RoleId,
+                Id = Guid.NewGuid(),
+                UserId = projectUser.UserId,
+                Role = (int)projectUser.Role,
                 AddedOn = DateTime.Now,
-                IsActive = projectUser.User.IsActive
+                IsActive = true
             };
         }
     }

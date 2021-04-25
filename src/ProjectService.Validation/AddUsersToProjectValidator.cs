@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -51,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         {
             foreach (var dbUser in _dbPrjectUsers)
             {
-                if (user.User.Id == dbUser.Id)
+                if (user.UserId == dbUser.Id)
                 {
                     return false;
                 }

@@ -38,8 +38,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 Name = "A test name",
                 ShortName = "Test",
                 DepartmentId = departmentId,
-                Description = "Description",
-                IsActive = true
+                Description = "Description"
             };
 
             editProject = new DbProject
@@ -47,8 +46,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 Name = "Is different",
                 ShortName = "Test",
                 DepartmentId = Guid.NewGuid(),
-                Description = "Is different too",
-                IsActive = false
+                Description = "Is different too"
             };
         }
 
@@ -93,7 +91,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 
             editProject.Id = dbProject.Id;
             editProject.Name = dbProject.Name;
-            editProject.IsActive = dbProject.IsActive;
             editProject.Description = dbProject.Description;
             editProject.DepartmentId = dbProject.DepartmentId;
 

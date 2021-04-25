@@ -5,8 +5,10 @@ using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.User;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Moq;
 using NUnit.Framework;
@@ -31,31 +33,17 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            var users = new List<UserRequest>
-            {
-                new UserRequest
-                {
-                    Id = Guid.NewGuid(),
-                    IsActive = true
-                },
-                new UserRequest
-                {
-                    Id = Guid.NewGuid(),
-                    IsActive = true
-                }
-            };
-
             var projectUsers = new List<ProjectUserRequest>
             {
                 new ProjectUserRequest
                 {
-                    RoleId = Guid.NewGuid(),
-                    User = users.ElementAt(0)
+                    Role = UserRoleType.ProjectAdmin,
+                    UserId = Guid.NewGuid()
                 },
                 new ProjectUserRequest
                 {
-                    RoleId = Guid.NewGuid(),
-                    User = users.ElementAt(0)
+                    Role = UserRoleType.ProjectAdmin,
+                    UserId = Guid.NewGuid()
                 }
             };
 
@@ -71,8 +59,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 {
                     Id = Guid.NewGuid(),
                     ProjectId = _request.ProjectId,
-                    UserId = projectUsers.ElementAt(0).User.Id,
-                    RoleId = projectUsers.ElementAt(0).RoleId,
+                    UserId = projectUsers.ElementAt(0).UserId,
                     AddedOn = DateTime.Now,
                     IsActive = true
                 },
@@ -80,8 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 {
                     Id = Guid.NewGuid(),
                     ProjectId = _request.ProjectId,
-                    UserId = projectUsers.ElementAt(1).User.Id,
-                    RoleId = projectUsers.ElementAt(1).RoleId,
+                    UserId = projectUsers.ElementAt(1).UserId,
                     AddedOn = DateTime.Now,
                     IsActive = true
                 }

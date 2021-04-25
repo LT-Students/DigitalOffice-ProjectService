@@ -1,6 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
@@ -20,11 +21,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
 
             _projectUser = new ProjectUserRequest
             {
-                User = new UserRequest
-                {
-                    Id = Guid.NewGuid()
-                },
-                RoleId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                Role = UserRoleType.ProjectAdmin
             };
         }
 
@@ -32,12 +30,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         public void ShouldThrowArgumentNullExceptionWhenProjectUserRequestIsNull()
         {
             ProjectUserRequest projectRequest = null;
-
-            var expectedDbProjectUser = new DbProjectUser
-            {
-                UserId = _projectUser.User.Id,
-                RoleId = _projectUser.RoleId,
-            };
 
             Assert.Throws<ArgumentNullException>(() => _projectUserRequestMapper.Map(projectRequest));
         }
@@ -49,9 +41,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
 
             var expectedDbProjectUser = new DbProjectUser
             {
-                UserId = _projectUser.User.Id,
-                RoleId = _projectUser.RoleId,
-                AddedOn = dbProjectUser.AddedOn
+                Id = dbProjectUser.Id,
+                UserId = _projectUser.UserId,
+                Role = (int)_projectUser.Role,
+                AddedOn = dbProjectUser.AddedOn,
+                IsActive = true
             };
 
             SerializerAssert.AreEqual(expectedDbProjectUser, dbProjectUser);

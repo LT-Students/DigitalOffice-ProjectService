@@ -1,13 +1,12 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
-using System.Threading.Tasks;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces
 {
     [AutoInject]
-    public interface IProjectUserMapper
+    public interface IProjectInfoMapper
     {
-        Task<ProjectUserInfo> Map(DbProjectUser dbProjectUser);
+        ProjectInfo Map(DbProject dbProject, string departmentName);
     }
 }
