@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             IDictionary<Guid, string> pairs = new Dictionary<Guid, string>();
 
-            string errorMessage = $"Can not find departments now. Please try again later.";
+            string errorMessage = "Can not find departments now. Please try again later.";
 
             try
             {
@@ -63,7 +63,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             IDictionary<Guid, string> pairs = new Dictionary<Guid, string>();
 
-            string errorMessage = $"Can not find departments names now. Please try again later.";
+            string errorMessage = "Can not find departments names now. Please try again later.";
 
             try
             {
