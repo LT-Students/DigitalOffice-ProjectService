@@ -158,6 +158,21 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldThrowArgumentNullExceptionWhenFilterIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => _command.Execute(null, 0, 0));
+            _mocker
+                .Verify<IRequestClient<IGetDepartmentsNamesRequest>>(x =>
+                    x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Never);
+            _mocker
+                .Verify<IRequestClient<IFindDepartmentsRequest>>(x =>
+                    x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Never);
+            _mocker
+                .Verify<IProjectRepository>(x =>
+                    x.FindProjects(
+                        It.IsAny<FindDbProjectsFilter>(), It.IsAny<int>(), It.IsAny<int>(), out _totalCount),
+                    Times.Never);
         }
 
         [Test]
@@ -189,6 +204,21 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(_projectsResponse);
 
             SerializerAssert.AreEqual(_projectsResponse, _command.Execute(_findProjectsFilter, skip, take));
+            _mocker
+                .Verify<IRequestClient<IGetDepartmentsNamesRequest>>(x =>
+                    x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Once);
+            _mocker
+                .Verify<IRequestClient<IFindDepartmentsRequest>>(x =>
+                    x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Never);
+            _mocker
+                .Verify<IProjectRepository>(x =>
+                    x.FindProjects(
+                        _findDbProjectsFilter, skip, take, out _totalCount),
+                    Times.Once);
         }
 
         [Test]
@@ -229,6 +259,21 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(_projectsResponse);
 
             SerializerAssert.AreEqual(_projectsResponse, _command.Execute(_findProjectsFilter, skip, take));
+            _mocker
+                .Verify<IRequestClient<IGetDepartmentsNamesRequest>>(x =>
+                    x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Once);
+            _mocker
+                .Verify<IRequestClient<IFindDepartmentsRequest>>(x =>
+                    x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Never);
+            _mocker
+                .Verify<IProjectRepository>(x =>
+                    x.FindProjects(
+                        _findDbProjectsFilter, skip, take, out _totalCount),
+                    Times.Once);
         }
 
         [Test]
@@ -269,6 +314,21 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(_projectsResponse);
 
             SerializerAssert.AreEqual(_projectsResponse, _command.Execute(_findProjectsFilter, skip, take));
+            _mocker
+                .Verify<IRequestClient<IGetDepartmentsNamesRequest>>(x =>
+                    x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Never);
+            _mocker
+                .Verify<IRequestClient<IFindDepartmentsRequest>>(x =>
+                    x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Once);
+            _mocker
+                .Verify<IProjectRepository>(x =>
+                    x.FindProjects(
+                        _findDbProjectsFilter, skip, take, out _totalCount),
+                    Times.Once);
         }
 
         [Test]
@@ -334,6 +394,16 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _mocker.Verify<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
                 x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
                     IFindDepartmentsRequest.CreateObj(_findProjectsFilter.DepartmentName), default, default), Times.Once);
+            _mocker
+                .Verify<IRequestClient<IGetDepartmentsNamesRequest>>(x =>
+                    x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Never);
+            _mocker
+                .Verify<IProjectRepository>(x =>
+                    x.FindProjects(
+                        _findDbProjectsFilter, It.IsAny<int>(), It.IsAny<int>(), out _totalCount),
+                    Times.Once);
         }
 
         [Test]
@@ -386,10 +456,64 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             var response = _command.Execute(_findProjectsFilter, skip, take);
 
             SerializerAssert.AreEqual(_projectsResponse, response);
-            _mocker.Verify<IRequestClient<IGetDepartmentsNamesRequest>>(x => x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
-                It.IsAny<object>(),
-                default,
-                default));
+            _mocker
+                .Verify<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
+                    x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
+                        IFindDepartmentsRequest.CreateObj(_findProjectsFilter.DepartmentName), default, default),
+                    Times.Never);
+            _mocker
+                .Verify<IRequestClient<IGetDepartmentsNamesRequest>>(x =>
+                    x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Once);
+            _mocker
+                .Verify<IProjectRepository>(x =>
+                    x.FindProjects(
+                        _findDbProjectsFilter, It.IsAny<int>(), It.IsAny<int>(), out _totalCount),
+                    Times.Once);
+        }
+
+        [Test]
+        public void ShouldThrowExceptionWhenRepositoryThrowEception()
+        {
+            _mocker
+                .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
+                    _findProjectsFilter,
+                    null))
+                .Returns(_findDbProjectsFilter);
+
+            _mocker
+                .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
+                    It.IsAny<FindDbProjectsFilter>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    out _totalCount))
+                .Throws(new Exception());
+
+            _mocker
+                .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
+                    _dbProjects,
+                    It.IsAny<int>(),
+                    _idNameGet,
+                    It.IsAny<List<string>>()))
+                .Returns(_projectsResponse);
+
+            Assert.Throws<Exception>(() => _command.Execute(_findProjectsFilter, 0, 0));
+            _mocker
+                .Verify<IRequestClient<IGetDepartmentsNamesRequest>>(x =>
+                    x.GetResponse<IOperationResult<IGetDepartmentsNamesResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Never);
+            _mocker
+                .Verify<IRequestClient<IFindDepartmentsRequest>>(x =>
+                    x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
+                        It.IsAny<object>(), default, default),
+                    Times.Never);
+            _mocker
+                .Verify<IProjectRepository>(x =>
+                    x.FindProjects(
+                        It.IsAny<FindDbProjectsFilter>(), It.IsAny<int>(), It.IsAny<int>(), out _totalCount),
+                    Times.Once);
         }
     }
 }
