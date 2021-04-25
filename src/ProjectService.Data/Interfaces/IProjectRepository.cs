@@ -29,7 +29,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <summary>
         /// Edits the existing project in the database.
         /// </summary>
-        /// <param name="dbProject">New data of the project.</param>
+        /// <param name="projectId">Edit project Id.</param>
+        /// <param name="request">New data of the project.</param>
         /// <returns>Id of the edited project.</returns>
         bool EditProject(Guid projectId, JsonPatchDocument<DbProject> request);
 
