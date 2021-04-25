@@ -70,7 +70,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                     {
                         Id = _dbProject.Id,
                         Name = _dbProject.Name,
-                        IsActive = _dbProject.Status
+                        ProjectStatus = _dbProject.Status
                     }
                 };
 
