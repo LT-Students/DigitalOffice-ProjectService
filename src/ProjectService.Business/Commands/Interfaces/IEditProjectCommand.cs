@@ -9,8 +9,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     /// Represents interface for a command in command pattern.
     /// Provides method for editing an existing project.
     /// </summary>
-
-    //[AutoInject]
+    [AutoInject]
     public interface IEditProjectCommand
     {
         /// <summary>

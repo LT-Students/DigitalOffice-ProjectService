@@ -13,14 +13,13 @@ namespace LT.DigitalOffice.ProjectService.Validation
 {
     public class EditProjectValidator : AbstractValidator<JsonPatchDocument<EditProjectRequest>>, IEditProjectValidator
     {
-        private static string Name => $"/{nameof(EditProjectRequest.Name)}";
-        private static string ShortName => $"/{nameof(EditProjectRequest.ShortName)}";
-        private static string Description => $"/{nameof(EditProjectRequest.Description)}";
-        private static string ShortDescription => $"/{nameof(EditProjectRequest.ShortDescription)}";
-        private static string Status => $"/{nameof(EditProjectRequest.Status)}";
+        public static List<string> Paths => new List<string> { Name, ShortName, Description, ShortDescription, Status };
 
-        private static List<string> Paths => new List<string> { Name, ShortName, Description, ShortDescription, Status };
-
+        public static string Name => $"/{nameof(EditProjectRequest.Name)}";
+        public static string ShortName => $"/{nameof(EditProjectRequest.ShortName)}";
+        public static string Description => $"/{nameof(EditProjectRequest.Description)}";
+        public static string ShortDescription => $"/{nameof(EditProjectRequest.ShortDescription)}";
+        public static string Status => $"/{nameof(EditProjectRequest.Status)}";
         Func<JsonPatchDocument<EditProjectRequest>, string, Operation> GetOperationByPath =>
             (x, path) =>
                 x.Operations.FirstOrDefault(x =>
