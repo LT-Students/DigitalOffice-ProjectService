@@ -26,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         private IDictionary<Guid, string> FindDepartment(string departmentName, List<string> errors)
         {
-            IDictionary<Guid, string> pairs = new Dictionary<Guid, string>();
+            IDictionary<Guid, string> departmentNames = new Dictionary<Guid, string>();
 
             string errorMessage = "Can not find departments now. Please try again later.";
 
@@ -38,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 {
                     foreach(var pair in response.Message.Body.IdNamePairs)
                     {
-                        pairs.Add(pair);
+                        departmentNames.Add(pair);
                     }
                 }
                 else
@@ -55,12 +55,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 errors.Add(errorMessage);
             }
 
-            return pairs;
+            return departmentNames;
         }
 
         private IDictionary<Guid, string> GetDepartmentName(List<DbProject> dbProjects, List<string> errors)
         {
-            IDictionary<Guid, string> pairs = new Dictionary<Guid, string>();
+            IDictionary<Guid, string> departmentNames = new Dictionary<Guid, string>();
 
             string errorMessage = "Can not find departments names now. Please try again later.";
 
@@ -72,7 +72,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     getDepartmentsRequest).Result;
                 if (response.Message.IsSuccess)
                 {
-                    pairs = response.Message.Body.IdNamePairs;
+                    departmentNames = response.Message.Body.IdNamePairs;
                 }
                 else
                 {
@@ -88,7 +88,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 errors.Add(errorMessage);
             }
 
-            return pairs;
+            return departmentNames;
         }
 
         public FindProjectsCommand(
