@@ -13,14 +13,14 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     {
         private IDataProvider _provider;
         private ITaskPropertyRepository _repository;
-        
+
         private readonly Guid _taskPropertyId = Guid.NewGuid();
         private readonly string _name = "Name";
         private readonly string _description = "Description";
         private readonly int _type = 1;
 
         private DbTaskProperty _dbTaskProperty;
-        
+
         private void CreateMemoryDb()
         {
             var dbOptions = new DbContextOptionsBuilder<ProjectServiceDbContext>()
@@ -36,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = _name,
                 Type = _type
             };
-            
+
             _provider.TaskProperties.Add(_dbTaskProperty);
 
             _provider.Save();
@@ -53,7 +53,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Description = _description,
                 Type = _type
             };
-            
+
             CreateMemoryDb();
         }
 
@@ -67,6 +67,15 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         public void Get()
         {
             SerializerAssert.AreEqual(_dbTaskProperty, _repository.Get(_taskPropertyId));
-        } 
+        }
+
+        [OneTimeTearDown]
+        public void CleanDb()
+        {
+            if (_provider.IsInMemory())
+            {
+                _provider.EnsureDeleted();
+            }
+        }
     }
 }

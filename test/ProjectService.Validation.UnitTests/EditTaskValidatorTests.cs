@@ -136,6 +136,40 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
 
+        #region Validate values types
+        
+        [Test]
+        public void ExceptionWhenAssignedToIsNotId()
+        { 
+            GetOperationByPath(EditTaskValidator.AssignedTo).value = 123;
+            _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
+        }
+        
+        [Test]
+        public void ExceptionWhenPriorityIdIsNotId()
+        { 
+            GetOperationByPath(EditTaskValidator.PriorityId).value = 123;
+            _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
+        }
+
+        [Test]
+        public void ExceptionWhenStatusIdIsNotId()
+        { 
+            GetOperationByPath(EditTaskValidator.StatusId).value = 123;
+            _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
+        }
+
+        [Test]
+        public void ExceptionWhenTypeIdIsNotId()
+        { 
+            GetOperationByPath(EditTaskValidator.TypeId).value = 123;
+            _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
+        }
+
+        #endregion
+        
+        #region Validate null and empty
+        
         [Test]
         public void ExceptionWhenNameIsNullOrEmpty()
         {
@@ -152,35 +186,37 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             GetOperationByPath(EditTaskValidator.Description).value = null;
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
-
+        
         [Test]
-        public void ExceptionWhenAssignedToIsNotId()
-        { 
-            GetOperationByPath(EditTaskValidator.AssignedTo).value = 123;
-            _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
-        }
-
-        [Test]
-        public void ExceptionWhenPriorityIdIsEmpty()
+        public void ExceptionWhenAssignedToIsEmpty()
         {
-            GetOperationByPath(EditTaskValidator.PriorityId).value = Guid.Empty;
+            GetOperationByPath(EditTaskValidator.AssignedTo).value = null;
+            _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
+        }
+        
+        [Test]
+        public void ExceptionWhenPriorityIdIsNull()
+        {
+            GetOperationByPath(EditTaskValidator.PriorityId).value = null;
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
 
         [Test]
-        public void ExceptionWhenStatusIdIsEmpty()
+        public void ExceptionWhenStatusIdIsNull()
         {
-            GetOperationByPath(EditTaskValidator.StatusId).value = Guid.Empty;
+            GetOperationByPath(EditTaskValidator.StatusId).value = null;
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
 
         [Test]
-        public void ExceptionWhenTypeIdIsEmpty()
+        public void ExceptionWhenTypeIdIsNull()
         {
-            GetOperationByPath(EditTaskValidator.TypeId).value = Guid.Empty;
+            GetOperationByPath(EditTaskValidator.TypeId).value = null;
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
 
+        #endregion
+        
         [Test]
         public void ExceptionWhenPlannedMinutesIsBelowZero()
         {

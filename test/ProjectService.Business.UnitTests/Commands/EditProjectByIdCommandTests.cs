@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System;
+using FluentValidation;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Business.Commands;
@@ -10,9 +11,8 @@ using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Moq;
 using NUnit.Framework;
-using System;
 
-namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
+namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 {
     internal class EditProjectByIdCommandTests
     {

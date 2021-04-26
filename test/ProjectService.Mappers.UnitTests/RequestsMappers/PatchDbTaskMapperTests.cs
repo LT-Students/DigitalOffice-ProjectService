@@ -28,8 +28,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         private Guid _statusId = Guid.NewGuid();
         private Guid _typeId = Guid.NewGuid();
 
-        [OneTimeSetUp]
-        public void OneTimeSetup()
+        [SetUp]
+        public void SetUp()
         {
             _mapper = new PatchDbTaskMapper();
 
@@ -121,7 +121,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         [Test]
         public void ThrowExceptionWhenNull()
         {
-            Assert.Throws<BadRequestException>(() => { _mapper.Map(null); });
+            _request = null;
+            Assert.Throws<BadRequestException>(() => { _mapper.Map(_request); });
         }
     }
 }

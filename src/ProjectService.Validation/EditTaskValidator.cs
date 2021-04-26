@@ -36,6 +36,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
         {
             _taskPropertyRepository = taskPropertyRepository;
             _userRepository = userRepository;
+
+            CascadeMode = CascadeMode.Stop;
             
             RuleFor(x => x.Operations)
                 .Must(x =>
@@ -61,7 +63,6 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
                         RuleFor(x => (string) GetOperationByPath(x, Name).value)
                             .NotEmpty()
-                            .NotNull()
                             .MaximumLength(150)
                             .WithMessage("Name is too long");
                     });
@@ -71,8 +72,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
                         RuleFor(x => x.Operations)
                             .UniqueOperationWithAllowedOp(Description, "replace", "add", "remove");
 
-                        RuleFor(x => (string) GetOperationByPath(x, Description).value)
-                            .NotEmpty();
+                        RuleFor(x => GetOperationByPath(x, Description).value)
+                            .NotNull();
                     });
                     
                     When(x => GetOperationByPath(x, AssignedTo) != null, () =>
@@ -80,19 +81,21 @@ namespace LT.DigitalOffice.ProjectService.Validation
                         RuleFor(x => x.Operations)
                             .UniqueOperationWithAllowedOp(AssignedTo, "replace", "add", "remove");
 
-                        RuleFor(x => GetOperationByPath(x, AssignedTo))
-                            .Must(o => _userRepository.AreExist((Guid) o.value));
-                    }); // Trouble
+                        RuleFor(x => GetOperationByPath(x, AssignedTo).value)
+                            .NotEmpty()
+                            .Must(o => Guid.TryParse(o.ToString(), out Guid _))
+                            .Must(o => _userRepository.AreExist((Guid) o));
+                    });
                     
                     When(x => GetOperationByPath(x, PriorityId) != null, () =>
                     {
                         RuleFor(x => x.Operations)
-                            .NotEmpty()
                             .UniqueOperationWithAllowedOp(PriorityId, "replace", "add");
                         
-                        RuleFor(x => GetOperationByPath(x, PriorityId))
+                        RuleFor(x => GetOperationByPath(x, PriorityId).value)
                             .NotEmpty()
-                            .Must(o => _taskPropertyRepository.AreExist((Guid) o.value));
+                            .Must(o => Guid.TryParse(o.ToString(), out Guid _))
+                            .Must(o => _taskPropertyRepository.AreExist((Guid) o));
                     });
                     
                     When(x => GetOperationByPath(x, StatusId) != null, () =>
@@ -101,9 +104,10 @@ namespace LT.DigitalOffice.ProjectService.Validation
                             .NotEmpty()
                             .UniqueOperationWithAllowedOp(StatusId, "replace", "add");
                         
-                        RuleFor(x => GetOperationByPath(x, StatusId))
+                        RuleFor(x => GetOperationByPath(x, StatusId).value)
                             .NotEmpty()
-                            .Must(o => _taskPropertyRepository.AreExist((Guid) o.value));
+                            .Must(o => Guid.TryParse(o.ToString(), out Guid _))
+                            .Must(o => _taskPropertyRepository.AreExist((Guid) o));
                     }); 
                     
                     When(x => GetOperationByPath(x, TypeId) != null, () =>
@@ -112,9 +116,10 @@ namespace LT.DigitalOffice.ProjectService.Validation
                             .NotEmpty()
                             .UniqueOperationWithAllowedOp(StatusId, "replace", "add");
                         
-                        RuleFor(x => GetOperationByPath(x, TypeId))
+                        RuleFor(x => GetOperationByPath(x, TypeId).value)
                             .NotEmpty()
-                            .Must(o => _taskPropertyRepository.AreExist((Guid) o.value));
+                            .Must(o => Guid.TryParse(o.ToString(), out Guid _))
+                            .Must(o => _taskPropertyRepository.AreExist((Guid) o));
                     });
                     
                     When(x => GetOperationByPath(x, PlannedMinutes) != null, () =>
@@ -122,8 +127,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
                         RuleFor(x => x.Operations)
                             .UniqueOperationWithAllowedOp(PlannedMinutes, "replace", "add", "remove");
 
-                        RuleFor(x => GetOperationByPath(x, PlannedMinutes))
-                            .Must(x => (int) x.value >= 0);
+                        RuleFor(x => GetOperationByPath(x, PlannedMinutes).value)
+                            .NotEmpty()
+                            .Must(x => (int) x >= 0);
                     });
                 });
         }

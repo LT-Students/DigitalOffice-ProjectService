@@ -5,7 +5,6 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
@@ -22,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
         private JsonPatchDocument<DbTask> _patchDbTask;
         private DbTask _result;
-        
+
         private Guid _taskId = Guid.NewGuid();
         private string _name = "NewName";
         private string _description = "New Description";
@@ -31,6 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private Guid _priorityId = Guid.NewGuid();
         private Guid _statusId = Guid.NewGuid();
         private Guid _typeId = Guid.NewGuid();
+
         private void CreateMemoryDb()
         {
             var dbOptions = new DbContextOptionsBuilder<ProjectServiceDbContext>()
@@ -38,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 .Options;
 
             _provider = new ProjectServiceDbContext(dbOptions);
-            
+
             _provider.Tasks.Add(new DbTask()
             {
                 Id = _taskId,
@@ -50,9 +50,9 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 StatusId = Guid.NewGuid(),
                 TypeId = Guid.NewGuid()
             });
-            
+
             _provider.Save();
-            
+
             _repository = new TaskRepository(_provider);
         }
 
@@ -112,20 +112,20 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             };
         }
 
-        [TearDown]
+        [Test]
+        public void ShouldEditTask()
+        {
+            Assert.IsTrue(_repository.Edit(_taskId, _patchDbTask));
+            SerializerAssert.AreEqual(_result, _provider.Tasks.FirstOrDefault(x => x.Id == _taskId));
+        }
+
+        [OneTimeTearDown]
         public void CleanDb()
         {
             if (_provider.IsInMemory())
             {
                 _provider.EnsureDeleted();
             }
-        }
-
-        [Test]
-        public void ShouldEditTask()
-        {
-            Assert.IsTrue(_repository.Edit(_taskId, _patchDbTask));
-            SerializerAssert.AreEqual(_result, _provider.Tasks.FirstOrDefault(x => x.Id == _taskId));
         }
     }
 }
