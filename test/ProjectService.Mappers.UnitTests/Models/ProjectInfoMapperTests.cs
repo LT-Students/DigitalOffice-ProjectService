@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
-                Status = (int)ProjectStatusType.Abandoned
+                Status = (int)ProjectStatusType.Active
             };
 
             _expectedProjectInfo = new ProjectInfo
@@ -46,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
                 CreatedAt = _dbProject.CreatedAt,
-                Status = ProjectStatusType.Abandoned,
+                Status = ProjectStatusType.Active,
                 Department = new DepartmentInfo
                 {
                     Id = _dbProject.DepartmentId,
