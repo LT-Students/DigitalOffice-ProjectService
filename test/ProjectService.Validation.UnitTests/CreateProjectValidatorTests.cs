@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
-                Status = ProjectStatusType.Abandoned,
+                Status = ProjectStatusType.Active,
                 Users = new List<ProjectUserRequest>
                 {
                     new ProjectUserRequest
@@ -89,7 +89,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
-                Status = ProjectStatusType.Abandoned,
+                Status = ProjectStatusType.Active,
                 Users = new List<ProjectUserRequest>
                 {
                     new ProjectUserRequest
@@ -119,7 +119,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
-                Status = ProjectStatusType.Abandoned,
+                Status = ProjectStatusType.Active,
                 Users = new List<ProjectUserRequest>
                 {
                     new ProjectUserRequest

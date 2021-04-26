@@ -6,6 +6,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
     {
         public string GetUserDataEndpoint { get; set; }
         public string GetFileEndpoint { get; set; }
-        public string GetDepartmentDataEndpoint { get; set; }
+        public string GetDepartmentEndpoint { get; set; }
+        public string FindDepartmentsEndpoint { get; set; }
     }
 }

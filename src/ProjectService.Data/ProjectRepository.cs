@@ -3,6 +3,7 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,6 +15,28 @@ namespace LT.DigitalOffice.ProjectService.Data
     public class ProjectRepository : IProjectRepository
     {
         private readonly IDataProvider provider;
+
+        private IQueryable<DbProject> CreateFindPredicates(
+            FindDbProjectsFilter filter,
+            IQueryable<DbProject> dbProjects)
+        {
+            if (!string.IsNullOrEmpty(filter.Name))
+            {
+                dbProjects = dbProjects.Where(u => u.Name.ToUpper().Contains(filter.Name.ToUpper()));
+            }
+
+            if (!string.IsNullOrEmpty(filter.ShortName))
+            {
+                dbProjects = dbProjects.Where(u => u.ShortName.ToUpper().Contains(filter.ShortName.ToUpper()));
+            }
+
+            if (filter.IdNameDepartments != null)
+            {
+                dbProjects = dbProjects.Where(u => filter.IdNameDepartments.Keys.Contains(u.DepartmentId));
+            }
+
+            return dbProjects;
+        }
 
         public ProjectRepository(IDataProvider provider)
         {
@@ -92,9 +115,21 @@ namespace LT.DigitalOffice.ProjectService.Data
             provider.Save();
         }
 
-        public IEnumerable<DbProject> GetProjects(bool showNotActive)
+        public List<DbProject> FindProjects(FindDbProjectsFilter filter, int skipCount, int takeCount, out int totalCount)
         {
-            return provider.Projects.ToList();
+            if (filter == null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
+
+            var dbProjects = provider.Projects
+                .AsSingleQuery()
+                .AsQueryable();
+
+            var projects = CreateFindPredicates(filter, dbProjects).ToList();
+            totalCount = projects.Count;
+
+            return projects.Skip(skipCount * takeCount).Take(takeCount).ToList();
         }
     }
 }

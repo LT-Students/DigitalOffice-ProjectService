@@ -1,5 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Collections.Generic;
@@ -42,18 +43,12 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds);
 
         /// <summary>
-        /// Returns all projects.
-        /// </summary>
-        /// <param name="showNotActive">Do you want to show inactive projects?</param>
-        /// <returns>All projects.</returns>
-        IEnumerable<DbProject> GetProjects(bool showNotActive);
-
-        /// <summary>
         /// Returns all users from project with specified id.
         /// </summary>
         /// <param name="projectId">Project id.</param>
         /// <param name="showNotActiveUsers">Do you want to show inactive users?</param>
         /// <returns>All users from project..</returns>
         IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActiveUsers);
+        List<DbProject> FindProjects(FindDbProjectsFilter dbFilter, int skipCount, int takeCount, out int totalCount);
     }
 }
