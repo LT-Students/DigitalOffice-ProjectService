@@ -6,4 +6,9 @@
     <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="RequestsModels\" />
+    <Folder Include="ResponsesModels\" />
+  </ItemGroup>
+
 </Project>

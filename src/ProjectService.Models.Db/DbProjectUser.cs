@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
+using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Models.Db
 {
@@ -17,6 +18,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public bool IsActive { get; set; }
 
         public DbProject Project { get; set; }
+        public ICollection<DbTask> Tasks { get; set; }
+        public ICollection<DbTaskProperty> TaskProperties { get; set; }
     }
 
     public class DbProjectUserConfiguration : IEntityTypeConfiguration<DbProjectUser>
