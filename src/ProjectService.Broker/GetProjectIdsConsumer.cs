@@ -18,11 +18,6 @@ namespace LT.DigitalOffice.ProjectService.Broker
         {
             var dbProjectUsers = _repository.Find(userId);
 
-            if (dbProjectUsers == null)
-            {
-                throw new NotFoundException($"User with id: {userId} was not found.");
-            }
-
             var projectIds = dbProjectUsers.Select(x => x.ProjectId).ToList();
 
             return IProjectsResponse.CreateObj(projectIds);

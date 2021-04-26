@@ -100,43 +100,5 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 await _harness.Stop();
             }
         }
-
-        [Test]
-        public async Task ShouldThrowExceptionWhenUserIdWasNotFound()
-        {
-            List<DbProjectUser> dbProjectUsers = null;
-
-            _repository
-                .Setup(x => x.Find(_userId))
-                .Returns(dbProjectUsers);
-
-            await _harness.Start();
-
-            try
-            {
-                var requestClient = await _harness.ConnectRequestClient<IGetUserProjectsRequest>();
-
-                var response = await requestClient.GetResponse<IOperationResult<IProjectsResponse>>(
-                    IGetUserProjectsRequest.CreateObj(_userId), default, default);
-
-                var expectedResult = new
-                {
-                    IsSuccess = false,
-                    Errors = new List<string> { $"User with id: {_userId} was not found." },
-                    Body = null as object
-                };
-
-                Assert.False(response.Message.IsSuccess);
-                Assert.AreEqual(expectedResult.Errors, response.Message.Errors);
-                SerializerAssert.AreEqual(expectedResult, response.Message);
-                Assert.True(_consumerTestHarness.Consumed.Select<IGetUserProjectsRequest>().Any());
-                Assert.True(_harness.Sent.Select<IOperationResult<IProjectsResponse>>().Any());
-                _repository.Verify(x => x.Find(_userId), Times.Once);
-            }
-            finally
-            {
-                await _harness.Stop();
-            }
-        }
     }
 }

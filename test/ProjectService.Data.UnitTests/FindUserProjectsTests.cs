@@ -1,0 +1,103 @@
+﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Data.Provider;
+using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.UnitTestKernel;
+using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LT.DigitalOffice.ProjectService.Data.UnitTests
+{
+    class FIndUserProjectsTests
+    {
+        private IDataProvider _provider;
+        private IUserRepository _userRepository;
+
+        private List<DbProjectUser> _newProjectUsers;
+        private DbContextOptions<ProjectServiceDbContext> _dbOptionsProjectService;
+
+        private Guid _userId;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            _userId = Guid.NewGuid();
+
+            _dbOptionsProjectService = new DbContextOptionsBuilder<ProjectServiceDbContext>()
+                .UseInMemoryDatabase("ProjectServiceTest")
+                .Options;
+
+            _provider = new ProjectServiceDbContext(_dbOptionsProjectService);
+
+            _userRepository = new UserRepository(_provider);
+
+            var projects = new List<DbProject>
+            {
+                new DbProject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Digital Office",
+                    ShortName = "DO",
+                    CreatedAt = DateTime.UtcNow,
+                    AuthorId = Guid.NewGuid(),
+                    Status = 1
+                },
+                new DbProject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Digital Office",
+                    ShortName = "DO",
+                    CreatedAt = DateTime.UtcNow,
+                    AuthorId = Guid.NewGuid(),
+                    Status = 1
+                }
+            };
+
+            _newProjectUsers = new List<DbProjectUser>
+            {
+                new DbProjectUser
+                {
+                    Id = Guid.NewGuid(),
+                    ProjectId = projects[0].Id,
+                    UserId = _userId,
+                    AddedOn = DateTime.Now,
+                    IsActive = true
+                },
+                new DbProjectUser
+                {
+                    Id = Guid.NewGuid(),
+                    ProjectId = projects[1].Id,
+                    UserId = _userId,
+                    AddedOn = DateTime.Now,
+                    IsActive = true
+                }
+            };
+
+            _provider.Projects.AddRange(projects);
+            _provider.ProjectsUsers.AddRange(_newProjectUsers);
+            _provider.Save();
+        }
+
+        [Test]
+        public void ShouldArgumentNullExceptionWhenListDbProjectUserIsNull()
+        {
+            var result = _userRepository.Find(_userId).Select(x => { x.Project = null; return x; });
+
+            SerializerAssert.AreEqual(_newProjectUsers, result);
+        }
+
+        [TearDown]
+        public void CleanMemoryDb()
+        {
+            if (_provider.IsInMemory())
+            {
+                _provider.EnsureDeleted();
+            }
+        }
+    }
+}
