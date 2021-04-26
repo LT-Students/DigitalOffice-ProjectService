@@ -57,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             if (projectToEdit == null)
             {
-                throw new NullReferenceException("Project with this Id does not exist");
+                throw new NullReferenceException($"Project with {projectId} Id does not exist");
             }
 
             request.ApplyTo(projectToEdit);

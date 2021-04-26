@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             _dbProjectAfter = new DbProject
             {
                 Id = _dbProjectBefore.Id,
-                DepartmentId = _dbProjectBefore.DepartmentId,
+                DepartmentId = Guid.NewGuid(),
                 AuthorId = _dbProjectBefore.AuthorId,
                 Status = (int)ProjectStatusType.Closed,
                 Name = "Name1",
@@ -89,7 +89,13 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                     "replace",
                     $"/{nameof(DbProject.Status)}",
                     "",
-                    _dbProjectAfter.Status)
+                    _dbProjectAfter.Status),
+
+                new Operation<DbProject>(
+                    "replace",
+                    $"/{nameof(DbProject.DepartmentId)}",
+                    "",
+                    _dbProjectAfter.DepartmentId)
 
             }, new CamelCasePropertyNamesContractResolver());
             #endregion

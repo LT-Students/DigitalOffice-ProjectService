@@ -59,10 +59,31 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         }
 
         [Test]
-        public void SusseccCommandExecute()
+        public void SuccessCommandExecuteWhenAdminandHasRights()
         {
             SerializerAssert.AreEqual(true, _command.Execute(It.IsAny<Guid>(), _request));
         }
+
+        [Test]
+        public void SuccessCommandExecuteWhenNotAdmin()
+        {
+            _mocker
+                .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+                .Returns(false);
+
+            SerializerAssert.AreEqual(true, _command.Execute(It.IsAny<Guid>(), _request));
+        }
+
+        [Test]
+        public void SuccessCommandExecuteWhenNotRights()
+        {
+            _mocker
+                .Setup<IAccessValidator, bool>(x => x.HasRights(It.IsAny<int>()))
+                .Returns(false);
+
+            SerializerAssert.AreEqual(true, _command.Execute(It.IsAny<Guid>(), _request));
+        }
+
 
         [Test]
         public void ValidationExceptionWhenInvalidRequest()
@@ -72,26 +93,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(false);
 
             Assert.Throws<ValidationException>(() => _command.Execute(It.IsAny<Guid>(), _request));
-        }
-
-        [Test]
-        public void ForbiddenExceptionWhenUserIsNotAdmin()
-        {
-            _mocker
-                .Setup<IAccessValidator, bool>(x => x.IsAdmin())
-                .Returns(false);
-
-            Assert.Throws<ForbiddenException>(() => _command.Execute(It.IsAny<Guid>(), _request));
-        }
-
-        [Test]
-        public void ForbiddenExceptionWhenUserHasNoRights()
-        {
-            _mocker
-                .Setup<IAccessValidator, bool>(x => x.HasRights(It.IsAny<int>()))
-                .Returns(false);
-
-            Assert.Throws<ForbiddenException>(() => _command.Execute(It.IsAny<Guid>(), _request));
         }
 
         [Test]

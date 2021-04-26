@@ -13,13 +13,23 @@ namespace LT.DigitalOffice.ProjectService.Validation
 {
     public class EditProjectValidator : AbstractValidator<JsonPatchDocument<EditProjectRequest>>, IEditProjectValidator
     {
-        public static List<string> Paths => new List<string> { Name, ShortName, Description, ShortDescription, Status };
+        public static List<string> Paths =>
+            new List<string>
+            {
+                Name,
+                ShortName,
+                Description,
+                ShortDescription,
+                Status,
+                DepartmentId
+            };
 
         public static string Name => $"/{nameof(EditProjectRequest.Name)}";
         public static string ShortName => $"/{nameof(EditProjectRequest.ShortName)}";
         public static string Description => $"/{nameof(EditProjectRequest.Description)}";
         public static string ShortDescription => $"/{nameof(EditProjectRequest.ShortDescription)}";
         public static string Status => $"/{nameof(EditProjectRequest.Status)}";
+        public static string DepartmentId => $"/{nameof(EditProjectRequest.DepartmentId)}";
         Func<JsonPatchDocument<EditProjectRequest>, string, Operation> GetOperationByPath =>
             (x, path) =>
                 x.Operations.FirstOrDefault(x =>
@@ -79,6 +89,15 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
                         RuleFor(x => (ProjectStatusType)GetOperationByPath(x, Status).value)
                             .IsInEnum().WithMessage("Wrong status value.");
+                    });
+
+                    When(x => GetOperationByPath(x, DepartmentId) != null, () =>
+                    {
+                        RuleFor(x => x.Operations).UniqueOperationWithAllowedOp(DepartmentId, "replace");
+
+                        RuleFor(x => GetOperationByPath(x, DepartmentId).value)
+                            .Must(x => Guid.TryParse(x.ToString(), out Guid _))
+                            .WithMessage("Wrong department id value.");
                     });
                 });
         }

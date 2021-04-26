@@ -61,7 +61,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     "replace",
                     $"/{nameof(EditProjectRequest.Status)}",
                     "",
-                    ProjectStatusType.Active)
+                    ProjectStatusType.Active),
+
+                new Operation<EditProjectRequest>(
+                    "replace",
+                    $"/{nameof(EditProjectRequest.DepartmentId)}",
+                    "",
+                    Guid.NewGuid())
 
             }, new CamelCasePropertyNamesContractResolver());
         }
@@ -128,6 +134,14 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void ExceptionWhenStatusIsTooLong()
         {
             GetOperationByPath(EditProjectValidator.Status).value = 10;
+
+            _validator.TestValidate(_request).ShouldHaveAnyValidationError();
+        }
+
+        [Test]
+        public void ExceptionWhenDepartmentIdIsInvalid()
+        {
+            GetOperationByPath(EditProjectValidator.DepartmentId).value = "not guid";
 
             _validator.TestValidate(_request).ShouldHaveAnyValidationError();
         }
