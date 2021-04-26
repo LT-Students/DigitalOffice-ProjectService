@@ -87,8 +87,9 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         public void ShouldArgumentNullExceptionWhenListDbProjectUserIsNull()
         {
             var result = _userRepository.Find(_userId).Select(x => { x.Project = null; return x; });
+            var expected = _newProjectUsers.Select(x => { x.Project = null; return x; });
 
-            SerializerAssert.AreEqual(_newProjectUsers, result);
+            SerializerAssert.AreEqual(expected, result);
         }
 
         [TearDown]
