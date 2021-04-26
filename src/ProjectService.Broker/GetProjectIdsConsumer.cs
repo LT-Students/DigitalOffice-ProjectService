@@ -1,14 +1,12 @@
 ﻿using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Broker.Requests;
 using MassTransit;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
 
 namespace LT.DigitalOffice.ProjectService.Broker
 {
@@ -18,14 +16,14 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
         private object GetProjectIds(Guid userId)
         {
-            var dbUsers = _repository.Get(userId);
+            var dbProjectUsers = _repository.Find(userId);
 
-            if (dbUsers == null)
+            if (dbProjectUsers == null)
             {
                 throw new NotFoundException($"User with id: {userId} was not found.");
             }
 
-            var projectIds = dbUsers.Select(x => x.ProjectId).ToList();
+            var projectIds = dbProjectUsers.Select(x => x.ProjectId).ToList();
 
             return IProjectsResponse.CreateObj(projectIds);
         }

@@ -13,7 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
     {
         private readonly IProjectRepository _repository;
 
-        private object GetProjectIds(Guid projectId)
+        private object GetProjectInfo(Guid projectId)
         {
             var dbProject = _repository.GetProject(projectId);
 
@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
         public async Task Consume(ConsumeContext<IGetProjectRequest> context)
         {
-            var response = OperationResultWrapper.CreateResponse(GetProjectIds, context.Message.Id);
+            var response = OperationResultWrapper.CreateResponse(GetProjectInfo, context.Message.Id);
 
             await context.RespondAsync<IOperationResult<IProjectResponse>>(response);
         }
