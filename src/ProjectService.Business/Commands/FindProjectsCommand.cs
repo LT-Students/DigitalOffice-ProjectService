@@ -58,7 +58,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             return departmentNames;
         }
 
-        private IDictionary<Guid, string> GetDepartmentName(List<DbProject> dbProjects, List<string> errors)
+        private IDictionary<Guid, string> GetDepartmentsNames(List<DbProject> dbProjects, List<string> errors)
         {
             IDictionary<Guid, string> departmentNames = new Dictionary<Guid, string>();
 
@@ -125,7 +125,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             List<DbProject> dbProject = _repository.FindProjects(dbFilter, skipCount, takeCount, out int totalCount);
 
-            var departmentsNames = pairs ?? GetDepartmentName(dbProject, errors);
+            var departmentsNames = pairs ?? GetDepartmentsNames(dbProject, errors);
 
             var response = _responseMapper.Map(dbProject, totalCount, departmentsNames, errors);
 
