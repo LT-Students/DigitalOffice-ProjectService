@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 ShortName = "DO",
                 DepartmentId = Guid.NewGuid(),
                 Description = "New project for Lanit-Tercom",
-                Status = (int)ProjectStatusType.Active
+                Status = (int)ProjectStatusType.Suspend
             };
         }
 
@@ -50,8 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
         {
             _repository
                 .Setup(x => x.GetProject(_projectId))
-                .Returns(_dbProject)
-                .Verifiable();
+                .Returns(_dbProject);
 
             await _harness.Start();
 

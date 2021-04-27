@@ -73,7 +73,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = projects[1].Id,
                     UserId = _userId,
-                    AddedOn = DateTime.Now,
+                    AddedOn = DateTime.UtcNow,
                     IsActive = true
                 }
             };
@@ -84,7 +84,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }
 
         [Test]
-        public void ShouldArgumentNullExceptionWhenListDbProjectUserIsNull()
+        public void ShouldReturnsDbProjectUsersWhenListDbProjectUserIsNull()
         {
             var result = _userRepository.Find(_userId).Select(x => { x.Project = null; return x; });
             var expected = _newProjectUsers.Select(x => { x.Project = null; return x; });

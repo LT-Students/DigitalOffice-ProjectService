@@ -8,13 +8,13 @@ namespace LT.DigitalOffice.Broker.Responses
         string Name { get; }
         int ProjectStatus { get; set; }
 
-        static object CreateObj(Guid id, string name, int projectService)
+        static object CreateObj(Guid id, string name, int projectStatus)
         {
             return new
             {
                 Id = id,
                 Name = name,
-                ProjectService  = projectService
+                ProjectStatus = projectStatus
             };
         }
     }
