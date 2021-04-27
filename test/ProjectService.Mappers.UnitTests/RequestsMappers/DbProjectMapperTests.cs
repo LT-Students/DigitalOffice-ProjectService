@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
-                Status = ProjectStatusType.Abandoned,
+                Status = ProjectStatusType.Active,
                 Users = new List<ProjectUserRequest>
                 {
                     new ProjectUserRequest
