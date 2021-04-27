@@ -19,11 +19,15 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public string ShortDescription { get; set; }
         public DateTime CreatedAt { get; set; }
 
+        public ICollection<DbTask> Tasks { get; set; }
         public ICollection<DbProjectUser> Users { get; set; }
         public ICollection<DbProjectFile> Files { get; set; }
+        public ICollection<DbTaskProperty> TaskProperties { get; set; }
 
         public DbProject()
         {
+            Tasks = new HashSet<DbTask>();
+
             Users = new HashSet<DbProjectUser>();
 
             Files = new HashSet<DbProjectFile>();
