@@ -49,7 +49,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         
         public OperationResultResponse<bool> Execute(Guid taskId, JsonPatchDocument<EditTaskRequest> patch)
         {
-            if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects))) //TODO from kernel AddEditRemoveTasks who can edit?
+            if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects))) //TODO add from kernel AddEditRemoveTasks
             {
                 throw new ForbiddenException("Not enough rights.");
             }
