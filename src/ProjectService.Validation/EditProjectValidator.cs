@@ -71,12 +71,12 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
                     When(x => GetOperationByPath(x, Description) != null, () =>
                     {
-                        RuleFor(x => x.Operations).UniqueOperationWithAllowedOp(Description, "replace", "remove");
+                        RuleFor(x => x.Operations).UniqueOperationWithAllowedOp(Description, "replace");
                     });
 
                     When(x => GetOperationByPath(x, ShortDescription) != null, () =>
                     {
-                        RuleFor(x => x.Operations).UniqueOperationWithAllowedOp(ShortDescription, "replace", "remove");
+                        RuleFor(x => x.Operations).UniqueOperationWithAllowedOp(ShortDescription, "replace");
 
                         RuleFor(x => (string)GetOperationByPath(x, ShortDescription).value)
                             .MaximumLength(300).WithMessage("Short description is to long");

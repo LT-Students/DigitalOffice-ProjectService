@@ -75,13 +75,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public bool EditProject(Guid projectId, JsonPatchDocument<DbProject> request)
         {
-            var projectToEdit = provider.Projects
-                .FirstOrDefault(p => p.Id == projectId);
-
-            if (projectToEdit == null)
-            {
-                throw new NullReferenceException($"Project with {projectId} Id does not exist");
-            }
+            var projectToEdit = GetProject(projectId);
 
             request.ApplyTo(projectToEdit);
             provider.Save();
