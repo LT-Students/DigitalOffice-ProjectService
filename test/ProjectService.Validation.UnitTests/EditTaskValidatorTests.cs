@@ -17,10 +17,10 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
     {
         private IValidator<JsonPatchDocument<EditTaskRequest>> _validator;
         private JsonPatchDocument<EditTaskRequest> _editTaskRequest;
-        
+
         private Mock<ITaskPropertyRepository> _taskPropertyRepository;
         private Mock<IUserRepository> _userRepository;
-        
+
         Func<string, Operation> GetOperationByPath =>
             (path) => _editTaskRequest.Operations.Find(x => x.path == path);
 
@@ -28,7 +28,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void OneTimeSetUp()
         {
             _taskPropertyRepository = new Mock<ITaskPropertyRepository>();
-            
+
             _taskPropertyRepository
                 .Setup(x => x.AreExist(It.IsAny<Guid[]>()))
                 .Returns(true);
@@ -38,10 +38,10 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             _userRepository
                 .Setup(x => x.AreExist(It.IsAny<Guid[]>()))
                 .Returns(true);
-            
+
             _validator = new EditTaskValidator(_taskPropertyRepository.Object, _userRepository.Object);
         }
-        
+
         [SetUp]
         public void SetUp()
         {
@@ -57,31 +57,31 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     $"/{nameof(EditTaskRequest.Description)}",
                     "",
                     "New Description"),
-                
+
                 new Operation<EditTaskRequest>(
                     "replace",
                     $"/{nameof(EditTaskRequest.AssignedTo)}",
                     "",
                     Guid.NewGuid()),
-                
+
                 new Operation<EditTaskRequest>(
                     "replace",
                     $"/{nameof(EditTaskRequest.PriorityId)}",
                     "",
                     Guid.NewGuid()),
-                
+
                 new Operation<EditTaskRequest>(
                     "replace",
                     $"/{nameof(EditTaskRequest.StatusId)}",
                     "",
                     Guid.NewGuid()),
-                
+
                 new Operation<EditTaskRequest>(
                     "replace",
                     $"/{nameof(EditTaskRequest.TypeId)}",
                     "",
                     Guid.NewGuid()),
-                
+
                 new Operation<EditTaskRequest>(
                     "replace",
                     $"/{nameof(EditTaskRequest.PlannedMinutes)}",
@@ -97,12 +97,12 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         #region Base validate exceptions
-        
+
         [Test]
         public void ExceptionWhenThereAreNotOperations()
         {
             _editTaskRequest.Operations.Clear();
-            
+
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
 
@@ -122,60 +122,60 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 $"/{nameof(EditTaskRequest.Name)}",
                 "",
                 "Name"));
-            
+
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
-        
+
         #endregion
 
         [Test]
         public void ExceptionWhenNameTooLong()
         {
             GetOperationByPath(EditTaskValidator.Name).value = "".PadLeft(151);
-            
+
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
 
         #region Validate values types
-        
+
         [Test]
         public void ExceptionWhenAssignedToIsNotId()
-        { 
+        {
             GetOperationByPath(EditTaskValidator.AssignedTo).value = 123;
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
-        
+
         [Test]
         public void ExceptionWhenPriorityIdIsNotId()
-        { 
+        {
             GetOperationByPath(EditTaskValidator.PriorityId).value = 123;
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
 
         [Test]
         public void ExceptionWhenStatusIdIsNotId()
-        { 
+        {
             GetOperationByPath(EditTaskValidator.StatusId).value = 123;
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
 
         [Test]
         public void ExceptionWhenTypeIdIsNotId()
-        { 
+        {
             GetOperationByPath(EditTaskValidator.TypeId).value = 123;
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
 
         #endregion
-        
+
         #region Validate null and empty
-        
+
         [Test]
         public void ExceptionWhenNameIsNullOrEmpty()
         {
             GetOperationByPath(EditTaskValidator.Name).value = "";
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
-            
+
             GetOperationByPath(EditTaskValidator.Name).value = null;
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
@@ -186,14 +186,14 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             GetOperationByPath(EditTaskValidator.Description).value = null;
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
-        
+
         [Test]
         public void ExceptionWhenAssignedToIsEmpty()
         {
             GetOperationByPath(EditTaskValidator.AssignedTo).value = null;
             _validator.TestValidate(_editTaskRequest).ShouldHaveAnyValidationError();
         }
-        
+
         [Test]
         public void ExceptionWhenPriorityIdIsNull()
         {
@@ -216,7 +216,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         #endregion
-        
+
         [Test]
         public void ExceptionWhenPlannedMinutesIsBelowZero()
         {

@@ -20,10 +20,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         {
             builder
                 .ToTable(DbTaskProperty.TableName);
-            
+
             builder
                 .HasKey(t => t.Id);
-            
+
             builder
                 .Property(t => t.Name)
                 .HasMaxLength(150)

@@ -1,4 +1,3 @@
-using System;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -31,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 if (operation != null)
                 {
                     result.Operations.Add(new Operation<DbTask>(operation, item.path, item.from, item.value));
-                } 
+                }
             }
 
             return result;

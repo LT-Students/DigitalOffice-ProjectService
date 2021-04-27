@@ -22,8 +22,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
                 Assembly.Load("LT.DigitalOffice.ProjectService.Models.Db"));
         }
 
-        public ProjectServiceDbContext (DbContextOptions<ProjectServiceDbContext> options)
-            :base(options)
+        public ProjectServiceDbContext(DbContextOptions<ProjectServiceDbContext> options)
+            : base(options)
         {
         }
 
