@@ -8,13 +8,13 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
     [DbContext(typeof(ProjectServiceDbContext))]
     [Migration("20210424205311_AddDbTasksTable")]
     public class _20210424205311_AddDbTasksTable : Migration
-    { //TODO Add defaults
+    {
         private void CreateTableTasks(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
                 name: DbTask.TableName,
                 columns: table => new
-                { //TODO do defaults
+                {
                     Name = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true),
                     ProjectId = table.Column<Guid>(nullable: false),
