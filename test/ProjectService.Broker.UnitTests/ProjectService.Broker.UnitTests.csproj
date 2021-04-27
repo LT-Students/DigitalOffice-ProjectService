@@ -3,10 +3,6 @@
   <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
 
   <ItemGroup>
-    <PackageReference Include="MassTransit" Version="7.1.8" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\src\ProjectService.Broker\ProjectService.Broker.csproj" />
     <ProjectReference Include="..\..\src\ProjectService.Data\ProjectService.Data.csproj" />
   </ItemGroup>

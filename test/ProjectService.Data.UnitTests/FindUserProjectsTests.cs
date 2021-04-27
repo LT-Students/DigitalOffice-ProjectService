@@ -18,8 +18,8 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private IDataProvider _provider;
         private IUserRepository _userRepository;
 
+        private List<DbProject> _projects;
         private List<DbProjectUser> _newProjectUsers;
-        private DbContextOptions<ProjectServiceDbContext> _dbOptionsProjectService;
 
         private Guid _userId;
 
@@ -28,15 +28,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         {
             _userId = Guid.NewGuid();
 
-            _dbOptionsProjectService = new DbContextOptionsBuilder<ProjectServiceDbContext>()
-                .UseInMemoryDatabase("ProjectServiceTest")
-                .Options;
-
-            _provider = new ProjectServiceDbContext(_dbOptionsProjectService);
-
-            _userRepository = new UserRepository(_provider);
-
-            var projects = new List<DbProject>
+            _projects = new List<DbProject>
             {
                 new DbProject
                 {
@@ -63,7 +55,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 new DbProjectUser
                 {
                     Id = Guid.NewGuid(),
-                    ProjectId = projects[0].Id,
+                    ProjectId = _projects[0].Id,
                     UserId = _userId,
                     AddedOn = DateTime.Now,
                     IsActive = true
@@ -71,14 +63,26 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 new DbProjectUser
                 {
                     Id = Guid.NewGuid(),
-                    ProjectId = projects[1].Id,
+                    ProjectId = _projects[1].Id,
                     UserId = _userId,
                     AddedOn = DateTime.UtcNow,
                     IsActive = true
                 }
             };
+        }
 
-            _provider.Projects.AddRange(projects);
+        [SetUp]
+        public void SetUp()
+        {
+            var dbOptionsProjectService = new DbContextOptionsBuilder<ProjectServiceDbContext>()
+                .UseInMemoryDatabase("ProjectServiceTest")
+                .Options;
+
+            _provider = new ProjectServiceDbContext(dbOptionsProjectService);
+
+            _userRepository = new UserRepository(_provider);
+
+            _provider.Projects.AddRange(_projects);
             _provider.ProjectsUsers.AddRange(_newProjectUsers);
             _provider.Save();
         }
