@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
-    internal class EditProjectRequestValidatorTests
+    internal class EditProjectValidatorTests
     {
         private IValidator<JsonPatchDocument<EditProjectRequest>> _validator;
         private JsonPatchDocument<EditProjectRequest> _request;
