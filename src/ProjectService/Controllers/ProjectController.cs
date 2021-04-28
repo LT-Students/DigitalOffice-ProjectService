@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
@@ -23,10 +24,9 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         [HttpGet("getProjectById")]
         public ProjectExpandedResponse GetProjectById(
             [FromServices] IGetProjectByIdCommand command,
-            [FromQuery] Guid projectId,
-            [FromQuery] bool showNotActiveUsers = false)
+            [FromQuery] GetProjectFilter filter)
         {
-            return command.Execute(projectId, showNotActiveUsers).Result;
+            return command.Execute(filter).Result;
         }
 
         [HttpPost("create")]

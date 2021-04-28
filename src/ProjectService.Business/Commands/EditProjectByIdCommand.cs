@@ -1,9 +1,11 @@
 ﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using System;
 
@@ -29,18 +31,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             validator.ValidateAndThrowCustom(request);
 
-            const int rightId = 2;
-
-            if (!(accessValidator.IsAdmin() || accessValidator.HasRights(rightId)))
+            if (!(accessValidator.IsAdmin() || accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
 
-            var dbProject = repository.GetProject(request.ProjectId);
-            if (dbProject == null)
+            var projectFilter = new GetProjectFilter
             {
-                throw new NotFoundException($"Project with id {request.ProjectId} is not found.");
-            }
+                ProjectId = request.ProjectId
+            };
+
+            var dbProject = repository.GetProject(projectFilter);
 
             request.Patch.ApplyTo(dbProject);
 

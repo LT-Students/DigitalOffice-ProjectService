@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using System;
 using System.Threading.Tasks;
@@ -17,6 +18,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
         /// </summary>
         /// <param name="projectId">Specified id of project.</param>
         /// <returns>Project expanded information.</returns>
-        Task<ProjectExpandedResponse> Execute(Guid projectId, bool showNotActiveUsers);
+        Task<ProjectExpandedResponse> Execute(GetProjectFilter filter);
     }
 }

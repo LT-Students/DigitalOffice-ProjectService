@@ -1,32 +1,132 @@
-﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+﻿using LT.DigitalOffice.Broker.Requests;
+using LT.DigitalOffice.Broker.Responses;
+using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
+using MassTransit;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
     public class GetProjectByIdCommand : IGetProjectByIdCommand
     {
+        private readonly ILogger<GetProjectByIdCommand> _logger;
         private readonly IProjectRepository _repository;
-        private readonly IProjectExpandedResponseMapper _mapper;
+        private readonly IProjectExpandedResponseMapper _projectExpandedResponseMapper;
+        private readonly IProjectUserInfoMapper _projectUserInfoMapper;
+        private readonly IProjectFileInfoMapper _projectFileInfoMapper;
+        private readonly IRequestClient<IGetDepartmentRequest> _departmentRequestClient;
+        private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
 
-        public GetProjectByIdCommand(
-            IProjectRepository repository,
-            IProjectExpandedResponseMapper mapper)
+        private async Task<DepartmentInfo> GetDepartmentAsync(Guid departmentId)
         {
-            _repository = repository;
-            _mapper = mapper;
+            DepartmentInfo department = null;
+
+            try
+            {
+                var departmentResponse = await _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
+                    IGetDepartmentRequest.CreateObj(departmentId));
+
+                if (departmentResponse.Message.IsSuccess)
+                {
+                    department = new DepartmentInfo
+                    {
+                        Id = departmentResponse.Message.Body.Id,
+                        Name = departmentResponse.Message.Body.Name
+                    };
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, "Exception on get department request.");
+            }
+
+            return department;
         }
 
-        public async Task<ProjectExpandedResponse> Execute(Guid projectId, bool showNotActiveUsers)
+        private async Task<List<ProjectUserInfo>> GetProjectUsersAsync(IEnumerable<DbProjectUser> projectUsers, bool showNotActiveUsers)
         {
-            var dbProject = _repository.GetProject(projectId);
+            List<ProjectUserInfo> projectUsersInfo = new();
 
-            var dbProjectUsers = _repository.GetProjectUsers(projectId, showNotActiveUsers);
+            try
+            {
+                List<Guid> userIds;
 
-            return await _mapper.Map(dbProject, dbProjectUsers);
+                if (showNotActiveUsers == true)
+                {
+                    userIds = projectUsers.Select(x => x.Id).Distinct().ToList();
+                }
+                else
+                {
+                    userIds = projectUsers.Where(x => x.IsActive == true).Select(x => x.Id).Distinct().ToList();
+                }
+
+                var usersDataResponse = await _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
+                    IGetUsersDataRequest.CreateObj(userIds));
+
+                if (usersDataResponse.Message.IsSuccess)
+                {
+                    var usersData = usersDataResponse.Message.Body.UsersData;
+
+                    projectUsersInfo = projectUsers
+                        .Select(pu => _projectUserInfoMapper.Map(usersData.First(x => x.Id == pu.Id), pu))
+                        .ToList();
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        $"Can not get users. Reason:{Environment.NewLine}{string.Join('\n', usersDataResponse.Message.Errors)}.");
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, "Exception on get user information.");
+            }
+
+            return projectUsersInfo;
+        }
+
+        public GetProjectByIdCommand(
+            ILogger<GetProjectByIdCommand> logger,
+            IProjectRepository repository,
+            IProjectExpandedResponseMapper mapper,
+            IProjectUserInfoMapper projectUserInfoMapper,
+            IProjectFileInfoMapper projectFileInfoMapper,
+            IRequestClient<IGetDepartmentRequest> departmentRequestClient,
+            IRequestClient<IGetUsersDataRequest> usersDataRequestClient)
+        {
+            _logger = logger;
+            _repository = repository;
+            _projectExpandedResponseMapper = mapper;
+            _projectUserInfoMapper = projectUserInfoMapper;
+            _projectFileInfoMapper = projectFileInfoMapper;
+            _departmentRequestClient = departmentRequestClient;
+            _usersDataRequestClient = usersDataRequestClient;
+        }
+
+        public async Task<ProjectExpandedResponse> Execute(GetProjectFilter filter)
+        {
+            var dbProject = _repository.GetProject(filter);
+
+            var department = GetDepartmentAsync(dbProject.DepartmentId);
+
+            var showNotActiveUsers = filter.ShowNotActiveUsers == true;
+            var usersInfo = GetProjectUsersAsync(dbProject.Users, showNotActiveUsers);
+
+            var filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map);
+
+            return _projectExpandedResponseMapper.Map(dbProject, await usersInfo, filesInfo, await department);
         }
     }
 }

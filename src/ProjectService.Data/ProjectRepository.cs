@@ -3,7 +3,9 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,28 +21,28 @@ namespace LT.DigitalOffice.ProjectService.Data
             this.provider = provider;
         }
 
-        public DbProject GetProject(Guid projectId)
+        public DbProject GetProject(GetProjectFilter filter)
         {
-            var dbProject = provider.Projects.FirstOrDefault(p => p.Id == projectId);
+            IQueryable<DbProject> dbProjectQueryable = provider.Projects.AsQueryable();
+
+            if (filter.IncludeUsers.HasValue && filter.IncludeUsers.Value)
+            {
+                dbProjectQueryable = dbProjectQueryable.Include(x => x.Users);
+            }
+
+            if (filter.IncludeFiles.HasValue && filter.IncludeFiles.Value)
+            {
+                dbProjectQueryable = dbProjectQueryable.Include(x => x.Files);
+            }
+
+            var dbProject = dbProjectQueryable.FirstOrDefault(x => x.Id == filter.ProjectId);
 
             if (dbProject == null)
             {
-                throw new NotFoundException($"Project with id: '{projectId}' was not found.");
+                throw new NotFoundException($"Project with id: '{filter.ProjectId}' was not found.");
             }
 
             return dbProject;
-        }
-
-        public IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActive)
-        {
-            var predicate = PredicateBuilder.New<DbProjectUser>(u => u.ProjectId == projectId && u.IsActive);
-
-            if (showNotActive)
-            {
-                predicate.Or(u => !u.IsActive);
-            }
-
-            return provider.ProjectsUsers.Include(u => u.Role).Where(predicate).ToList();
         }
 
         public void CreateNewProject(DbProject newProject)

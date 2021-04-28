@@ -1,5 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using System;
 using System.Collections.Generic;
 
@@ -15,9 +16,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <summary>
         /// Returns the project with the specified id from database.
         /// </summary>
-        /// <param name="projectId">Specified id of project.</param>
+        /// <param name="filter">Filter info.</param>
         /// <returns>Project with specified id.</returns>
-        DbProject GetProject(Guid projectId);
+        public DbProject GetProject(GetProjectFilter filter);
 
         /// <summary>
         /// Adds new project to the database. Returns the id of the added project.
@@ -45,13 +46,5 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="showNotActive">Do you want to show inactive projects?</param>
         /// <returns>All projects.</returns>
         IEnumerable<DbProject> GetProjects(bool showNotActive);
-
-        /// <summary>
-        /// Returns all users from project with specified id.
-        /// </summary>
-        /// <param name="projectId">Project id.</param>
-        /// <param name="showNotActiveUsers">Do you want to show inactive users?</param>
-        /// <returns>All users from project..</returns>
-        IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActiveUsers);
     }
 }

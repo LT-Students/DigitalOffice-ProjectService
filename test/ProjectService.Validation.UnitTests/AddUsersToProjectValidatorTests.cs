@@ -4,7 +4,6 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.User;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Moq;
@@ -19,7 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
     {
         private IAddUsersToProjectValidator validator;
 
-        private Mock<IProjectRepository> _repository;
+        private Mock<IUserRepository> _repository;
 
         private AddUsersToProjectRequest _request;
         private IEnumerable<DbProjectUser> _dbProjectUsers;
@@ -27,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [SetUp]
         public void SetUp()
         {
-            _repository = new Mock<IProjectRepository>();
+            _repository = new Mock<IUserRepository>();
             validator = new AddUsersToProjectValidator(_repository.Object);
 
             var projectId = Guid.NewGuid();

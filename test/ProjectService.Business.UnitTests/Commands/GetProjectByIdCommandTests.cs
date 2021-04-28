@@ -1,160 +1,370 @@
+using LT.DigitalOffice.Broker.Models;
+using LT.DigitalOffice.Broker.Requests;
+using LT.DigitalOffice.Broker.Responses;
+using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
+using LT.DigitalOffice.UnitTestKernel;
+using MassTransit;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 {
     internal class GetProjectByIdCommandTests
     {
-        private IGetProjectByIdCommand command;
-        private Mock<IProjectRepository> repositoryMock;
-        private Mock<IProjectExpandedResponseMapper> mapperMock;
+        private IGetProjectByIdCommand _command;
+        private Mock<ILogger<GetProjectByIdCommand>> _loggerMock;
+        private Mock<IProjectRepository> _repositoryMock;
+        private Mock<IProjectExpandedResponseMapper> _projectExpandedResponseMapperMock;
+        private Mock<IProjectUserInfoMapper> _projectUserInfoMapperMock;
+        private Mock<IProjectFileInfoMapper> _projectFileInfoMapperMock;
+        
+        private Mock<IRequestClient<IGetDepartmentRequest>> _rcDepartmentMock;
+        private Mock<IGetDepartmentResponse> _departmentResponseMock;
+        private Mock<IOperationResult<IGetDepartmentResponse>> _departmentOperationResultMock;
+        private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _departmentBrokerResponseMock;
 
-        private const string NAME = "Project";
+        private Mock<IRequestClient<IGetUsersDataRequest>> _rcUsersDataMock;
+        private Mock<IGetUsersDataResponse> _usersResponseMock;
+        private Mock<IOperationResult<IGetUsersDataResponse>> _usersOperationResultMock;
+        private Mock<Response<IOperationResult<IGetUsersDataResponse>>> _usersBrokerResponseMock;
 
-        private const bool SHOW_NOT_ACTIVE_USERS = false;
+        private List<UserData> _usersData;
+        private List<ProjectUserInfo> _projectUsersInfo;
+        private List<ProjectFileInfo> _projectFilesInfo;
+        private DbProjectUser _dbProjectUser;
+        private DbProjectFile _dbProjectFile;
+        private DbProject _dbProject;
+        private DepartmentInfo _departmentInfo;
+        private GetProjectFilter _fullFilter;
+        private ProjectInfo _projectInfo;
+        private ProjectExpandedResponse _expectedResponse;
 
-        private IEnumerable<DbProjectUser> dbProjecUsers;
-        private DbProject dbProject;
+        private Guid _projectId;
 
-        private Guid projectId;
+        private static Mock<IRequestClient<TRequest>> SuccessBrokerSetUp<TRequest, TResponse>(Mock<TResponse> responseMock) where TRequest : class where TResponse : class
+        {
+            var operationResultMock = new Mock<IOperationResult<TResponse>>();
+            operationResultMock
+                .Setup(x => x.Body)
+                .Returns(responseMock.Object);
+            operationResultMock
+                .Setup(x => x.IsSuccess)
+                .Returns(true);
+            operationResultMock
+                .Setup(x => x.Errors)
+                .Returns(new List<string>());
+
+            var brokerResponseMock = new Mock<Response<IOperationResult<TResponse>>>();
+            brokerResponseMock
+                .Setup(x => x.Message)
+                .Returns(operationResultMock.Object);
+
+            var rcDepartmentMock = new Mock<IRequestClient<TRequest>>();
+            rcDepartmentMock
+                .Setup(x => x.GetResponse<IOperationResult<TResponse>>(It.IsAny<object>(), default, default).Result)
+                .Returns(brokerResponseMock.Object);
+
+            return rcDepartmentMock;
+        }
+
+        private void DepartmentBrokerSetUp()
+        {
+            var departmentResponseMock = new Mock<IGetDepartmentResponse>();
+            departmentResponseMock
+                .Setup(x => x.Id)
+                .Returns(_departmentInfo.Id);
+            departmentResponseMock
+                .Setup(x => x.Name)
+                .Returns(_departmentInfo.Name);
+
+            _rcDepartmentMock = SuccessBrokerSetUp<IGetDepartmentRequest, IGetDepartmentResponse>(departmentResponseMock);
+        }
+
+        private void UsersBrokerSetUp()
+        {
+            var usersResponseMock = new Mock<IGetUsersDataResponse>();
+            usersResponseMock
+                .Setup(x => x.UsersData)
+                .Returns(_usersData);
+
+            _rcUsersDataMock = SuccessBrokerSetUp<IGetUsersDataRequest, IGetUsersDataResponse>(usersResponseMock);
+        }
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            projectId = Guid.NewGuid();
+            _projectId = Guid.NewGuid();
 
-            dbProject = new DbProject
+            _dbProject = new DbProject
             {
-                Id = projectId,
-                Name = NAME
+                Id = _projectId,
+                Name = "Project",
+                DepartmentId = Guid.NewGuid()
             };
 
-            dbProjecUsers = new List<DbProjectUser>
+            _departmentInfo = new DepartmentInfo
             {
-                new DbProjectUser
-                {
-                    Id = Guid.NewGuid(),
-                    ProjectId = projectId,
-                    Project = dbProject,
-                    UserId = Guid.NewGuid()
-                },
+                Id = _dbProject.DepartmentId,
+                Name = "DepartmentName"
+            };
 
-                new DbProjectUser
+            _projectInfo = new ProjectInfo
+            {
+                Id = _dbProject.Id,
+                Name = _dbProject.Name,
+                Department = _departmentInfo
+            };
+
+            _dbProjectUser = new DbProjectUser
+            {
+                Id = Guid.NewGuid(),
+                ProjectId = _projectId,
+                Project = _dbProject,
+                UserId = Guid.NewGuid(),
+                AddedOn = DateTime.Now,
+                RemovedOn = DateTime.Now,
+                IsActive = true,
+                Role = (int)UserRoleType.ProjectAdmin
+            };
+
+            _dbProject.Users.Add(_dbProjectUser);
+
+            _usersData = new List<UserData>
+            {
+                new UserData
                 {
-                    Id = Guid.NewGuid(),
-                    ProjectId = projectId,
-                    Project = dbProject,
-                    UserId = Guid.NewGuid()
+                    Id = _dbProjectUser.Id,
+                    IsActive = _dbProjectUser.IsActive,
+                    FirstName = "Spartak",
+                    LastName = "Ryabtsev",
+                    MiddleName = "Alexandrovich"
                 }
+            };
+
+            _projectUsersInfo = new List<ProjectUserInfo>
+            {
+                new ProjectUserInfo
+                {
+                    Id = _usersData.First().Id,
+                    Role = (UserRoleType)_dbProjectUser.Role,
+                    FirstName = _usersData.First().FirstName,
+                    LastName = _usersData.First().LastName,
+                    MiddleName = _usersData.First().MiddleName,
+                    AddedOn = _dbProjectUser.AddedOn,
+                    RemovedOn = _dbProjectUser.RemovedOn,
+                    IsActive = _dbProjectUser.IsActive
+                }
+            };
+
+            _dbProjectFile = new DbProjectFile
+            {
+                Id = Guid.NewGuid(),
+                ProjectId = _projectId,
+                Project = _dbProject
+            };
+
+            _dbProject.Files.Add(_dbProjectFile);
+
+            _projectFilesInfo = new List<ProjectFileInfo>
+            {
+                new ProjectFileInfo
+                {
+                    FileId = _dbProjectFile.Id,
+                    ProjectId = _projectId
+                }
+            };
+
+            _fullFilter = new GetProjectFilter
+            {
+                ProjectId = _projectId,
+                IncludeFiles = true,
+                IncludeUsers = true,
+                ShowNotActiveUsers = true
+            };
+
+            _expectedResponse = new ProjectExpandedResponse
+            {
+                Project = _projectInfo,
+                Files = _projectFilesInfo,
+                Users = _projectUsersInfo
             };
         }
 
         [SetUp]
         public void SetUp()
         {
-            repositoryMock = new Mock<IProjectRepository>();
-            mapperMock = new Mock<IProjectExpandedResponseMapper>();
-            command = new GetProjectByIdCommand(repositoryMock.Object, mapperMock.Object);
+            _loggerMock = new Mock<ILogger<GetProjectByIdCommand>>();
+
+            _repositoryMock = new Mock<IProjectRepository>();
+            _repositoryMock
+                .Setup(x => x.GetProject(_fullFilter))
+                .Returns(_dbProject);
+
+            DepartmentBrokerSetUp();
+            UsersBrokerSetUp();
+
+            _projectUserInfoMapperMock = new Mock<IProjectUserInfoMapper>();
+            _projectUserInfoMapperMock
+                .Setup(x => x.Map(_usersData.First(), _dbProjectUser))
+                .Returns(_projectUsersInfo.First());
+
+            _projectFileInfoMapperMock = new Mock<IProjectFileInfoMapper>();
+            _projectFileInfoMapperMock
+                .Setup(x => x.Map(_dbProjectFile))
+                .Returns(_projectFilesInfo.First());
+
+            _projectExpandedResponseMapperMock = new Mock<IProjectExpandedResponseMapper>();
+
+            _command = new GetProjectByIdCommand(
+                _loggerMock.Object,
+                _repositoryMock.Object,
+                _projectExpandedResponseMapperMock.Object,
+                _projectUserInfoMapperMock.Object,
+                _projectFileInfoMapperMock.Object,
+                _rcDepartmentMock.Object,
+                _rcUsersDataMock.Object);
         }
 
         [Test]
-        public void ShouldThrowExceptionWhenGetProjectFromRepository()
+        public void ShouldThrowExceptionWhenGetProjectThrowsIt()
         {
-            repositoryMock
-                .Setup(x => x.GetProject(projectId))
-                .Throws(new Exception())
-                .Verifiable();
+            _repositoryMock
+                .Setup(x => x.GetProject(_fullFilter))
+                .Throws(new Exception());
 
-            Assert.ThrowsAsync<Exception>(() => command.Execute(projectId, SHOW_NOT_ACTIVE_USERS));
-            repositoryMock.Verify();
+            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
         }
 
         [Test]
-        public void ShouldThrowExceptionWhenGetProjectUsersFromRepository()
+        public void ShouldThrowExceptionWhenGetDepartmentClientThrowsIt()
         {
-            repositoryMock
-                .Setup(x => x.GetProject(projectId))
-                .Returns(dbProject)
-                .Verifiable();
+            _rcDepartmentMock
+                .Setup(x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(It.IsAny<object>(), default, default).Result)
+                .Throws(new Exception());
 
-            repositoryMock
-                .Setup(x => x.GetProjectUsers(projectId, SHOW_NOT_ACTIVE_USERS))
-                .Throws(new Exception())
-                .Verifiable();
-
-            Assert.ThrowsAsync<Exception>(() => command.Execute(projectId, SHOW_NOT_ACTIVE_USERS));
-            repositoryMock.Verify();
+            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
         }
 
         [Test]
-        public void ShouldThrowExceptionWhenMapperThrowsIt()
+        public void ShouldThrowExceptionWhenGetUsersClientThrowsIt()
         {
-            repositoryMock
-                .Setup(x => x.GetProject(projectId))
-                .Returns(dbProject)
-                .Verifiable();
+            _repositoryMock
+                .Setup(x => x.GetProject(_fullFilter))
+                .Returns(_dbProject);
 
-            repositoryMock
-                .Setup(x => x.GetProjectUsers(projectId, SHOW_NOT_ACTIVE_USERS))
-                .Returns(dbProjecUsers)
-                .Verifiable();
+            _rcUsersDataMock
+                .Setup(x => x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default).Result)
+                .Throws(new Exception());
 
-            mapperMock
-                .Setup(x => x.Map(dbProject, dbProjecUsers))
-                .Throws(new Exception())
-                .Verifiable();
+            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
+        }
 
-            Assert.ThrowsAsync<Exception>(() => command.Execute(projectId, SHOW_NOT_ACTIVE_USERS));
-            repositoryMock.Verify();
-            mapperMock.Verify();
+        [Test]
+        public void ShouldThrowExceptionWhenProjectUserMapperThrowsIt()
+        {
+            _repositoryMock
+                .Setup(x => x.GetProject(_fullFilter))
+                .Returns(_dbProject);
+
+            _projectUserInfoMapperMock
+                .Setup(x => x.Map(It.IsAny<UserData>(), It.IsAny<DbProjectUser>()))
+                .Throws(new Exception());
+
+            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
+        }
+
+        [Test]
+        public void ShouldThrowExceptionWhenProjectUserFileMapperThrowsIt()
+        {
+            _repositoryMock
+                .Setup(x => x.GetProject(_fullFilter))
+                .Returns(_dbProject);
+
+            _projectFileInfoMapperMock
+                .Setup(x => x.Map(_dbProjectFile))
+                .Throws(new Exception());
+
+            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
+        }
+
+        [Test]
+        public void ShouldThrowExceptionWhenProjectExpandedResponseMapperThrowsIt()
+        {
+            _repositoryMock
+                .Setup(x => x.GetProject(_fullFilter))
+                .Returns(_dbProject);
+
+            _projectExpandedResponseMapperMock
+                .Setup(x => x.Map(_dbProject, _projectUsersInfo, _projectFilesInfo, _departmentInfo))
+                .Throws(new Exception());
+
+            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
         }
 
         [Test]
         public void ShouldReturnProjectInfo()
         {
-            var expectedResult = new ProjectExpandedResponse
+            _repositoryMock
+                .Setup(x => x.GetProject(_fullFilter))
+                .Returns(_dbProject);
+
+            _projectExpandedResponseMapperMock
+                .Setup(x => x.Map(_dbProject, _projectUsersInfo, _projectFilesInfo, _departmentInfo))
+                .Returns(_expectedResponse);
+
+            var result = _command.Execute(_fullFilter).Result;
+
+            SerializerAssert.AreEqual(_expectedResponse, result);
+        }
+
+        [Test]
+        public void ShouldReturnProjectInfoWithoutInActiveUsers()
+        {
+            var filterWithoutNotActiveUsers = new GetProjectFilter
             {
-                Project = new ProjectInfo
-                {
-                    Id = dbProject.Id
-                },
-                Department = new DepartmentInfo
-                {
-                    Id = Guid.NewGuid()
-                }
+                ProjectId = _projectId,
+                IncludeFiles = true,
+                IncludeUsers = true,
+                ShowNotActiveUsers = false
             };
 
-            repositoryMock
-                .Setup(x => x.GetProject(projectId))
-                .Returns(dbProject)
-                .Verifiable();
+            _repositoryMock
+                .Setup(x => x.GetProject(filterWithoutNotActiveUsers))
+                .Returns(_dbProject);
 
-            repositoryMock
-                .Setup(x => x.GetProjectUsers(projectId, SHOW_NOT_ACTIVE_USERS))
-                .Returns(dbProjecUsers)
-                .Verifiable();
 
-            mapperMock
-                .Setup(x => x.Map(dbProject, dbProjecUsers))
-                .Returns(Task.FromResult(expectedResult))
-                .Verifiable();
+            _dbProjectUser = new DbProjectUser
+            {
+                Id = Guid.NewGuid(),
+                ProjectId = _projectId,
+                Project = _dbProject,
+                UserId = Guid.NewGuid(),
+                AddedOn = DateTime.Now,
+                RemovedOn = DateTime.Now,
+                IsActive = false,
+                Role = (int)UserRoleType.ProjectAdmin
+            };
 
-            var result = command.Execute(projectId, SHOW_NOT_ACTIVE_USERS).Result;
+            _dbProject.Users = new List<DbProjectUser> { _dbProjectUser };
 
-            Assert.AreEqual(expectedResult.Project.Id, result.Project.Id);
-            Assert.AreEqual(expectedResult.Project.Name, result.Project.Name);
-            Assert.AreEqual(expectedResult.Department.Id, result.Department.Id);
-            repositoryMock.Verify();
-            mapperMock.Verify();
+            var result = _command.Execute(_fullFilter).Result;
+
+            SerializerAssert.AreEqual(_expectedResponse, result);
         }
     }
 }

@@ -1,65 +1,45 @@
-﻿using LT.DigitalOffice.Broker.Requests;
-using LT.DigitalOffice.Broker.Responses;
-using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
-using MassTransit;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
 {
     public class ProjectExpandedResponseMapper : IProjectExpandedResponseMapper
     {
-        private readonly ILogger<ProjectExpandedResponseMapper> _logger;
-        private readonly IProjectUserMapper _projectUserMapper;
-        private readonly IRequestClient<IGetDepartmentRequest> _departmentRequestClient;
+        private readonly IProjectInfoMapper _projectInfoMapper;
 
-        public ProjectExpandedResponseMapper(
-            ILogger<ProjectExpandedResponseMapper> logger,
-            IProjectUserMapper projectUserMapper,
-            IRequestClient<IGetDepartmentRequest> departmentRequestClient)
+        public ProjectExpandedResponseMapper(IProjectInfoMapper projectInfoMapper)
         {
-            _logger = logger;
-            _projectUserMapper = projectUserMapper;
-            _departmentRequestClient = departmentRequestClient;
+            _projectInfoMapper = projectInfoMapper;
         }
 
-        public async Task<ProjectExpandedResponse> Map(
+        public ProjectExpandedResponse Map(
             DbProject dbProject,
-            IEnumerable<DbProjectUser> users)
+            IEnumerable<ProjectUserInfo> users,
+            IEnumerable<ProjectFileInfo> files,
+            DepartmentInfo department)
         {
-            DepartmentInfo department = null;
-
-            try
+            if (dbProject == null)
             {
-                var departmentResponse = await _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(dbProject.DepartmentId));
-
-                if (departmentResponse.Message.IsSuccess)
-                {
-                    department = new DepartmentInfo
-                    {
-                        Id = departmentResponse.Message.Body.Id,
-                        Name = departmentResponse.Message.Body.Name
-                    };
-                }
+                throw new ArgumentNullException(nameof(dbProject));
             }
-            catch (Exception exc)
+
+            if (department.Id != dbProject.DepartmentId)
             {
-                _logger.LogError(exc, "Exception on get department request.");
+                throw new ArgumentException("DepartmentId not valid.");
             }
 
             return new ProjectExpandedResponse
             {
-                Department = department,
-                Users = users.Select(async u => await _projectUserMapper.Map(u)).Select(t => t.Result).ToList()
+                Project = _projectInfoMapper.Map(dbProject, department.Name),
+                Users = users,
+                Files = files
             };
         }
     }

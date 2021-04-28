@@ -6,6 +6,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Moq;
@@ -16,12 +17,14 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
 {
     internal class EditProjectByIdCommandTests
     {
-        private DbProject dbProject;
-        private EditProjectRequest editRequest;
         private IEditProjectByIdCommand command;
         private Mock<IProjectRepository> repositoryMock;
         private Mock<IEditProjectValidator> validatorMock;
         private Mock<IAccessValidator> accessValidatorMock;
+
+        private DbProject dbProject;
+        private EditProjectRequest editRequest;
+        private GetProjectFilter filter;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -35,6 +38,11 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
             dbProject = new DbProject
             {
                 Id = editRequest.ProjectId
+            };
+
+            filter = new GetProjectFilter
+            {
+                ProjectId = editRequest.ProjectId
             };
         }
 
@@ -58,7 +66,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(true);
 
             repositoryMock
-                .Setup(x => x.GetProject(dbProject.Id))
+                .Setup(x => x.GetProject(filter))
                 .Returns(dbProject);
 
             repositoryMock
@@ -113,7 +121,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         {
             Assert.AreEqual(editRequest.ProjectId, command.Execute(editRequest));
             validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
-            repositoryMock.Verify(r => r.GetProject(dbProject.Id), Times.Once);
+            repositoryMock.Verify(r => r.GetProject(filter), Times.Once);
             repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Once);
         }
 
@@ -126,7 +134,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
 
             Assert.AreEqual(editRequest.ProjectId, command.Execute(editRequest));
             validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
-            repositoryMock.Verify(r => r.GetProject(dbProject.Id), Times.Once);
+            repositoryMock.Verify(r => r.GetProject(filter), Times.Once);
             repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Once);
         }
 
