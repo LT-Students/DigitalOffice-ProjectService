@@ -21,7 +21,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         Func<string, Operation> GetOperationByPath =>
             (path) => _request.Operations.Find(x => x.path == path);
 
-
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {

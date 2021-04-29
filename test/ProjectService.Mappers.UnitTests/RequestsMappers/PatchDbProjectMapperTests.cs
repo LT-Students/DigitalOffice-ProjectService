@@ -13,9 +13,9 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
 {
-    public class EditProjectMapperTests
+    public class PatchDbProjectMapperTests
     {
-        private IEditProjectMapper _mapper;
+        private IPatchDbProjectMapper _mapper;
         private JsonPatchDocument<EditProjectRequest> _request;
         private JsonPatchDocument<DbProject> _dbRequest;
 
@@ -94,7 +94,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
             }, new CamelCasePropertyNamesContractResolver());
             #endregion
 
-            _mapper = new EditProjectMapper();
+            _mapper = new PatchDbProjectMapper();
         }
 
         [Test]

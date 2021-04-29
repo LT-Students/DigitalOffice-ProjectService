@@ -94,6 +94,10 @@ namespace LT.DigitalOffice.ProjectService
                 .AddRabbitMqCheck();
 
             ConfigureMassTransit(services);
+
+            services
+                .AddControllersWithViews()
+                .AddNewtonsoftJson();
         }
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)

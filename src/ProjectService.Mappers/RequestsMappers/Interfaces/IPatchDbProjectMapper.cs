@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.JsonPatch;
 namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces
 {
     [AutoInject]
-    public interface IEditProjectMapper
+    public interface IPatchDbProjectMapper
     {
         JsonPatchDocument<DbProject> Map(JsonPatchDocument<EditProjectRequest> request);
     }

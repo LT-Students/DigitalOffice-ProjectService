@@ -7,7 +7,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 {
-    public class EditProjectMapper : IEditProjectMapper
+    public class PatchDbProjectMapper : IPatchDbProjectMapper
     {
         public JsonPatchDocument<DbProject> Map(JsonPatchDocument<EditProjectRequest> request)
         {

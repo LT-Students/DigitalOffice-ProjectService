@@ -29,7 +29,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            #region DbProject before patch
             _dbProjectBefore = new DbProject
             {
                 Id = Guid.NewGuid(),
@@ -42,9 +41,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 ShortDescription = "ShortDescription",
                 CreatedAt = DateTime.UtcNow
             };
-            #endregion
 
-            #region DbProject after patch
             _dbProjectAfter = new DbProject
             {
                 Id = _dbProjectBefore.Id,
@@ -57,9 +54,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 ShortDescription = "ShortDescription1",
                 CreatedAt = _dbProjectBefore.CreatedAt
             };
-            #endregion
 
-            #region DbProject Patch data
             _patchProject = new JsonPatchDocument<DbProject>(new List<Operation<DbProject>>
             {
                 new Operation<DbProject>(
@@ -99,7 +94,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                     _dbProjectAfter.DepartmentId)
 
             }, new CamelCasePropertyNamesContractResolver());
-            #endregion
         }
 
         [SetUp]
@@ -119,7 +113,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             _provider.Projects.Add(_dbProjectBefore);
             _provider.Save();
 
-            SerializerAssert.AreEqual(true, _repository.EditProject(_dbProjectBefore.Id, _patchProject));
+            SerializerAssert.AreEqual(true, _repository.Edit(_dbProjectBefore.Id, _patchProject));
 
             var patchedProject = _provider.Projects.FirstOrDefault(p => p.Id == _dbProjectBefore.Id);
             SerializerAssert.AreEqual(_dbProjectAfter, patchedProject);
@@ -130,7 +124,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         {
             Guid chanceGuid = Guid.NewGuid();
 
-            Assert.Throws<NotFoundException>(() => _repository.EditProject(chanceGuid, _patchProject));
+            Assert.Throws<NotFoundException>(() => _repository.Edit(chanceGuid, _patchProject));
         }
 
         [TearDown]

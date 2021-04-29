@@ -6,7 +6,6 @@ using System;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using Microsoft.AspNetCore.JsonPatch;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
@@ -43,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         }
 
         [HttpPatch("edit")]
-        public bool Edit(
+        public OperationResultResponse<bool> Edit(
             [FromServices] IEditProjectCommand command,
             [FromQuery] Guid projectId,
             [FromBody] JsonPatchDocument<EditProjectRequest> request)
