@@ -53,5 +53,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="showNotActiveUsers">Do you want to show inactive users?</param>
         /// <returns>All users from project..</returns>
         IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActiveUsers);
+
+        bool AreExist(params Guid[] ids);
     }
 }

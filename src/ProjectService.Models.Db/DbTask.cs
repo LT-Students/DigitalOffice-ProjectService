@@ -25,7 +25,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public int Number { get; set; }
 
         public DbProject Project { get; set; }
-        public DbProjectUser User { get; set; }
+        public DbProjectUser Author { get; set; }
+        public DbProjectUser Assigner { get; set; }
         public DbTaskProperty Status { get; set; }
         public DbTaskProperty Priority { get; set; }
         public DbTaskProperty Type { get; set; }
@@ -41,8 +42,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .HasKey(t => t.Id);
 
             builder
-                .HasOne(t => t.User)
-                .WithMany(u => u.Tasks)
+                .HasOne(t => t.Author)
+                .WithMany(u => u.AuthorTasks)
                 .HasForeignKey(t => t.AuthorId);
 
             builder
@@ -56,14 +57,19 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .HasForeignKey(t => t.StatusId);
 
             builder
-                   .HasOne(t => t.Type)
-                   .WithMany(tp => tp.TypeTasks)
-                    .HasForeignKey(t => t.TypeId);
+                .HasOne(t => t.Type)
+                .WithMany(tp => tp.TypeTasks)
+                .HasForeignKey(t => t.TypeId);
 
             builder
-                  .HasOne(t => t.Priority)
-                  .WithMany(tp => tp.PriorityTasks)
-                  .HasForeignKey(t => t.PriorityId);
+                .HasOne(t => t.Priority)
+                .WithMany(tp => tp.PriorityTasks)
+                .HasForeignKey(t => t.PriorityId);
+
+            builder
+                 .HasOne(t => t.Assigner)
+                 .WithMany(u => u.AssignerTasks)
+                 .HasForeignKey(t => t.AssignedTo);
 
             builder
                 .Property(t => t.Name)

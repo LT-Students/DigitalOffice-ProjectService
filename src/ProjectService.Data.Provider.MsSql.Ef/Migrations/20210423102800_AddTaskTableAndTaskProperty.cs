@@ -39,41 +39,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Task", x => x.Id);
-
-                    table.ForeignKey(
-                        name: "FK_Tasks_Projects",
-                        column: a => a.ProjectId,
-                        principalTable: DbProject.TableName,
-                        principalColumn: ColumnIdName,
-                        onDelete: ReferentialAction.Cascade);
-
-                    table.ForeignKey(
-                        name: "FK_Tasks_ProjectUsers",
-                        column: a => a.AuthorId,
-                        principalTable: DbProjectUser.TableName,
-                        principalColumn: ColumnIdName,
-                        onDelete: ReferentialAction.Cascade);
-
-                    table.ForeignKey(
-                        name: "FK_Tasks_TaskProperties",
-                        column: a => a.TypeId,
-                        principalTable: DbTaskProperty.TableName,
-                        principalColumn: ColumnIdName,
-                        onDelete: ReferentialAction.Cascade);
-
-                    table.ForeignKey(
-                       name: "FK_Tasks_TaskProperties",
-                       column: a => a.StatusId,
-                       principalTable: DbTaskProperty.TableName,
-                       principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.Cascade);
-
-                    table.ForeignKey(
-                       name: "FK_Tasks_TaskProperties",
-                       column: a => a.PriorityId,
-                       principalTable: DbTaskProperty.TableName,
-                       principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.Cascade);
                 });
         }
 
@@ -95,20 +60,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                constraints: table =>
                {
                    table.PrimaryKey("PK_TaskProperty", x => x.Id);
-
-                   table.ForeignKey(
-                       name: "FK_TaskPrtoperty_Projects",
-                       column: a => a.ProjectId,
-                       principalTable: DbProject.TableName,
-                       principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.Cascade);
-
-                   table.ForeignKey(
-                       name: "FK_TaskPrtoperty_ProjectUsers",
-                       column: a => a.AuthorId,
-                       principalTable: DbProjectUser.TableName,
-                       principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.Cascade);
                });
         }
 

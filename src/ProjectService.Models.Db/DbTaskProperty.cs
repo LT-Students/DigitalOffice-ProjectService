@@ -7,7 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 {
     public class DbTaskProperty
     {
-        public const string TableName = "TaskPropeties";
+        public const string TableName = "TaskProperties";
 
         public Guid Id { get; set; }
         public string Name { get; set; }

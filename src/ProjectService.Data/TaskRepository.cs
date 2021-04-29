@@ -2,6 +2,7 @@
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using System;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
@@ -14,17 +15,17 @@ namespace LT.DigitalOffice.ProjectService.Data
             this.provider = provider;
         }
 
-        public Guid CreateNewTask(DbTask newTask)
+        public Guid CreateTask(DbTask newTask)
         {
-            provider.Task.Add(newTask);
+            provider.Tasks.Add(newTask);
             provider.Save();
 
             return newTask.Id;
         }
 
-        /*public bool IsExist(params Guid[] ids)
+        public bool AreExist(Guid id)
         {
-            provider.Task.
-        }*/
+            return provider.Tasks.FirstOrDefault(x => x.ParentTaskId == id) != null;
+        }
     }
 }

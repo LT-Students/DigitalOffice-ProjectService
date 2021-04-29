@@ -6,10 +6,6 @@ using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
@@ -19,6 +15,8 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private ITaskRepository _taskRepository;
 
         private DbTask newTask;
+        private readonly Guid _Id = Guid.NewGuid();
+        private readonly Guid _parentTaskId = Guid.NewGuid();
 
         [SetUp]
         public void SetUp()
@@ -33,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
             newTask = new DbTask
             {
-                Id = Guid.NewGuid(),
+                Id = _Id,
                 Name = "DigitalOffice",
                 ProjectId = Guid.NewGuid(),
                 AssignedTo = Guid.NewGuid(),
@@ -42,35 +40,21 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 StatusId = Guid.NewGuid(),
                 PriorityId = Guid.NewGuid(),
                 Deadline = DateTime.UtcNow,
-                PlannedMinutes =30,
-                ParentTaskId = Guid.NewGuid(),
+                PlannedMinutes = 30,
+                ParentTaskId = _parentTaskId,
                 AuthorId = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
                 Number = 3
             };
-
-            _taskRepository.CreateNewTask(newTask);
         }
 
         [Test]
-        public void ShouldAddNewTaskWhenTheNameWasRepeated()
+        public void ShouldAddNewTaskToDbAndCheckPerentIdExistanse()
         {
-            var newTaskWithRepeatedName = newTask;
-            newTaskWithRepeatedName.Id = Guid.NewGuid();
-
-            Assert.That(_taskRepository.CreateNewTask(newTask), Is.EqualTo(newTaskWithRepeatedName.Id));
-            SerializerAssert.AreEqual(newTaskWithRepeatedName, _provider.Task.FirstOrDefault(task => task.Id == newTaskWithRepeatedName.Id));
+            SerializerAssert.AreEqual(newTask.Id, _taskRepository.CreateTask(newTask));
+            Assert.NotNull(_provider.Tasks.Find(newTask.Id));
+            Assert.IsTrue(_taskRepository.AreExist(newTask.ParentTaskId.Value));
         }
-
-     /*   [Test]
-        public void ShouldAddNewTaskToDb()
-        {
-            newTask.Name = "Any name";
-            newTask.Id = Guid.NewGuid();
-
-            Assert.AreEqual(newTask.Id, _taskRepository.CreateNewTask(newTask));
-            Assert.That(_provider.Projects.Find(newTask.Id), Is.EqualTo(newTask));
-        }*/
 
         [TearDown]
         public void CleanMemoryDb()

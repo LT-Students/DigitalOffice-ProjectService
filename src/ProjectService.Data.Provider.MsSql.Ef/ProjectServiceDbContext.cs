@@ -12,8 +12,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
         public DbSet<DbProject> Projects { get; set; }
         public DbSet<DbProjectFile> ProjectsFiles { get; set; }
         public DbSet<DbProjectUser> ProjectsUsers { get; set; }
-        public DbSet<DbTask> Task { get; set; }
-        public DbSet<DbTaskProperty> TaskProperty { get; set; }
+        public DbSet<DbTask> Tasks { get; set; }
+        public DbSet<DbTaskProperty> TaskProperties { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

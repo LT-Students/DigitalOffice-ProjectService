@@ -96,5 +96,10 @@ namespace LT.DigitalOffice.ProjectService.Data
         {
             return provider.Projects.ToList();
         }
+
+        public bool AreExist(params Guid[] ids)
+        {
+            return ids.All(id => provider.Projects.FirstOrDefault(x => x.Id == id) != null);
+        }
     }
 }

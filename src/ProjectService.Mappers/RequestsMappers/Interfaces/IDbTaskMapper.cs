@@ -9,6 +9,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces
     [AutoInject]
     public interface IDbTaskMapper
     {
-        public DbTask Map(CreateTaskRequest taskRequiest);
+        public DbTask Map(CreateTaskRequest taskRequiest, Guid authorId);
     }
 }

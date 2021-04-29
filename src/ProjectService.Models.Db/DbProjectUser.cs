@@ -18,7 +18,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public bool IsActive { get; set; }
 
         public DbProject Project { get; set; }
-        public ICollection<DbTask> Tasks { get; set; }
+        public ICollection<DbTask> AuthorTasks { get; set; }
+        public ICollection<DbTask> AssignerTasks { get; set; }
         public ICollection<DbTaskProperty> TaskProperties { get; set; }
     }
 

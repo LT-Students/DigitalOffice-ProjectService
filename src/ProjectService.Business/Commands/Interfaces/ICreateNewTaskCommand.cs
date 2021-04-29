@@ -1,5 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
         /// </summary>
         /// <param name="request">Project data.</param>
         /// <returns>Id of the added task.</returns>
-        Guid Execute(CreateTaskRequest request);
+        OperationResultResponse<Guid> Execute(CreateTaskRequest request);
     }
 }

@@ -31,5 +31,10 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             _provider.ProjectsUsers.AddRange(dbProjectUsers);
         }
+
+        public bool AreExist(Guid usderId, Guid projectId)
+        {
+            return _provider.ProjectsUsers.FirstOrDefault(x => x.Id == usderId && x.ProjectId == projectId) != null;
+        }
     }
 }

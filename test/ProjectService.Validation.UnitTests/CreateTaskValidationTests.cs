@@ -1,43 +1,52 @@
 ﻿using FluentValidation.TestHelper;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using Moq;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
     internal class CreateTaskValidationTests
     {
         private ICreateTaskValidator _validator;
+        private Mock<ITaskRepository> _taskRepository;
+        private Mock<IUserRepository> _userRepository;
+        private Mock<IProjectRepository> _projectRepository;
+
         private CreateTaskRequest _taskRequest;
 
         [SetUp]
         public void SetUp()
         {
-            _validator = new CreateTaskRequestValidator();
+            _taskRepository = new Mock<ITaskRepository>();
+            _userRepository = new Mock<IUserRepository>();
+            _projectRepository = new Mock<IProjectRepository>();
+
+            _validator = new CreateTaskRequestValidator(_taskRepository.Object, _userRepository.Object, _projectRepository.Object);
 
             _taskRequest = new CreateTaskRequest
             {
                 Name = "Create Task",
                 Description = "Do smth after smth",
-                Deadline = DateTime.UtcNow
+                Deadline = DateTime.UtcNow,
+                ProjectId = Guid.NewGuid(),
+                AssignedTo = Guid.NewGuid(),
+                ParentTaskId = Guid.NewGuid()
             };
         }
-/*
+
         [Test]
-        public void ShouldErrorWhenTaskNameIsEmpty()
+        public void ShouldThrowErrorWhenTaskNameIsEmpty()
         {
             _validator.ShouldHaveValidationErrorFor(x => x.Name, "");
         }
 
         [Test]
-        public void ShouldErrorWhenTaskNameIsTooLong()
+        public void ShouldThrowErrorWhenTaskNameIsTooLong()
         {
-            var name = "Task Name".PadLeft(150);
+            var name = "Task Name".PadLeft(160);
 
             _validator.ShouldHaveValidationErrorFor(x => x.Name, name);
         }
@@ -49,17 +58,86 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
-        public void ShouldErrorWhenDeadlineLessThanCreatedTime()
+        public void ShouldThrowErrorWhenDeadlineLessThanCreatedTime()
         {
-            var deadline = DateTime.UtcNow;
-            var createdAt = DateTime.UtcNow;
-            _validator.ShouldHaveValidationErrorFor(x => x.Deadline);
+            _validator.TestValidate(new CreateTaskRequest
+            {
+                Deadline = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow.AddDays(1)
+            }).ShouldHaveValidationErrorFor(x => x.Deadline);
+        }
+
+        [Test]
+        public void ShouldThrowErrorWhenProjectIdIsNull()
+        {
+            _validator.ShouldHaveValidationErrorFor(x => x.ProjectId, Guid.Empty);
+        }
+
+        [Test]
+        public void ShouldTrowErrorWhenProjectIdDoesNotExist()
+        {
+            _projectRepository
+                .Setup(x => x.AreExist(_taskRequest.ProjectId))
+                .Returns(false)
+                .Verifiable();
+
+            _validator.ShouldHaveValidationErrorFor(x => x.ProjectId, _taskRequest.ProjectId);
+            _projectRepository.Verify();
+        }
+
+        [Test]
+        public void ShouldThrowErrorWhenPerentTaskIdDoesNotExist()
+        {
+            _taskRepository
+                .Setup(x => x.AreExist(_taskRequest.ParentTaskId.Value))
+                .Returns(false)
+                .Verifiable();
+
+            _validator.ShouldHaveValidationErrorFor(x => x.ParentTaskId, _taskRequest.ParentTaskId.Value);
+            _taskRepository.Verify();
+        }
+
+        [Test]
+        public void ShouldThrowErrorWhenAssignedToIdDoesNotExist()
+        {
+            _userRepository
+                .Setup(x => x.AreExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Returns(false)
+                .Verifiable();
+
+            _taskRepository
+                .Setup(x => x.AreExist(_taskRequest.ParentTaskId.Value))
+                .Returns(true)
+                .Verifiable();
+
+            _projectRepository
+               .Setup(x => x.AreExist(_taskRequest.ProjectId))
+               .Returns(true)
+               .Verifiable();
+
+            _validator.TestValidate(_taskRequest).ShouldHaveAnyValidationError();
+            _userRepository.Verify();
         }
 
         [Test]
         public void ShouldNotErrorsWhenRequestIsValid()
         {
+            _userRepository
+                .Setup(x => x.AreExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Returns(true)
+                .Verifiable();
+
+            _taskRepository
+                .Setup(x => x.AreExist(_taskRequest.ParentTaskId.Value))
+                .Returns(true)
+                .Verifiable();
+
+            _projectRepository
+               .Setup(x => x.AreExist(_taskRequest.ProjectId))
+               .Returns(true)
+               .Verifiable();
+
             _validator.TestValidate(_taskRequest).ShouldNotHaveAnyValidationErrors();
-        }*/
+        }
     }
 }

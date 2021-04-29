@@ -20,8 +20,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// </summary>
         /// <param name="item">Task to add.</param>
         /// <returns>Id of the added task.</returns>
-        Guid CreateNewTask(DbTask item);
+        Guid CreateTask(DbTask item);
 
-        bool IsExist(params Guid[] ids);
+        bool AreExist(Guid id);
     }
 }

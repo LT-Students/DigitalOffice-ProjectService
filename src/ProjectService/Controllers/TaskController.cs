@@ -1,6 +1,6 @@
 ﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.RequestsModels;
+using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,8 +13,8 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [ApiController]
     public class TaskController : ControllerBase
     {
-        [HttpPost("createNewTask")]
-        public Guid CreateNewTask(
+        [HttpPost("createTask")]
+        public OperationResultResponse<Guid> CreateNewTask(
            [FromServices] ICreateNewTaskCommand command,
            [FromBody] CreateTaskRequest request)
         {

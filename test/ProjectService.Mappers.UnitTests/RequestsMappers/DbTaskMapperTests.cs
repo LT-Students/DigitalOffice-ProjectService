@@ -12,7 +12,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
     {
         private IDbTaskMapper _dbTaskMapper;
         private CreateTaskRequest _createTaskRequest;
-        public DbTask _dbTask;
+
+        private readonly Guid authorId = Guid.NewGuid();
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -21,12 +22,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
 
             _createTaskRequest = new CreateTaskRequest
             {
-                Id = Guid.NewGuid(),
                 Name = "Create Smth",
                 Description = "Create smth in somewhere",
                 PlannedMinutes = 30,
                 AssignedTo = Guid.NewGuid(),
-                AuthorId = Guid.NewGuid(),
+                AuthorId = authorId,
                 Deadline = DateTime.UtcNow,
                 ProjectId = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
@@ -36,20 +36,34 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 StatusId = Guid.NewGuid(),
                 TypeId = Guid.NewGuid()
             };
+        }
 
-            _dbTask = new DbTask
+        [Test]
+        public void ShouldThrowArgumentNullExceptionWhenCreateTaskRequestIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null, authorId));
+        }
+
+        [Test]
+        public void ShouldReturnDbTaskWhenCreateTaskRequestIsMapped()
+        {
+            var authorId = Guid.NewGuid();
+
+            var dbTask = _dbTaskMapper.Map(_createTaskRequest, authorId);
+
+            var expectedDbTask = new DbTask
             {
-                Id = _createTaskRequest.Id,
-                Name = "Create Smth",
-                Description = "Create smth in somewhere",
-                PlannedMinutes = 30,
+                Id = dbTask.Id,
+                Name = _createTaskRequest.Name,
+                Description = _createTaskRequest.Description,
+                PlannedMinutes = _createTaskRequest.PlannedMinutes,
                 AssignedTo = _createTaskRequest.AssignedTo,
-                AuthorId = _createTaskRequest.AuthorId,
+                AuthorId =authorId,
                 Deadline = _createTaskRequest.Deadline,
                 ProjectId = _createTaskRequest.ProjectId,
-                CreatedAt = _createTaskRequest.CreatedAt,
-                ParentTaskId =_createTaskRequest.ParentTaskId,
-                Number = 2,
+                CreatedAt = dbTask.CreatedAt,
+                ParentTaskId = _createTaskRequest.ParentTaskId,
+                Number = _createTaskRequest.Number,
                 Priority = new DbTaskProperty()
                 {
                     Id = _createTaskRequest.PriorityId
@@ -63,18 +77,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                     Id = _createTaskRequest.TypeId
                 }
             };
-        }
 
-        [Test]
-        public void ShouldThrowArgumentNullExceptionWhenCreateTaskRequestIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null));
-        }
-
-        [Test]
-        public void ShouldReturnDbTaskWhenCreateTaskRequestIsMapped()
-        {
-            SerializerAssert.AreEqual(_dbTask, _dbTaskMapper.Map(_createTaskRequest));
+            SerializerAssert.AreEqual(expectedDbTask, dbTask);
         }
     }
 }
