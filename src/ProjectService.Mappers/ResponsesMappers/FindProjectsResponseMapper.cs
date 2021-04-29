@@ -17,7 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
             _mapper = mapper;
         }
 
-        public ProjectsResponse Map(List<DbProject> dbProjects, int totalCount, IDictionary<Guid, string> departmentsNames, List<string> errors)
+        public FindResponse<ProjectInfo> Map(List<DbProject> dbProjects, int totalCount, IDictionary<Guid, string> departmentsNames, List<string> errors)
         {
             if (dbProjects == null)
             {
@@ -31,10 +31,10 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
                 projectInfos.Add(_mapper.Map(dbProject, departmentName));
             }
 
-            return new ProjectsResponse
+            return new FindResponse<ProjectInfo>
             {
                 TotalCount = totalCount,
-                Projects = projectInfos,
+                Body = projectInfos,
                 Errors = errors
             };
         }
