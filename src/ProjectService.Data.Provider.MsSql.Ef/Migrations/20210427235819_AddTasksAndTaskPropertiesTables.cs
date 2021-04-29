@@ -9,8 +9,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
     [Migration("20210427235819_AddTasksAndTaskPropertiesTables")]
     class AddTasksAndTaskPropertiesTables : Migration
     {
-        private const string ColumnIdName = "Id";
-
         private void CreateTasksTable(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -35,48 +33,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey($"PK_{DbTask.TableName}", x => x.Id);
-
-                    table.ForeignKey(
-                        name: $"FK_{DbTask.TableName}_{DbProject.TableName}",
-                        column: a => a.ProjectId,
-                        principalTable: DbProject.TableName,
-                        principalColumn: ColumnIdName,
-                        onDelete: ReferentialAction.Cascade);
-
-                    table.ForeignKey(
-                        name: $"FK_{DbTask.TableName}_{DbProjectUser.TableName}_{nameof(DbTask.AuthorId)}",
-                        column: a => a.AuthorId,
-                        principalTable: DbProjectUser.TableName,
-                        principalColumn: ColumnIdName,
-                        onDelete: ReferentialAction.NoAction);
-
-                    table.ForeignKey(
-                        name: $"FK_{DbTask.TableName}_{DbProjectUser.TableName}_{nameof(DbTask.AssignedTo)}",
-                        column: a => a.AssignedTo,
-                        principalTable: DbProjectUser.TableName,
-                        principalColumn: ColumnIdName,
-                        onDelete: ReferentialAction.NoAction);
-
-                    table.ForeignKey(
-                        name: $"FK_{DbTask.TableName}_{DbTaskProperty.TableName}_{nameof(DbTask.TypeId)}",
-                        column: a => a.TypeId,
-                        principalTable: DbTaskProperty.TableName,
-                        principalColumn: ColumnIdName,
-                        onDelete: ReferentialAction.NoAction);
-
-                    table.ForeignKey(
-                       name: $"FK_{DbTask.TableName}_{DbTaskProperty.TableName}_{nameof(DbTask.StatusId)}",
-                       column: a => a.StatusId,
-                       principalTable: DbTaskProperty.TableName,
-                       principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.NoAction);
-
-                    table.ForeignKey(
-                       name: $"FK_{DbTask.TableName}_{DbTaskProperty.TableName}_{nameof(DbTask.PriorityId)}",
-                       column: a => a.PriorityId,
-                       principalTable: DbTaskProperty.TableName,
-                       principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.NoAction);
                 });
         }
 
@@ -98,20 +54,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                constraints: table =>
                {
                    table.PrimaryKey($"PK_{DbTaskProperty.TableName}", x => x.Id);
-
-                   table.ForeignKey(
-                       name: $"FK_{DbTaskProperty.TableName}_{DbProject.TableName}",
-                       column: a => a.ProjectId,
-                       principalTable: DbProject.TableName,
-                       principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.NoAction);
-
-                   table.ForeignKey(
-                       name: $"FK_{DbTaskProperty.TableName}_{DbProjectUser.TableName}",
-                       column: a => a.AuthorId,
-                       principalTable: DbProjectUser.TableName,
-                       principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.NoAction);
                });
         }
 
