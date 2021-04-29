@@ -13,6 +13,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
     {
         public ProjectFileInfo Map(DbProjectFile dbProjectFile)
         {
+            if (dbProjectFile == null)
+            {
+                throw new ArgumentNullException(nameof(dbProjectFile));
+            }
+
             return new ProjectFileInfo
             {
                 FileId = dbProjectFile.FileId,

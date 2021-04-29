@@ -15,6 +15,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
     {
         public ProjectUserInfo Map(UserData userData, DbProjectUser dbProjectUser)
         {
+            if (dbProjectUser == null)
+            {
+                throw new ArgumentNullException(nameof(dbProjectUser));
+            }
+
             if (userData.Id != dbProjectUser.UserId)
             {
                 throw new ArgumentException("Something went wrong while converting user data.");

@@ -29,17 +29,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IRequestClient<IGetDepartmentRequest> _departmentRequestClient;
         private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
 
-        private async Task<DepartmentInfo> GetDepartmentAsync(Guid departmentId)
+        private DepartmentInfo GetDepartment(Guid departmentId)
         {
             DepartmentInfo department = null;
 
             try
             {
-                var departmentResponse = await _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(departmentId));
+                var departmentResponse = _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
+                    IGetDepartmentRequest.CreateObj(departmentId)).Result;
 
                 if (departmentResponse.Message.IsSuccess)
                 {
+                    //TODO Add mapper
                     department = new DepartmentInfo
                     {
                         Id = departmentResponse.Message.Body.Id,
@@ -55,7 +56,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             return department;
         }
 
-        private async Task<List<ProjectUserInfo>> GetProjectUsersAsync(IEnumerable<DbProjectUser> projectUsers, bool showNotActiveUsers)
+        private List<ProjectUserInfo> GetProjectUsers(IEnumerable<DbProjectUser> projectUsers, bool showNotActiveUsers)
         {
             List<ProjectUserInfo> projectUsersInfo = new();
 
@@ -72,8 +73,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     userIds = projectUsers.Where(x => x.IsActive == true).Select(x => x.Id).Distinct().ToList();
                 }
 
-                var usersDataResponse = await _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
-                    IGetUsersDataRequest.CreateObj(userIds));
+                var usersDataResponse = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
+                    IGetUsersDataRequest.CreateObj(userIds)).Result;
 
                 if (usersDataResponse.Message.IsSuccess)
                 {
@@ -115,18 +116,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _usersDataRequestClient = usersDataRequestClient;
         }
 
-        public async Task<ProjectExpandedResponse> Execute(GetProjectFilter filter)
+        public ProjectExpandedResponse Execute(GetProjectFilter filter)
         {
             var dbProject = _repository.GetProject(filter);
 
-            var department = GetDepartmentAsync(dbProject.DepartmentId);
+            var department = GetDepartment(dbProject.DepartmentId);
 
             var showNotActiveUsers = filter.ShowNotActiveUsers == true;
-            var usersInfo = GetProjectUsersAsync(dbProject.Users, showNotActiveUsers);
+            var usersInfo = GetProjectUsers(dbProject.Users, showNotActiveUsers);
 
             var filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map);
 
-            return _projectExpandedResponseMapper.Map(dbProject, await usersInfo, filesInfo, await department);
+            return _projectExpandedResponseMapper.Map(dbProject, usersInfo, filesInfo, department);
         }
     }
 }

@@ -34,14 +34,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         private Mock<IProjectFileInfoMapper> _projectFileInfoMapperMock;
         
         private Mock<IRequestClient<IGetDepartmentRequest>> _rcDepartmentMock;
-        private Mock<IGetDepartmentResponse> _departmentResponseMock;
-        private Mock<IOperationResult<IGetDepartmentResponse>> _departmentOperationResultMock;
-        private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _departmentBrokerResponseMock;
 
         private Mock<IRequestClient<IGetUsersDataRequest>> _rcUsersDataMock;
-        private Mock<IGetUsersDataResponse> _usersResponseMock;
-        private Mock<IOperationResult<IGetUsersDataResponse>> _usersOperationResultMock;
-        private Mock<Response<IOperationResult<IGetUsersDataResponse>>> _usersBrokerResponseMock;
 
         private List<UserData> _usersData;
         private List<ProjectUserInfo> _projectUsersInfo;
@@ -247,7 +241,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup(x => x.GetProject(_fullFilter))
                 .Throws(new Exception());
 
-            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
+            Assert.Throws<Exception>(() => _command.Execute(_fullFilter));
         }
 
         [Test]
@@ -257,7 +251,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup(x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(It.IsAny<object>(), default, default).Result)
                 .Throws(new Exception());
 
-            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
+            Assert.Throws<Exception>(() => _command.Execute(_fullFilter));
         }
 
         [Test]
@@ -271,7 +265,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup(x => x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default).Result)
                 .Throws(new Exception());
 
-            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
+            Assert.Throws<Exception>(() => _command.Execute(_fullFilter));
         }
 
         [Test]
@@ -285,7 +279,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup(x => x.Map(It.IsAny<UserData>(), It.IsAny<DbProjectUser>()))
                 .Throws(new Exception());
 
-            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
+            Assert.Throws<Exception>(() => _command.Execute(_fullFilter));
         }
 
         [Test]
@@ -299,7 +293,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup(x => x.Map(_dbProjectFile))
                 .Throws(new Exception());
 
-            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
+            Assert.Throws<Exception>(() => _command.Execute(_fullFilter));
         }
 
         [Test]
@@ -313,7 +307,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup(x => x.Map(_dbProject, _projectUsersInfo, _projectFilesInfo, _departmentInfo))
                 .Throws(new Exception());
 
-            Assert.ThrowsAsync<Exception>(() => _command.Execute(_fullFilter));
+            Assert.Throws<Exception>(() => _command.Execute(_fullFilter));
         }
 
         [Test]
@@ -324,10 +318,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Returns(_dbProject);
 
             _projectExpandedResponseMapperMock
-                .Setup(x => x.Map(_dbProject, _projectUsersInfo, _projectFilesInfo, _departmentInfo))
+                .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>()))
                 .Returns(_expectedResponse);
 
-            var result = _command.Execute(_fullFilter).Result;
+            var result = _command.Execute(_fullFilter);
 
             SerializerAssert.AreEqual(_expectedResponse, result);
         }
@@ -347,7 +341,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup(x => x.GetProject(filterWithoutNotActiveUsers))
                 .Returns(_dbProject);
 
-
             _dbProjectUser = new DbProjectUser
             {
                 Id = Guid.NewGuid(),
@@ -362,7 +355,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 
             _dbProject.Users = new List<DbProjectUser> { _dbProjectUser };
 
-            var result = _command.Execute(_fullFilter).Result;
+            var result = _command.Execute(_fullFilter);
 
             SerializerAssert.AreEqual(_expectedResponse, result);
         }

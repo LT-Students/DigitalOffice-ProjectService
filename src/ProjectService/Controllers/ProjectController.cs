@@ -26,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
             [FromServices] IGetProjectByIdCommand command,
             [FromQuery] GetProjectFilter filter)
         {
-            return command.Execute(filter).Result;
+            return command.Execute(filter);
         }
 
         [HttpPost("create")]
