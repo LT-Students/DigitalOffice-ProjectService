@@ -24,7 +24,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public DateTime? Deadline { get; set; }
 
         public DbProject Project { get; set; }
-        public DbProjectUser User { get; set; }
+        public DbProjectUser Author { get; set; }
+        public DbProjectUser AssignedUser { get; set; }
         public DbTaskProperty Status { get; set; }
         public DbTaskProperty Priority { get; set; }
         public DbTaskProperty Type { get; set; }
@@ -41,8 +42,13 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .HasKey(t => t.Id);
 
             builder
-                .HasOne(t => t.User)
-                .WithMany(pu => pu.Tasks)
+                .HasOne(t => t.AssignedUser)
+                .WithMany(pu => pu.AssignedUserTasks)
+                .HasForeignKey(t => t.AssignedTo);
+
+            builder
+                .HasOne(t => t.Author)
+                .WithMany(pu => pu.AuthorTasks)
                 .HasForeignKey(t => t.AuthorId);
 
             builder

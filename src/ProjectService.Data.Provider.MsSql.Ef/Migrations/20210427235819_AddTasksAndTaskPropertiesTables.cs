@@ -44,39 +44,39 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                         onDelete: ReferentialAction.Cascade);
 
                     table.ForeignKey(
-                        name: $"FK_{DbTask.TableName}_{DbProjectUser.TableName}",
+                        name: $"FK_{DbTask.TableName}_{DbProjectUser.TableName}_{nameof(DbTask.AuthorId)}",
                         column: a => a.AuthorId,
                         principalTable: DbProjectUser.TableName,
                         principalColumn: ColumnIdName,
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
 
                     table.ForeignKey(
-                        name: $"FK_{DbTask.TableName}_{DbProjectUser.TableName}",
+                        name: $"FK_{DbTask.TableName}_{DbProjectUser.TableName}_{nameof(DbTask.AssignedTo)}",
                         column: a => a.AssignedTo,
                         principalTable: DbProjectUser.TableName,
                         principalColumn: ColumnIdName,
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
 
                     table.ForeignKey(
-                        name: $"FK_{DbTask.TableName}_{DbTaskProperty.TableName}",
+                        name: $"FK_{DbTask.TableName}_{DbTaskProperty.TableName}_{nameof(DbTask.TypeId)}",
                         column: a => a.TypeId,
                         principalTable: DbTaskProperty.TableName,
                         principalColumn: ColumnIdName,
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
 
                     table.ForeignKey(
-                       name: $"FK_{DbTask.TableName}_{DbTaskProperty.TableName}",
+                       name: $"FK_{DbTask.TableName}_{DbTaskProperty.TableName}_{nameof(DbTask.StatusId)}",
                        column: a => a.StatusId,
                        principalTable: DbTaskProperty.TableName,
                        principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.Cascade);
+                       onDelete: ReferentialAction.NoAction);
 
                     table.ForeignKey(
-                       name: $"FK_{DbTask.TableName}_{DbTaskProperty.TableName}",
+                       name: $"FK_{DbTask.TableName}_{DbTaskProperty.TableName}_{nameof(DbTask.PriorityId)}",
                        column: a => a.PriorityId,
                        principalTable: DbTaskProperty.TableName,
                        principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.Cascade);
+                       onDelete: ReferentialAction.NoAction);
                 });
         }
 
@@ -104,21 +104,21 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                        column: a => a.ProjectId,
                        principalTable: DbProject.TableName,
                        principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.Cascade);
+                       onDelete: ReferentialAction.NoAction);
 
                    table.ForeignKey(
                        name: $"FK_{DbTaskProperty.TableName}_{DbProjectUser.TableName}",
                        column: a => a.AuthorId,
                        principalTable: DbProjectUser.TableName,
                        principalColumn: ColumnIdName,
-                       onDelete: ReferentialAction.Cascade);
+                       onDelete: ReferentialAction.NoAction);
                });
         }
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            CreateTasksTable(migrationBuilder);
             CreateTaskProperties(migrationBuilder);
+            CreateTasksTable(migrationBuilder);
         }
     }
 }
