@@ -77,6 +77,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             }
         }
 
+        [SetUp]
+        public void SetUp()
+        {
+            _mocker.GetMock<ITaskInfoMapper>().Reset();
+            _mocker.GetMock<ITaskRepository>().Reset();
+        }
+
         [Test]
         public void ShouldThrowExceptionWhenFilterIsNull()
         {
@@ -87,6 +94,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             FindTasksFilter filter = null;
 
             Assert.Throws<ArgumentNullException>(() => _command.Execute(filter, skipCount, takeCount));
+            _mocker.Verify<ITaskInfoMapper, TaskInfo>(x => x.Map(It.IsAny<DbTask>()), Times.Never);
+            _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
+                x.Find(filter, skipCount, takeCount, out totalCount), Times.Never);
         }
 
         [Test]
@@ -117,6 +127,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 .Returns(_taskInfo.ElementAt(3));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
+            _mocker.Verify<ITaskInfoMapper, TaskInfo>(x => x.Map(It.IsAny<DbTask>()), Times.Exactly(_dbTasks.Count()));
+            _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
+                x.Find(filter, skipCount, takeCount, out totalCount), Times.Once);
         }
     }
 }
