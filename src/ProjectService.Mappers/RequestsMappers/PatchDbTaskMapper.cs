@@ -24,6 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 {
                     OperationType.Add => "add",
                     OperationType.Replace => "replace",
+                    OperationType.Remove => "remove",
                     _ => null
                 };
 
