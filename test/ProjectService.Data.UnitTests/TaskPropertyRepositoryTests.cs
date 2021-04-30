@@ -21,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
         private DbTaskProperty _dbTaskProperty;
 
-        private void CreateMemoryDb()
+        private void CreateInMemoryDb()
         {
             var dbOptions = new DbContextOptionsBuilder<ProjectServiceDbContext>()
                 .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
@@ -54,7 +54,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Type = _type
             };
 
-            CreateMemoryDb();
+            CreateInMemoryDb();
         }
 
         [Test]

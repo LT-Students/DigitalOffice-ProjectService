@@ -94,11 +94,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             IGetDepartmentResponse department = GetDepartment(requestUserId, errors);
 
-            if (!_accessValidator.IsAdmin() && 
-                    project?.Users.FirstOrDefault(x =>
-                            x.UserId == requestUserId) == null &&
-                    department?.Id != project?.DepartmentId
-            )
+            bool isAdmin = _accessValidator.IsAdmin();
+            
+            bool isProjectParticipant = project?.Users.FirstOrDefault(x =>
+                x.UserId == requestUserId) != null;
+            
+            bool isDepartmentDirector = department?.Id == project?.DepartmentId;
+            
+            if (!isAdmin && !isProjectParticipant && !isDepartmentDirector)
             {
                 throw new ForbiddenException("Not enough rights.");
             }
