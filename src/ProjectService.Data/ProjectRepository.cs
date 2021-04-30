@@ -27,7 +27,14 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             if (filter.IncludeUsers.HasValue && filter.IncludeUsers.Value)
             {
-                dbProjectQueryable = dbProjectQueryable.Include(x => x.Users);
+                if (filter.ShowNotActiveUsers.HasValue && !filter.ShowNotActiveUsers.Value)
+                {
+                    dbProjectQueryable = dbProjectQueryable.Include(x => x.Users.Where(x => x.IsActive == true));
+                }
+                else
+                {
+                    dbProjectQueryable = dbProjectQueryable.Include(x => x.Users);
+                }
             }
 
             if (filter.IncludeFiles.HasValue && filter.IncludeFiles.Value)

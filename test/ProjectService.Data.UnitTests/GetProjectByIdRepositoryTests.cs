@@ -20,6 +20,9 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         private IProjectRepository _repository;
 
         private DbProject _dbProject;
+        private DbProjectFile _dbFile;
+        private DbProjectUser _activeDbUser;
+        private DbProjectUser _notActiveDbUser;
 
         [SetUp]
         public void SetUp()
@@ -37,14 +40,14 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 Name = "Project"
             };
 
-            var dbFile = new DbProjectFile
+            _dbFile = new DbProjectFile
             {
                 Id = Guid.NewGuid(),
                 FileId = Guid.NewGuid(),
                 ProjectId = _dbProject.Id,
             };
 
-            var activeDbUser = new DbProjectUser
+            _activeDbUser = new DbProjectUser
             {
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
@@ -52,7 +55,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 IsActive = true
             };
 
-            var notActiveDbUser = new DbProjectUser
+            _notActiveDbUser = new DbProjectUser
             {
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
@@ -61,8 +64,8 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             };
 
             _provider.Projects.Add(_dbProject);
-            _provider.ProjectsUsers.AddRange(activeDbUser, notActiveDbUser);
-            _provider.ProjectsFiles.Add(dbFile);
+            _provider.ProjectsUsers.AddRange(_activeDbUser, _notActiveDbUser);
+            _provider.ProjectsFiles.Add(_dbFile);
             _provider.Save();
         }
 
@@ -87,7 +90,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         }
 
         [Test]
-        public void ShouldReturnFullProjectInfo()
+        public void ShouldReturnProjectWithAllUsersAndFiles()
         {
             var fullFilter = new GetProjectFilter
             {
@@ -103,15 +106,15 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             {
                 Id = _dbProject.Id,
                 Name = _dbProject.Name,
-                Files = _dbProject.Files,
-                Users = _dbProject.Users
+                Files = new List<DbProjectFile> { _dbFile },
+                Users = new List<DbProjectUser> { _activeDbUser, _notActiveDbUser }
             };
 
             SerializerAssert.AreEqual(expected, result);
         }
 
         [Test]
-        public void ShouldNotReturnInfo()
+        public void ShouldReturnProjectWithoutUsersAndFiles()
         {
             var fullFilter = new GetProjectFilter
             {
@@ -133,7 +136,30 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         }
 
         [Test]
-        public void ShouldReturnActiveUsersProjectInfo()
+        public void ShouldReturnProjectWithFiles()
+        {
+            var fullFilter = new GetProjectFilter
+            {
+                ProjectId = _dbProject.Id,
+                IncludeFiles = false,
+                IncludeUsers = false,
+                ShowNotActiveUsers = true
+            };
+
+            var result = _repository.GetProject(fullFilter);
+
+            var expected = new DbProject
+            {
+                Id = _dbProject.Id,
+                Name = _dbProject.Name,
+                Files = new List<DbProjectFile> { _dbFile }
+            };
+
+            SerializerAssert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void ShouldReturnProjectWithActiveUsers()
         {
             var fullFilter = new GetProjectFilter
             {
@@ -148,26 +174,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             {
                 Id = _dbProject.Id,
                 Name = _dbProject.Name,
-                Users = _dbProject.Users.Where(x => x.IsActive == true).ToList()
-            };
-
-            SerializerAssert.AreEqual(expected, result);
-        }
-
-        [Test]
-        public void ShouldReturnMinimumInfo()
-        {
-            var fullFilter = new GetProjectFilter
-            {
-                ProjectId = _dbProject.Id
-            };
-
-            var result = _repository.GetProject(fullFilter);
-
-            var expected = new DbProject
-            {
-                Id = _dbProject.Id,
-                Name = _dbProject.Name
+                Users = new List<DbProjectUser> { _activeDbUser }
             };
 
             SerializerAssert.AreEqual(expected, result);
