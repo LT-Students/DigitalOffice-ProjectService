@@ -84,9 +84,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         public OperationResultResponse<bool> Execute(Guid taskId, JsonPatchDocument<EditTaskRequest> patch)
         {
             var errors = new List<string>();
-            
-            DbTask task = _taskRepository.Get(taskId) ??
-                          throw new NotFoundException("This task id wasn't found.");
+
+            DbTask task = _taskRepository.Get(taskId);
 
             DbProject project = _projectRepository.GetProject(task.ProjectId);
 
