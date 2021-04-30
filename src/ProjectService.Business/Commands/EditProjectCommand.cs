@@ -86,7 +86,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             }
 
             var response = new OperationResultResponse<bool>();
-            response.Errors = new List<string>();
 
             foreach (Operation item in request.Operations)
             {
