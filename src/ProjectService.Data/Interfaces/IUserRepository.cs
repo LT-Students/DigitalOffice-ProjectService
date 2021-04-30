@@ -26,5 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="dbProjectUsers">List project users to add.</param>
         /// <param name="projectId">Project id from request.</param>
         void AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUsers, Guid projectId);
+
+        IEnumerable<DbProjectUser> Find(Guid userId);
     }
 }

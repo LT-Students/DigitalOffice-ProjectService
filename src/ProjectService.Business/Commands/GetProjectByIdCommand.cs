@@ -36,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             try
             {
                 var departmentResponse = _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(departmentId)).Result;
+                    IGetDepartmentRequest.CreateObj(null, departmentId)).Result;
 
                 if (departmentResponse.Message.IsSuccess)
                 {

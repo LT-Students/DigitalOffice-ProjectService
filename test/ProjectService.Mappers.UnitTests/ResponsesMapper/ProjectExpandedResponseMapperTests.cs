@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
-                Status = (int)ProjectStatusType.Abandoned
+                Status = (int)ProjectStatusType.Active
             };
 
             _users = new List<ProjectUserInfo>
