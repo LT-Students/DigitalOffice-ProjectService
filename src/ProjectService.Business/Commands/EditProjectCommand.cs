@@ -89,12 +89,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             var response = new OperationResultResponse<bool>();
 
-            /*if (!_accessValidator.IsAdmin() &&
+            if (!_accessValidator.IsAdmin() &&
                 (GetDepartment(dbProject.DepartmentId, response.Errors).DirectorUserId !=
                 _httpContextAccessor.HttpContext.GetUserId()))
             {
                 throw new ForbiddenException("Not enough rights.");
-            }*/
+            }
 
             foreach (Operation item in request.Operations)
             {
