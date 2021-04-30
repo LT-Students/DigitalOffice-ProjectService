@@ -53,7 +53,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         {
             SerializerAssert.AreEqual(newTask.Id, _taskRepository.CreateTask(newTask));
             Assert.NotNull(_provider.Tasks.Find(newTask.Id));
-            Assert.IsTrue(_taskRepository.AreExist(newTask.ParentTaskId.Value));
+            Assert.IsTrue(_taskRepository.IsExist(newTask.ParentTaskId.Value));
         }
 
         [TearDown]

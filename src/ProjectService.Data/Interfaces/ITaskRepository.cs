@@ -22,6 +22,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <returns>Id of the added task.</returns>
         Guid CreateTask(DbTask item);
 
-        bool AreExist(Guid id);
+        bool IsExist(Guid id);
     }
 }

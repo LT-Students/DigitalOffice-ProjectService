@@ -24,7 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private AutoMocker _mocker;
         private DbTask _dbTask;
         private CreateTaskRequest _newRequest;
-        private ICreateNewTaskCommand _command;
+        private ICreateTaskCommand _command;
         private OperationResultResponse<Guid> _response;
 
         [OneTimeSetUp]
@@ -133,10 +133,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [Test]
         public void ShouldReturnResponseWhenCreatingNewTaskAndUserIsAdmin()
         {
-            _mocker
-               .Setup<IAccessValidator, bool>(x => x.IsAdmin())
-               .Returns(true);
-
             _mocker
                 .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId))
                 .Returns(_dbTask);

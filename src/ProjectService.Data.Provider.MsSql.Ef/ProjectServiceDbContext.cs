@@ -15,7 +15,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
         public DbSet<DbTask> Tasks { get; set; }
         public DbSet<DbTaskProperty> TaskProperties { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(

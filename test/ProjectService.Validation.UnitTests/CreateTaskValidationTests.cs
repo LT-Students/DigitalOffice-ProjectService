@@ -77,7 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void ShouldTrowErrorWhenProjectIdDoesNotExist()
         {
             _projectRepository
-                .Setup(x => x.AreExist(_taskRequest.ProjectId))
+                .Setup(x => x.IsExist(_taskRequest.ProjectId))
                 .Returns(false)
                 .Verifiable();
 
@@ -89,7 +89,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void ShouldThrowErrorWhenPerentTaskIdDoesNotExist()
         {
             _taskRepository
-                .Setup(x => x.AreExist(_taskRequest.ParentTaskId.Value))
+                .Setup(x => x.IsExist(_taskRequest.ParentTaskId.Value))
                 .Returns(false)
                 .Verifiable();
 
@@ -101,17 +101,17 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void ShouldThrowErrorWhenAssignedToIdDoesNotExist()
         {
             _userRepository
-                .Setup(x => x.AreExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Setup(x => x.AreUserAndProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
                 .Returns(false)
                 .Verifiable();
 
             _taskRepository
-                .Setup(x => x.AreExist(_taskRequest.ParentTaskId.Value))
+                .Setup(x => x.IsExist(_taskRequest.ParentTaskId.Value))
                 .Returns(true)
                 .Verifiable();
 
             _projectRepository
-               .Setup(x => x.AreExist(_taskRequest.ProjectId))
+               .Setup(x => x.IsExist(_taskRequest.ProjectId))
                .Returns(true)
                .Verifiable();
 
@@ -123,17 +123,17 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void ShouldNotErrorsWhenRequestIsValid()
         {
             _userRepository
-                .Setup(x => x.AreExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Setup(x => x.AreUserAndProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
                 .Returns(true)
                 .Verifiable();
 
             _taskRepository
-                .Setup(x => x.AreExist(_taskRequest.ParentTaskId.Value))
+                .Setup(x => x.IsExist(_taskRequest.ParentTaskId.Value))
                 .Returns(true)
                 .Verifiable();
 
             _projectRepository
-               .Setup(x => x.AreExist(_taskRequest.ProjectId))
+               .Setup(x => x.IsExist(_taskRequest.ProjectId))
                .Returns(true)
                .Verifiable();
 

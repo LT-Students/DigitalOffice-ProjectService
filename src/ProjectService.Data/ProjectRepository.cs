@@ -132,9 +132,9 @@ namespace LT.DigitalOffice.ProjectService.Data
             return projects.Skip(skipCount * takeCount).Take(takeCount).ToList();
         }
 
-        public bool AreExist(params Guid[] ids)
+        public bool IsExist(Guid id)
         {
-            return ids.All(id => provider.Projects.FirstOrDefault(x => x.Id == id) != null);
+            return provider.Projects.FirstOrDefault(x => x.Id == id) != null;
         }
     }
 }

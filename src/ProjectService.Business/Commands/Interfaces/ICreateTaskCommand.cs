@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     /// Provides method for adding a new task.
     /// </summary>
     [AutoInject]
-    public interface ICreateNewTaskCommand
+    public interface ICreateTaskCommand
     {
         /// <summary>
         /// Adds a new task. Returns id of the added task.

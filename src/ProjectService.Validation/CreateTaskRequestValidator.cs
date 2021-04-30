@@ -26,19 +26,19 @@ namespace LT.DigitalOffice.ProjectService.Validation
             When(task => task.ParentTaskId.HasValue, () =>
             {
                 RuleFor(task => task.ParentTaskId)
-                    .Must(x => tasksRepository.AreExist(x.Value));
+                    .Must(x => tasksRepository.IsExist(x.Value));
             });
 
             When(task => task.AssignedTo.HasValue, () =>
             {
                 RuleFor(task => task)
-                    .Must(task => userRepository.AreExist(task.AssignedTo.Value, task.ProjectId))
+                    .Must(task => userRepository.AreUserAndProjectExist(task.AssignedTo.Value, task.ProjectId))
                     .WithMessage("User does not exist");
             });
 
             RuleFor(task => task.ProjectId)
                 .NotEmpty()
-                .Must(x => projectRepository.AreExist(x));
+                .Must(x => projectRepository.IsExist(x));
 
             When(task => task.Deadline != null, () =>
             {

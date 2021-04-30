@@ -4,7 +4,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
     public class CreateTaskRequest
     {
-        //public Guid Id { get; set; }
         public string Name { get; set; }
         public Guid ProjectId { get; set; }
         public string Description { get; set; }

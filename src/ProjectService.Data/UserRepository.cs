@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             return _provider.ProjectsUsers.Where(pu => pu.UserId == userId).ToList();
         }
 
-        public bool AreExist(Guid usderId, Guid projectId)
+        public bool AreUserAndProjectExist(Guid usderId, Guid projectId)
         {
             return _provider.ProjectsUsers.FirstOrDefault(x => x.Id == usderId && x.ProjectId == projectId) != null;
         }

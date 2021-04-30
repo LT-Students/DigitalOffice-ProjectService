@@ -15,7 +15,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
-    public class CreateTaskCommand : ICreateNewTaskCommand
+    public class CreateTaskCommand : ICreateTaskCommand
     {
         private readonly ITaskRepository _repository;
         private readonly ICreateTaskValidator _validator;

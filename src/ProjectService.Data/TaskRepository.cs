@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             return newTask.Id;
         }
 
-        public bool AreExist(Guid id)
+        public bool IsExist(Guid id)
         {
             return provider.Tasks.FirstOrDefault(x => x.ParentTaskId == id) != null;
         }
