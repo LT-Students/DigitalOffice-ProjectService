@@ -18,7 +18,9 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public bool AreExist(params Guid[] ids)
         {
-            return ids.All(id => _provider.TaskProperties.FirstOrDefault(x => x.Id == id) != null);
+            var dbIds = _provider.TaskProperties.Select(x => x.Id);
+            
+            return ids.All(x => dbIds.Contains(x));
         }
 
         public DbTaskProperty Get(Guid propertyId)

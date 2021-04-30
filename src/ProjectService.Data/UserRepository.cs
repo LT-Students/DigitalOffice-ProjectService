@@ -34,7 +34,9 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public bool AreExist(params Guid[] ids)
         {
-            return ids.All(id => _provider.ProjectsUsers.FirstOrDefault(x => x.Id == id) != null);
+            var dbIds = _provider.ProjectsUsers.Select(x => x.Id);
+            
+            return ids.All(x => dbIds.Contains(x));
         }
     }
 }

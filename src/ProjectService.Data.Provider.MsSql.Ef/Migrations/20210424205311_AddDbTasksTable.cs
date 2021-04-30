@@ -7,7 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
     [DbContext(typeof(ProjectServiceDbContext))]
     [Migration("20210424205311_AddDbTasksTable")]
-    public class _20210424205311_AddDbTasksTable : Migration
+    public class AddDbTasksTable : Migration
     {
         private void CreateTableTasks(MigrationBuilder migrationBuilder)
         {

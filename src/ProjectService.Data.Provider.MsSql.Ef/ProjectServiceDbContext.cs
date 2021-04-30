@@ -10,7 +10,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
     public class ProjectServiceDbContext : DbContext, IDataProvider
     {
         public DbSet<DbTask> Tasks { get; set; }
-
         public DbSet<DbTaskProperty> TaskProperties { get; set; }
         public DbSet<DbProject> Projects { get; set; }
         public DbSet<DbProjectFile> ProjectsFiles { get; set; }

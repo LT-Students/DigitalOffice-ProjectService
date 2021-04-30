@@ -15,7 +15,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public Guid AuthorId { get; set; }
         public Guid? ParentId { get; set; }
         public Guid? AssignedTo { get; set; }
-
         public Guid PriorityId { get; set; }
         public Guid StatusId { get; set; }
         public Guid TypeId { get; set; }
