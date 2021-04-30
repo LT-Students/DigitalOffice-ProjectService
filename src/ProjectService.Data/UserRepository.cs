@@ -32,6 +32,11 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider.ProjectsUsers.AddRange(dbProjectUsers);
         }
 
+        public IEnumerable<DbProjectUser> Find(Guid userId)
+        {
+            return _provider.ProjectsUsers.Where(pu => pu.UserId == userId).ToList();
+        }
+
         public bool AreExist(params Guid[] ids)
         {
             var dbIds = _provider.ProjectsUsers.Select(x => x.Id);
