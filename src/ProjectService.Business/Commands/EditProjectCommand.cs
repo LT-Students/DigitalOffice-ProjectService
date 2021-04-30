@@ -3,6 +3,7 @@ using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -13,6 +14,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using MassTransit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.Extensions.Logging;
@@ -29,6 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IPatchDbProjectMapper _mapper;
         private readonly IProjectRepository _repository;
         private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<CreateProjectCommand> _logger;
 
         private IGetDepartmentResponse GetDepartment(Guid departmentId, List<string> errors)
@@ -65,6 +68,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             IPatchDbProjectMapper mapper,
             IProjectRepository repository,
             IRequestClient<IGetDepartmentRequest> requestClient,
+            IHttpContextAccessor httpContextAccessor,
             ILogger<CreateProjectCommand> logger
         )
         {
@@ -73,6 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _mapper = mapper;
             _repository = repository;
             _requestClient = requestClient;
+            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
 
@@ -80,12 +85,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             _validator.ValidateAndThrowCustom(request);
 
-            if (!_accessValidator.IsAdmin() && !_accessValidator.HasRights(Kernel.Constants.Rights.AddEditRemoveProjects))
-            {
-                throw new ForbiddenException("Not enough rights.");
-            }
+            DbProject dbProject = _repository.GetProject(projectId);
 
             var response = new OperationResultResponse<bool>();
+
+            /*if (!_accessValidator.IsAdmin() &&
+                (GetDepartment(dbProject.DepartmentId, response.Errors).DirectorUserId !=
+                _httpContextAccessor.HttpContext.GetUserId()))
+            {
+                throw new ForbiddenException("Not enough rights.");
+            }*/
 
             foreach (Operation item in request.Operations)
             {
@@ -105,7 +114,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 };
             }
 
-            response.Body = _repository.Edit(projectId, _mapper.Map(request));
+            response.Body = _repository.Edit(dbProject, _mapper.Map(request));
             response.Status = OperationResultStatusType.FullSuccess;
 
             return response;

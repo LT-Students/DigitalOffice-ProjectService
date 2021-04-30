@@ -6,13 +6,15 @@ namespace LT.DigitalOffice.Broker.Responses
     {
         Guid Id { get; }
         string Name { get; }
+        Guid DirectorUserId { get; }
 
-        static object CreateObj(Guid id, string name)
+        static object CreateObj(Guid id, string name, Guid directorUserId)
         {
             return new
             {
                 Id = id,
-                Name = name
+                Name = name,
+                DirectorUserId = directorUserId
             };
         }
     }

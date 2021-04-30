@@ -33,7 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="projectId">Edit project Id.</param>
         /// <param name="request">New data of the project.</param>
         /// <returns>True if project updated.</returns>
-        bool Edit(Guid projectId, JsonPatchDocument<DbProject> request);
+        bool Edit(DbProject dbProject, JsonPatchDocument<DbProject> request);
 
         /// <summary>
         /// Disable active workers, which were previously assigned to the project.

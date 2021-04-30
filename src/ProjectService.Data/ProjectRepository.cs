@@ -73,16 +73,9 @@ namespace LT.DigitalOffice.ProjectService.Data
             provider.Save();
         }
 
-        public bool Edit(Guid projectId, JsonPatchDocument<DbProject> request)
+        public bool Edit(DbProject dbProject, JsonPatchDocument<DbProject> request)
         {
-            var projectToEdit = provider.Projects.FirstOrDefault(x => x.Id == projectId);
-
-            if (projectToEdit == null)
-            {
-                throw new NotFoundException($"Project with id: '{projectId}' not found");
-            }
-
-            request.ApplyTo(projectToEdit);
+            request.ApplyTo(dbProject);
             provider.Save();
 
             return true;
