@@ -106,13 +106,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         }
 
         [Test]
-        public void SuccessCommandExecuteWhenAdminandHasRights()
-        {
-            SerializerAssert.AreEqual(_response, _command.Execute(It.IsAny<Guid>(), _request));
-        }
-
-        [Test]
-        public void SuccessCommandExecuteWhenNotAdmin()
+        public void SuccessCommandExecuteWhenRequesterHasRightsAndNotAdmin()
         {
             _mocker
                 .Setup<IAccessValidator, bool>(x => x.IsAdmin())
@@ -122,7 +116,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         }
 
         [Test]
-        public void SuccessCommandExecuteWhenNotRights()
+        public void SuccessCommandExecuteWhenRequesterAdminAndNotRights()
         {
             _mocker
                 .Setup<IAccessValidator, bool>(x => x.HasRights(It.IsAny<int>()))
@@ -149,7 +143,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         }
 
         [Test]
-        public void ForbiddenExceptionWhenUserIsNotAdminAndHasNoRights()
+        public void ForbiddenExceptionWhenRequesterIsNotAdminAndNotHasRights()
         {
             _mocker
                 .Setup<IAccessValidator, bool>(x => x.IsAdmin())
@@ -173,11 +167,8 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         public void NotSuccessBrokerResponse()
         {
             _operationResult.Setup(x => x.IsSuccess).Returns(false);
-            _response.Body = false;
-            _response.Status = OperationResultStatusType.Failed;
-            _response.Errors.Add("Cannot edit project. Please try again later.");
 
-            SerializerAssert.AreEqual(_response, _command.Execute(It.IsAny<Guid>(), _request));
+            Assert.Throws<BadRequestException>(() => _command.Execute(It.IsAny<Guid>(), _request));
             _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
                 x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
                     IGetDepartmentRequest.CreateObj(null, _departmentId), default, default), Times.Once);
@@ -186,7 +177,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         }
 
         [Test]
-        public void ArgumentNullExceptionWhenMapperThrowsIt()
+        public void MapperArgumentNullExceptionWhenRequestIsNull()
         {
             _mocker
                 .Setup<IPatchDbProjectMapper, JsonPatchDocument<DbProject>>(x => x.Map(_request))

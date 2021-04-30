@@ -38,9 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         public EditProjectValidator()
         {
             RuleFor(x => x.Operations)
-                .Must(x =>
-                    x.Select(x => x.path)
-                .Distinct().Count() == x.Count())
+                .Must(x => x.Select(x => x.path).Distinct().Count() == x.Count())
                 .WithMessage("You don't have to change the same field of Project multiple times.")
                 .Must(x => x.Any())
                 .WithMessage("You don't have changes.")
@@ -56,7 +54,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
                         RuleFor(x => (string)GetOperationByPath(x, Name).value)
                             .NotEmpty()
-                            .MaximumLength(150).WithMessage("First name is too long.");
+                            .MaximumLength(150)
+                            .WithMessage("First name is too long.");
                     });
 
                     When(x => GetOperationByPath(x, ShortName) != null, () =>
@@ -65,8 +64,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
                         RuleFor(x => (string)GetOperationByPath(x, ShortName).value)
                             .NotEmpty()
-                            .MaximumLength(30).WithMessage("Short name is too long.");
-
+                            .MaximumLength(30)
+                            .WithMessage("Short name is too long.");
                     });
 
                     When(x => GetOperationByPath(x, Description) != null, () =>
@@ -79,16 +78,17 @@ namespace LT.DigitalOffice.ProjectService.Validation
                         RuleFor(x => x.Operations).UniqueOperationWithAllowedOp(ShortDescription, "replace");
 
                         RuleFor(x => (string)GetOperationByPath(x, ShortDescription).value)
-                            .MaximumLength(300).WithMessage("Short description is to long");
+                            .MaximumLength(300)
+                            .WithMessage("Short description is to long");
                     });
-
 
                     When(x => GetOperationByPath(x, Status) != null, () =>
                     {
                         RuleFor(x => x.Operations).UniqueOperationWithAllowedOp(Status, "replace");
 
                         RuleFor(x => (ProjectStatusType)GetOperationByPath(x, Status).value)
-                            .IsInEnum().WithMessage("Wrong status value.");
+                            .IsInEnum()
+                            .WithMessage("Wrong status value.");
                     });
 
                     When(x => GetOperationByPath(x, DepartmentId) != null, () =>

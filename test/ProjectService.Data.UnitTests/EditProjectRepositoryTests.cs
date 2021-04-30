@@ -108,7 +108,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         }
 
         [Test]
-        public void SuccessPatch()
+        public void SuccessEditProject()
         {
             _provider.Projects.Add(_dbProjectBefore);
             _provider.Save();

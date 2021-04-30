@@ -130,7 +130,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
-        public void ExceptionWhenStatusIsTooLong()
+        public void ExceptionWhenStatusIsNotContainedInEnum()
         {
             GetOperationByPath(EditProjectValidator.Status).value = 10;
 
