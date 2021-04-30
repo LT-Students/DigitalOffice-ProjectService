@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             try
             {
                 var response = _requestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                IGetDepartmentRequest.CreateObj(departmentId)).Result;
+                IGetDepartmentRequest.CreateObj(null, departmentId)).Result;
 
                 if (response.Message.IsSuccess)
                 {
@@ -98,7 +98,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             {
                 throw new BadRequestException("Project department not found.");
             }
-            else if(errors.Any())
+            else if (errors.Any())
             {
                 return new OperationResultResponse<ProjectInfo>
                 {

@@ -38,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
-                Status = (int)ProjectStatusType.Abandoned,
+                Status = (int)ProjectStatusType.Active,
                 Users = new List<DbProjectUser>
                 {
                     new DbProjectUser
