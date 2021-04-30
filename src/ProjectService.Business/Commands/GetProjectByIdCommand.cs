@@ -125,7 +125,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var showNotActiveUsers = filter.ShowNotActiveUsers == true;
             var usersInfo = GetProjectUsers(dbProject.Users, showNotActiveUsers);
 
-            var filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map);
+            var filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
 
             return _projectExpandedResponseMapper.Map(dbProject, usersInfo, filesInfo, department);
         }

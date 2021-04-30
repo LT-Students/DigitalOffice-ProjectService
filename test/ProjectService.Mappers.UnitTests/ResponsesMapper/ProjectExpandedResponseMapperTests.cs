@@ -75,6 +75,19 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
                 Name = "DepartmentName"
             };
 
+            _projectInfo = new ProjectInfo
+            {
+                Id = _dbProject.Id,
+                Department = _department,
+                Description = _dbProject.Description,
+                ShortDescription = _dbProject.ShortDescription,
+                Name = _dbProject.Name,
+                AuthorId = _dbProject.AuthorId,
+                CreatedAt = _dbProject.CreatedAt,
+                ShortName = _dbProject.ShortName,
+                Status =(ProjectStatusType)_dbProject.Status
+            };
+
             _expectedResponse = new ProjectExpandedResponse
             {
                 Project = _projectInfo,
@@ -92,20 +105,23 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         [Test]
         public void ShoulThrowExceptionWhenDbProjectIsNull()
         {
-            Assert.AreEqual(_expectedResponse, _projectIProjectExpandedResponseMapper.Map(null, _users, _files, _department));
+            Assert.Throws<ArgumentNullException>(() => _projectIProjectExpandedResponseMapper.Map(null, _users, _files, _department));
         }
 
         [Test]
         public void ShoulThrowExceptionWhenDepartmentIdDontMatch()
         {
             _department.Id = Guid.NewGuid();
-            Assert.AreEqual(_expectedResponse, _projectIProjectExpandedResponseMapper.Map(_dbProject, _users, _files, _department));
+
+            Assert.Throws<ArgumentException>(() => _projectIProjectExpandedResponseMapper.Map(_dbProject, _users, _files, _department));
         }
 
         [Test]
         public void ShouldReturnProjectExpandedResponse()
         {
-            Assert.AreEqual(_expectedResponse, _projectIProjectExpandedResponseMapper.Map(_dbProject, _users, _files, _department));
+            var result = _projectIProjectExpandedResponseMapper.Map(_dbProject, _users, _files, _department);
+
+            SerializerAssert.AreEqual(_expectedResponse, result);
         }
     }
 }

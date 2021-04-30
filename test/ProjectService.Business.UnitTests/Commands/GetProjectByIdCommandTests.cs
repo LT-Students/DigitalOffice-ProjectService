@@ -223,6 +223,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Returns(_projectFilesInfo.First());
 
             _projectExpandedResponseMapperMock = new Mock<IProjectExpandedResponseMapper>();
+            _projectExpandedResponseMapperMock
+                .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>()))
+                .Returns(_expectedResponse)
+                .Verifiable();
 
             _command = new GetProjectByIdCommand(
                 _loggerMock.Object,
@@ -257,10 +261,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         [Test]
         public void ShouldThrowExceptionWhenGetUsersClientThrowsIt()
         {
-            _repositoryMock
-                .Setup(x => x.GetProject(_fullFilter))
-                .Returns(_dbProject);
-
             _rcUsersDataMock
                 .Setup(x => x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default).Result)
                 .Throws(new Exception());
@@ -271,10 +271,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         [Test]
         public void ShouldThrowExceptionWhenProjectUserMapperThrowsIt()
         {
-            _repositoryMock
-                .Setup(x => x.GetProject(_fullFilter))
-                .Returns(_dbProject);
-
             _projectUserInfoMapperMock
                 .Setup(x => x.Map(It.IsAny<UserData>(), It.IsAny<DbProjectUser>()))
                 .Throws(new Exception());
@@ -285,10 +281,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         [Test]
         public void ShouldThrowExceptionWhenProjectUserFileMapperThrowsIt()
         {
-            _repositoryMock
-                .Setup(x => x.GetProject(_fullFilter))
-                .Returns(_dbProject);
-
             _projectFileInfoMapperMock
                 .Setup(x => x.Map(_dbProjectFile))
                 .Throws(new Exception());
@@ -299,10 +291,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         [Test]
         public void ShouldThrowExceptionWhenProjectExpandedResponseMapperThrowsIt()
         {
-            _repositoryMock
-                .Setup(x => x.GetProject(_fullFilter))
-                .Returns(_dbProject);
-
             _projectExpandedResponseMapperMock
                 .Setup(x => x.Map(_dbProject, _projectUsersInfo, _projectFilesInfo, _departmentInfo))
                 .Throws(new Exception());
@@ -313,15 +301,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         [Test]
         public void ShouldReturnProjectInfo()
         {
-            _repositoryMock
-                .Setup(x => x.GetProject(_fullFilter))
-                .Returns(_dbProject);
-
             _projectExpandedResponseMapperMock
                 .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>()))
-                .Returns(_expectedResponse);
+                .Returns(_expectedResponse)
+                .Verifiable();
 
             var result = _command.Execute(_fullFilter);
+
+            _projectExpandedResponseMapperMock.Verify(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>()), Times.Once);
 
             SerializerAssert.AreEqual(_expectedResponse, result);
         }

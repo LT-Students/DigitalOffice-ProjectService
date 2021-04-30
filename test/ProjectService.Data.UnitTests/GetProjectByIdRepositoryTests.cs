@@ -42,17 +42,13 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 Id = Guid.NewGuid(),
                 FileId = Guid.NewGuid(),
                 ProjectId = _dbProject.Id,
-                Project = _dbProject
             };
-
-            _dbProject.Files = new List<DbProjectFile> { dbFile };
 
             var activeDbUser = new DbProjectUser
             {
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
                 ProjectId = _dbProject.Id,
-                Project = _dbProject,
                 IsActive = true
             };
 
@@ -61,13 +57,12 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
                 ProjectId = _dbProject.Id,
-                Project = _dbProject,
                 IsActive = false
             };
 
-            _dbProject.Users = new List<DbProjectUser> { activeDbUser, notActiveDbUser };
-
             _provider.Projects.Add(_dbProject);
+            _provider.ProjectsUsers.AddRange(activeDbUser, notActiveDbUser);
+            _provider.ProjectsFiles.Add(dbFile);
             _provider.Save();
         }
 

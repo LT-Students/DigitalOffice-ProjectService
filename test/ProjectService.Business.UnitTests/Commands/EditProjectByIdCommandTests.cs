@@ -66,7 +66,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(true);
 
             repositoryMock
-                .Setup(x => x.GetProject(filter))
+                .Setup(x => x.GetProject(It.IsAny<GetProjectFilter>()))
                 .Returns(dbProject);
 
             repositoryMock
@@ -121,7 +121,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         {
             Assert.AreEqual(editRequest.ProjectId, command.Execute(editRequest));
             validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
-            repositoryMock.Verify(r => r.GetProject(filter), Times.Once);
+            repositoryMock.Verify(r => r.GetProject(It.IsAny<GetProjectFilter>()), Times.Once);
             repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Once);
         }
 
@@ -134,7 +134,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
 
             Assert.AreEqual(editRequest.ProjectId, command.Execute(editRequest));
             validatorMock.Verify(v => v.Validate(It.IsAny<IValidationContext>()), Times.Once);
-            repositoryMock.Verify(r => r.GetProject(filter), Times.Once);
+            repositoryMock.Verify(r => r.GetProject(It.IsAny<GetProjectFilter>()), Times.Once);
             repositoryMock.Verify(r => r.EditProjectById(dbProject), Times.Once);
         }
 
