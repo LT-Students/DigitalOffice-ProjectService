@@ -21,7 +21,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public int Number { get; set; }
         public int? PlannedMinutes { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime? Deadline { get; set; }
 
         public DbProject Project { get; set; }
         public DbProjectUser Author { get; set; }
@@ -40,6 +39,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
             builder
                 .HasKey(t => t.Id);
+
+            builder
+                .Property(t => t.Name)
+                .IsRequired();
 
             builder
                 .HasOne(t => t.AssignedUser)
@@ -70,10 +73,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .HasOne(t => t.Priority)
                 .WithMany(tp => tp.PriorityTasks)
                 .HasForeignKey(t => t.PriorityId);
-
-            builder
-                .Property(t => t.Name)
-                .IsRequired();
         }
     }
 }

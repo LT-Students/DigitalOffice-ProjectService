@@ -11,7 +11,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
         [FromQuery(Name = "projectId")]
         public Guid? ProjectId { get; set; }
 
-        [FromQuery(Name="assign")]
+        [FromQuery(Name="assignTo")]
         public Guid? Assign { get; set; }
     }
 }

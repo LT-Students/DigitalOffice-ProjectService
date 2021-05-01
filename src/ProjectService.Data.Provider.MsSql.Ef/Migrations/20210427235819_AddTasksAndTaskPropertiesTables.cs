@@ -26,8 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                     Number = table.Column<int>(nullable: false),
                     PlannedMinutes = table.Column<int?>(nullable: true),
                     Name = table.Column<string>(nullable: false),
-                    Description = table.Column<string>(nullable: false),
-                    Deadline = table.Column<DateTime?>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                 },
                 constraints: table =>

@@ -17,6 +17,5 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
         public int Number { get; set; }
         public int? PlannedMinutes { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime? Deadline { get; set; }
     }
 }

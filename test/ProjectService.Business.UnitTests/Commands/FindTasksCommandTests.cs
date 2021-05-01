@@ -6,6 +6,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.UnitTestKernel;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Moq.AutoMock;
 using NUnit.Framework;
@@ -19,15 +20,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     {
         private IEnumerable<DbTask> _dbTasks;
         private IEnumerable<TaskInfo> _taskInfo;
+        private IEnumerable<DbProjectUser> _dbProjectUsers;
 
-        private IFindTasksCommand _command;
         private AutoMocker _mocker;
+        private IFindTasksCommand _command;
+        IDictionary<object, object> _contextValues;
 
+        #region Setup
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _taskInfo = new List<TaskInfo>();
             _dbTasks = new List<DbTask>();
+
+            _contextValues = new Dictionary<object, object>();
+            _contextValues.Add("UserId", Guid.NewGuid());
 
             _mocker = new AutoMocker();
             _command = _mocker.CreateInstance<FindTasksCommand>();
@@ -43,7 +50,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                         PlannedMinutes = 30,
                         AssignedTo = Guid.NewGuid(),
                         AuthorId = Guid.NewGuid(),
-                        Deadline = DateTime.UtcNow,
                         ProjectId = Guid.NewGuid(),
                         CreatedAt = DateTime.UtcNow,
                         ParentId = Guid.NewGuid(),
@@ -54,8 +60,33 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     });
             }
 
+            _dbProjectUsers = new List<DbProjectUser>
+            {
+                new DbProjectUser
+                {
+                    Id = Guid.NewGuid(),
+                    ProjectId = _dbTasks.ElementAt(0).ProjectId,
+                    UserId = (Guid)_contextValues["UserId"],
+                    AddedOn = DateTime.Now,
+                    IsActive = true
+                },
+                new DbProjectUser
+                {
+                    Id = Guid.NewGuid(),
+                    ProjectId = _dbTasks.ElementAt(0).ProjectId,
+                    UserId = (Guid)_contextValues["UserId"],
+                    AddedOn = DateTime.Now,
+                    IsActive = true
+                }
+            };
+
             foreach (var dbTask in _dbTasks)
             {
+                if (dbTask.ProjectId != _dbProjectUsers.ElementAt(0).ProjectId)
+                {
+                    continue;
+                }
+
                 _taskInfo = _taskInfo.Append(
                     new TaskInfo
                     {
@@ -63,7 +94,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                         AssignedTo = dbTask.AssignedTo,
                         AuthorId = dbTask.AuthorId,
                         CreatedAt = dbTask.CreatedAt,
-                        Deadline = dbTask.Deadline,
                         Description = dbTask.Description,
                         Name = dbTask.Name,
                         Number = dbTask.Number,
@@ -72,10 +102,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                         PriorityId = dbTask.PriorityId,
                         ProjectId = dbTask.ProjectId,
                         StatusId = dbTask.StatusId,
-                        TypeId= dbTask.TypeId
+                        TypeId = dbTask.TypeId
                     });
             }
         }
+        #endregion
 
         [SetUp]
         public void SetUp()
@@ -89,14 +120,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             int skipCount = 0;
             int takeCount = _dbTasks.Count();
-            int totalCount = _dbTasks.Count();
+            int totalCount = _taskInfo.Count(); ;
 
             FindTasksFilter filter = null;
 
             Assert.Throws<ArgumentNullException>(() => _command.Execute(filter, skipCount, takeCount));
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x => x.Map(It.IsAny<DbTask>()), Times.Never);
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
-                x.Find(filter, skipCount, takeCount, out totalCount), Times.Never);
+                x.Find(filter, It.IsAny<List<Guid>>(), skipCount, takeCount, out totalCount), Times.Never);
         }
 
         [Test]
@@ -104,32 +135,40 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             int skipCount = 0;
             int takeCount = _dbTasks.Count();
-            int totalCount = _dbTasks.Count();
+            int totalCount = _taskInfo.Count();
 
             var result = new FindResponse<TaskInfo>
             {
-                TotalCount = _dbTasks.Count(),
+                TotalCount = _taskInfo.Count(),
                 Body = _taskInfo,
             };
+
+            var projectIds = _taskInfo.Select(x => x.ProjectId);
+            var dbTasks = _dbTasks.Where(x => projectIds.Contains(x.ProjectId));
 
             var filter = new FindTasksFilter();
             filter.Assign = _dbTasks.ElementAt(0).AssignedTo;
 
             _mocker
-                .Setup<ITaskRepository, IEnumerable<DbTask>>(x => x.Find(filter, skipCount, takeCount, out totalCount))
-                .Returns(_dbTasks);
+                .Setup<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items)
+                .Returns(_contextValues);
+
+            _mocker
+                .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Find((Guid)_contextValues["UserId"]))
+                .Returns(_dbProjectUsers);
+
+            _mocker
+                .Setup<ITaskRepository, IEnumerable<DbTask>>(x => x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount))
+                .Returns(dbTasks);
 
             _mocker
                 .SetupSequence<ITaskInfoMapper, TaskInfo>(x => x.Map(It.IsAny<DbTask>()))
-                .Returns(_taskInfo.ElementAt(0))
-                .Returns(_taskInfo.ElementAt(1))
-                .Returns(_taskInfo.ElementAt(2))
-                .Returns(_taskInfo.ElementAt(3));
+                .Returns(_taskInfo.ElementAt(0));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
-            _mocker.Verify<ITaskInfoMapper, TaskInfo>(x => x.Map(It.IsAny<DbTask>()), Times.Exactly(_dbTasks.Count()));
+            _mocker.Verify<ITaskInfoMapper, TaskInfo>(x => x.Map(It.IsAny<DbTask>()), Times.Exactly(_taskInfo.Count()));
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
-                x.Find(filter, skipCount, takeCount, out totalCount), Times.Once);
+                x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount), Times.Once);
         }
     }
 }

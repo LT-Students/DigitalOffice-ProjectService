@@ -15,7 +15,8 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         private IQueryable<DbTask> CreateFindPredicates(
             FindTasksFilter filter,
-            IQueryable<DbTask> dbTasks)
+            IQueryable<DbTask> dbTasks,
+            IEnumerable<Guid> projectIds)
         {
             if (filter.Number.HasValue)
             {
@@ -32,6 +33,11 @@ namespace LT.DigitalOffice.ProjectService.Data
                 dbTasks = dbTasks.Where(x => x.AssignedTo.Equals(filter.Assign));
             }
 
+            if(projectIds.Any())
+            {
+                dbTasks = dbTasks.Where(x => projectIds.Contains(x.ProjectId));
+            }
+
             return dbTasks;
         }
 
@@ -40,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
-        public IEnumerable<DbTask> Find(FindTasksFilter filter, int skipCount, int takeCount, out int totalCount)
+        public IEnumerable<DbTask> Find(FindTasksFilter filter, IEnumerable<Guid> projectIds, int skipCount, int takeCount, out int totalCount)
         {
             if (filter == null)
             {
@@ -51,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                 .AsSingleQuery()
                 .AsQueryable();
 
-            var tasks = CreateFindPredicates(filter, dbTasks).ToList();
+            var tasks = CreateFindPredicates(filter, dbTasks, projectIds).ToList();
             totalCount = tasks.Count;
 
             return tasks.Skip(skipCount * takeCount).Take(takeCount).ToList();

@@ -21,7 +21,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 Number = dbTask.Number,
                 TypeId = dbTask.TypeId,
                 StatusId = dbTask.StatusId,
-                Deadline = dbTask.Deadline,
                 ParentId = dbTask.ParentId,
                 AuthorId = dbTask.AuthorId,
                 ProjectId = dbTask.ProjectId,
