@@ -21,12 +21,20 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public DateTime CreateTime { get; set; }
         public int? PlannedMinutes { get; set; }
         public int Number { get; set; }
+
+        public DbProject Project { get; set; }
+        public DbProjectUser Author { get; set; }
+        public DbProjectUser Assigner { get; set; }
+        public DbTaskProperty Status { get; set; }
+        public DbTaskProperty Priority { get; set; }
+        public DbTaskProperty Type { get; set; }
     }
 
     public class DbTaskConfiguration : IEntityTypeConfiguration<DbTask>
     {
         public void Configure(EntityTypeBuilder<DbTask> builder)
         {
+            
             builder
                 .ToTable(DbTask.TableName);
 
@@ -65,6 +73,36 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
             builder
                 .Property(t => t.Number)
                 .IsRequired();
+            
+            builder
+                .HasOne(t => t.Author)
+                .WithMany(u => u.AuthorTasks)
+                .HasForeignKey(t => t.AuthorId);
+
+            builder
+                .HasOne(t => t.Project)
+                .WithMany(p => p.Tasks)
+                .HasForeignKey(t => t.ProjectId);
+
+            builder
+                .HasOne(t => t.Status)
+                .WithMany(tp => tp.StatusTasks)
+                .HasForeignKey(t => t.StatusId);
+
+            builder
+                .HasOne(t => t.Type)
+                .WithMany(tp => tp.TypeTasks)
+                .HasForeignKey(t => t.TypeId);
+
+            builder
+                .HasOne(t => t.Priority)
+                .WithMany(tp => tp.PriorityTasks)
+                .HasForeignKey(t => t.PriorityId);
+
+            builder
+                .HasOne(t => t.Assigner)
+                .WithMany(u => u.AssignerTasks)
+                .HasForeignKey(t => t.AssignedTo);
         }
     }
 }

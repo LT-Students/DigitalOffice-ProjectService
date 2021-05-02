@@ -20,18 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 
             foreach (var item in request.Operations)
             {
-                string operation = item.OperationType switch
-                {
-                    OperationType.Add => "add",
-                    OperationType.Replace => "replace",
-                    OperationType.Remove => "remove",
-                    _ => null
-                };
-
-                if (operation != null)
-                {
-                    result.Operations.Add(new Operation<DbTask>(operation, item.path, item.from, item.value));
-                }
+                result.Operations.Add(new Operation<DbTask>(item.op, item.path, item.from, item.value));
             }
 
             return result;
