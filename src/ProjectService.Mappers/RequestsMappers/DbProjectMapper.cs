@@ -2,7 +2,6 @@
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers

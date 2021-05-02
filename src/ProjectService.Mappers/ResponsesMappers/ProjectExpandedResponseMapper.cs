@@ -6,7 +6,6 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
 {

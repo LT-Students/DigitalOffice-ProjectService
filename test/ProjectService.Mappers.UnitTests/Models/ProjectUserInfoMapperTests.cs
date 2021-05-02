@@ -1,14 +1,9 @@
 ﻿using LT.DigitalOffice.Broker.Models;
-using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers;
 using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.UnitTestKernel;
-using Moq;
 using NUnit.Framework;
 using System;
 

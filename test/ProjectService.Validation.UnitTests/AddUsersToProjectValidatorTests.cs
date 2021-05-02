@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using FluentValidation.TestHelper;
+﻿using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
