@@ -62,7 +62,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private readonly Guid _departmentId = Guid.NewGuid();
         private readonly Guid _taskId = Guid.NewGuid();
 
-
         private readonly OperationResultResponse<bool> _fullSuccessModel = new()
         {
             Status = OperationResultStatusType.FullSuccess,
