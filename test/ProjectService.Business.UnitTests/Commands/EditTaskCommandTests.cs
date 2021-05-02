@@ -252,7 +252,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 DepartmentId = _departmentId
             });
             
-
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
         }
 
