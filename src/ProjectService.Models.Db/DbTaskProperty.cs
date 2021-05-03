@@ -10,13 +10,17 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public const string TableName = "TaskProperties";
 
         public Guid Id { get; set; }
+        public Guid AuthorId { get; set; }
+        public Guid ProjectId { get; set; }
+        public int PropertyType { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public int Type { get; set; }
-        public Guid ProjectId { get; set; }
-        public Guid AuthorId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public bool IsActive { get; set; }
+
         public DbProject Project { get; set; }
         public DbProjectUser User { get; set; }
+
         public ICollection<DbTask> PriorityTasks { get; set; }
         public ICollection<DbTask> TypeTasks { get; set; }
         public ICollection<DbTask> StatusTasks { get; set; }
@@ -30,26 +34,36 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .ToTable(DbTaskProperty.TableName);
 
             builder
-                .HasKey(t => t.Id);
+                .HasKey(tp => tp.Id);
+
+            builder
+                .Property(tp => tp.Name)
+                .IsRequired();
 
             builder
                 .HasOne(tp => tp.User)
-                .WithMany(u => u.TaskProperties)
+                .WithMany(pu => pu.TaskProperties)
                 .HasForeignKey(tp => tp.AuthorId);
 
             builder
                 .HasOne(tp => tp.Project)
                 .WithMany(p => p.TaskProperties)
                 .HasForeignKey(tp => tp.ProjectId);
-            
-            builder
-                .Property(t => t.Name)
-                .HasMaxLength(150)
-                .IsRequired();
 
             builder
-                .Property(t => t.Type)
-                .IsRequired();
+                .HasMany(tp => tp.PriorityTasks)
+                .WithOne(T => T.Priority)
+                .HasForeignKey(x => x.PriorityId);
+
+            builder
+                .HasMany(tp => tp.TypeTasks)
+                .WithOne(T => T.Type)
+                .HasForeignKey(x => x.TypeId);
+
+            builder
+                .HasMany(tp => tp.StatusTasks)
+                .WithOne(T => T.Status)
+                .HasForeignKey(x => x.StatusId);
         }
     }
 }

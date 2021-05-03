@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
         public DbProject Project { get; set; }
         public ICollection<DbTask> AuthorTasks { get; set; }
-        public ICollection<DbTask> AssignerTasks { get; set; }
+        public ICollection<DbTask> AssignedUserTasks { get; set; }
         public ICollection<DbTaskProperty> TaskProperties { get; set; }
     }
 
@@ -37,6 +37,21 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .HasOne(pu => pu.Project)
                 .WithMany(p => p.Users)
                 .HasForeignKey(pu => pu.ProjectId);
+            
+            builder
+                .HasMany(pu => pu.AssignedUserTasks)
+                .WithOne(t => t.AssignedUser)
+                .HasForeignKey(t => t.AssignedTo);
+
+            builder
+                .HasMany(pu => pu.AuthorTasks)
+                .WithOne(t => t.Author)
+                .HasForeignKey(t => t.AuthorId);
+
+            builder
+                .HasMany(pu => pu.TaskProperties)
+                .WithOne(tp => tp.User)
+                .HasForeignKey(t => t.AuthorId);
         }
     }
 }

@@ -27,7 +27,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public DbProject()
         {
             Users = new HashSet<DbProjectUser>();
-            
             Tasks = new HashSet<DbTask>();
             TaskProperties = new HashSet<DbTaskProperty>();
             Files = new HashSet<DbProjectFile>();

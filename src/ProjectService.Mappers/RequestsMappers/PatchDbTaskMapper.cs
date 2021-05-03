@@ -1,3 +1,4 @@
+using System;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -13,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
         {
             if (request == null)
             {
-                throw new BadRequestException();
+                throw new ArgumentNullException();
             }
 
             var result = new JsonPatchDocument<DbTask>();
