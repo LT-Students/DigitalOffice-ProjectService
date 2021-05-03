@@ -122,7 +122,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         public void ThrowExceptionWhenNull()
         {
             _request = null;
-            Assert.Throws<BadRequestException>(() => { _mapper.Map(_request); });
+            Assert.Throws<ArgumentNullException>(() => { _mapper.Map(_request); });
         }
     }
 }
