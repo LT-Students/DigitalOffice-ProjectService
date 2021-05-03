@@ -60,8 +60,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
             builder
                 .HasMany(pu => pu.TaskProperties)
-                .WithOne(tp => tp.User)
-                .HasForeignKey(t => t.AuthorId);
+                .WithOne(tp => tp.User);
         }
     }
 }

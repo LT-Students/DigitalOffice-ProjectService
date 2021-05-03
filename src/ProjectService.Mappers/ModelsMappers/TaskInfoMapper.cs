@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
+﻿using LT.DigitalOffice.Broker.Responses;
+using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using System;
@@ -7,7 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
 {
     public class TaskInfoMapper : ITaskInfoMapper
     {
-        public TaskInfo Map(DbTask dbTask)
+        public TaskInfo Map(DbTask dbTask, IGetUserDataResponse assignedUser, IGetUserDataResponse author)
         {
             if (dbTask == null)
             {
@@ -19,16 +20,29 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 Id = dbTask.Id,
                 Name = dbTask.Name,
                 Number = dbTask.Number,
-                TypeId = dbTask.TypeId,
-                StatusId = dbTask.StatusId,
-                ParentId = dbTask.ParentId,
-                AuthorId = dbTask.AuthorId,
-                ProjectId = dbTask.ProjectId,
+                TypeName = dbTask.Type.Name,
                 CreatedAt = dbTask.CreatedAt,
-                AssignedTo = dbTask.AssignedTo,
-                PriorityId = dbTask.PriorityId,
+                StatusName = dbTask.Status.Name,
                 Description = dbTask.Description,
+                PriorityName = dbTask.Priority.Name,
                 PlannedMinutes = dbTask.PlannedMinutes,
+                Author = new UserTaskInfo
+                {
+                    Id = dbTask.AuthorId,
+                    FirstName = author?.FirstName,
+                    LastName = author?.LastName
+                },
+                Project = new ProjectTaskInfo
+                {
+                    Id = dbTask.Id,
+                    ProjectName = dbTask.Project.ShortName
+                },
+                AssignedTo = new UserTaskInfo
+                {
+                    Id = dbTask.AssignedTo.HasValue ? dbTask.AssignedTo.Value : null,
+                    FirstName = author?.FirstName,
+                    LastName = author?.LastName
+                }
             };
         }
     }

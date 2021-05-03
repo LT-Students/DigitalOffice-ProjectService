@@ -156,7 +156,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         public void ShouldThrowExceptionWhenCreatingNewProjectWithIncorrectProjectData()
         {
             _mocker
-               .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+               .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
                .Returns(true);
 
             _mocker
@@ -164,7 +164,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 .Returns(false);
 
             Assert.Throws<ValidationException>(() => _command.Execute(_newRequest));
-            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(), Times.Once);
+            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
             _mocker.Verify<ICreateProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
         }
 
@@ -172,7 +172,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         public void ShouldThrowExceptionWhenUserHasNotRights()
         {
             _mocker
-               .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+               .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
                .Returns(false);
 
             _mocker
@@ -181,7 +181,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
 
             Assert.Throws<ForbiddenException>(() => _command.Execute(_newRequest));
 
-            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(), Times.Once);
+            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
             _mocker.Verify<IAccessValidator, bool>(x => x.HasRights(Rights.AddEditRemoveProjects), Times.Once);
             _mocker.Verify<ICreateProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Never);
             _mocker.Verify<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _autorId), Times.Never);

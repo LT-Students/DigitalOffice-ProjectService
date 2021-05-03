@@ -1,5 +1,7 @@
-﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
+﻿using LT.DigitalOffice.Broker.Requests;
+using LT.DigitalOffice.Broker.Responses;
+using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -7,8 +9,11 @@ using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
+using MassTransit;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
@@ -19,16 +24,49 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly ITaskRepository _taskRepository;
         private readonly IUserRepository _userRepository;
         private readonly IAccessValidator _accessValidator;
+        private readonly ILogger<FindTasksCommand> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRequestClient<IGetUserDataRequest> _requestClient;
+
+        private IGetUserDataResponse GetUserData(Guid userId, List<string> errors)
+        {
+            string errorMessage = "Can not find user data. Please try again later.";
+
+            try
+            {
+                var response = _requestClient.GetResponse<IOperationResult<IGetUserDataResponse>>(
+                    IGetUserDataRequest.CreateObj(userId)).Result;
+
+                if (response.Message.IsSuccess)
+                {
+                    return response.Message.Body;
+                }
+
+                errors.AddRange(response.Message.Errors);
+
+                _logger.LogWarning("Can not find user data with this id {UserId}: " +
+                    $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}", userId);
+            }
+            catch (Exception exc)
+            {
+                errors.Add(errorMessage);
+
+                _logger.LogError(exc, errorMessage);
+            }
+
+            return null;
+        }
 
         public FindTasksCommand(
             ITaskInfoMapper mapper,
             ITaskRepository taskRepository,
             IUserRepository userRepository,
+            IAccessValidator accessValidator,
             IHttpContextAccessor httpContextAccessor,
-            IAccessValidator accessValidator)
+            IRequestClient<IGetUserDataRequest> requestClient)
         {
             _mapper = mapper;
+            _requestClient = requestClient;
             _taskRepository = taskRepository;
             _userRepository = userRepository;
             _accessValidator = accessValidator;
@@ -42,24 +80,39 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 throw new ArgumentNullException(nameof(filter));
             }
 
+            List<string> errors = new();
+
             var userId = _httpContextAccessor.HttpContext.GetUserId();
             var projectUsers = _userRepository.Find(userId);
 
             bool isAdmin = _accessValidator.IsAdmin();
             if (!projectUsers.Any() && !isAdmin)
             {
-                throw new ForbiddenException("Not enough rights.");
+                return new FindResponse<TaskInfo>();
             }
 
             var projectIds = projectUsers.Select(x => x.ProjectId).Distinct();
             var dbTasks = _taskRepository.Find(filter, projectIds, skipCount, takeCount, out int totalCount);
 
-            var tasks = dbTasks.Select(x => _mapper.Map(x));
+            List<TaskInfo> tasks = new();
+            foreach (var dbTask in dbTasks)
+            {
+                IGetUserDataResponse assignedUser = null;
+
+                assignedUser = dbTask.AssignedTo.HasValue ?
+                    GetUserData(dbTask.AssignedTo.Value, errors) :
+                    null;
+
+                var author = GetUserData(dbTask.AuthorId, errors);
+
+                tasks.Add(_mapper.Map(dbTask, assignedUser, author));
+            }
 
             return new FindResponse<TaskInfo>
             {
                 TotalCount = totalCount,
-                Body = tasks
+                Body = tasks,
+                Errors = errors
             };
         }
     }

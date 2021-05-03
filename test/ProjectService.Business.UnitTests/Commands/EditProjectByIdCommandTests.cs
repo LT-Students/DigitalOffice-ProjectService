@@ -50,7 +50,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(true);
 
             accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(true);
 
             accessValidatorMock
@@ -88,7 +88,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(false);
 
             accessValidatorMock
-               .Setup(x => x.IsAdmin())
+               .Setup(x => x.IsAdmin(null))
                .Returns(false);
 
             Assert.Throws<ForbiddenException>(
@@ -134,7 +134,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         public void ShouldReturnProjectGuidWhenUserIsOnlyHasRights()
         {
             accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(false);
 
             Assert.AreEqual(editRequest.ProjectId, command.Execute(editRequest));
