@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Id = _taskPropertyId,
                 Description = _description,
                 Name = _name,
-                Type = _type
+                PropertyType = _type
             };
 
             _provider.TaskProperties.Add(_dbTaskProperty);
@@ -51,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Id = _taskPropertyId,
                 Name = _name,
                 Description = _description,
-                Type = _type
+                PropertyType = _type
             };
 
             CreateInMemoryDb();
