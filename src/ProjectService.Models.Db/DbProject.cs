@@ -52,7 +52,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .IsRequired();
 
             builder
-                .Property(P => P.Name)
+                .Property(p => p.Name)
                 .HasMaxLength(150);
 
             builder
@@ -66,6 +66,18 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
             builder
                 .HasMany(p => p.Users)
                 .WithOne(u => u.Project);
+
+            builder
+                .HasMany(p => p.Files)
+                .WithOne(f => f.Project);
+
+            builder
+                .HasMany(p => p.Tasks)
+                .WithOne(t => t.Project);
+
+            builder
+                .HasMany(p => p.TaskProperties)
+                .WithOne(tp => tp.Project);
         }
     }
 }
