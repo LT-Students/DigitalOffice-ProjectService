@@ -98,7 +98,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
             Assert.Throws<ArgumentNullException>(() => _mapper.Map(null, userData, userData));
         }
 
-       /* [Test]
+        [Test]
         public void ShouldReturnDbTaskSuccessful()
         {
             var assignedUserData = new Mock<IGetUserDataResponse>();
@@ -111,6 +111,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
             authorData.Setup(x => x.LastName).Returns("Semenov");
 
             SerializerAssert.AreEqual(_taskInfo, _mapper.Map(_dbTask, assignedUserData.Object, authorData.Object));
-        }*/
+        }
     }
 }

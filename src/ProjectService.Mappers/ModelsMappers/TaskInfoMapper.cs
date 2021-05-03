@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 throw new ArgumentNullException(nameof(dbTask));
             }
 
-            return new TaskInfo
+            var db = new TaskInfo
             {
                 Id = dbTask.Id,
                 Name = dbTask.Name,
@@ -34,16 +34,18 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 },
                 Project = new ProjectTaskInfo
                 {
-                    Id = dbTask.Id,
+                    Id = dbTask.ProjectId,
                     ProjectName = dbTask.Project.ShortName
                 },
                 AssignedTo = new UserTaskInfo
                 {
                     Id = dbTask.AssignedTo.HasValue ? dbTask.AssignedTo.Value : null,
-                    FirstName = author?.FirstName,
-                    LastName = author?.LastName
+                    FirstName = assignedUser?.FirstName,
+                    LastName = assignedUser?.LastName
                 }
             };
+
+            return db;
         }
     }
 }

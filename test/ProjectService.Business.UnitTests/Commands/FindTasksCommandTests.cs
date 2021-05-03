@@ -108,7 +108,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         }
         #endregion
 
-/*        [SetUp]
+        [SetUp]
         public void SetUp()
         {
             _mocker.GetMock<ITaskInfoMapper>().Reset();
@@ -157,18 +157,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Find((Guid)_contextValues["UserId"]))
                 .Returns(_dbProjectUsers);
 
-            *//*_mocker
+            /*_mocker
                 .Setup<ITaskRepository, IEnumerable<DbTask>>(x => x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount))
                 .Returns(dbTasks);*/
 
             /*_mocker
                 .SetupSequence<ITaskInfoMapper, TaskInfo>(x => x.Map(It.IsAny<DbTask>()))
-                .Returns(_taskInfo.ElementAt(0));*//*
+                .Returns(_taskInfo.ElementAt(0));*/
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
            // _mocker.Verify<ITaskInfoMapper, TaskInfo>(x => x.Map(It.IsAny<DbTask>()), Times.Exactly(_taskInfo.Count()));
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount), Times.Once);
-        }*/
+        }
     }
 }
