@@ -97,7 +97,7 @@ namespace LT.DigitalOffice.ProjectService
                 .AddRabbitMqCheck();
 
             ConfigureMassTransit(services);
-            
+
             services
                 .AddControllersWithViews()
                 .AddNewtonsoftJson();

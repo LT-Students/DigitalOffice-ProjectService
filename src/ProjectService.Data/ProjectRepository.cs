@@ -4,6 +4,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -72,21 +73,12 @@ namespace LT.DigitalOffice.ProjectService.Data
             provider.Save();
         }
 
-        public Guid EditProjectById(DbProject dbProject)
+        public bool Edit(DbProject dbProject, JsonPatchDocument<DbProject> request)
         {
-            var projectToEdit = provider.Projects
-                .AsNoTracking()
-                .FirstOrDefault(p => p.Id == dbProject.Id);
-
-            if (projectToEdit == null)
-            {
-                throw new NullReferenceException("Project with this Id does not exist");
-            }
-
-            provider.Projects.Update(dbProject);
+            request.ApplyTo(dbProject);
             provider.Save();
 
-            return dbProject.Id;
+            return true;
         }
 
         public void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds)
