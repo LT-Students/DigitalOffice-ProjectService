@@ -83,36 +83,40 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         public OperationResultResponse<bool> Execute(Guid taskId, JsonPatchDocument<EditTaskRequest> patch)
         {
+            _validator.ValidateAndThrowCustom(patch);
+
             var errors = new List<string>();
 
             DbTask task = _taskRepository.Get(taskId);
-
             DbProject project = _projectRepository.GetProject(task.ProjectId);
 
             Guid requestUserId = _httpContext.GetUserId();
-
             IGetDepartmentResponse department = GetDepartment(requestUserId, errors);
 
             bool isAdmin = _accessValidator.IsAdmin();
             
             bool isProjectParticipant = project?.Users.FirstOrDefault(x =>
                 x.UserId == requestUserId) != null;
-            
-            bool isDepartmentDirector = department?.Id == project?.DepartmentId;
-            
+
+            bool isDepartmentDirector = false;
+            if (department != null && project != null)
+            {
+                 isDepartmentDirector = department.Id == project.DepartmentId;
+            }
+
             if (!isAdmin && !isProjectParticipant && !isDepartmentDirector)
             {
                 throw new ForbiddenException("Not enough rights.");
             }
 
-            _validator.ValidateAndThrowCustom(patch);
-
             var dbTaskPatch = _mapper.Map(patch);
-            _taskRepository.Edit(taskId, dbTaskPatch);
+
+            _taskRepository.Edit(task, dbTaskPatch);
 
             return new OperationResultResponse<bool>
             {
-                Status = OperationResultStatusType.FullSuccess,
+                Status = errors.Count == 0 ?
+                    OperationResultStatusType.FullSuccess : OperationResultStatusType.PartialSuccess,
                 Body = true,
                 Errors = errors
             };

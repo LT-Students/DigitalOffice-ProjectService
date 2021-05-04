@@ -122,7 +122,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         [Test]
         public void ShouldEditTask()
         {
-            Assert.IsTrue(_repository.Edit(_taskId, _patchDbTask));
+            Assert.IsTrue(_repository.Edit(_repository.Get(_taskId), _patchDbTask));
             SerializerAssert.AreEqual(_result, _provider.Tasks.FirstOrDefault(x => x.Id == _taskId));
         }
 
@@ -133,7 +133,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
             Assert.Throws<NotFoundException>(() => _repository.Get(_taskId));
 
-            Assert.Throws<NotFoundException>(() => _repository.Edit(_taskId, _patchDbTask));
+            Assert.Throws<NotFoundException>(() => _repository.Edit(_repository.Get(_taskId), _patchDbTask));
         }
         
         [Test]

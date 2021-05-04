@@ -17,12 +17,9 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
-        public bool Edit(Guid id, JsonPatchDocument<DbTask> taskPatch)
+        public bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch)
         {
-            var dbTask = _provider.Tasks.FirstOrDefault(x => x.Id == id) ??
-                         throw new NotFoundException($"Task id '{id}' was not found.");
-
-            taskPatch.ApplyTo(dbTask);
+            taskPatch.ApplyTo(task);
             _provider.Save();
 
             return true;

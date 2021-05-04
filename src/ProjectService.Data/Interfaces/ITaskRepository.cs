@@ -9,7 +9,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     [AutoInject]
     public interface ITaskRepository
     {
-        public bool Edit(Guid id, JsonPatchDocument<DbTask> taskPatch);
+        public bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch);
 
         public DbTask Get(Guid taskId);
     }

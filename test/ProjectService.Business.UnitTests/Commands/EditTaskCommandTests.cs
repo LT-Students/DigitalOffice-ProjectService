@@ -175,7 +175,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             #region Mock default setups
 
             _taskRepositoryMock
-                .Setup(x => x.Edit(_taskId, _mapper.Map(_request)))
+                .Setup(x => x.Edit(new DbTask
+                    {
+                        Id = _taskId
+                    },
+                    _mapper.Map(_request)))
                 .Returns(true);
 
             _taskRepositoryMock
