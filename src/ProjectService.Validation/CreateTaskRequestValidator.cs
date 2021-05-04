@@ -23,9 +23,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
                 .NotEmpty()
                 .WithMessage("Task must have description");
 
-            When(task => task.ParentTaskId.HasValue, () =>
+            When(task => task.ParentId.HasValue, () =>
             {
-                RuleFor(task => task.ParentTaskId)
+                RuleFor(task => task.ParentId)
                     .Must(x => tasksRepository.IsExist(x.Value));
             });
 
@@ -39,13 +39,6 @@ namespace LT.DigitalOffice.ProjectService.Validation
             RuleFor(task => task.ProjectId)
                 .NotEmpty()
                 .Must(x => projectRepository.IsExist(x));
-
-            When(task => task.Deadline != null, () =>
-            {
-                RuleFor(task => task.Deadline)
-                    .GreaterThan(task => task.CreatedAt)
-                .WithMessage("Dedline should be late then created time");
-            });
         }
     }
 }

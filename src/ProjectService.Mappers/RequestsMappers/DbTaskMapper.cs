@@ -24,11 +24,10 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 PlannedMinutes = taskRequiest.PlannedMinutes,
                 AssignedTo = taskRequiest.AssignedTo,
                 AuthorId = authorId,
-                Deadline = taskRequiest.Deadline,
                 ProjectId = taskRequiest.ProjectId,
-                CreatedAt = taskRequiest.CreatedAt,
-                ParentTaskId = taskRequiest.ParentTaskId,
-                Number = taskRequiest.Number,
+                CreatedAt = DateTime.UtcNow,
+                ParentId = taskRequiest.ParentId,
+                Number = 1,
                 Priority = new DbTaskProperty
                 {
                     Id = taskRequiest.PriorityId

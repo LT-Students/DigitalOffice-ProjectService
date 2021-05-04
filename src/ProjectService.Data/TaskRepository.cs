@@ -8,24 +8,24 @@ namespace LT.DigitalOffice.ProjectService.Data
 {
     public class TaskRepository : ITaskRepository
     {
-        private readonly IDataProvider provider;
+        private readonly IDataProvider _provider;
 
         public TaskRepository(IDataProvider provider)
         {
-            this.provider = provider;
+            _provider = provider;
         }
 
         public Guid CreateTask(DbTask newTask)
         {
-            provider.Tasks.Add(newTask);
-            provider.Save();
+            _provider.Tasks.Add(newTask);
+            _provider.Save();
 
             return newTask.Id;
         }
 
         public bool IsExist(Guid id)
         {
-            return provider.Tasks.FirstOrDefault(x => x.ParentTaskId == id) != null;
+            return _provider.Tasks.FirstOrDefault(x => x.ParentId == id) != null;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [ApiController]
     public class TaskController : ControllerBase
     {
-        [HttpPost("create")]
+        [HttpPost("Create")]
         public OperationResultResponse<Guid> CreateNewTask(
            [FromServices] ICreateTaskCommand command,
            [FromBody] CreateTaskRequest request)

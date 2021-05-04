@@ -39,9 +39,8 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 TypeId = Guid.NewGuid(),
                 StatusId = Guid.NewGuid(),
                 PriorityId = Guid.NewGuid(),
-                Deadline = DateTime.UtcNow,
                 PlannedMinutes = 30,
-                ParentTaskId = _parentTaskId,
+                ParentId = _parentTaskId,
                 AuthorId = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
                 Number = 3
@@ -53,7 +52,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         {
             SerializerAssert.AreEqual(newTask.Id, _taskRepository.CreateTask(newTask));
             Assert.NotNull(_provider.Tasks.Find(newTask.Id));
-            Assert.IsTrue(_taskRepository.IsExist(newTask.ParentTaskId.Value));
+            Assert.IsTrue(_taskRepository.IsExist(newTask.ParentId.Value));
         }
 
         [TearDown]

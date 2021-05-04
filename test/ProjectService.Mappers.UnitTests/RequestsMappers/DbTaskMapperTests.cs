@@ -27,11 +27,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 PlannedMinutes = 30,
                 AssignedTo = Guid.NewGuid(),
                 AuthorId = authorId,
-                Deadline = DateTime.UtcNow,
                 ProjectId = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                ParentTaskId = Guid.NewGuid(),
-                Number = 2,
+                ParentId = Guid.NewGuid(),
                 PriorityId = Guid.NewGuid(),
                 StatusId = Guid.NewGuid(),
                 TypeId = Guid.NewGuid()
@@ -58,12 +55,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 Description = _createTaskRequest.Description,
                 PlannedMinutes = _createTaskRequest.PlannedMinutes,
                 AssignedTo = _createTaskRequest.AssignedTo,
-                AuthorId =authorId,
-                Deadline = _createTaskRequest.Deadline,
+                AuthorId = authorId,
                 ProjectId = _createTaskRequest.ProjectId,
                 CreatedAt = dbTask.CreatedAt,
-                ParentTaskId = _createTaskRequest.ParentTaskId,
-                Number = _createTaskRequest.Number,
+                ParentId = _createTaskRequest.ParentId,
+                Number = 1,
                 Priority = new DbTaskProperty()
                 {
                     Id = _createTaskRequest.PriorityId

@@ -30,10 +30,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             {
                 Name = "Create Task",
                 Description = "Do smth after smth",
-                Deadline = DateTime.UtcNow,
                 ProjectId = Guid.NewGuid(),
                 AssignedTo = Guid.NewGuid(),
-                ParentTaskId = Guid.NewGuid()
+                ParentId = Guid.NewGuid()
             };
         }
 
@@ -58,16 +57,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
-        public void ShouldThrowErrorWhenDeadlineLessThanCreatedTime()
-        {
-            _validator.TestValidate(new CreateTaskRequest
-            {
-                Deadline = DateTime.UtcNow,
-                CreatedAt = DateTime.UtcNow.AddDays(1)
-            }).ShouldHaveValidationErrorFor(x => x.Deadline);
-        }
-
-        [Test]
         public void ShouldThrowErrorWhenProjectIdIsNull()
         {
             _validator.ShouldHaveValidationErrorFor(x => x.ProjectId, Guid.Empty);
@@ -89,11 +78,11 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void ShouldThrowErrorWhenPerentTaskIdDoesNotExist()
         {
             _taskRepository
-                .Setup(x => x.IsExist(_taskRequest.ParentTaskId.Value))
+                .Setup(x => x.IsExist(_taskRequest.ParentId.Value))
                 .Returns(false)
                 .Verifiable();
 
-            _validator.ShouldHaveValidationErrorFor(x => x.ParentTaskId, _taskRequest.ParentTaskId.Value);
+            _validator.ShouldHaveValidationErrorFor(x => x.ParentId, _taskRequest.ParentId.Value);
             _taskRepository.Verify();
         }
 
@@ -106,7 +95,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 .Verifiable();
 
             _taskRepository
-                .Setup(x => x.IsExist(_taskRequest.ParentTaskId.Value))
+                .Setup(x => x.IsExist(_taskRequest.ParentId.Value))
                 .Returns(true)
                 .Verifiable();
 
@@ -128,7 +117,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 .Verifiable();
 
             _taskRepository
-                .Setup(x => x.IsExist(_taskRequest.ParentTaskId.Value))
+                .Setup(x => x.IsExist(_taskRequest.ParentId.Value))
                 .Returns(true)
                 .Verifiable();
 
