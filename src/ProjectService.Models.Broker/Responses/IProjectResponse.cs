@@ -2,19 +2,19 @@
 
 namespace LT.DigitalOffice.Broker.Responses
 {
-    public interface IGetDepartmentResponse
+    public interface IProjectResponse
     {
         Guid Id { get; }
         string Name { get; }
-        Guid DirectorUserId { get; }
+        int ProjectStatus { get; set; }
 
-        static object CreateObj(Guid id, string name, Guid directorUserId)
+        static object CreateObj(Guid id, string name, int projectStatus)
         {
             return new
             {
                 Id = id,
                 Name = name,
-                DirectorUserId = directorUserId
+                ProjectStatus = projectStatus
             };
         }
     }
