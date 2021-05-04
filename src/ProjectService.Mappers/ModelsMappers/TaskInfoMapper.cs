@@ -35,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 Project = new ProjectTaskInfo
                 {
                     Id = dbTask.ProjectId,
-                    ProjectName = dbTask.Project.ShortName
+                    ShortName = dbTask.Project.ShortName
                 },
                 AssignedTo = new UserTaskInfo
                 {

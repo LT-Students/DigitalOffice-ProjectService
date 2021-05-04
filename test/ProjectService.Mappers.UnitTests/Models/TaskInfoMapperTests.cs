@@ -80,7 +80,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 Project = new ProjectTaskInfo
                 {
                     Id = _dbTask.ProjectId,
-                    ProjectName = "DO"
+                    ShortName = "DO"
                 },
                 CreatedAt = _dbTask.CreatedAt,
                 Number = 2,

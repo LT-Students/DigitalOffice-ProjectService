@@ -61,11 +61,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             ITaskInfoMapper mapper,
             ITaskRepository taskRepository,
             IUserRepository userRepository,
+            ILogger<FindTasksCommand> logger,
             IAccessValidator accessValidator,
             IHttpContextAccessor httpContextAccessor,
             IRequestClient<IGetUserDataRequest> requestClient)
         {
             _mapper = mapper;
+            _logger = logger;
             _requestClient = requestClient;
             _taskRepository = taskRepository;
             _userRepository = userRepository;
@@ -85,8 +87,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var userId = _httpContextAccessor.HttpContext.GetUserId();
             var projectUsers = _userRepository.Find(userId);
 
-            bool isAdmin = _accessValidator.IsAdmin();
-            if (!projectUsers.Any() && !isAdmin)
+            if (!projectUsers.Any() && !_accessValidator.IsAdmin())
             {
                 return new FindResponse<TaskInfo>();
             }
