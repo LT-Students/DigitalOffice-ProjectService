@@ -29,7 +29,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
         public static string PlannedMinutes => $"/{nameof(EditTaskRequest.PlannedMinutes)}";
 
         Func<JsonPatchDocument<EditTaskRequest>, string, Operation> GetOperationByPath =>
-            (x, path) => x.Operations.FirstOrDefault(x => x.path == path);
+            (x, path) =>
+                x.Operations.FirstOrDefault(x => 
+                    string.Equals(x.path, path, StringComparison.OrdinalIgnoreCase));
 
         public EditTaskValidator(
             ITaskPropertyRepository taskPropertyRepository,
