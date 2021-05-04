@@ -3,6 +3,7 @@ using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -79,12 +80,12 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _mocker = new AutoMocker();
             _command = _mocker.CreateInstance<CreateTaskCommand>();
 
-            IDictionary<object, object> _items = new Dictionary<object, object>();
+           /* IDictionary<object, object> _items = new Dictionary<object, object>();
             _items.Add("UserId", _authorId);
 
             _mocker
                 .Setup<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items)
-                .Returns(_items);
+                .Returns(_items);*/
 
             _newRequest = new CreateTaskRequest
             {
@@ -136,7 +137,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             ClientRequestUp(Guid.NewGuid());
             RcGetDepartment(Guid.NewGuid());
 
-            var responseMock = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
+            /*var responseMock = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
             var department = new Mock<IGetDepartmentResponse>();
             department.Setup(x => x.Id).Returns(_departmentId);
             department.Setup(x => x.Name).Returns("Department name");
@@ -153,7 +154,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _mocker
               .Setup<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
               x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                  It.IsAny<object>(), default, default).Result).Returns(responseMock.Object);
+                  It.IsAny<object>(), default, default).Result).Returns(responseMock.Object);*/
         }
 
         [SetUp]
@@ -213,7 +214,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             ClientRequestUp(_authorId);
 
             _mocker
-                .Setup<IProjectRepository, DbProject>(x => x.GetProject(_projectId))
+                .Setup<IProjectRepository, DbProject>(x => x.GetProject(It.IsAny<Guid>()))
                 .Returns(new DbProject()
                 {
                     Users = new List<DbProjectUser>()
@@ -238,6 +239,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(_response.Body);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
+
+            _mocker.Verify<IProjectRepository, DbProject>(x => x.GetProject(_newRequest.ProjectId), Times.Once);
+            _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
+            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
+            _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
         }
 
         [Test]
@@ -246,7 +252,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             RcGetDepartment(_departmentId);
 
             _mocker
-                 .Setup<IProjectRepository, DbProject>(x => x.GetProject(_projectId))
+                 .Setup<IProjectRepository, DbProject>(x => x.GetProject(It.IsAny<Guid>()))
                  .Returns(new DbProject()
                  {
                      DepartmentId = _departmentId
@@ -265,6 +271,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(_response.Body);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
+
+            _mocker.Verify<IProjectRepository, DbProject>(x => x.GetProject(_newRequest.ProjectId), Times.Once);
+            _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
+            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
+            _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
         }
 
         [Test]
@@ -272,7 +283,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         {
             var newResponse = new OperationResultResponse<Guid>
             {
-                Status = OperationResultStatusType.Failed,
+                Status = OperationResultStatusType.PartialSuccess,
                 Errors = new List<string>() { "Cannot create task. Please try again later." }
             };
 
@@ -285,10 +296,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                .Returns(true);
 
             _mocker
-                .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId))
-                .Returns(_dbTask);
-
-            _mocker
                .Setup<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
                    It.IsAny<object>(), default, default).Result).Throws(new Exception());
@@ -296,7 +303,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             SerializerAssert.AreEqual(newResponse, _command.Execute(_newRequest));
 
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(), Times.Once);
-            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Never);
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
             _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
@@ -305,11 +311,21 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         }
 
         [Test]
+        public void ExceptionWhenUserCannotEdit()
+        {
+            Assert.Throws<ForbiddenException>(() => _command.Execute(_newRequest));
+        }
+
+        [Test]
         public void ShouldReturnResponseWhenCreatingNewTaskAndUserIsAdmin()
         {
             _mocker
-              .Setup<IAccessValidator, bool>(x => x.IsAdmin())
-              .Returns(true);
+                  .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+                  .Returns(true);
+
+            _mocker
+                 .Setup<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
+                 .Returns(true);
 
             _mocker
                 .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId))
@@ -320,6 +336,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(_response.Body);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
+
+            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(), Times.Once);
+            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
+            _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
+            _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
         }
     }
 }
