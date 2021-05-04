@@ -499,9 +499,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     x.Map(It.IsAny<DbTask>(), It.IsAny<IGetUserDataResponse>(), It.IsAny<IGetUserDataResponse>()))
                 .Returns(_tasksInfo.ElementAt(0));
 
-            var author = IGetUserDataRequest.CreateObj(It.IsAny<Guid>());
-            var user = IGetUserDataRequest.CreateObj(It.IsAny<Guid>());
-
             _mocker
                 .SetupSequence<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
                     x.GetResponse<IOperationResult<IGetUserDataResponse>>(It.IsAny<object>(), default, default))
