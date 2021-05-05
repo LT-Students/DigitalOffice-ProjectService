@@ -24,6 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public ICollection<DbTask> TypeTasks { get; set; }
         public ICollection<DbTask> StatusTasks { get; set; }
     }
+
     public class DbTaskPropertyConfiguration : IEntityTypeConfiguration<DbTaskProperty>
     {
         public void Configure(EntityTypeBuilder<DbTaskProperty> builder)

@@ -21,7 +21,6 @@ using Moq.AutoMock;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 {
@@ -66,26 +65,13 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                .Setup<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
                    It.IsAny<object>(), default, default).Result).Returns(responseMock.Object);
-            /*_mocker
-               .Setup<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
-               x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(null, departmentId), default, default).Result).Returns(responseMock.Object);*/
         }
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            //_authorId = Guid.NewGuid();
-
             _mocker = new AutoMocker();
             _command = _mocker.CreateInstance<CreateTaskCommand>();
-
-           /* IDictionary<object, object> _items = new Dictionary<object, object>();
-            _items.Add("UserId", _authorId);
-
-            _mocker
-                .Setup<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items)
-                .Returns(_items);*/
 
             _newRequest = new CreateTaskRequest
             {
@@ -136,25 +122,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             ClientRequestUp(Guid.NewGuid());
             RcGetDepartment(Guid.NewGuid());
-
-            /*var responseMock = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
-            var department = new Mock<IGetDepartmentResponse>();
-            department.Setup(x => x.Id).Returns(_departmentId);
-            department.Setup(x => x.Name).Returns("Department name");
-
-            _mocker.Setup<Response<IOperationResult<IGetDepartmentResponse>>, IGetDepartmentResponse>(x => x.Message.Body).Returns(department.Object);
-            _mocker.Setup<Response<IOperationResult<IGetDepartmentResponse>>, bool>(x => x.Message.IsSuccess).Returns(true);
-
-            _mocker.Setup<Response<IOperationResult<IGetDepartmentResponse>>, List<string>>(x => x.Message.Errors).Returns(new List<string>());
-
-            responseMock.Setup(x => x.Message.Body).Returns(department.Object);
-            responseMock.Setup(x => x.Message.IsSuccess).Returns(true);
-            responseMock.Setup(x => x.Message.Errors).Returns(new List<string>());
-
-            _mocker
-              .Setup<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
-              x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                  It.IsAny<object>(), default, default).Result).Returns(responseMock.Object);*/
         }
 
         [SetUp]
@@ -311,7 +278,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         }
 
         [Test]
-        public void ExceptionWhenUserCannotEdit()
+        public void ExceptionWhenUserCannotCreate()
         {
             Assert.Throws<ForbiddenException>(() => _command.Execute(_newRequest));
         }

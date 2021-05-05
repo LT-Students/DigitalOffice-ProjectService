@@ -47,8 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     return response.Message.Body;
                 }
 
-                _logger.LogWarning($"Can not find department with this id '{userId}': " +
-                                   $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
+                _logger.LogWarning($"Can not find department with this id '{userId}':", userId);
             }
             catch (Exception exc)
             {
@@ -116,5 +115,4 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             };
         }
     }
-
 }

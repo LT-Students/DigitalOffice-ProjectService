@@ -7,10 +7,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
     [DbContext(typeof(ProjectServiceDbContext))]
     [Migration("20210423102800_AddTaskAndTaskPropertyTables")]
-    public class AddDbTask : Migration
+    public class AddTaskAndTaskPropertyTables : Migration
     {
-        private const string ColumnIdName = "Id";
-
         private void CreateTaskTable(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
