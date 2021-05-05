@@ -1,5 +1,4 @@
 ﻿using LT.DigitalOffice.Broker.Models;
-using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
@@ -16,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                 throw new ArgumentNullException(nameof(dbTask));
             }
 
-            var db = new TaskInfo
+            return new TaskInfo
             {
                 Id = dbTask.Id,
                 Name = dbTask.Name,
@@ -45,8 +44,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
                     LastName = assignedUser?.LastName
                 }
             };
-
-            return db;
         }
     }
 }
