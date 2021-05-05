@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.Broker.Requests;
+﻿using LT.DigitalOffice.Broker.Models;
+using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
@@ -32,10 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private AutoMocker _mocker;
         private IFindTasksCommand _command;
         private IDictionary<object, object> _contextValues;
-        private Mock<Response<IOperationResult<IGetUserDataResponse>>> _responseAuthorFirst;
-        private Mock<Response<IOperationResult<IGetUserDataResponse>>> _responseAnssignedUserFirst;
-        private Mock<Response<IOperationResult<IGetUserDataResponse>>> _responseAuthorSecond;
-        private Mock<Response<IOperationResult<IGetUserDataResponse>>> _responseAnssignedUserSecond;
+        private Mock<Response<IOperationResult<IGetUsersDataResponse>>> _responseUsersData;
 
         #region Setup
 
@@ -46,28 +44,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _contextValues = new Dictionary<object, object>();
             _contextValues.Add("UserId", Guid.NewGuid());
-
-            _mocker = new AutoMocker();
-            _command = _mocker.CreateInstance<FindTasksCommand>();
-
-            var assignedUserData = new Mock<IGetUserDataResponse>();
-            var authorData = new Mock<IGetUserDataResponse>();
-
-            _responseAuthorFirst = new Mock<Response<IOperationResult<IGetUserDataResponse>>>();
-            _responseAnssignedUserFirst = new Mock<Response<IOperationResult<IGetUserDataResponse>>>();
-            _responseAuthorSecond = new Mock<Response<IOperationResult<IGetUserDataResponse>>>();
-            _responseAnssignedUserSecond = new Mock<Response<IOperationResult<IGetUserDataResponse>>>();
-
-            assignedUserData.Setup(x => x.FirstName).Returns("Ivan");
-            assignedUserData.Setup(x => x.LastName).Returns("Ivanov");
-
-            authorData.Setup(x => x.FirstName).Returns("Semen");
-            authorData.Setup(x => x.LastName).Returns("Semenov");
-
-            _responseAuthorFirst.Setup(x => x.Message.Body).Returns(authorData.Object);
-            _responseAnssignedUserFirst.Setup(x => x.Message.Body).Returns(assignedUserData.Object);
-            _responseAuthorSecond.Setup(x => x.Message.Body).Returns(authorData.Object);
-            _responseAnssignedUserSecond.Setup(x => x.Message.Body).Returns(assignedUserData.Object);
 
             for (int i = 0; i <= 1; i++)
             {
@@ -165,16 +141,41 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                         TypeName = "Feature"
                     });
             }
+
+            var users = new List<UserData>();
+            foreach (var dbTask in _dbTasks)
+            {
+                users.Add(new UserData
+                {
+                    Id = dbTask.AssignedTo.Value,
+                    FirstName = "Ivan",
+                    LastName = "Ivanov"
+                });
+
+                users.Add(new UserData
+                {
+                    Id = dbTask.AuthorId,
+                    FirstName = "Semen",
+                    LastName = "Semenov"
+                });
+            }
+
+
+            var getUsersDataResponse = new Mock<IGetUsersDataResponse>();
+            _responseUsersData = new Mock<Response<IOperationResult<IGetUsersDataResponse>>>();
+
+            getUsersDataResponse.Setup(x => x.UsersData).Returns(users);
+
+            _responseUsersData.Setup(x => x.Message.Body).Returns(getUsersDataResponse.Object);
         }
 
         [SetUp]
         public void SetUp()
         {
-            _mocker.GetMock<ITaskInfoMapper>().Reset();
-            _mocker.GetMock<ITaskRepository>().Reset();
-            _mocker.GetMock<IRequestClient<IGetUserDataRequest>>().Reset();
-            _mocker.GetMock<IHttpContextAccessor>().Reset();
-            _mocker.GetMock<IAccessValidator>().Reset();
+            _mocker = new AutoMocker();
+            _command = _mocker.CreateInstance<FindTasksCommand>();
+
+            _responseUsersData.Reset();
 
             _tasksInfo = new List<TaskInfo>();
             foreach (var dbTask in _dbTasks)
@@ -231,7 +232,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var arg = It.IsAny<IGetUserDataResponse>();
             Assert.Throws<ArgumentNullException>(() => _command.Execute(filter, skipCount, takeCount));
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
-                x.Map(It.IsAny<DbTask>(), It.IsAny<IGetUserDataResponse>(), It.IsAny<IGetUserDataResponse>()), Times.Never);
+                x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Never);
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<List<Guid>>(), skipCount, takeCount, out totalCount), Times.Never);
             _mocker.Verify<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
@@ -262,7 +263,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _mocker.Verify<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items, Times.Exactly(2));
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
-                x.Map(It.IsAny<DbTask>(), It.IsAny<IGetUserDataResponse>(), It.IsAny<IGetUserDataResponse>()), Times.Never);
+                x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Never);
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<List<Guid>>(), skipCount, takeCount, out totalCount), Times.Never);
             _mocker.Verify<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
@@ -270,7 +271,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         }
 
         [Test]
-        public void ShouldReturnFindResponseWhenBrokerResponseAssignedUserIsNotSucces()
+        public void ShouldReturnFindResponseWhenBrokerResponseIsNotSucces()
         {
             int skipCount = 0;
             int takeCount = _dbTasks.Count();
@@ -288,10 +289,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var filter = new FindTasksFilter();
             filter.Assign = _dbTasks.ElementAt(0).AssignedTo;
 
-            _responseAuthorFirst.Setup(x => x.Message.IsSuccess).Returns(true);
-            _responseAnssignedUserFirst.Setup(x => x.Message.IsSuccess).Returns(false);
+            _responseUsersData.Setup(x => x.Message.IsSuccess).Returns(true);
 
-            _responseAnssignedUserFirst.Setup(x => x.Message.Errors).Returns(new List<string>());
+            _responseUsersData.Setup(x => x.Message.Errors).Returns(new List<string>());
 
             foreach (var task in _tasksInfo)
             {
@@ -317,22 +317,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _mocker
                 .SetupSequence<ITaskInfoMapper, TaskInfo>(x =>
-                    x.Map(It.IsAny<DbTask>(), It.IsAny<IGetUserDataResponse>(), It.IsAny<IGetUserDataResponse>()))
+                    x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()))
                 .Returns(_tasksInfo.ElementAt(0));
 
             _mocker
-                .SetupSequence<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
-                    x.GetResponse<IOperationResult<IGetUserDataResponse>>(It.IsAny<object>(), default, default))
-                .Returns(Task.FromResult(_responseAnssignedUserFirst.Object))
-                .Returns(Task.FromResult(_responseAuthorFirst.Object));
+                .Setup<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
+                    x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default))
+                .Returns(Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
             _mocker.Verify<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items, Times.Exactly(2));
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Never);
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
-                x.Map(It.IsAny<DbTask>(), It.IsAny<IGetUserDataResponse>(), It.IsAny<IGetUserDataResponse>()), Times.Exactly(_tasksInfo.Count()));
-            _mocker.Verify<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
-                x.GetResponse<IOperationResult<IGetUserDataResponse>>(It.IsAny<object>(), default, default), Times.Exactly(_tasksInfo.Count() * 2));
+                x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Exactly(_tasksInfo.Count()));
+            _mocker.Verify<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
+                x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default), Times.Once);
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount), Times.Once);
         }
@@ -353,10 +352,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var filter = new FindTasksFilter();
             filter.Assign = _dbTasks.ElementAt(0).AssignedTo;
 
-            _responseAuthorFirst.Setup(x => x.Message.IsSuccess).Returns(true);
-            _responseAnssignedUserFirst.Setup(x => x.Message.IsSuccess).Returns(true);
-            _responseAuthorSecond.Setup(x => x.Message.IsSuccess).Returns(true);
-            _responseAnssignedUserSecond.Setup(x => x.Message.IsSuccess).Returns(true);
+            _responseUsersData.Setup(x => x.Message.IsSuccess).Returns(true);
 
             _mocker
                 .Setup<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items)
@@ -376,25 +372,22 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _mocker
                 .SetupSequence<ITaskInfoMapper, TaskInfo>(x =>
-                    x.Map(It.IsAny<DbTask>(), It.IsAny<IGetUserDataResponse>(), It.IsAny<IGetUserDataResponse>()))
+                    x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()))
                 .Returns(_fullTasksInfo.ElementAt(0))
                 .Returns(_fullTasksInfo.ElementAt(1));
 
             _mocker
-                .SetupSequence<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
-                    x.GetResponse<IOperationResult<IGetUserDataResponse>>(It.IsAny<object>(), default, default))
-                .Returns(Task.FromResult(_responseAnssignedUserFirst.Object))
-                .Returns(Task.FromResult(_responseAuthorFirst.Object))
-                .Returns(Task.FromResult(_responseAnssignedUserSecond.Object))
-                .Returns(Task.FromResult(_responseAuthorSecond.Object));
+                .Setup<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
+                    x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default))
+                .Returns(Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
             _mocker.Verify<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items, Times.Exactly(2));
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
-                x.Map(It.IsAny<DbTask>(), It.IsAny<IGetUserDataResponse>(), It.IsAny<IGetUserDataResponse>()), Times.Exactly(_fullTasksInfo.Count()));
-            _mocker.Verify<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
-                x.GetResponse<IOperationResult<IGetUserDataResponse>>(It.IsAny<object>(), default, default), Times.Exactly(_fullTasksInfo.Count() * 2));
+                x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Exactly(_fullTasksInfo.Count()));
+            _mocker.Verify<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
+                x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default), Times.Once);
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount), Times.Once);
         }
@@ -417,10 +410,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             var filter = new FindTasksFilter();
             filter.Assign = _dbTasks.ElementAt(0).AssignedTo;
-            _responseAuthorFirst.Setup(x => x.Message.IsSuccess).Returns(false);
-            _responseAnssignedUserFirst.Setup(x => x.Message.IsSuccess).Returns(true);
+            _responseUsersData.Setup(x => x.Message.IsSuccess).Returns(false);
 
-            _responseAuthorFirst.Setup(x => x.Message.Errors).Returns(new List<string>());
+            _responseUsersData.Setup(x => x.Message.Errors).Returns(new List<string>());
 
             foreach (var task in _tasksInfo)
             {
@@ -441,22 +433,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _mocker
                 .SetupSequence<ITaskInfoMapper, TaskInfo>(x =>
-                    x.Map(It.IsAny<DbTask>(), It.IsAny<IGetUserDataResponse>(), It.IsAny<IGetUserDataResponse>()))
+                    x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()))
                 .Returns(_tasksInfo.ElementAt(0));
 
             _mocker
-                .SetupSequence<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
-                    x.GetResponse<IOperationResult<IGetUserDataResponse>>(It.IsAny<object>(), default, default))
-                .Returns(Task.FromResult(_responseAnssignedUserFirst.Object))
-                .Returns(Task.FromResult(_responseAuthorFirst.Object));
+                .SetupSequence<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
+                    x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default))
+                .Returns(Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
             _mocker.Verify<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items, Times.Exactly(2));
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Never);
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
-                x.Map(It.IsAny<DbTask>(), It.IsAny<IGetUserDataResponse>(), It.IsAny<IGetUserDataResponse>()), Times.Exactly(_tasksInfo.Count()));
-            _mocker.Verify<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
-                x.GetResponse<IOperationResult<IGetUserDataResponse>>(It.IsAny<object>(), default, default), Times.Exactly(_tasksInfo.Count() * 2));
+                x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Exactly(_tasksInfo.Count()));
+            _mocker.Verify<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
+                x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default), Times.Once);
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount), Times.Once);
         }
@@ -479,8 +470,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             var filter = new FindTasksFilter();
             filter.Assign = _dbTasks.ElementAt(0).AssignedTo;
-            _responseAuthorFirst.Setup(x => x.Message.IsSuccess).Returns(true);
-            _responseAnssignedUserFirst.Setup(x => x.Message.IsSuccess).Returns(true);
+            _responseUsersData.Setup(x => x.Message.IsSuccess).Returns(true);
 
             _mocker
                 .Setup<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items)
@@ -496,22 +486,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _mocker
                 .SetupSequence<ITaskInfoMapper, TaskInfo>(x =>
-                    x.Map(It.IsAny<DbTask>(), It.IsAny<IGetUserDataResponse>(), It.IsAny<IGetUserDataResponse>()))
+                    x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()))
                 .Returns(_tasksInfo.ElementAt(0));
 
             _mocker
-                .SetupSequence<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
-                    x.GetResponse<IOperationResult<IGetUserDataResponse>>(It.IsAny<object>(), default, default))
-                .Returns(Task.FromResult(_responseAnssignedUserFirst.Object))
-                .Returns(Task.FromResult(_responseAuthorFirst.Object));
+                .SetupSequence<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
+                    x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default))
+                .Returns(Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
             _mocker.Verify<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items, Times.Exactly(2));
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Never);
-            _mocker.Verify<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
-                    x.GetResponse<IOperationResult<IGetUserDataResponse>>(It.IsAny<object>(), default, default), Times.Exactly(_tasksInfo.Count() * 2));
+            _mocker.Verify<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
+                    x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default), Times.Once);
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
-                x.Map(It.IsAny<DbTask>(), It.IsAny<IGetUserDataResponse>(), It.IsAny<IGetUserDataResponse>()), Times.Exactly(_tasksInfo.Count()));
+                x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Exactly(_tasksInfo.Count()));
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount), Times.Once);
         }

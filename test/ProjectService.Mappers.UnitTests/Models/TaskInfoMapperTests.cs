@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.Broker.Responses;
+﻿using LT.DigitalOffice.Broker.Models;
+using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers;
 using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -58,7 +59,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                     ShortName = "DO"
                 }
             };
+        }
 
+        [SetUp]
+        public void SetUp()
+        {
             _taskInfo = new TaskInfo
             {
                 Id = _dbTask.Id,
@@ -93,24 +98,44 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenDbTaskIsNull()
         {
-            IGetUserDataResponse userData= null;
+            UserData userData = null;
 
             Assert.Throws<ArgumentNullException>(() => _mapper.Map(null, userData, userData));
         }
 
         [Test]
+        public void ShouldReturnDbTaskSuccessfulWhenUserDataIsNull()
+        {
+            UserData assignedUserData = null;
+            UserData authorData = null;
+
+            _taskInfo.AssignedTo.FirstName = null;
+            _taskInfo.AssignedTo.LastName = null;
+
+            _taskInfo.Author.FirstName = null;
+            _taskInfo.Author.LastName = null;
+
+            SerializerAssert.AreEqual(_taskInfo, _mapper.Map(_dbTask, assignedUserData, authorData));
+        }
+
+        [Test]
         public void ShouldReturnDbTaskSuccessful()
         {
-            var assignedUserData = new Mock<IGetUserDataResponse>();
-            var authorData = new Mock<IGetUserDataResponse>();
+            UserData assignedUserData = new UserData
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Ivan",
+                LastName = "Ivanov"
+            };
 
-            assignedUserData.Setup(x => x.FirstName).Returns("Ivan");
-            assignedUserData.Setup(x => x.LastName).Returns("Ivanov");
+            UserData authorData = new UserData
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Semen",
+                LastName = "Semenov"
+            };
 
-            authorData.Setup(x => x.FirstName).Returns("Semen");
-            authorData.Setup(x => x.LastName).Returns("Semenov");
-
-            SerializerAssert.AreEqual(_taskInfo, _mapper.Map(_dbTask, assignedUserData.Object, authorData.Object));
+            SerializerAssert.AreEqual(_taskInfo, _mapper.Map(_dbTask, assignedUserData, authorData));
         }
     }
 }

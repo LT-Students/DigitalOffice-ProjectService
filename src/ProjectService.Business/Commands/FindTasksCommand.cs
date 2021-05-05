@@ -6,6 +6,7 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
@@ -26,16 +27,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IAccessValidator _accessValidator;
         private readonly ILogger<FindTasksCommand> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IRequestClient<IGetUserDataRequest> _requestClient;
+        private readonly IRequestClient<IGetUsersDataRequest> _requestClient;
 
-        private IGetUserDataResponse GetUserData(Guid userId, List<string> errors)
+        private IGetUsersDataResponse GetUsersData(List<Guid> userId, List<string> errors)
         {
             string errorMessage = "Can not find user data. Please try again later.";
 
             try
             {
-                var response = _requestClient.GetResponse<IOperationResult<IGetUserDataResponse>>(
-                    IGetUserDataRequest.CreateObj(userId)).Result;
+                var response = _requestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
+                    IGetUsersDataRequest.CreateObj(userId)).Result;
 
                 if (response.Message.IsSuccess)
                 {
@@ -64,7 +65,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             ILogger<FindTasksCommand> logger,
             IAccessValidator accessValidator,
             IHttpContextAccessor httpContextAccessor,
-            IRequestClient<IGetUserDataRequest> requestClient)
+            IRequestClient<IGetUsersDataRequest> requestClient)
         {
             _mapper = mapper;
             _logger = logger;
@@ -92,19 +93,19 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 return new FindResponse<TaskInfo>();
             }
 
-            var projectIds = projectUsers.Select(x => x.ProjectId).Distinct();
+            var projectIds = projectUsers.Select(x => x.ProjectId);
             var dbTasks = _taskRepository.Find(filter, projectIds, skipCount, takeCount, out int totalCount);
+
+            var users = dbTasks.Where(x => x.AssignedTo.HasValue).Select(x => x.AssignedTo.Value).ToList();
+            users.AddRange(dbTasks.Select(x => x.AuthorId).ToList());
+
+            var usersData = GetUsersData(users, errors);
 
             List<TaskInfo> tasks = new();
             foreach (var dbTask in dbTasks)
             {
-                IGetUserDataResponse assignedUser = null;
-
-                assignedUser = dbTask.AssignedTo.HasValue ?
-                    GetUserData(dbTask.AssignedTo.Value, errors) :
-                    null;
-
-                var author = GetUserData(dbTask.AuthorId, errors);
+                var assignedUser = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AssignedTo);
+                var author = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AuthorId);
 
                 tasks.Add(_mapper.Map(dbTask, assignedUser, author));
             }

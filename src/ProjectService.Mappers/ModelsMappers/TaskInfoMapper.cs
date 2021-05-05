@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.Broker.Responses;
+﻿using LT.DigitalOffice.Broker.Models;
+using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
@@ -8,7 +9,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
 {
     public class TaskInfoMapper : ITaskInfoMapper
     {
-        public TaskInfo Map(DbTask dbTask, IGetUserDataResponse assignedUser, IGetUserDataResponse author)
+        public TaskInfo Map(DbTask dbTask, UserData assignedUser, UserData author)
         {
             if (dbTask == null)
             {
