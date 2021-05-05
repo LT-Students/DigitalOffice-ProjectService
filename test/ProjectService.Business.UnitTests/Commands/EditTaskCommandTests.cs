@@ -30,6 +30,8 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 {
     public class EditTaskCommandTests
     {
+        #region Private
+        
         #region Private Models
         
         private IEditTaskCommand _command;
@@ -49,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
         #endregion
         
-        #region Private fields
+        #region Private Fields
 
         private readonly string _name = "NewName";
         private readonly string _description = "New Description";
@@ -71,6 +73,29 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
         #endregion
 
+        #region Private Methods
+        
+        private void VerifyCalls(
+            Func<Times> projectRepositoryTimes, 
+            Func<Times> getInTaskRepositoryTimes, 
+            Func<Times> editInTaskRepositoryTimes,
+            Func<Times> requestClientTimes,
+            Func<Times> httpAccessorTimes)
+        {
+            _projectRepositoryMock.Verify(x => x.GetProject(It.IsAny<Guid>()), projectRepositoryTimes);
+            _taskRepositoryMock.Verify(x => 
+                x.Get(It.IsAny<Guid>()), getInTaskRepositoryTimes);
+            
+            _taskRepositoryMock.Verify(x => 
+                x.Edit(It.IsAny<DbTask>(), It.IsAny<JsonPatchDocument<DbTask>>()), editInTaskRepositoryTimes);
+            
+            _requestClient.Verify(x => 
+                x.GetResponse<IOperationResult<IGetDepartmentResponse>>(It.IsAny<object>(), 
+                    default, 
+                    default), requestClientTimes);
+            
+            _httpAccessorMock.Verify(x => x.HttpContext, httpAccessorTimes);
+        }
         private void ClientRequestUp(Guid newGuid)
         {
             IDictionary<object, object> httpContextItems = new Dictionary<object, object>();
@@ -79,7 +104,8 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             _httpAccessorMock
                 .Setup(x => x.HttpContext.Items)
-                .Returns(httpContextItems);
+                .Returns(httpContextItems)
+                .Verifiable();
         }
 
         private void RcGetDepartment(Guid departmentId)
@@ -106,8 +132,13 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                         It.IsAny<object>(), 
                         default, 
                         default))
-                .Returns(Task.FromResult(_operationResultBrokerMock.Object));
+                .Returns(Task.FromResult(_operationResultBrokerMock.Object))
+                .Verifiable();
         }
+
+        #endregion
+        
+        #endregion
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -180,14 +211,14 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                         Id = _taskId
                     },
                     _mapper.Map(_request)))
-                .Returns(true);
+                .Returns(true).Verifiable();
 
             _taskRepositoryMock
                 .Setup(x => x.Get(_taskId))
                 .Returns(new DbTask
                 {
                     ProjectId = _projectId
-                });
+                }).Verifiable();
             
             _accessValidatorMock
                 .Setup(x => x.IsAdmin())
@@ -202,7 +233,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                         UserId = Guid.NewGuid()
                     }
                 }
-            });
+            }).Verifiable();
 
             #endregion
             
@@ -223,6 +254,12 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _accessValidatorMock.Setup(x => x.IsAdmin()).Returns(true);
 
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
+
+            VerifyCalls(Times.Once,
+                Times.Once,
+                Times.Once,
+                Times.Once, 
+                Times.Once);
         }
 
         [Test]
@@ -244,6 +281,12 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             });
 
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
+            
+            VerifyCalls(Times.Once,
+                Times.Once,
+                Times.Once,
+                Times.Once, 
+                Times.Once);
         }
 
         [Test]
@@ -257,12 +300,24 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             });
             
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
+            
+            VerifyCalls(Times.Once,
+                Times.Once,
+                Times.Once,
+                Times.Once, 
+                Times.Once);
         }
 
         [Test]
         public void ExceptionWhenUserCannotEdit()
         {
             Assert.Throws<ForbiddenException>(() => _command.Execute(_taskId, _request));
+            
+            VerifyCalls(Times.Once,
+                Times.Once,
+                Times.Never,
+                Times.Once,
+                Times.Once);
         }
 
         [Test]
@@ -279,6 +334,12 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns((Task<Response<IOperationResult<IGetDepartmentResponse>>>) null);
             
             Assert.AreEqual(1, _command.Execute(_taskId, _request).Errors.Count);
+            
+            VerifyCalls(Times.Once,
+                Times.Once,
+                Times.Once,
+                Times.Once,
+                Times.Once);
         }
     }
 }
