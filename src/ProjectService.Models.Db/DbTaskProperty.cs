@@ -52,18 +52,15 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
             builder
                 .HasMany(tp => tp.PriorityTasks)
-                .WithOne(T => T.Priority)
-                .HasForeignKey(x => x.PriorityId);
+                .WithOne(T => T.Priority);
 
             builder
                 .HasMany(tp => tp.TypeTasks)
-                .WithOne(T => T.Type)
-                .HasForeignKey(x => x.TypeId);
+                .WithOne(T => T.Type);
 
             builder
                 .HasMany(tp => tp.StatusTasks)
-                .WithOne(T => T.Status)
-                .HasForeignKey(x => x.StatusId);
+                .WithOne(T => T.Status);
         }
     }
 }
