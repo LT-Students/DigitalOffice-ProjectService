@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     return response.Message.Body;
                 }
 
-                _logger.LogWarning($"Can not find department with this id '{userId}':", userId);
+                _logger.LogWarning($"Can not find department contain user with Id: '{userId}'");
             }
             catch (Exception exc)
             {
@@ -85,16 +85,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             var authorId = _httpContextAccessor.HttpContext.GetUserId();
 
-            DbProject project = _projectRepository.GetProject(request.ProjectId);
+            List<DbProjectUser> projectUsers =
+                _projectRepository.GetProjectUsers(request.ProjectId, false).ToList();
 
             IGetDepartmentResponse department = GetDepartment(authorId, errors);
 
             bool isAdmin = _accessValidator.IsAdmin();
 
-            bool isProjectParticipant = project?.Users.FirstOrDefault(x =>
+            bool isProjectParticipant = projectUsers.FirstOrDefault(x =>
                 x.UserId == authorId) != null;
 
-            bool isDepartmentDirector = department?.Id == project?.DepartmentId;
+            bool isDepartmentDirector = false;
+            if (department != null)
+            {
+                isDepartmentDirector = department.DirectorUserId == authorId;
+            }
 
             if (!isAdmin && !isProjectParticipant && !isDepartmentDirector)
             {

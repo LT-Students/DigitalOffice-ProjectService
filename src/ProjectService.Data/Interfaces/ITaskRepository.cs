@@ -22,6 +22,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <returns>Id of the added task.</returns>
         Guid CreateTask(DbTask item);
 
+        /// <summary>
+        /// Checking the task Id in database. Returns true if it exist or false if it's not.
+        /// </summary>
+        /// <param name="Id">task Id.</param>
+        /// <returns>true or false after checking the task Id.</returns>
         bool IsExist(Guid id);
     }
 }
