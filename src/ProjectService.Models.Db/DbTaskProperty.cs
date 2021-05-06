@@ -48,6 +48,18 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
             builder
                 .Property(tp => tp.Name)
                 .IsRequired();
+
+            builder
+                .HasMany(tp => tp.PriorityTasks)
+                .WithOne(T => T.Priority);
+
+            builder
+                .HasMany(tp => tp.TypeTasks)
+                .WithOne(T => T.Type);
+
+            builder
+                .HasMany(tp => tp.StatusTasks)
+                .WithOne(T => T.Status);
         }
     }
 }

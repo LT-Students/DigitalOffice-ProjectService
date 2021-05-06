@@ -22,3 +22,22 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         }
     }
 }
+
+namespace LT.DigitalOffice.ProjectService.Controllers
+{
+    [Route("[controller]")]
+    [ApiController]
+    public class TaskController : ControllerBase
+    {
+        [HttpPatch("edit")]
+        public OperationResultResponse<bool> Edit(
+            [FromQuery] Guid id,
+            [FromBody] JsonPatchDocument<EditTaskRequest> request,
+            IEditTaskCommand command)
+        {
+            return command.Execute(id, request);
+        }
+    }
+}
+
+using Microsoft.AspNetCore.JsonPatch;

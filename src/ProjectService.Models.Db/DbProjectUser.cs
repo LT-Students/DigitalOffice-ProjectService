@@ -41,6 +41,20 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
             builder
                 .HasMany(pu => pu.TaskProperties)
                 .WithOne(t => t.User);
+            
+            builder
+                .HasMany(pu => pu.AssignedUserTasks)
+                .WithOne(t => t.AssignedUser)
+                .HasForeignKey(t => t.AssignedTo);
+
+            builder
+                .HasMany(pu => pu.AuthorTasks)
+                .WithOne(t => t.Author)
+                .HasForeignKey(t => t.AuthorId);
+
+            builder
+                .HasMany(pu => pu.TaskProperties)
+                .WithOne(tp => tp.User);
         }
     }
 }

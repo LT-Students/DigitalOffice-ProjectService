@@ -1,3 +1,5 @@
+using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
+using Microsoft.AspNetCore.JsonPatch;
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using System;
@@ -28,5 +30,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="Id">task Id.</param>
         /// <returns>true or false after checking the task Id.</returns>
         bool IsExist(Guid id);
-    }
+
+        public bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch);
+
+        public DbTask Get(Guid taskId);
 }

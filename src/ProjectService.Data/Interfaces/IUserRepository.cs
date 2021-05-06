@@ -22,5 +22,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         IEnumerable<DbProjectUser> Find(Guid userId);
 
         bool AreUserAndProjectExist(Guid usderId, Guid projectId);
+
+        /// <summary>
+        /// Check that users are exist
+        /// </summary>
+        /// <param name="ids">Ids to check that all of them exists</param>
+        bool AreExist(params Guid[] ids);
     }
 }
