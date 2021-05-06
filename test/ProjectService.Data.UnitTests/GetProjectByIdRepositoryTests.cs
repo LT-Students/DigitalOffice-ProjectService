@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 {
@@ -109,7 +110,16 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 Users = new List<DbProjectUser> { _activeDbUser, _notActiveDbUser }
             };
 
-            SerializerAssert.AreEqual(expected, result);
+            Assert.AreEqual(expected.Id, result.Id);
+
+            Assert.AreEqual(expected.Files.Count, result.Files.Count);
+            Assert.AreEqual(expected.Files.First().Id, result.Files.First().Id);
+
+            Assert.AreEqual(expected.Users.Count, result.Users.Count);
+            Assert.NotNull(result.Users.First(x => x.Id == _activeDbUser.Id));
+            Assert.NotNull(result.Users.First(x => x.Id == _notActiveDbUser.Id));
+            Assert.NotNull(expected.Users.First(x => x.Id == _activeDbUser.Id));
+            Assert.NotNull(expected.Users.First(x => x.Id == _notActiveDbUser.Id));
         }
 
         [Test]
@@ -131,7 +141,9 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 Name = _dbProject.Name
             };
 
-            SerializerAssert.AreEqual(expected, result);
+            Assert.AreEqual(expected.Id, result.Id);
+            Assert.AreEqual(expected.Files.Count, result.Files.Count);
+            Assert.AreEqual(expected.Users.Count, result.Users.Count);
         }
 
         [Test]
@@ -154,7 +166,10 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 Files = new List<DbProjectFile> { _dbFile }
             };
 
-            SerializerAssert.AreEqual(expected, result);
+            Assert.AreEqual(expected.Id, result.Id);
+
+            Assert.AreEqual(expected.Files.Count, result.Files.Count);
+            Assert.AreEqual(expected.Files.First().Id, result.Files.First().Id);
         }
 
         [Test]
@@ -176,7 +191,11 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 Users = new List<DbProjectUser> { _activeDbUser }
             };
 
-            SerializerAssert.AreEqual(expected, result);
+            Assert.AreEqual(expected.Id, result.Id);
+
+            Assert.AreEqual(expected.Users.Count, result.Users.Count);
+            Assert.NotNull(result.Users.First(x => x.Id == _activeDbUser.Id));
+            Assert.NotNull(expected.Users.First(x => x.Id == _activeDbUser.Id));
         }
     }
 }

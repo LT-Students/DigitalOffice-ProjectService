@@ -67,12 +67,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup(x => x.Message)
                 .Returns(operationResultMock.Object);
 
-            var rcDepartmentMock = new Mock<IRequestClient<TRequest>>();
-            rcDepartmentMock
+            var requestClientMock = new Mock<IRequestClient<TRequest>>();
+            requestClientMock
                 .Setup(x => x.GetResponse<IOperationResult<TResponse>>(It.IsAny<object>(), default, default).Result)
                 .Returns(brokerResponseMock.Object);
 
-            return rcDepartmentMock;
+            return requestClientMock;
         }
 
         private void DepartmentBrokerSetUp()
@@ -248,33 +248,39 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         }
 
         [Test]
-        public void ShouldThrowExceptionWhenGetDepartmentClientThrowsIt()
+        public void ShouldNotThrowExceptionWhenGetDepartmentClientThrowsIt()
         {
             _rcDepartmentMock
                 .Setup(x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(It.IsAny<object>(), default, default).Result)
                 .Throws(new Exception());
 
-            Assert.Throws<Exception>(() => _command.Execute(_fullFilter));
+            var result = _command.Execute(_fullFilter);
+
+            SerializerAssert.AreEqual(_expectedResponse, result);
         }
 
         [Test]
-        public void ShouldThrowExceptionWhenGetUsersClientThrowsIt()
+        public void ShouldNotThrowExceptionWhenGetUsersClientThrowsIt()
         {
             _rcUsersDataMock
                 .Setup(x => x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default).Result)
                 .Throws(new Exception());
 
-            Assert.Throws<Exception>(() => _command.Execute(_fullFilter));
+            var result = _command.Execute(_fullFilter);
+
+            SerializerAssert.AreEqual(_expectedResponse, result);
         }
 
         [Test]
-        public void ShouldThrowExceptionWhenProjectUserMapperThrowsIt()
+        public void ShouldNotThrowExceptionWhenProjectUserMapperThrowsIt()
         {
             _projectUserInfoMapperMock
                 .Setup(x => x.Map(It.IsAny<UserData>(), It.IsAny<DbProjectUser>()))
                 .Throws(new Exception());
 
-            Assert.Throws<Exception>(() => _command.Execute(_fullFilter));
+            var result = _command.Execute(_fullFilter);
+
+            SerializerAssert.AreEqual(_expectedResponse, result);
         }
 
         [Test]
@@ -291,7 +297,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         public void ShouldThrowExceptionWhenProjectExpandedResponseMapperThrowsIt()
         {
             _projectExpandedResponseMapperMock
-                .Setup(x => x.Map(_dbProject, _projectUsersInfo, _projectFilesInfo, _departmentInfo))
+                .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>()))
                 .Throws(new Exception());
 
             Assert.Throws<Exception>(() => _command.Execute(_fullFilter));

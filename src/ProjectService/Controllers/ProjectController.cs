@@ -23,8 +23,8 @@ namespace LT.DigitalOffice.ProjectService.Controllers
             return command.Execute(filter, skipCount, takeCount);
         }
 
-        [HttpGet("getProjectById")]
-        public ProjectExpandedResponse GetProjectById(
+        [HttpGet("get")]
+        public ProjectExpandedResponse Get(
             [FromServices] IGetProjectByIdCommand command,
             [FromQuery] GetProjectFilter filter)
         {

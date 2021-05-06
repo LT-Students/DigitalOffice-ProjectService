@@ -29,14 +29,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
                 throw new ArgumentNullException(nameof(dbProject));
             }
 
-            if (department.Id != dbProject.DepartmentId)
+            if (department?.Id != null && department.Id != dbProject.DepartmentId)
             {
                 throw new ArgumentException("DepartmentId not valid.");
             }
 
             return new ProjectExpandedResponse
             {
-                Project = _projectInfoMapper.Map(dbProject, department.Name),
+                Project = _projectInfoMapper.Map(dbProject, department?.Name),
                 Users = users,
                 Files = files
             };
