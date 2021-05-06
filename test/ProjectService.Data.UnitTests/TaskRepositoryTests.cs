@@ -93,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         public void ShouldReturnFoundTasksSuccessfulWhenFindByAssign()
         {
             var filter = new FindTasksFilter();
-            filter.Assign = _assign;
+            filter.AssignTo = _assign;
 
             int skipCount = 0;
             int takeCount = _dbTasks.Count;

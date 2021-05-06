@@ -8,10 +8,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
         [FromQuery(Name = "number")]
         public int? Number { get; set; }
 
-        [FromQuery(Name = "projectId")]
+        [FromQuery(Name = "projectid")]
         public Guid? ProjectId { get; set; }
 
-        [FromQuery(Name="assignTo")]
-        public Guid? Assign { get; set; }
+        [FromQuery(Name="assignto")]
+        public Guid? AssignTo { get; set; }
     }
 }
