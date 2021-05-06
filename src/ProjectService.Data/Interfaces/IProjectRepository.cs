@@ -1,6 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Collections.Generic;
 
@@ -29,9 +30,10 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <summary>
         /// Edits the existing project in the database.
         /// </summary>
-        /// <param name="dbProject">New data of the project.</param>
-        /// <returns>UserId of the edited project.</returns>
-        Guid EditProjectById(DbProject dbProject);
+        /// <param name="projectId">Edit project Id.</param>
+        /// <param name="request">New data of the project.</param>
+        /// <returns>True if project updated.</returns>
+        bool Edit(DbProject dbProject, JsonPatchDocument<DbProject> request);
 
         /// <summary>
         /// Disable active workers, which were previously assigned to the project.

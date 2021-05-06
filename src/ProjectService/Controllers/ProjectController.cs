@@ -6,6 +6,7 @@ using System;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
@@ -39,12 +40,13 @@ namespace LT.DigitalOffice.ProjectService.Controllers
             return command.Execute(request);
         }
 
-        [HttpPost("editProjectById")]
-        public Guid EditProjectById(
-            [FromServices] IEditProjectByIdCommand command,
-            [FromBody] EditProjectRequest request)
+        [HttpPatch("edit")]
+        public OperationResultResponse<bool> Edit(
+            [FromServices] IEditProjectCommand command,
+            [FromQuery] Guid projectId,
+            [FromBody] JsonPatchDocument<EditProjectRequest> request)
         {
-            return command.Execute(request);
+            return command.Execute(projectId, request);
         }
     }
 }
