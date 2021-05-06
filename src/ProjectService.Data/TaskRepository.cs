@@ -28,9 +28,9 @@ namespace LT.DigitalOffice.ProjectService.Data
                 dbTasks = dbTasks.Where(x => x.ProjectId.Equals(filter.ProjectId));
             }
 
-            if (filter.Assign.HasValue)
+            if (filter.AssignTo.HasValue)
             {
-                dbTasks = dbTasks.Where(x => x.AssignedTo.Equals(filter.Assign));
+                dbTasks = dbTasks.Where(x => x.AssignedTo.Equals(filter.AssignTo));
             }
 
             if(projectIds.Any())
