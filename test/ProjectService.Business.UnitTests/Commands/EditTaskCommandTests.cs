@@ -63,7 +63,8 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private readonly Guid _projectId = Guid.NewGuid();
         private readonly Guid _departmentId = Guid.NewGuid();
         private readonly Guid _taskId = Guid.NewGuid();
-
+        private readonly Guid _userId = Guid.NewGuid();
+        
         private readonly OperationResultResponse<bool> _fullSuccessModel = new()
         {
             Status = OperationResultStatusType.FullSuccess,
@@ -82,7 +83,9 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             Func<Times> requestClientTimes,
             Func<Times> httpAccessorTimes)
         {
-            _projectRepositoryMock.Verify(x => x.GetProject(It.IsAny<Guid>()), projectRepositoryTimes);
+            _projectRepositoryMock.Verify(x => x.GetProjectUsers(
+                It.IsAny<Guid>(), It.IsAny<bool>()), projectRepositoryTimes);
+            
             _taskRepositoryMock.Verify(x => 
                 x.Get(It.IsAny<Guid>()), getInTaskRepositoryTimes);
             
@@ -111,8 +114,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private void RcGetDepartment(Guid departmentId)
         {
             var department = new Mock<IGetDepartmentResponse>();
-            department.Setup(x => x.Id).Returns(departmentId);
-            department.Setup(x => x.Name).Returns("Department name");
+            department.Setup(x => x.DirectorUserId).Returns(_userId);
             
             _operationResultBrokerMock
                 .Setup(x => x.Message.Body)
@@ -224,15 +226,14 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Setup(x => x.IsAdmin())
                 .Returns(false);
             
-            _projectRepositoryMock.Setup(x => x.GetProject(_projectId)).Returns(new DbProject()
+            _projectRepositoryMock
+                .Setup(x => x.GetProjectUsers(_projectId, false))
+                .Returns(new List<DbProjectUser>()
             {
-                Users = new List<DbProjectUser>()
-                {
-                    new DbProjectUser
+                new DbProjectUser
                     {
                         UserId = Guid.NewGuid()
                     }
-                }
             }).Verifiable();
 
             #endregion
@@ -265,20 +266,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [Test]
         public void FullSuccessOperationWhenUserInProject()
         {
-            Guid userId = Guid.NewGuid();
-
-            ClientRequestUp(userId);
-            
-            _projectRepositoryMock.Setup(x => x.GetProject(_projectId)).Returns(new DbProject()
-            {
-                Users = new List<DbProjectUser>()
-                {
-                    new DbProjectUser
-                    {
-                        UserId = userId
-                    }
-                }
-            });
+            ClientRequestUp(_userId);
 
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
             
@@ -292,13 +280,8 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [Test]
         public void FullSuccessWhenUserIsDepartmentDirector()
         {
-            RcGetDepartment(_departmentId);
-            
-            _projectRepositoryMock.Setup(x => x.GetProject(_projectId)).Returns(new DbProject()
-            {
-                DepartmentId = _departmentId
-            });
-            
+            ClientRequestUp(_userId);
+
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
             
             VerifyCalls(Times.Once,

@@ -88,20 +88,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var errors = new List<string>();
 
             DbTask task = _taskRepository.Get(taskId);
-            DbProject project = _projectRepository.GetProject(task.ProjectId);
+            List<DbProjectUser> projectUsers = 
+                _projectRepository.GetProjectUsers(task.ProjectId, false).ToList();
 
             Guid requestUserId = _httpContext.GetUserId();
             IGetDepartmentResponse department = GetDepartment(requestUserId, errors);
 
             bool isAdmin = _accessValidator.IsAdmin();
-            
-            bool isProjectParticipant = project?.Users.FirstOrDefault(x =>
+
+            bool isProjectParticipant = projectUsers.FirstOrDefault(x =>
                 x.UserId == requestUserId) != null;
 
             bool isDepartmentDirector = false;
-            if (department != null && project != null)
+            if (department != null)
             {
-                 isDepartmentDirector = department.Id == project.DepartmentId;
+                 isDepartmentDirector = department.DirectorUserId == requestUserId;
             }
 
             if (!isAdmin && !isProjectParticipant && !isDepartmentDirector)
