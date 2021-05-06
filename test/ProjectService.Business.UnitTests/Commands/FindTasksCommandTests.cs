@@ -229,12 +229,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             FindTasksFilter filter = null;
 
-            var arg = It.IsAny<IGetUserDataResponse>();
             Assert.Throws<ArgumentNullException>(() => _command.Execute(filter, skipCount, takeCount));
+
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
                 x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Never);
+
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<List<Guid>>(), skipCount, takeCount, out totalCount), Times.Never);
+
             _mocker.Verify<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
                 x.GetResponse<IOperationResult<IGetUserDataResponse>>(It.IsAny<object>(), default, default), Times.Never);
         }
@@ -260,12 +262,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             filter.AssignTo = _dbTasks.ElementAt(0).AssignedTo;
 
             SerializerAssert.AreEqual(expectedResult, _command.Execute(filter, skipCount, takeCount));
+
             _mocker.Verify<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items, Times.Exactly(2));
+
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
+
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
                 x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Never);
+
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<List<Guid>>(), skipCount, takeCount, out totalCount), Times.Never);
+
             _mocker.Verify<IRequestClient<IGetUserDataRequest>, Task<Response<IOperationResult<IGetUserDataResponse>>>>(x =>
                 x.GetResponse<IOperationResult<IGetUserDataResponse>>(It.IsAny<object>(), default, default), Times.Never);
         }
@@ -326,12 +333,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 .Returns(Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
+
             _mocker.Verify<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items, Times.Exactly(2));
+
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Never);
+
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
                 x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Exactly(_tasksInfo.Count()));
+
             _mocker.Verify<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
                 x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default), Times.Once);
+
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount), Times.Once);
         }
@@ -382,12 +394,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 .Returns(Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
+
             _mocker.Verify<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items, Times.Exactly(2));
+
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
+
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
                 x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Exactly(_fullTasksInfo.Count()));
+
             _mocker.Verify<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
                 x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default), Times.Once);
+
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount), Times.Once);
         }
@@ -442,12 +459,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 .Returns(Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
+
             _mocker.Verify<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items, Times.Exactly(2));
+
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Never);
+
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
                 x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Exactly(_tasksInfo.Count()));
+
             _mocker.Verify<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
                 x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default), Times.Once);
+
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount), Times.Once);
         }
@@ -495,12 +517,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 .Returns(Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
+
             _mocker.Verify<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items, Times.Exactly(2));
+
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Never);
+
             _mocker.Verify<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
                     x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default), Times.Once);
+
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
                 x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Exactly(_tasksInfo.Count()));
+
             _mocker.Verify<ITaskRepository, IEnumerable<DbTask>>(x =>
                 x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount), Times.Once);
         }
