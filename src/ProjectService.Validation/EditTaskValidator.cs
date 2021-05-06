@@ -62,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     When(x => GetOperationByPath(x, Name) != null, () =>
                     {
                         RuleFor(x => x.Operations)
-                            .UniqueOperationWithAllowedOp(Name, "replace", "add");
+                            .UniqueOperationWithAllowedOp(Name, "replace", "add", "remove");
 
                         RuleFor(x => (string) GetOperationByPath(x, Name).value)
                             .NotEmpty()
@@ -93,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     When(x => GetOperationByPath(x, PriorityId) != null, () =>
                     {
                         RuleFor(x => x.Operations)
-                            .UniqueOperationWithAllowedOp(PriorityId, "replace", "add");
+                            .UniqueOperationWithAllowedOp(PriorityId, "replace");
 
                         RuleFor(x => GetOperationByPath(x, PriorityId).value)
                             .NotEmpty()
@@ -105,7 +105,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     {
                         RuleFor(x => x.Operations)
                             .NotEmpty()
-                            .UniqueOperationWithAllowedOp(StatusId, "replace", "add");
+                            .UniqueOperationWithAllowedOp(StatusId, "replace");
 
                         RuleFor(x => GetOperationByPath(x, StatusId).value)
                             .NotEmpty()
@@ -117,7 +117,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     {
                         RuleFor(x => x.Operations)
                             .NotEmpty()
-                            .UniqueOperationWithAllowedOp(StatusId, "replace", "add");
+                            .UniqueOperationWithAllowedOp(StatusId, "replace");
 
                         RuleFor(x => GetOperationByPath(x, TypeId).value)
                             .NotEmpty()
