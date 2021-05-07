@@ -153,7 +153,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldThrowExceptionWhenCreatingNewTaskWithIncorrectTasktData()
         {
             _mocker
-              .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+              .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
               .Returns(true);
 
             _mocker
@@ -162,7 +162,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             Assert.Throws<ValidationException>(() => _command.Execute(_newRequest));
 
-            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(), Times.Once);
+            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
         }
 
@@ -224,7 +224,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             };
 
             _mocker
-              .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+              .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
               .Returns(true);
 
             _mocker
@@ -238,7 +238,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             SerializerAssert.AreEqual(newResponse, _command.Execute(_newRequest));
 
-            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(), Times.Once);
+            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
             _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
@@ -259,7 +259,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldReturnResponseWhenCreatingNewTaskAndUserIsAdmin()
         {
             _mocker
-                  .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+                  .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
                   .Returns(true);
 
             _mocker
@@ -276,7 +276,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
 
-            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(), Times.Once);
+            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
             _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
             _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
