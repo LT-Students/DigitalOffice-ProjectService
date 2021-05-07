@@ -21,6 +21,15 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public ICollection<DbTask> AuthorTasks { get; set; }
         public ICollection<DbTask> AssignedUserTasks { get; set; }
         public ICollection<DbTaskProperty> TaskProperties { get; set; }
+
+        public DbProjectUser ()
+        {
+            AuthorTasks = new HashSet<DbTask>();
+
+            AssignedUserTasks = new HashSet<DbTask>();
+
+            TaskProperties = new HashSet<DbTaskProperty>();
+        }
     }
 
     public class DbProjectUserConfiguration : IEntityTypeConfiguration<DbProjectUser>

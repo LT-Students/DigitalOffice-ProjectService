@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
 {
     internal class CreateProjectCommandTests
     {
-        private Guid _autorId;
+        private Guid _authorId;
         private AutoMocker _mocker;
         private DbProject _newDbProject;
         private ProjectRequest _newRequest;
@@ -46,13 +46,13 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _autorId = Guid.NewGuid();
+            _authorId = Guid.NewGuid();
 
             _mocker = new AutoMocker();
             _command = _mocker.CreateInstance<CreateProjectCommand>();
 
             IDictionary<object, object> _items = new Dictionary<object, object>();
-            _items.Add("UserId", _autorId);
+            _items.Add("UserId", _authorId);
 
             _mocker
                 .Setup<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items)
@@ -79,7 +79,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             _newDbProject = new DbProject
             {
                 Id = Guid.NewGuid(),
-                AuthorId = _autorId,
+                AuthorId = _authorId,
                 ShortName = _newRequest.ShortName,
                 DepartmentId = _newRequest.DepartmentId,
                 Name = _newRequest.Name,
@@ -101,7 +101,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             var projectInfo = new ProjectInfo
             {
                 Id = Guid.NewGuid(),
-                AuthorId = _autorId,
+                AuthorId = _authorId,
                 ShortName = _newRequest.ShortName,
                 Name = _newRequest.Name,
                 Description = _newRequest.Description,
@@ -156,7 +156,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         public void ShouldThrowExceptionWhenCreatingNewProjectWithIncorrectProjectData()
         {
             _mocker
-               .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+               .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
                .Returns(true);
 
             _mocker
@@ -164,7 +164,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 .Returns(false);
 
             Assert.Throws<ValidationException>(() => _command.Execute(_newRequest));
-            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(), Times.Once);
+            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
             _mocker.Verify<ICreateProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
         }
 
@@ -172,7 +172,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         public void ShouldThrowExceptionWhenUserHasNotRights()
         {
             _mocker
-               .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+               .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
                .Returns(false);
 
             _mocker
@@ -181,10 +181,10 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
 
             Assert.Throws<ForbiddenException>(() => _command.Execute(_newRequest));
 
-            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(), Times.Once);
+            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
             _mocker.Verify<IAccessValidator, bool>(x => x.HasRights(Rights.AddEditRemoveProjects), Times.Once);
             _mocker.Verify<ICreateProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Never);
-            _mocker.Verify<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _autorId), Times.Never);
+            _mocker.Verify<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _authorId), Times.Never);
         }
 
         [Test]
@@ -204,7 +204,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             Assert.Throws<BadRequestException>(() => _command.Execute(_newRequest));
 
             _mocker.Verify<IAccessValidator, bool>(x => x.HasRights(Rights.AddEditRemoveProjects), Times.Once);
-            _mocker.Verify<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _autorId), Times.Never);
+            _mocker.Verify<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _authorId), Times.Never);
             _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
                 x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
                     IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, default),
@@ -230,7 +230,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 .Returns(true);
 
             _mocker
-                .Setup<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _autorId))
+                .Setup<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _authorId))
                 .Returns(_newDbProject);
 
             _mocker
@@ -242,7 +242,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             SerializerAssert.AreEqual(newResponse, _command.Execute(_newRequest));
 
             _mocker.Verify<IAccessValidator, bool>(x => x.HasRights(Rights.AddEditRemoveProjects), Times.Once);
-            _mocker.Verify<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _autorId), Times.Never);
+            _mocker.Verify<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _authorId), Times.Never);
             _mocker.Verify<ICreateProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
             _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
                 x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
@@ -262,7 +262,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 .Returns(true);
 
             _mocker
-                .Setup<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _autorId))
+                .Setup<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _authorId))
                 .Returns(_newDbProject);
 
             _mocker
@@ -285,7 +285,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 .Returns(true);
 
             _mocker
-                .Setup<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _autorId))
+                .Setup<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _authorId))
                 .Returns(_newDbProject);
 
             _mocker

@@ -92,7 +92,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldForbiddenExceptionWhenUserIsNotAdmin()
         {
             _accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(false)
                 .Verifiable();
 
@@ -111,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Verifiable();
 
             _accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(false)
                 .Verifiable();
 
@@ -123,7 +123,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldValidationExeptionWhenRequestDataIsNotValid()
         {
             _accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(true)
                 .Verifiable();
 
@@ -141,7 +141,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldArgumentNullExceptionWhenProjectUserRequestIsNull()
         {
             _accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(true)
                 .Verifiable();
 
@@ -165,7 +165,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldArgumentNullExceptionWhenDbProjectUserIsNull()
         {
             _accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(true)
                 .Verifiable();
 
@@ -194,7 +194,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldArgumentNullExceptionWhenProjectIdIsNotExist()
         {
             _accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(true)
                 .Verifiable();
 
@@ -223,7 +223,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldAddUsersToProjectSuccessful()
         {
             _accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(true)
                 .Verifiable();
 

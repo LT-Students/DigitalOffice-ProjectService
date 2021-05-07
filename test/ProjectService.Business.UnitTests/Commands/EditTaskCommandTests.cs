@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
@@ -25,6 +22,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 {
@@ -46,11 +46,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
         private Mock<IRequestClient<IGetDepartmentRequest>> _requestClient;
         private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _operationResultBrokerMock;
-        
+
         private JsonPatchDocument<EditTaskRequest> _request;
 
         #endregion
-        
+
         #region Private Fields
 
         private readonly string _name = "NewName";
@@ -64,7 +64,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private readonly Guid _departmentId = Guid.NewGuid();
         private readonly Guid _taskId = Guid.NewGuid();
         private readonly Guid _userId = Guid.NewGuid();
-        
+
         private readonly OperationResultResponse<bool> _fullSuccessModel = new()
         {
             Status = OperationResultStatusType.FullSuccess,
@@ -75,28 +75,28 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         #endregion
 
         #region Private Methods
-        
+
         private void VerifyCalls(
-            Func<Times> projectRepositoryTimes, 
-            Func<Times> getInTaskRepositoryTimes, 
+            Func<Times> projectRepositoryTimes,
+            Func<Times> getInTaskRepositoryTimes,
             Func<Times> editInTaskRepositoryTimes,
             Func<Times> requestClientTimes,
             Func<Times> httpAccessorTimes)
         {
             _projectRepositoryMock.Verify(x => x.GetProjectUsers(
                 It.IsAny<Guid>(), It.IsAny<bool>()), projectRepositoryTimes);
-            
-            _taskRepositoryMock.Verify(x => 
+
+            _taskRepositoryMock.Verify(x =>
                 x.Get(It.IsAny<Guid>()), getInTaskRepositoryTimes);
-            
-            _taskRepositoryMock.Verify(x => 
+
+            _taskRepositoryMock.Verify(x =>
                 x.Edit(It.IsAny<DbTask>(), It.IsAny<JsonPatchDocument<DbTask>>()), editInTaskRepositoryTimes);
-            
-            _requestClient.Verify(x => 
-                x.GetResponse<IOperationResult<IGetDepartmentResponse>>(It.IsAny<object>(), 
-                    default, 
+
+            _requestClient.Verify(x =>
+                x.GetResponse<IOperationResult<IGetDepartmentResponse>>(It.IsAny<object>(),
+                    default,
                     default), requestClientTimes);
-            
+
             _httpAccessorMock.Verify(x => x.HttpContext, httpAccessorTimes);
         }
         private void ClientRequestUp(Guid newGuid)
@@ -115,31 +115,31 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         {
             var department = new Mock<IGetDepartmentResponse>();
             department.Setup(x => x.DirectorUserId).Returns(_userId);
-            
+
             _operationResultBrokerMock
                 .Setup(x => x.Message.Body)
                 .Returns(department.Object);
-            
+
             _operationResultBrokerMock
                 .Setup(x => x.Message.IsSuccess)
                 .Returns(true);
-            
+
             _operationResultBrokerMock
                 .Setup(x => x.Message.Errors)
                 .Returns(new List<string>());
 
             _requestClient
-                .Setup(x => 
+                .Setup(x =>
                     x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                        It.IsAny<object>(), 
-                        default, 
+                        It.IsAny<object>(),
+                        default,
                         default))
                 .Returns(Task.FromResult(_operationResultBrokerMock.Object))
                 .Verifiable();
         }
 
         #endregion
-        
+
         #endregion
 
         [OneTimeSetUp]
@@ -199,12 +199,12 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _loggerMock = new Mock<ILogger<EditTaskCommand>>();
             _requestClient = new Mock<IRequestClient<IGetDepartmentRequest>>();
             _operationResultBrokerMock = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
-            
+
             #endregion
 
             ClientRequestUp(Guid.NewGuid());
             RcGetDepartment(Guid.NewGuid());
-            
+
             #region Mock default setups
 
             _taskRepositoryMock
@@ -221,11 +221,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 {
                     ProjectId = _projectId
                 }).Verifiable();
-            
+
             _accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(false);
-            
+
             _projectRepositoryMock
                 .Setup(x => x.GetProjectUsers(_projectId, false))
                 .Returns(new List<DbProjectUser>()
@@ -237,7 +237,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             }).Verifiable();
 
             #endregion
-            
+
             _command = new EditTaskCommand(
                 _taskRepositoryMock.Object,
                 _projectRepositoryMock.Object,
@@ -252,14 +252,14 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [Test]
         public void FullSuccessOperationWhenUserIsAdmin()
         {
-            _accessValidatorMock.Setup(x => x.IsAdmin()).Returns(true);
+            _accessValidatorMock.Setup(x => x.IsAdmin(null)).Returns(true);
 
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
 
             VerifyCalls(Times.Once,
                 Times.Once,
                 Times.Once,
-                Times.Once, 
+                Times.Once,
                 Times.Once);
         }
 
@@ -269,11 +269,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             ClientRequestUp(_userId);
 
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
-            
+
             VerifyCalls(Times.Once,
                 Times.Once,
                 Times.Once,
-                Times.Once, 
+                Times.Once,
                 Times.Once);
         }
 
@@ -283,11 +283,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             ClientRequestUp(_userId);
 
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
-            
+
             VerifyCalls(Times.Once,
                 Times.Once,
                 Times.Once,
-                Times.Once, 
+                Times.Once,
                 Times.Once);
         }
 
@@ -295,7 +295,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ExceptionWhenUserCannotEdit()
         {
             Assert.Throws<ForbiddenException>(() => _command.Execute(_taskId, _request));
-            
+
             VerifyCalls(Times.Once,
                 Times.Once,
                 Times.Never,
@@ -306,18 +306,18 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [Test]
         public void ExceptionWhenRequestClientUnavailable()
         {
-            _accessValidatorMock.Setup(x => x.IsAdmin()).Returns(true);
-            
+            _accessValidatorMock.Setup(x => x.IsAdmin(null)).Returns(true);
+
             _requestClient
-                .Setup(x => 
+                .Setup(x =>
                     x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                        It.IsAny<object>(), 
-                        default, 
+                        It.IsAny<object>(),
+                        default,
                         default))
                 .Returns((Task<Response<IOperationResult<IGetDepartmentResponse>>>) null);
-            
+
             Assert.AreEqual(1, _command.Execute(_taskId, _request).Errors.Count);
-            
+
             VerifyCalls(Times.Once,
                 Times.Once,
                 Times.Once,

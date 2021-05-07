@@ -58,8 +58,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .WithOne(T => T.Type);
 
             builder
-                .HasMany(tp => tp.StatusTasks)
-                .WithOne(T => T.Status);
+               .HasMany(tp => tp.StatusTasks)
+               .WithOne(T => T.Status);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.ResponseMappers
         private string _departmentName;
         private DbProject _dbProject;
         private ProjectInfo _projectInfo;
-        private ProjectsResponse _response;
+        private FindResponse<ProjectInfo> _response;
         private IDictionary<Guid, string> _idNameDepartment;
 
         private const int _totalCount = 1;
@@ -60,10 +60,10 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.ResponseMappers
             _idNameDepartment = new Dictionary<Guid, string>();
             _idNameDepartment.Add(_dbProject.DepartmentId, _departmentName);
 
-            _response = new ProjectsResponse
+            _response = new FindResponse<ProjectInfo>
             {
                 TotalCount = _totalCount,
-                Projects = new List<ProjectInfo> { _projectInfo },
+                Body = new List<ProjectInfo> { _projectInfo },
                 Errors = errors
             };
 

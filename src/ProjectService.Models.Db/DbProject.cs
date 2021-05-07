@@ -20,16 +20,19 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public DateTime CreatedAt { get; set; }
 
         public ICollection<DbTask> Tasks { get; set; }
-        public ICollection<DbTaskProperty> TaskProperties { get; set; }
         public ICollection<DbProjectUser> Users { get; set; }
         public ICollection<DbProjectFile> Files { get; set; }
+        public ICollection<DbTaskProperty> TaskProperties { get; set; }
 
         public DbProject()
         {
-            Users = new HashSet<DbProjectUser>();
             Tasks = new HashSet<DbTask>();
-            TaskProperties = new HashSet<DbTaskProperty>();
+
+            Users = new HashSet<DbProjectUser>();
+
             Files = new HashSet<DbProjectFile>();
+
+            TaskProperties = new HashSet<DbTaskProperty>();
         }
     }
 
@@ -50,10 +53,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
             builder
                 .Property(p => p.ShortName)
                 .IsRequired();
-
-            builder
-                .Property(p => p.Name)
-                .HasMaxLength(150);
 
             builder
                 .Property(p => p.ShortName)
