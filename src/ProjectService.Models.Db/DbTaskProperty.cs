@@ -1,7 +1,7 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LT.DigitalOffice.ProjectService.Models.Db
 {
@@ -59,8 +59,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .WithOne(T => T.Type);
 
             builder
-                .HasMany(tp => tp.StatusTasks)
-                .WithOne(T => T.Status);
+               .HasMany(tp => tp.StatusTasks)
+               .WithOne(T => T.Status);
         }
     }
 }

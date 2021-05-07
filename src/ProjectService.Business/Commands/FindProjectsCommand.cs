@@ -6,6 +6,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using MassTransit;
@@ -105,7 +106,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _findDepartmentsRequestClient = findDepartmentsRequestClient;
         }
 
-        public ProjectsResponse Execute(FindProjectsFilter filter, int skipCount, int takeCount)
+        public FindResponse<ProjectInfo> Execute(FindProjectsFilter filter, int skipCount, int takeCount)
         {
             if (filter == null)
             {
