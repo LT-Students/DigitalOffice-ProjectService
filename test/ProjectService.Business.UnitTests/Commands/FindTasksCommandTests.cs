@@ -259,7 +259,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 .Returns(false);
 
             var filter = new FindTasksFilter();
-            filter.AssignTo = _dbTasks.ElementAt(0).AssignedTo;
+            filter.AssignedTo = _dbTasks.ElementAt(0).AssignedTo;
 
             SerializerAssert.AreEqual(expectedResult, _command.Execute(filter, skipCount, takeCount));
 
@@ -294,7 +294,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var dbTasks = _dbTasks.Where(x => projectIds.Contains(x.ProjectId));
 
             var filter = new FindTasksFilter();
-            filter.AssignTo = _dbTasks.ElementAt(0).AssignedTo;
+            filter.AssignedTo = _dbTasks.ElementAt(0).AssignedTo;
 
             _responseUsersData.Setup(x => x.Message.IsSuccess).Returns(true);
 
@@ -362,7 +362,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             };
 
             var filter = new FindTasksFilter();
-            filter.AssignTo = _dbTasks.ElementAt(0).AssignedTo;
+            filter.AssignedTo = _dbTasks.ElementAt(0).AssignedTo;
 
             _responseUsersData.Setup(x => x.Message.IsSuccess).Returns(true);
 
@@ -426,7 +426,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var dbTasks = _dbTasks.Where(x => projectIds.Contains(x.ProjectId));
 
             var filter = new FindTasksFilter();
-            filter.AssignTo = _dbTasks.ElementAt(0).AssignedTo;
+            filter.AssignedTo = _dbTasks.ElementAt(0).AssignedTo;
             _responseUsersData.Setup(x => x.Message.IsSuccess).Returns(false);
 
             _responseUsersData.Setup(x => x.Message.Errors).Returns(new List<string>());
@@ -491,7 +491,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var dbTasks = _dbTasks.Where(x => projectIds.Contains(x.ProjectId));
 
             var filter = new FindTasksFilter();
-            filter.AssignTo = _dbTasks.ElementAt(0).AssignedTo;
+            filter.AssignedTo = _dbTasks.ElementAt(0).AssignedTo;
             _responseUsersData.Setup(x => x.Message.IsSuccess).Returns(true);
 
             _mocker
