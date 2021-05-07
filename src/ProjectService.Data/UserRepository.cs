@@ -40,14 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         public bool AreExist(params Guid[] ids)
         {
             var dbIds = _provider.ProjectsUsers.Select(x => x.Id);
-            
-            return ids.All(x => dbIds.Contains(x));
-        }
 
-        public bool AreExist(params Guid[] ids)
-        {
-            var dbIds = _provider.ProjectsUsers.Select(x => x.Id);
-            
             return ids.All(x => dbIds.Contains(x));
         }
     }

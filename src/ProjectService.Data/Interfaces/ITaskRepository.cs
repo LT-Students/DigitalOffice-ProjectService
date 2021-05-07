@@ -10,9 +10,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     [AutoInject]
     public interface ITaskRepository
     {
-        public DbTask Get(Guid taskId);
+        DbTask Get(Guid taskId);
 
-        public bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch);
+        bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch);
 
         IEnumerable<DbTask> Find(FindTasksFilter filter, IEnumerable<Guid> projectIds, int skipCount, int takeCount, out int totalCount);
     }
