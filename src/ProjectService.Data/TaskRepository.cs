@@ -1,7 +1,9 @@
-﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.Kernel.Exceptions.Models;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -33,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                 dbTasks = dbTasks.Where(x => x.AssignedTo.Equals(filter.AssignTo));
             }
 
-            if(projectIds.Any())
+            if (projectIds.Any())
             {
                 dbTasks = dbTasks.Where(x => projectIds.Contains(x.ProjectId));
             }
@@ -46,7 +48,26 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
-        public IEnumerable<DbTask> Find(FindTasksFilter filter, IEnumerable<Guid> projectIds, int skipCount, int takeCount, out int totalCount)
+        public bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch)
+        {
+            taskPatch.ApplyTo(task);
+            _provider.Save();
+
+            return true;
+        }
+
+        public DbTask Get(Guid taskId)
+        {
+            return _provider.Tasks.FirstOrDefault(x => x.Id == taskId) ??
+                   throw new NotFoundException($"Task id '{taskId}' was not found.");
+        }
+
+        public IEnumerable<DbTask> Find(
+            FindTasksFilter filter,
+            IEnumerable<Guid> projectIds,
+            int skipCount,
+            int takeCount,
+            out int totalCount)
         {
             if (filter == null)
             {

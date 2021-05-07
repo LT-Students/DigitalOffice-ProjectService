@@ -35,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 });
         }
 
-        private void CreateTaskProperties(MigrationBuilder migrationBuilder)
+        private void CreateTaskPropertiesTable(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
                name: DbTaskProperty.TableName,
@@ -58,7 +58,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            CreateTaskProperties(migrationBuilder);
+            CreateTaskPropertiesTable(migrationBuilder);
             CreateTasksTable(migrationBuilder);
         }
     }

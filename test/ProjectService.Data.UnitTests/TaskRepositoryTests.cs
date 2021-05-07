@@ -1,10 +1,14 @@
-﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
+﻿using LT.DigitalOffice.Kernel.Exceptions.Models;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.UnitTestKernel;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -22,6 +26,19 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private IDataProvider _provider;
         private ITaskRepository _repository;
         private DbContextOptions<ProjectServiceDbContext> _dbContextOptions;
+
+        private DbTask _result;
+        private DbTask _dbTask;
+        private JsonPatchDocument<DbTask> _patchDbTask;
+
+        private Guid _taskId;
+        private string _name = "NewName";
+        private string _description = "New Description";
+        private Guid _assignedTo = Guid.NewGuid();
+        private int _plannedMinutes = 60;
+        private Guid _priorityId = Guid.NewGuid();
+        private Guid _statusId = Guid.NewGuid();
+        private Guid _typeId = Guid.NewGuid();
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -58,21 +75,78 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             _dbTasks[3].Number = 5;
         }
 
-        [TearDown]
-        public void Clean()
-        {
-            if (_provider.IsInMemory())
-            {
-                _provider.EnsureDeleted();
-            }
-        }
-
         [SetUp]
         public void SetUp()
         {
+            _taskId = Guid.NewGuid();
+
+            _dbTask = new DbTask()
+            {
+                Id = _taskId,
+                Name = "Name",
+                Description = "Description",
+                AssignedTo = Guid.NewGuid(),
+                PlannedMinutes = 60,
+                PriorityId = Guid.NewGuid(),
+                StatusId = Guid.NewGuid(),
+                TypeId = Guid.NewGuid()
+            };
+
+            _patchDbTask = new JsonPatchDocument<DbTask>(new List<Operation<DbTask>>()
+            {
+                new Operation<DbTask>(
+                    "replace",
+                    $"/{nameof(DbTask.Name)}",
+                    "",
+                    _name),
+                new Operation<DbTask>(
+                    "replace",
+                    $"/{nameof(DbTask.Description)}",
+                    "",
+                    _description),
+                new Operation<DbTask>(
+                    "replace",
+                    $"/{nameof(DbTask.AssignedTo)}",
+                    "",
+                    _assignedTo),
+                new Operation<DbTask>(
+                    "replace",
+                    $"/{nameof(DbTask.PlannedMinutes)}",
+                    "",
+                    _plannedMinutes),
+                new Operation<DbTask>(
+                    "replace",
+                    $"/{nameof(DbTask.PriorityId)}",
+                    "",
+                    _priorityId),
+                new Operation<DbTask>(
+                    "replace",
+                    $"/{nameof(DbTask.StatusId)}",
+                    "",
+                    _statusId),
+                new Operation<DbTask>(
+                    "replace",
+                    $"/{nameof(DbTask.TypeId)}",
+                    "",
+                    _typeId),
+            }, new CamelCasePropertyNamesContractResolver());
+
+            _result = new DbTask()
+            {
+                Id = _taskId,
+                Name = _name,
+                Description = _description,
+                AssignedTo = _assignedTo,
+                PlannedMinutes = _plannedMinutes,
+                PriorityId = _priorityId,
+                StatusId = _statusId,
+                TypeId = _typeId
+            };
+
             _provider = new ProjectServiceDbContext(_dbContextOptions);
             _repository = new TaskRepository(_provider);
 
+            _provider.Tasks.Add(_dbTask);
             _provider.Tasks.AddRange(_dbTasks);
             _provider.Save();
         }
@@ -131,6 +205,38 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             SerializerAssert.AreEqual(_dbTasks,
                 _repository.Find(filter, _projectIds, skipCount, takeCount, out int totalCount).ToList());
             Assert.AreEqual(_dbTasks.Count, totalCount);
+        }
+
+        [Test]
+        public void ShouldEditTask()
+        {
+            Assert.IsTrue(_repository.Edit(_repository.Get(_taskId), _patchDbTask));
+            SerializerAssert.AreEqual(_result, _provider.Tasks.FirstOrDefault(x => x.Id == _taskId));
+        }
+
+        [Test]
+        public void ExceptionWhenThereIsNotTask()
+        {
+            _taskId = Guid.NewGuid();
+
+            Assert.Throws<NotFoundException>(() => _repository.Get(_taskId));
+
+            Assert.Throws<NotFoundException>(() => _repository.Edit(_repository.Get(_taskId), _patchDbTask));
+        }
+
+        [Test]
+        public void ShouldGetTask()
+        {
+            Assert.AreEqual(_dbTask, _repository.Get(_taskId));
+        }
+
+        [TearDown]
+        public void Clean()
+        {
+            if (_provider.IsInMemory())
+            {
+                _provider.EnsureDeleted();
+            }
         }
     }
 }
