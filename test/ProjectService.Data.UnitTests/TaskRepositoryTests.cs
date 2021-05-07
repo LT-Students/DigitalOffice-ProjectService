@@ -40,9 +40,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private Guid _statusId = Guid.NewGuid();
         private Guid _typeId = Guid.NewGuid();
 
-        private DbTask _dbTask;
-
-        private void CreateMemoryDb()
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
@@ -94,8 +91,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 StatusId = Guid.NewGuid(),
                 TypeId = Guid.NewGuid()
             };
-
-            CreateMemoryDb();
 
             _patchDbTask = new JsonPatchDocument<DbTask>(new List<Operation<DbTask>>()
             {
