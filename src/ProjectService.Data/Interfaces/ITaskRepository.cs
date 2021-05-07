@@ -34,4 +34,5 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         public bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch);
 
         public DbTask Get(Guid taskId);
+    }
 }

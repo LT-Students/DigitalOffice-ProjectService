@@ -3,9 +3,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
@@ -20,24 +18,14 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         {
             return command.Execute(request);
         }
-    }
-}
 
-namespace LT.DigitalOffice.ProjectService.Controllers
-{
-    [Route("[controller]")]
-    [ApiController]
-    public class TaskController : ControllerBase
-    {
         [HttpPatch("edit")]
         public OperationResultResponse<bool> Edit(
             [FromQuery] Guid id,
             [FromBody] JsonPatchDocument<EditTaskRequest> request,
-            IEditTaskCommand command)
+            [FromServices] IEditTaskCommand command)
         {
             return command.Execute(id, request);
         }
     }
 }
-
-using Microsoft.AspNetCore.JsonPatch;

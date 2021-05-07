@@ -23,8 +23,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public ICollection<DbTaskProperty> TaskProperties { get; set; }
         public ICollection<DbProjectUser> Users { get; set; }
         public ICollection<DbProjectFile> Files { get; set; }
-        public ICollection<DbTask> Tasks { get; set; }
-        public ICollection<DbTaskProperty> TaskProperties { get; set; }
 
         public DbProject()
         {

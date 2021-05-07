@@ -14,7 +14,5 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider
         DbSet<DbProject> Projects { get; set; }
         DbSet<DbProjectFile> ProjectsFiles { get; set; }
         DbSet<DbProjectUser> ProjectsUsers { get; set; }
-        DbSet<DbTask> Tasks { get; set; }
-        DbSet<DbTaskProperty> TaskProperties { get; set; }
     }
 }

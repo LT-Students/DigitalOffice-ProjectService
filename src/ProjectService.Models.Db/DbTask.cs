@@ -25,7 +25,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
         public DbProject Project { get; set; }
         public DbProjectUser Author { get; set; }
-        public DbProjectUser Assigner { get; set; }
+        public DbProjectUser AssignedUser { get; set; }
         public DbTaskProperty Status { get; set; }
         public DbTaskProperty Priority { get; set; }
         public DbTaskProperty Type { get; set; }
@@ -51,9 +51,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
              builder
                  .HasOne(t => t.Author)
-                 .HasForeignKey(t => t.AuthorId);
                  .WithMany(pu => pu.AuthorTasks)
-
+                 .HasForeignKey(t => t.AuthorId);
              builder
                  .HasOne(t => t.Project)
                  .WithMany(p => p.Tasks)

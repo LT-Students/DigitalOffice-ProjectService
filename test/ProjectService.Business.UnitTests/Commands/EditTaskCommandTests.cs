@@ -31,9 +31,9 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
     public class EditTaskCommandTests
     {
         #region Private
-        
+
         #region Private Models
-        
+
         private IEditTaskCommand _command;
 
         private Mock<ITaskRepository> _taskRepositoryMock;

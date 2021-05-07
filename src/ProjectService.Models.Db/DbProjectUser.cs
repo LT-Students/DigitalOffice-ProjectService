@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
         public DbProject Project { get; set; }
         public ICollection<DbTask> AuthorTasks { get; set; }
-        public ICollection<DbTask> AssignerTasks { get; set; }
+        public ICollection<DbTask> AssignedUserTasks { get; set; }
         public ICollection<DbTaskProperty> TaskProperties { get; set; }
     }
 
@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
             builder
                 .HasMany(pu => pu.TaskProperties)
                 .WithOne(t => t.User);
-            
+
             builder
                 .HasMany(pu => pu.AssignedUserTasks)
                 .WithOne(t => t.AssignedUser)

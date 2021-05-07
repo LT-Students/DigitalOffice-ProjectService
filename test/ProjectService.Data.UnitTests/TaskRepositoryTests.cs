@@ -33,7 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private readonly Guid _typeId = Guid.NewGuid();
 
         private DbTask _dbTask;
-        
+
         private void CreateMemoryDb()
         {
             var dbOptions = new DbContextOptionsBuilder<ProjectServiceDbContext>()
@@ -53,7 +53,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         public void SetUp()
         {
             _taskId = Guid.NewGuid();
-            
+
             _dbTask = new DbTask()
             {
                 Id = _taskId,
@@ -65,7 +65,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 StatusId = Guid.NewGuid(),
                 TypeId = Guid.NewGuid()
             };
-                
+
             CreateMemoryDb();
             _patchDbTask = new JsonPatchDocument<DbTask>(new List<Operation<DbTask>>()
             {
@@ -135,7 +135,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
             Assert.Throws<NotFoundException>(() => _repository.Edit(_repository.Get(_taskId), _patchDbTask));
         }
-        
+
         [Test]
         public void ShouldGetTask()
         {
