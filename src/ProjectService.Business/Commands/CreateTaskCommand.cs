@@ -115,7 +115,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             return new OperationResultResponse<Guid>
             {
                 Body = taskId,
-                Status = !errors.Any()?OperationResultStatusType.FullSuccess: OperationResultStatusType.PartialSuccess,
+                Status = !errors.Any() ?
+                    OperationResultStatusType.FullSuccess : OperationResultStatusType.PartialSuccess,
                 Errors = errors
             };
         }

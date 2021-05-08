@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using System;
@@ -43,8 +44,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                {
                    Id = table.Column<Guid>(nullable: false),
                    Name = table.Column<string>(nullable: false),
-                   ProjectId = table.Column<Guid>(nullable: false),
-                   AuthorId = table.Column<Guid>(nullable: false),
+                   ProjectId = table.Column<Guid?>(nullable: true),
+                   AuthorId = table.Column<Guid?>(nullable: true),
                    PropertyType = table.Column<int>(nullable: false),
                    Description = table.Column<string>(nullable: true),
                    CreatedAt = table.Column<DateTime>(nullable: false),
@@ -54,6 +55,87 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                {
                    table.PrimaryKey($"PK_{DbTaskProperty.TableName}", x => x.Id);
                });
+
+            migrationBuilder.InsertData(
+                table: DbTaskProperty.TableName,
+                columns: new[]
+                {
+                    nameof(DbTaskProperty.Id),
+                    nameof(DbTaskProperty.Name),
+                    nameof(DbTaskProperty.PropertyType),
+                    nameof(DbTaskProperty.CreatedAt),
+                    nameof(DbTaskProperty.IsActive)
+                },
+                columnTypes: new[]
+                {
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                },
+                new object[]
+                {
+                    Guid.NewGuid(),
+                    "(normal)",
+                    (int)TaskPropertyType.Priority,
+                    DateTime.UtcNow,
+                    true
+                });
+
+            migrationBuilder.InsertData(
+                table: DbTaskProperty.TableName,
+                columns: new[]
+                {
+                    nameof(DbTaskProperty.Id),
+                    nameof(DbTaskProperty.Name),
+                    nameof(DbTaskProperty.PropertyType),
+                    nameof(DbTaskProperty.CreatedAt),
+                    nameof(DbTaskProperty.IsActive)
+                },
+                columnTypes: new[]
+                {
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                },
+                new object[]
+                {
+                    Guid.NewGuid(),
+                    "(new)",
+                    (int)TaskPropertyType.Status,
+                    DateTime.UtcNow,
+                    true
+                });
+
+            migrationBuilder.InsertData(
+                table: DbTaskProperty.TableName,
+                columns: new[]
+                {
+                    nameof(DbTaskProperty.Id),
+                    nameof(DbTaskProperty.Name),
+                    nameof(DbTaskProperty.PropertyType),
+                    nameof(DbTaskProperty.CreatedAt),
+                    nameof(DbTaskProperty.IsActive)
+                },
+                columnTypes: new[]
+                {
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                },
+                new object[]
+                {
+                    Guid.NewGuid(),
+                    "(feature)",
+                    (int)TaskPropertyType.Type,
+                    DateTime.UtcNow,
+                    true
+                });
         }
 
         protected override void Up(MigrationBuilder migrationBuilder)

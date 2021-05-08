@@ -146,7 +146,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             _provider = new ProjectServiceDbContext(_dbContextOptions);
             _repository = new TaskRepository(_provider);
 
-            _provider.Tasks.Add(_dbTask);
             _provider.Tasks.AddRange(_dbTasks);
             _provider.Save();
         }
@@ -210,6 +209,8 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         [Test]
         public void ShouldEditTask()
         {
+            _provider.Tasks.Add(_dbTask);
+            _provider.Save();
             Assert.IsTrue(_repository.Edit(_repository.Get(_taskId), _patchDbTask));
             SerializerAssert.AreEqual(_result, _provider.Tasks.FirstOrDefault(x => x.Id == _taskId));
         }
@@ -227,6 +228,8 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         [Test]
         public void ShouldGetTask()
         {
+            _provider.Tasks.Add(_dbTask);
+            _provider.Save();
             Assert.AreEqual(_dbTask, _repository.Get(_taskId));
         }
 

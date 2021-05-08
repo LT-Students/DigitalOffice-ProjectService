@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         private Mock<ITaskRepository> _taskRepository;
         private Mock<IUserRepository> _userRepository;
         private Mock<IProjectRepository> _projectRepository;
-
+        private Mock<ITaskPropertyRepository> _taskPropertyRepository;
         private CreateTaskRequest _taskRequest;
 
         [SetUp]
@@ -23,8 +23,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             _taskRepository = new Mock<ITaskRepository>();
             _userRepository = new Mock<IUserRepository>();
             _projectRepository = new Mock<IProjectRepository>();
+            _taskPropertyRepository = new Mock<ITaskPropertyRepository>();
 
-            _validator = new CreateTaskRequestValidator(_taskRepository.Object, _userRepository.Object, _projectRepository.Object);
+            _validator = new CreateTaskRequestValidator(_taskRepository.Object, _userRepository.Object, _projectRepository.Object, _taskPropertyRepository.Object);
 
             _taskRequest = new CreateTaskRequest
             {
@@ -32,7 +33,10 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 Description = "Do smth after smth",
                 ProjectId = Guid.NewGuid(),
                 AssignedTo = Guid.NewGuid(),
-                ParentId = Guid.NewGuid()
+                ParentId = Guid.NewGuid(),
+                StatusId = Guid.NewGuid(),
+                PriorityId = Guid.NewGuid(),
+                TypeId = Guid.NewGuid()
             };
         }
 
@@ -109,6 +113,117 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
+        public void ShouldThrowErrorWhenPriorityIdIdDoesNotExist()
+        {
+            _userRepository
+                .Setup(x => x.AreUserAndProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Returns(false)
+                .Verifiable();
+
+            _taskRepository
+                .Setup(x => x.IsExist(_taskRequest.ParentId.Value))
+                .Returns(true)
+                .Verifiable();
+
+            _projectRepository
+               .Setup(x => x.IsExist(_taskRequest.ProjectId))
+               .Returns(true)
+               .Verifiable();
+
+            _taskPropertyRepository
+             .Setup(x => x.AreExist(_taskRequest.StatusId))
+             .Returns(true)
+             .Verifiable();
+
+            _taskPropertyRepository
+              .Setup(x => x.AreExist(_taskRequest.PriorityId))
+              .Returns(false)
+              .Verifiable();
+
+            _taskPropertyRepository
+              .Setup(x => x.AreExist(_taskRequest.TypeId))
+              .Returns(true)
+              .Verifiable();
+
+            _validator.TestValidate(_taskRequest).ShouldHaveAnyValidationError();
+            _userRepository.Verify();
+        }
+
+        [Test]
+        public void ShouldThrowErrorWhenStatusIdIdDoesNotExist()
+        {
+            _userRepository
+                .Setup(x => x.AreUserAndProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Returns(false)
+                .Verifiable();
+
+            _taskRepository
+                .Setup(x => x.IsExist(_taskRequest.ParentId.Value))
+                .Returns(true)
+                .Verifiable();
+
+            _projectRepository
+               .Setup(x => x.IsExist(_taskRequest.ProjectId))
+               .Returns(true)
+               .Verifiable();
+
+            _taskPropertyRepository
+             .Setup(x => x.AreExist(_taskRequest.StatusId))
+             .Returns(false)
+             .Verifiable();
+
+            _taskPropertyRepository
+              .Setup(x => x.AreExist(_taskRequest.PriorityId))
+              .Returns(true)
+              .Verifiable();
+
+            _taskPropertyRepository
+              .Setup(x => x.AreExist(_taskRequest.TypeId))
+              .Returns(true)
+              .Verifiable();
+
+            _validator.TestValidate(_taskRequest).ShouldHaveAnyValidationError();
+            _userRepository.Verify();
+        }
+
+        [Test]
+        public void ShouldThrowErrorWhenTypeIdIdDoesNotExist()
+        {
+            _userRepository
+                .Setup(x => x.AreUserAndProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Returns(false)
+                .Verifiable();
+
+            _taskRepository
+                .Setup(x => x.IsExist(_taskRequest.ParentId.Value))
+                .Returns(true)
+                .Verifiable();
+
+            _projectRepository
+               .Setup(x => x.IsExist(_taskRequest.ProjectId))
+               .Returns(true)
+               .Verifiable();
+
+            _taskPropertyRepository
+             .Setup(x => x.AreExist(_taskRequest.StatusId))
+             .Returns(true)
+             .Verifiable();
+
+            _taskPropertyRepository
+              .Setup(x => x.AreExist(_taskRequest.PriorityId))
+              .Returns(true)
+              .Verifiable();
+
+            _taskPropertyRepository
+              .Setup(x => x.AreExist(_taskRequest.TypeId))
+              .Returns(false)
+              .Verifiable();
+
+            _validator.TestValidate(_taskRequest).ShouldHaveAnyValidationError();
+            _userRepository.Verify();
+        }
+
+        [Test]
         public void ShouldNotErrorsWhenRequestIsValid()
         {
             _userRepository
@@ -125,6 +240,21 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                .Setup(x => x.IsExist(_taskRequest.ProjectId))
                .Returns(true)
                .Verifiable();
+
+            _taskPropertyRepository
+              .Setup(x => x.AreExist(_taskRequest.StatusId))
+              .Returns(true)
+              .Verifiable();
+
+            _taskPropertyRepository
+              .Setup(x => x.AreExist(_taskRequest.PriorityId))
+              .Returns(true)
+              .Verifiable();
+
+            _taskPropertyRepository
+              .Setup(x => x.AreExist(_taskRequest.TypeId))
+              .Returns(true)
+              .Verifiable();
 
             _validator.TestValidate(_taskRequest).ShouldNotHaveAnyValidationErrors();
         }

@@ -13,7 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 {
     public class CreateTaskRequestValidator : AbstractValidator<CreateTaskRequest>, ICreateTaskValidator
     {
-        public CreateTaskRequestValidator(ITaskRepository tasksRepository, IUserRepository userRepository, IProjectRepository projectRepository)
+        public CreateTaskRequestValidator(ITaskRepository tasksRepository, IUserRepository userRepository, IProjectRepository projectRepository, ITaskPropertyRepository taskPropertyRepository)
         {
             RuleFor(task => task.Name)
                 .NotEmpty()
@@ -39,6 +39,18 @@ namespace LT.DigitalOffice.ProjectService.Validation
             RuleFor(task => task.ProjectId)
                 .NotEmpty()
                 .Must(x => projectRepository.IsExist(x));
+
+            RuleFor(task => task.PriorityId)
+                .NotEmpty()
+                .Must(x => taskPropertyRepository.AreExist(x));
+
+            RuleFor(task => task.StatusId)
+                .NotEmpty()
+                .Must(x => taskPropertyRepository.AreExist(x));
+
+            RuleFor(task => task.TypeId)
+                .NotEmpty()
+                .Must(x => taskPropertyRepository.AreExist(x));
         }
     }
 }

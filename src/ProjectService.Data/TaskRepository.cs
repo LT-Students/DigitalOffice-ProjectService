@@ -71,7 +71,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         public DbTask Get(Guid taskId)
         {
             return _provider.Tasks.FirstOrDefault(x => x.Id == taskId) ??
-                    throw new NotFoundException($"Task id '{taskId}' was not found.");
+                throw new NotFoundException($"Task id '{taskId}' was not found.");
         }
 
         public IEnumerable<DbTask> Find(
