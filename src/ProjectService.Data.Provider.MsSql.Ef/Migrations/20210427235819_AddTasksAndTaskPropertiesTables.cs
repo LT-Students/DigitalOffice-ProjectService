@@ -62,23 +62,32 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 {
                     nameof(DbTaskProperty.Id),
                     nameof(DbTaskProperty.Name),
+                    nameof(DbTaskProperty.ProjectId),
+                    nameof(DbTaskProperty.AuthorId),
                     nameof(DbTaskProperty.PropertyType),
+                    nameof(DbTaskProperty.Description),
                     nameof(DbTaskProperty.CreatedAt),
                     nameof(DbTaskProperty.IsActive)
                 },
-                columnTypes: new[]
+                columnTypes: new string[]
                 {
-                    string.Empty,
-                    string.Empty,
-                    string.Empty,
-                    string.Empty,
-                    string.Empty,
+                    "uniqueidentifier",
+                    "nvarchar(max)",
+                    "uniqueidentifier",
+                    "uniqueidentifier",
+                    "int",
+                    "nvarchar(max)",
+                    "DateTime",
+                    "bit"
                 },
                 new object[]
                 {
                     Guid.NewGuid(),
-                    "(normal)",
+                    "normal",
+                    null,
+                    null,
                     (int)TaskPropertyType.Priority,
+                    null,
                     DateTime.UtcNow,
                     true
                 });
@@ -89,23 +98,32 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 {
                     nameof(DbTaskProperty.Id),
                     nameof(DbTaskProperty.Name),
+                    nameof(DbTaskProperty.ProjectId),
+                    nameof(DbTaskProperty.AuthorId),
                     nameof(DbTaskProperty.PropertyType),
+                    nameof(DbTaskProperty.Description),
                     nameof(DbTaskProperty.CreatedAt),
                     nameof(DbTaskProperty.IsActive)
                 },
                 columnTypes: new[]
                 {
-                    string.Empty,
-                    string.Empty,
-                    string.Empty,
-                    string.Empty,
-                    string.Empty,
+                    "uniqueidentifier",
+                    "nvarchar(max)",
+                    "uniqueidentifier",
+                    "uniqueidentifier",
+                    "int",
+                    "nvarchar(max)",
+                    "DateTime",
+                    "bit"
                 },
                 new object[]
                 {
                     Guid.NewGuid(),
-                    "(new)",
+                    "new",
+                    null,
+                    null,
                     (int)TaskPropertyType.Status,
+                    null,
                     DateTime.UtcNow,
                     true
                 });
@@ -116,23 +134,32 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 {
                     nameof(DbTaskProperty.Id),
                     nameof(DbTaskProperty.Name),
+                    nameof(DbTaskProperty.ProjectId),
+                    nameof(DbTaskProperty.AuthorId),
                     nameof(DbTaskProperty.PropertyType),
+                    nameof(DbTaskProperty.Description),
                     nameof(DbTaskProperty.CreatedAt),
                     nameof(DbTaskProperty.IsActive)
                 },
                 columnTypes: new[]
                 {
-                    string.Empty,
-                    string.Empty,
-                    string.Empty,
-                    string.Empty,
-                    string.Empty,
+                    "uniqueidentifier",
+                    "nvarchar(max)",
+                    "uniqueidentifier",
+                    "uniqueidentifier",
+                    "int",
+                    "nvarchar(max)",
+                    "DateTime",
+                    "bit"
                 },
                 new object[]
                 {
                     Guid.NewGuid(),
-                    "(feature)",
+                    "feature",
+                    null,
+                    null,
                     (int)TaskPropertyType.Type,
+                    null,
                     DateTime.UtcNow,
                     true
                 });

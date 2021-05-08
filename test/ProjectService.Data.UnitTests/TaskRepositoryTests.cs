@@ -216,6 +216,13 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }
 
         [Test]
+        public void ShouldCreateNewTask()
+        {
+            SerializerAssert.AreEqual(_dbTask.Id, _repository.CreateTask(_dbTask));
+            Assert.NotNull(_provider.Tasks.Find(_dbTask.Id));
+        }
+
+        [Test]
         public void ExceptionWhenThereIsNotTask()
         {
             _taskId = Guid.NewGuid();
