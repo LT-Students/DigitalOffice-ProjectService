@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     public class ProjectController : ControllerBase
     {
         [HttpGet("find")]
-        public ProjectsResponse Find(
+        public FindResponse<ProjectInfo> Find(
             [FromServices] IFindProjectsCommand command,
             [FromQuery] FindProjectsFilter filter,
             [FromQuery] int skipCount,

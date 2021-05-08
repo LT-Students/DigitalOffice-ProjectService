@@ -88,7 +88,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(true);
 
             _mocker
-                .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+                .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
                 .Returns(true);
 
             _mocker
@@ -124,7 +124,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         public void SuccessCommandExecuteWhenRequesterDepartamentDirecorAndNotAdmin()
         {
             _mocker
-                .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+                .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
                 .Returns(false);
 
             SerializerAssert.AreEqual(_response, _command.Execute(It.IsAny<Guid>(), _request));
@@ -146,7 +146,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(false);
 
             Assert.Throws<ValidationException>(() => _command.Execute(It.IsAny<Guid>(), _request));
-            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(), Times.Never);
+            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Never);
             _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
                 x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
                     IGetDepartmentRequest.CreateObj(null, _departmentId), default, default),
@@ -159,13 +159,13 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
         public void ForbiddenExceptionWhenRequesterNotAdminAndNotDepartmetDirector()
         {
             _mocker
-                .Setup<IAccessValidator, bool>(x => x.IsAdmin())
+                .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
                 .Returns(false);
 
             _getDepartmentResponse.Setup(x => x.DirectorUserId).Returns(_notDepartmentDirectorUserId);
 
             Assert.Throws<ForbiddenException>(() => _command.Execute(It.IsAny<Guid>(), _request));
-            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(), Times.Once);
+            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
             _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
                 x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
                     IGetDepartmentRequest.CreateObj(null, _departmentId), default, default),

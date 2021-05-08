@@ -1,9 +1,9 @@
-namespace LT.DigitalOffice.ProjectService.Models.Dto.Enums
+﻿namespace LT.DigitalOffice.ProjectService.Models.Dto.Enums
 {
     public enum TaskPropertyType
     {
         Type,
         Status,
-        Priority,
+        Priority
     }
 }

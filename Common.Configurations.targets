@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests')) != 'true'">
-    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.1.21" />
+    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.1.25" />
   </ItemGroup>
 
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests'))">
