@@ -15,9 +15,17 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         public OperationResultResponse<bool> Edit(
             [FromQuery] Guid id,
             [FromBody] JsonPatchDocument<EditTaskRequest> request,
-            IEditTaskCommand command)
+            [FromServices] IEditTaskCommand command)
         {
             return command.Execute(id, request);
+        }
+
+        [HttpGet("get")]
+        public TaskResponse Get(
+            [FromQuery] Guid taskId,
+            [FromServices] IGetTaskCommand command)
+        {
+            return command.Execute(taskId);
         }
     }
 }

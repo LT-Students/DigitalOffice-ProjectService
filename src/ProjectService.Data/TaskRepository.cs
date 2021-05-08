@@ -1,17 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.EntityFrameworkCore;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
     public class TaskRepository : ITaskRepository
     {
         private readonly IDataProvider _provider;
-
+        
         public TaskRepository(IDataProvider provider)
         {
             _provider = provider;
@@ -27,8 +29,18 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public DbTask Get(Guid taskId)
         {
-            return _provider.Tasks.FirstOrDefault(x => x.Id == taskId) ??
-                   throw new NotFoundException($"Task id '{taskId}' was not found.");
+            DbTask dbTask = _provider.Tasks
+                                .Include(t => t.Project)
+                                .Include(t => t.Author)
+                                .Include(t => t.AssignedUser)
+                                .Include(t => t.Status)
+                                .Include(t => t.Priority)
+                                .Include(t => t.Type)
+                                .Include(t => t.Subtasks)
+                                .FirstOrDefault(x => x.Id == taskId) ??
+                throw new NotFoundException($"Task id '{taskId}' was not found.");
+
+            return dbTask;
         }
     }
 }
