@@ -31,6 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         private Mock<IProjectExpandedResponseMapper> _projectExpandedResponseMapperMock;
         private Mock<IProjectUserInfoMapper> _projectUserInfoMapperMock;
         private Mock<IProjectFileInfoMapper> _projectFileInfoMapperMock;
+        private Mock<IDepartmentInfoMapper> _departmentInfoMapperMock;
         
         private Mock<IRequestClient<IGetDepartmentRequest>> _rcDepartmentMock;
 
@@ -211,6 +212,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             DepartmentBrokerSetUp();
             UsersBrokerSetUp();
 
+            _departmentInfoMapperMock = new Mock<IDepartmentInfoMapper>();
+            _departmentInfoMapperMock
+                .Setup(x => x.Map(It.IsAny<IGetDepartmentResponse>()))
+                .Returns(_departmentInfo);
+
             _projectUserInfoMapperMock = new Mock<IProjectUserInfoMapper>();
             _projectUserInfoMapperMock
                 .Setup(x => x.Map(_usersData.First(), _dbProjectUser))
@@ -233,6 +239,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 _projectExpandedResponseMapperMock.Object,
                 _projectUserInfoMapperMock.Object,
                 _projectFileInfoMapperMock.Object,
+                _departmentInfoMapperMock.Object,
                 _rcDepartmentMock.Object,
                 _rcUsersDataMock.Object);
         }

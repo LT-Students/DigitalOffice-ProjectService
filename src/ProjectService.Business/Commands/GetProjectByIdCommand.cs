@@ -25,6 +25,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IProjectExpandedResponseMapper _projectExpandedResponseMapper;
         private readonly IProjectUserInfoMapper _projectUserInfoMapper;
         private readonly IProjectFileInfoMapper _projectFileInfoMapper;
+        private readonly IDepartmentInfoMapper _departmentInfoMapper;
         private readonly IRequestClient<IGetDepartmentRequest> _departmentRequestClient;
         private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
 
@@ -100,17 +101,19 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         public GetProjectByIdCommand(
             ILogger<GetProjectByIdCommand> logger,
             IProjectRepository repository,
-            IProjectExpandedResponseMapper mapper,
+            IProjectExpandedResponseMapper projectExpandedResponsMapper,
             IProjectUserInfoMapper projectUserInfoMapper,
             IProjectFileInfoMapper projectFileInfoMapper,
+            IDepartmentInfoMapper departmentInfoMapper,
             IRequestClient<IGetDepartmentRequest> departmentRequestClient,
             IRequestClient<IGetUsersDataRequest> usersDataRequestClient)
         {
             _logger = logger;
             _repository = repository;
-            _projectExpandedResponseMapper = mapper;
+            _projectExpandedResponseMapper = projectExpandedResponsMapper;
             _projectUserInfoMapper = projectUserInfoMapper;
             _projectFileInfoMapper = projectFileInfoMapper;
+            _departmentInfoMapper = departmentInfoMapper;
             _departmentRequestClient = departmentRequestClient;
             _usersDataRequestClient = usersDataRequestClient;
         }
