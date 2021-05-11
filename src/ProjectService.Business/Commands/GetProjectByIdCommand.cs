@@ -40,12 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
                 if (departmentResponse.Message.IsSuccess)
                 {
-                    //TODO Add mapper
-                    department = new DepartmentInfo
-                    {
-                        Id = departmentResponse.Message.Body.Id,
-                        Name = departmentResponse.Message.Body.Name
-                    };
+                    department = _departmentInfoMapper.Map(departmentResponse.Message.Body);
                 }
             }
             catch (Exception exc)

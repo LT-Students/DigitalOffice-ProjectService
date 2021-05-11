@@ -123,30 +123,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         }
 
         [Test]
-        public void ShouldReturnProjectWithoutUsersAndFiles()
-        {
-            var fullFilter = new GetProjectFilter
-            {
-                ProjectId = _dbProject.Id,
-                IncludeFiles = false,
-                IncludeUsers = false,
-                ShowNotActiveUsers = true
-            };
-
-            var result = _repository.GetProject(fullFilter);
-
-            var expected = new DbProject
-            {
-                Id = _dbProject.Id,
-                Name = _dbProject.Name
-            };
-
-            Assert.AreEqual(expected.Id, result.Id);
-            Assert.AreEqual(expected.Files.Count, result.Files.Count);
-            Assert.AreEqual(expected.Users.Count, result.Users.Count);
-        }
-
-        [Test]
         public void ShouldReturnProjectWithFiles()
         {
             var fullFilter = new GetProjectFilter
@@ -170,32 +146,6 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
 
             Assert.AreEqual(expected.Files.Count, result.Files.Count);
             Assert.AreEqual(expected.Files.First().Id, result.Files.First().Id);
-        }
-
-        [Test]
-        public void ShouldReturnProjectWithActiveUsers()
-        {
-            var fullFilter = new GetProjectFilter
-            {
-                ProjectId = _dbProject.Id,
-                IncludeUsers = true,
-                ShowNotActiveUsers = false
-            };
-
-            var result = _repository.GetProject(fullFilter);
-
-            var expected = new DbProject
-            {
-                Id = _dbProject.Id,
-                Name = _dbProject.Name,
-                Users = new List<DbProjectUser> { _activeDbUser }
-            };
-
-            Assert.AreEqual(expected.Id, result.Id);
-
-            Assert.AreEqual(expected.Users.Count, result.Users.Count);
-            Assert.NotNull(result.Users.First(x => x.Id == _activeDbUser.Id));
-            Assert.NotNull(expected.Users.First(x => x.Id == _activeDbUser.Id));
         }
     }
 }
