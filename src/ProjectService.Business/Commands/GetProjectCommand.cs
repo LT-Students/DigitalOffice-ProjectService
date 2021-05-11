@@ -18,9 +18,9 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
-    public class GetProjectByIdCommand : IGetProjectByIdCommand
+    public class GetProjectCommand : IGetProjectCommand
     {
-        private readonly ILogger<GetProjectByIdCommand> _logger;
+        private readonly ILogger<GetProjectCommand> _logger;
         private readonly IProjectRepository _repository;
         private readonly IProjectExpandedResponseMapper _projectExpandedResponseMapper;
         private readonly IProjectUserInfoMapper _projectUserInfoMapper;
@@ -65,9 +65,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             {
                 List<Guid> userIds;
 
-                if (showNotActiveUsers == true)
+                if (showNotActiveUsers)
                 {
-                    userIds = projectUsers.Select(x => x.Id).Distinct().ToList();
+                    userIds = projectUsers.Select(x => x.UserId).Distinct().ToList();
                 }
                 else
                 {
@@ -84,7 +84,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     var usersData = usersDataResponse.Message.Body.UsersData;
 
                     projectUsersInfo = projectUsers
-                        .Select(pu => _projectUserInfoMapper.Map(usersData.First(x => x.Id == pu.Id), pu))
+                        .Select(pu => _projectUserInfoMapper.Map(usersData.First(x => x.Id == pu.UserId), pu))
                         .ToList();
                 }
                 else
@@ -103,8 +103,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             return projectUsersInfo;
         }
 
-        public GetProjectByIdCommand(
-            ILogger<GetProjectByIdCommand> logger,
+        public GetProjectCommand(
+            ILogger<GetProjectCommand> logger,
             IProjectRepository repository,
             IProjectExpandedResponseMapper projectExpandedResponsMapper,
             IProjectUserInfoMapper projectUserInfoMapper,

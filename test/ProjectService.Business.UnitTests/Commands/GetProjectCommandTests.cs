@@ -23,10 +23,10 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 {
-    internal class GetProjectByIdCommandTests
+    internal class GetProjectCommandTests
     {
-        private IGetProjectByIdCommand _command;
-        private Mock<ILogger<GetProjectByIdCommand>> _loggerMock;
+        private IGetProjectCommand _command;
+        private Mock<ILogger<GetProjectCommand>> _loggerMock;
         private Mock<IProjectRepository> _repositoryMock;
         private Mock<IProjectExpandedResponseMapper> _projectExpandedResponseMapperMock;
         private Mock<IProjectUserInfoMapper> _projectUserInfoMapperMock;
@@ -202,7 +202,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         [SetUp]
         public void SetUp()
         {
-            _loggerMock = new Mock<ILogger<GetProjectByIdCommand>>();
+            _loggerMock = new Mock<ILogger<GetProjectCommand>>();
 
             _repositoryMock = new Mock<IProjectRepository>();
             _repositoryMock
@@ -233,7 +233,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Returns(_expectedResponse)
                 .Verifiable();
 
-            _command = new GetProjectByIdCommand(
+            _command = new GetProjectCommand(
                 _loggerMock.Object,
                 _repositoryMock.Object,
                 _projectExpandedResponseMapperMock.Object,

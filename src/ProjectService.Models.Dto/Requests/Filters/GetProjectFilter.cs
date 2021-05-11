@@ -5,7 +5,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
 {
     public class GetProjectFilter
     {
-        [FromQuery(Name = "projectId")]
+        [FromQuery(Name = "projectid")]
         public Guid ProjectId { get; set; }
 
         [FromQuery(Name = "includeusers")]

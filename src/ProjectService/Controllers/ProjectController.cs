@@ -26,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
 
         [HttpGet("get")]
         public ProjectExpandedResponse Get(
-            [FromServices] IGetProjectByIdCommand command,
+            [FromServices] IGetProjectCommand command,
             [FromQuery] GetProjectFilter filter)
         {
             return command.Execute(filter);
