@@ -27,6 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     {
         private readonly ITaskRepository _taskRepository;
         private readonly IProjectRepository _projectRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IEditTaskValidator _validator;
         private readonly IAccessValidator _accessValidator;
         private readonly HttpContext _httpContext;
@@ -64,6 +65,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         public EditTaskCommand(
             ITaskRepository taskRepository,
             IProjectRepository projectRepository,
+            IUserRepository userRepository,
             IEditTaskValidator validator,
             IAccessValidator accessValidator,
             IHttpContextAccessor httpContextAccessor,
@@ -73,6 +75,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             _taskRepository = taskRepository;
             _projectRepository = projectRepository;
+            _userRepository = userRepository;
             _validator = validator;
             _accessValidator = accessValidator;
             _httpContext = httpContextAccessor.HttpContext;
@@ -89,7 +92,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             DbTask task = _taskRepository.Get(taskId);
             List<DbProjectUser> projectUsers = 
-                _projectRepository.GetProjectUsers(task.ProjectId, false).ToList();
+                _userRepository.GetProjectUsers(task.ProjectId, false).ToList();
 
             Guid requestUserId = _httpContext.GetUserId();
             IGetDepartmentResponse department = GetDepartment(requestUserId, errors);
