@@ -6,8 +6,8 @@ using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
     [AutoInject]
-    public interface IFindProjectsCommand
+    public interface IFindTasksCommand
     {
-        FindResponse<ProjectInfo> Execute(FindProjectsFilter filter, int skipCount, int takeCount);
+        FindResponse<TaskInfo> Execute(FindTasksFilter filter, int skipCount, int takeCount);
     }
 }

@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private Dictionary<Guid, string> _idNameFind;
         private Dictionary<Guid, string> _idNameGet;
         private DbProject _dbProject;
-        private ProjectsResponse _projectsResponse;
+        private FindResponse<ProjectInfo> _projectsResponse;
         private FindProjectsFilter _findProjectsFilter;
         private FindDbProjectsFilter _findDbProjectsFilter;
         private ProjectInfo _projectInfo;
@@ -82,11 +82,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 }
             };
 
-            _projectsResponse = new ProjectsResponse
+            _projectsResponse = new FindResponse<ProjectInfo>
             {
                 TotalCount = 1,
                 Errors = null,
-                Projects = new List<ProjectInfo>
+                Body = new List<ProjectInfo>
                 {
                     _projectInfo
                 }
@@ -172,7 +172,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(_dbProjects);
 
             _mocker
-                .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
+                .Setup<IFindProjectsResponseMapper, FindResponse<ProjectInfo>>(x => x.Map(
                     _dbProjects,
                     It.IsAny<int>(),
                     _idNameGet,
@@ -222,7 +222,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(_dbProjects);
 
             _mocker
-                .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
+                .Setup<IFindProjectsResponseMapper, FindResponse<ProjectInfo>>(x => x.Map(
                     _dbProjects,
                     It.IsAny<int>(),
                     _idNameGet,
@@ -272,7 +272,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(_dbProjects);
 
             _mocker
-                .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
+                .Setup<IFindProjectsResponseMapper, FindResponse<ProjectInfo>>(x => x.Map(
                     _dbProjects,
                     It.IsAny<int>(),
                     _idNameGet,
@@ -333,15 +333,15 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                     out _totalCount))
                 .Returns(new List<DbProject>());
 
-            _projectsResponse = new ProjectsResponse
+            _projectsResponse = new FindResponse<ProjectInfo>
             {
                 TotalCount = 1,
                 Errors = errors,
-                Projects = new List<ProjectInfo>()
+                Body = new List<ProjectInfo>()
             };
 
             _mocker
-                .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
+                .Setup<IFindProjectsResponseMapper, FindResponse<ProjectInfo>>(x => x.Map(
                     It.IsAny<List<DbProject>>(),
                     It.IsAny<int>(),
                     It.Is<IDictionary<Guid, string>>(d => d.Count == 0),
@@ -350,7 +350,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             var response = _command.Execute(_findProjectsFilter, 0, 2);
 
-            Assert.IsEmpty(response.Projects);
+            Assert.IsEmpty(response.Body);
             Assert.IsNotEmpty(response.Errors);
             _mocker.Verify<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
                 x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
@@ -380,7 +380,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Throws(new Exception());
 
             _mocker
-                .Setup<IFindProjectsResponseMapper, ProjectsResponse>(x => x.Map(
+                .Setup<IFindProjectsResponseMapper, FindResponse<ProjectInfo>>(x => x.Map(
                     _dbProjects,
                     It.IsAny<int>(),
                     _idNameGet,

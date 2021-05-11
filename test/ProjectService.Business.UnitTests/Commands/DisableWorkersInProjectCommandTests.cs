@@ -38,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             accessValidatorMock = new Mock<IAccessValidator>();
 
             accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(true);
 
             accessValidatorMock
@@ -103,7 +103,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldDisableWorkersWhenUserIsNotAdminAndHasRights()
         {
             accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(false);
 
             Assert.DoesNotThrow(() => command.Execute(projectId, userIds));
@@ -113,7 +113,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldThrowExceptionWhenUserIsNotAdminAndHasNotRights()
         {
             accessValidatorMock
-                .Setup(x => x.IsAdmin())
+                .Setup(x => x.IsAdmin(null))
                 .Returns(false);
 
             accessValidatorMock
