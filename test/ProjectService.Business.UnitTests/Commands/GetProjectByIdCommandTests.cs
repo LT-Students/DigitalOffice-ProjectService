@@ -229,7 +229,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 
             _projectExpandedResponseMapperMock = new Mock<IProjectExpandedResponseMapper>();
             _projectExpandedResponseMapperMock
-                .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>()))
+                .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>(), It.IsAny<List<string>>()))
                 .Returns(_expectedResponse)
                 .Verifiable();
 
@@ -304,7 +304,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         public void ShouldThrowExceptionWhenProjectExpandedResponseMapperThrowsIt()
         {
             _projectExpandedResponseMapperMock
-                .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>()))
+                .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>(), It.IsAny<List<string>>()))
                 .Throws(new Exception());
 
             Assert.Throws<Exception>(() => _command.Execute(_fullFilter));
@@ -314,13 +314,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         public void ShouldReturnProjectInfo()
         {
             _projectExpandedResponseMapperMock
-                .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>()))
+                .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>(), It.IsAny<List<string>>()))
                 .Returns(_expectedResponse)
                 .Verifiable();
 
             var result = _command.Execute(_fullFilter);
 
-            _projectExpandedResponseMapperMock.Verify(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>()), Times.Once);
+            _projectExpandedResponseMapperMock.Verify(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>(), It.IsAny<List<string>>()), Times.Once);
 
             SerializerAssert.AreEqual(_expectedResponse, result);
         }

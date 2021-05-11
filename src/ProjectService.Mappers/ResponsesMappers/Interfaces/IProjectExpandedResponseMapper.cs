@@ -10,6 +10,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces
     [AutoInject]
     public interface IProjectExpandedResponseMapper
     {
-        ProjectExpandedResponse Map(DbProject dbProject, IEnumerable<ProjectUserInfo> users, IEnumerable<ProjectFileInfo> files, DepartmentInfo department);
+        ProjectExpandedResponse Map(DbProject dbProject, IEnumerable<ProjectUserInfo> users, IEnumerable<ProjectFileInfo> files, DepartmentInfo department, List<string> errors);
     }
 }

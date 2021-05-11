@@ -49,7 +49,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             if (filter.IncludeUsers.HasValue && filter.IncludeUsers.Value)
             {
                 if (filter.ShowNotActiveUsers.HasValue && !filter.ShowNotActiveUsers.Value)
-                {// TODO: fix, where not work
+                {
                     dbProjectQueryable = dbProjectQueryable.Include(x => x.Users.Where(x => x.IsActive));
                 }
                 else

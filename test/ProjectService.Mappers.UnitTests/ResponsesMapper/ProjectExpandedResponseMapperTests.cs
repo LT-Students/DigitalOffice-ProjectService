@@ -24,6 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         private IEnumerable<ProjectUserInfo> _users;
         private IEnumerable<ProjectFileInfo> _files;
         private DepartmentInfo _department;
+        private List<string> _errors;
         private ProjectExpandedResponse _expectedResponse;
 
         [OneTimeSetUp]
@@ -87,11 +88,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
                 Status =(ProjectStatusType)_dbProject.Status
             };
 
+            _errors = new List<string> { "Error!!!" };
+
             _expectedResponse = new ProjectExpandedResponse
             {
                 Project = _projectInfo,
                 Users = _users,
-                Files = _files
+                Files = _files,
+                Errors = _errors
             };
 
             _projectInfoMapperMock
@@ -104,7 +108,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         [Test]
         public void ShoulThrowExceptionWhenDbProjectIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _projectIProjectExpandedResponseMapper.Map(null, _users, _files, _department));
+            Assert.Throws<ArgumentNullException>(() => _projectIProjectExpandedResponseMapper.Map(null, _users, _files, _department, _errors));
         }
 
         [Test]
@@ -112,13 +116,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         {
             _department.Id = Guid.NewGuid();
 
-            Assert.Throws<ArgumentException>(() => _projectIProjectExpandedResponseMapper.Map(_dbProject, _users, _files, _department));
+            Assert.Throws<ArgumentException>(() => _projectIProjectExpandedResponseMapper.Map(_dbProject, _users, _files, _department, _errors));
         }
 
         [Test]
         public void ShouldReturnProjectExpandedResponse()
         {
-            var result = _projectIProjectExpandedResponseMapper.Map(_dbProject, _users, _files, _department);
+            var result = _projectIProjectExpandedResponseMapper.Map(_dbProject, _users, _files, _department, _errors);
 
             SerializerAssert.AreEqual(_expectedResponse, result);
         }

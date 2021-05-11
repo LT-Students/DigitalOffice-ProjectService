@@ -29,8 +29,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IRequestClient<IGetDepartmentRequest> _departmentRequestClient;
         private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
 
-        private DepartmentInfo GetDepartment(Guid departmentId)
+        private DepartmentInfo GetDepartment(Guid departmentId, List<string> errors)
         {
+            string errorMessage = $"Can not get department info for DepartmentId '{departmentId}'. Please try again later.";
+
             DepartmentInfo department = null;
 
             try
@@ -45,14 +47,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             }
             catch (Exception exc)
             {
+                errors.Add(errorMessage);
+
                 _logger.LogError(exc, "Exception on get department request.");
             }
 
             return department;
         }
 
-        private List<ProjectUserInfo> GetProjectUsers(IEnumerable<DbProjectUser> projectUsers, bool showNotActiveUsers)
+        private List<ProjectUserInfo> GetProjectUsers(IEnumerable<DbProjectUser> projectUsers, bool showNotActiveUsers, List<string> errors)
         {
+            string errorMessage = null;
+
             List<ProjectUserInfo> projectUsersInfo = new();
 
             try
@@ -67,6 +73,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 {
                     userIds = projectUsers.Where(x => x.IsActive == true).Select(x => x.Id).Distinct().ToList();
                 }
+
+                errorMessage = $"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.";
 
                 var usersDataResponse = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
                     IGetUsersDataRequest.CreateObj(userIds)).Result;
@@ -87,6 +95,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             }
             catch (Exception exc)
             {
+                errors.Add(errorMessage);
+
                 _logger.LogError(exc, "Exception on get user information.");
             }
 
@@ -115,16 +125,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         public ProjectExpandedResponse Execute(GetProjectFilter filter)
         {
+            List<string> errors = new();
+
             var dbProject = _repository.GetProject(filter);
 
-            var department = GetDepartment(dbProject.DepartmentId);
+            var department = GetDepartment(dbProject.DepartmentId, errors);
 
             var showNotActiveUsers = filter.ShowNotActiveUsers == true;
-            var usersInfo = GetProjectUsers(dbProject.Users, showNotActiveUsers);
+            var usersInfo = GetProjectUsers(dbProject.Users, showNotActiveUsers, errors);
 
             var filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
 
-            return _projectExpandedResponseMapper.Map(dbProject, usersInfo, filesInfo, department);
+            return _projectExpandedResponseMapper.Map(dbProject, usersInfo, filesInfo, department, errors);
         }
     }
 }

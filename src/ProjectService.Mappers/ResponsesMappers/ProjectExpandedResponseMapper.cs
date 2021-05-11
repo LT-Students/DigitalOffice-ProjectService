@@ -22,7 +22,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
             DbProject dbProject,
             IEnumerable<ProjectUserInfo> users,
             IEnumerable<ProjectFileInfo> files,
-            DepartmentInfo department)
+            DepartmentInfo department,
+            List<string> errors)
         {
             if (dbProject == null)
             {
@@ -38,7 +39,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
             {
                 Project = _projectInfoMapper.Map(dbProject, department?.Name),
                 Users = users,
-                Files = files
+                Files = files,
+                Errors = errors
             };
         }
     }
