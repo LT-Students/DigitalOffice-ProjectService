@@ -2,11 +2,11 @@
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces
+namespace LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces
 {
     [AutoInject]
-    public interface IProjectFileInfoMapper
+    public interface IProjectInfoMapper
     {
-        ProjectFileInfo Map(DbProjectFile dbProjectFile);
+        ProjectInfo Map(DbProject dbProject, string departmentName);
     }
 }

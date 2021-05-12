@@ -1,9 +1,9 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using System;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.ModelsMappers
+namespace LT.DigitalOffice.ProjectService.Mappers.Models
 {
     public class ProjectFileInfoMapper : IProjectFileInfoMapper
     {

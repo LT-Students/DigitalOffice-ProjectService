@@ -4,7 +4,7 @@ using Moq.AutoMock;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.Broker.Requests;
-using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using MassTransit;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using System.Collections.Generic;
