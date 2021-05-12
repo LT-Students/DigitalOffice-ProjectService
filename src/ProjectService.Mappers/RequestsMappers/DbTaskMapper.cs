@@ -7,7 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 {
     public class DbTaskMapper : IDbTaskMapper
     {
-        public DbTask Map(CreateTaskRequest taskRequiest, Guid authorId)
+        public DbTask Map(CreateTaskRequest taskRequiest, Guid authorId, int numberTask)
         {
             if (taskRequiest == null)
             {
@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 ProjectId = taskRequiest.ProjectId,
                 CreatedAt = DateTime.UtcNow,
                 ParentId = taskRequiest.ParentId,
-                Number = 1,
+                Number = numberTask,
                 Priority = new DbTaskProperty
                 {
                     Id = taskRequiest.PriorityId

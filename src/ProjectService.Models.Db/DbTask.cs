@@ -53,6 +53,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                  .HasOne(t => t.Author)
                  .WithMany(pu => pu.AuthorTasks)
                  .HasForeignKey(t => t.AuthorId);
+
              builder
                  .HasOne(t => t.Project)
                  .WithMany(p => p.Tasks)

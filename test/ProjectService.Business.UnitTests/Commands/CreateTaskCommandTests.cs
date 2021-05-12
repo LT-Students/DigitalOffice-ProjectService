@@ -6,7 +6,9 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Helpers.Task;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
@@ -16,11 +18,13 @@ using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using LT.DigitalOffice.UnitTestKernel;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.AutoMock;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 {
@@ -176,7 +180,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
               .Returns(true);
 
             _mocker
-               .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId))
+               .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0))
                .Returns(_dbTask);
 
             _mocker
@@ -186,7 +190,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
 
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
-            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
+            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0), Times.Once);
             _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
         }
 
@@ -200,7 +204,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
              .Returns(true);
 
             _mocker
-               .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId))
+               .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0))
                .Returns(_dbTask);
 
             _mocker
@@ -210,7 +214,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
 
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
-            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
+            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0), Times.Once);
             _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
         }
 
@@ -258,6 +262,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [Test]
         public void ShouldReturnResponseWhenCreatingNewTaskAndUserIsAdmin()
         {
+            _mocker.Setup<IDataProvider, IEnumerable<DbProject>>(x => x.Projects)
+                .Returns(new List<DbProject> { new DbProject { Id = Guid.NewGuid() } });
+
+            TaskNumber.LoadCache(_mocker.GetMock<IDataProvider>().Object);
+
             _mocker
                   .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
                   .Returns(true);
@@ -267,7 +276,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                  .Returns(true);
 
             _mocker
-                .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId))
+                .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0))
                 .Returns(_dbTask);
 
             _mocker
@@ -277,7 +286,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
 
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
-            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
+            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0), Times.Once);
             _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
         }

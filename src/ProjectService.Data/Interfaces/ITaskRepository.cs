@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
@@ -24,6 +25,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         IEnumerable<DbTask> Find(FindTasksFilter filter, IEnumerable<Guid> projectIds, int skipCount, int takeCount, out int totalCount);
 
         Guid CreateTask(DbTask item);
+
+        ConcurrentDictionary<Guid, int> MaxNumber();
 
         bool IsExist(Guid id);
     }

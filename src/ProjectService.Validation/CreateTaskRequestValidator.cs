@@ -13,11 +13,17 @@ namespace LT.DigitalOffice.ProjectService.Validation
 {
     public class CreateTaskRequestValidator : AbstractValidator<CreateTaskRequest>, ICreateTaskValidator
     {
-        public CreateTaskRequestValidator(ITaskRepository tasksRepository, IUserRepository userRepository, IProjectRepository projectRepository, ITaskPropertyRepository taskPropertyRepository)
+        public CreateTaskRequestValidator(
+            ITaskRepository tasksRepository,
+            IUserRepository userRepository,
+            IProjectRepository projectRepository,
+            ITaskPropertyRepository taskPropertyRepository)
+
         {
             RuleFor(task => task.Name)
                 .NotEmpty()
-                .MaximumLength(150).WithMessage("Task name is too long.");
+                .MaximumLength(150)
+                .WithMessage("Task name is too long.");
 
             RuleFor(task => task.Description)
                 .NotEmpty()
@@ -26,19 +32,21 @@ namespace LT.DigitalOffice.ProjectService.Validation
             When(task => task.ParentId.HasValue, () =>
             {
                 RuleFor(task => task.ParentId)
-                    .Must(x => tasksRepository.IsExist(x.Value));
+                    .Must(x => tasksRepository.IsExist(x.Value))
+                    .WithMessage("Task does not exist");
             });
 
             When(task => task.AssignedTo.HasValue, () =>
             {
                 RuleFor(task => task)
-                    .Must(task => userRepository.AreUserAndProjectExist(task.AssignedTo.Value, task.ProjectId))
+                    .Must(task => userRepository.AreUserProjectExist(task.AssignedTo.Value, task.ProjectId))
                     .WithMessage("User does not exist");
             });
 
             RuleFor(task => task.ProjectId)
                 .NotEmpty()
-                .Must(x => projectRepository.IsExist(x));
+                .Must(x => projectRepository.IsExist(x))
+                .WithMessage("Project does not exist");
 
             RuleFor(task => task.PriorityId)
                 .NotEmpty()

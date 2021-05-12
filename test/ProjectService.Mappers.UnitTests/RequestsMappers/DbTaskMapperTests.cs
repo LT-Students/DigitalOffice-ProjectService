@@ -5,6 +5,8 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
 {
@@ -38,7 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenCreateTaskRequestIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null, authorId));
+            Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null, authorId, 0));
         }
 
         [Test]
@@ -46,7 +48,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         {
             var authorId = Guid.NewGuid();
 
-            var dbTask = _dbTaskMapper.Map(_createTaskRequest, authorId);
+            var dbTask = _dbTaskMapper.Map(_createTaskRequest, authorId, 0);
 
             var expectedDbTask = new DbTask
             {
@@ -59,7 +61,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 ProjectId = _createTaskRequest.ProjectId,
                 CreatedAt = dbTask.CreatedAt,
                 ParentId = _createTaskRequest.ParentId,
-                Number = 1,
+                Number = 2,
                 Priority = new DbTaskProperty()
                 {
                     Id = _createTaskRequest.PriorityId

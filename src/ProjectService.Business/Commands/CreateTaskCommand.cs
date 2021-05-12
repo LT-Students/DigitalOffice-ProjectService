@@ -6,7 +6,9 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Helpers.Task;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
@@ -17,6 +19,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,8 +27,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
     public class CreateTaskCommand : ICreateTaskCommand
     {
+        //private static ConcurrentDictionary<Guid, int> _dictionary = null;
+
         private readonly ITaskRepository _repository;
         private readonly ICreateTaskValidator _validator;
+        private readonly IDataProvider _provider;
         private readonly IDbTaskMapper _mapperTask;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
@@ -33,21 +39,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IProjectRepository _projectRepository;
         private readonly ILogger<CreateTaskCommand> _logger;
 
-        private IGetDepartmentResponse GetDepartment(Guid userId, List<string> errors)
+        private IGetDepartmentResponse GetDepartment(Guid authorId, List<string> errors)
         {
             string errorMessage = "Cannot create task. Please try again later.";
 
             try
             {
                 var response = _requestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(userId, null)).Result;
+                    IGetDepartmentRequest.CreateObj(authorId, null)).Result;
 
                 if (response.Message.IsSuccess)
                 {
                     return response.Message.Body;
                 }
 
-                _logger.LogWarning($"Can not find department contain user with Id: '{userId}'");
+                _logger.LogWarning($"Can not find department contain user with Id: '{authorId}'");
             }
             catch (Exception exc)
             {
@@ -106,9 +112,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 throw new ForbiddenException("Not enough rights.");
             }
 
-            _validator.ValidateAndThrowCustom(request);
+            TaskNumber.GetProjectTaskMaxNumber(request.ProjectId, out int number);
 
-            var dbTask = _mapperTask.Map(request, authorId);
+            var dbTask = _mapperTask.Map(request, authorId, number);
 
             Guid taskId = _repository.CreateTask(dbTask);
 

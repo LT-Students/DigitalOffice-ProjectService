@@ -46,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                    Name = table.Column<string>(nullable: false),
                    ProjectId = table.Column<Guid?>(nullable: true),
                    AuthorId = table.Column<Guid?>(nullable: true),
-                   PropertyType = table.Column<int>(nullable: false),
+                   Type = table.Column<int>(nullable: false),
                    Description = table.Column<string>(nullable: true),
                    CreatedAt = table.Column<DateTime>(nullable: false),
                    IsActive = table.Column<bool>(nullable: false)
@@ -64,7 +64,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                     nameof(DbTaskProperty.Name),
                     nameof(DbTaskProperty.ProjectId),
                     nameof(DbTaskProperty.AuthorId),
-                    nameof(DbTaskProperty.PropertyType),
+                    nameof(DbTaskProperty.Type),
                     nameof(DbTaskProperty.Description),
                     nameof(DbTaskProperty.CreatedAt),
                     nameof(DbTaskProperty.IsActive)
@@ -100,7 +100,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                     nameof(DbTaskProperty.Name),
                     nameof(DbTaskProperty.ProjectId),
                     nameof(DbTaskProperty.AuthorId),
-                    nameof(DbTaskProperty.PropertyType),
+                    nameof(DbTaskProperty.Type),
                     nameof(DbTaskProperty.Description),
                     nameof(DbTaskProperty.CreatedAt),
                     nameof(DbTaskProperty.IsActive)
@@ -136,7 +136,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                     nameof(DbTaskProperty.Name),
                     nameof(DbTaskProperty.ProjectId),
                     nameof(DbTaskProperty.AuthorId),
-                    nameof(DbTaskProperty.PropertyType),
+                    nameof(DbTaskProperty.Type),
                     nameof(DbTaskProperty.Description),
                     nameof(DbTaskProperty.CreatedAt),
                     nameof(DbTaskProperty.IsActive)
@@ -155,7 +155,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 new object[]
                 {
                     Guid.NewGuid(),
-                    "feature",
+                    "Feature",
                     null,
                     null,
                     (int)TaskPropertyType.Type,

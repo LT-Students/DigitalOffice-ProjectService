@@ -8,6 +8,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.JsonPatch;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
@@ -72,6 +73,20 @@ namespace LT.DigitalOffice.ProjectService.Data
         {
             return _provider.Tasks.FirstOrDefault(x => x.Id == taskId) ??
                 throw new NotFoundException($"Task id '{taskId}' was not found.");
+        }
+
+        public ConcurrentDictionary<Guid, int> MaxNumber()
+        {
+            var dictionary = new ConcurrentDictionary<Guid, int>();
+            var projectIds = _provider.Projects.Select(x => x.Id);
+            foreach (var Id in projectIds)
+            {
+                int? taskNumber = _provider.Tasks.Where(x => x.ProjectId == Id)?.Max(n => n.Number);
+
+                dictionary[Id] = taskNumber.GetValueOrDefault();
+            }
+
+            return dictionary;
         }
 
         public IEnumerable<DbTask> Find(
