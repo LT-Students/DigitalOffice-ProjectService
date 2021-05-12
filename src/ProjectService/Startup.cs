@@ -115,7 +115,7 @@ namespace LT.DigitalOffice.ProjectService
 
             app.UseRouting();
 
-            app.UseMiddleware<TokenMiddleware>();
+            //app.UseMiddleware<TokenMiddleware>();
 
             app.UseCors(CorsPolicyName);
 
@@ -181,6 +181,7 @@ namespace LT.DigitalOffice.ProjectService
         {
             x.AddConsumer<GetProjectIdsConsumer>();
             x.AddConsumer<GetProjectInfoConsumer>();
+            x.AddConsumer<GetUserProjectsInfoConsumer>();
         }
 
         private void ConfigureEndpoints(
@@ -196,6 +197,11 @@ namespace LT.DigitalOffice.ProjectService
             cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectInfoEndpoint, ep =>
             {
                 ep.ConfigureConsumer<GetProjectInfoConsumer>(context);
+            });
+
+            cfg.ReceiveEndpoint(rabbitMqConfig.GetUserProjectsInfoEndpoint, ep =>
+            {
+                ep.ConfigureConsumer<GetUserProjectsInfoConsumer>(context);
             });
         }
 
