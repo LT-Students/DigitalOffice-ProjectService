@@ -2,6 +2,7 @@
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,9 +33,9 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider.ProjectsUsers.AddRange(dbProjectUsers);
         }
 
-        public IEnumerable<DbProjectUser> Find(Guid userId)
+        public List<DbProjectUser> Find(Guid userId)
         {
-            return _provider.ProjectsUsers.Where(x => x.UserId == userId);
+            return _provider.ProjectsUsers.Include(u => u.Project).Where(x => x.UserId == userId).ToList();
         }
 
         public bool AreExist(params Guid[] ids)

@@ -44,11 +44,13 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
             migrationBuilder.AddColumn<Guid>(
                 name: nameof(DbProject.AuthorId),
                 table: DbProject.TableName,
+                defaultValue: Guid.Empty,
                 nullable: false);
 
             migrationBuilder.AddColumn<int>(
                 name: nameof(DbProject.Status),
                 table: DbProject.TableName,
+                defaultValue: 1,
                 nullable: false);
         }
 
@@ -65,6 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
             migrationBuilder.AddColumn<int>(
                 name: nameof(DbProjectUser.Role),
                 table: DbProjectUser.TableName,
+                defaultValue: 1,
                 nullable: false);
         }
 

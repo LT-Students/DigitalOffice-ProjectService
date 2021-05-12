@@ -1,50 +1,50 @@
-﻿using LT.DigitalOffice.Broker.Responses;
+﻿using LT.DigitalOffice.Broker.Models;
+using LT.DigitalOffice.Broker.Requests;
+using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using MassTransit;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using LT.DigitalOffice.Broker.Models;
-using LT.DigitalOffice.Broker.Requests;
 
 namespace LT.DigitalOffice.ProjectService.Broker
 {
     public class GetUserProjectsInfoConsumer : IConsumer<IGetUserProjectsInfoRequest>
     {
         private readonly IUserRepository _userRepository;
-        private readonly IProjectRepository _projectRepository;
+
         private object GeUserProjects(Guid userId)
         {
-            var dbUserProjects = _userRepository.Find(userId);
-            if (dbUserProjects == null)
+            var dbProjectUsers = _userRepository.Find(userId);
+            if (dbProjectUsers == null)
             {
                 throw new EndpointNotFoundException();
             }
 
             var projectsResponse = new List<ProjectShortInfo>();
 
-            foreach (var dbUserProject in dbUserProjects)
+            foreach (var dbProjectUser in dbProjectUsers)
             {
-                var dbProject = _projectRepository.GetProject(dbUserProject.ProjectId);
+                if (dbProjectUser.Project == null)
+                {
+                    continue;
+                }
 
-                projectsResponse.Add(new ProjectShortInfo {
-                    Id = dbProject.Id,
-                    Name = dbProject.Name,
-                    Status = ((ProjectStatusType)dbProject.Status).ToString()
+                projectsResponse.Add(new ProjectShortInfo
+                {
+                    Id = dbProjectUser.Project.Id,
+                    Name = dbProjectUser.Project.Name,
+                    Status = ((ProjectStatusType)dbProjectUser.Project.Status).ToString()
                 });
             }
             return IGetUserProjectsInfoResponse.CreateObj(projectsResponse);
         }
 
-        public GetUserProjectsInfoConsumer(
-            IUserRepository userRepository,
-            IProjectRepository projectRepository)
+        public GetUserProjectsInfoConsumer(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _projectRepository = projectRepository;
         }
 
         public async Task Consume(ConsumeContext<IGetUserProjectsInfoRequest> context)
