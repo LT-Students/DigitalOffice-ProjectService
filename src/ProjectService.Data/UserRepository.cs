@@ -1,11 +1,9 @@
-﻿using LinqKit;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
+﻿using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Data
@@ -21,21 +19,25 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActive)
         {
-            var predicate = PredicateBuilder.New<DbProjectUser>(u => u.ProjectId == projectId && u.IsActive);
+            IQueryable<DbProjectUser> dbProjectQueryable = _provider.ProjectsUsers.AsQueryable();
 
             if (showNotActive)
             {
-                predicate.Or(u => !u.IsActive);
+                dbProjectQueryable = dbProjectQueryable.Where(x => x.ProjectId == projectId);
             }
-
-            return _provider.ProjectsUsers.Include(u => u.Role).Where(predicate).ToList();
+            else
+            {
+                dbProjectQueryable = dbProjectQueryable.Where(x => x.ProjectId == projectId && x.IsActive);
+            }
+            
+            return dbProjectQueryable;
         }
 
         public void AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUsers , Guid projectId)
         {
             if (dbProjectUsers == null)
             {
-                throw new ArgumentNullException("List project users is null");
+                throw new ArgumentNullException(nameof(dbProjectUsers));
             }
 
             if (!_provider.Projects.Any(p => p.Id == projectId))
