@@ -28,7 +28,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         private IGetProjectCommand _command;
         private Mock<ILogger<GetProjectCommand>> _loggerMock;
         private Mock<IProjectRepository> _repositoryMock;
-        private Mock<IProjectExpandedResponseMapper> _projectExpandedResponseMapperMock;
+        private Mock<IProjectResponseMapper> _projectResponseMapperMock;
         private Mock<IProjectUserInfoMapper> _projectUserInfoMapperMock;
         private Mock<IProjectFileInfoMapper> _projectFileInfoMapperMock;
         private Mock<IDepartmentInfoMapper> _departmentInfoMapperMock;
@@ -46,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         private DepartmentInfo _departmentInfo;
         private GetProjectFilter _fullFilter;
         private ProjectInfo _projectInfo;
-        private ProjectExpandedResponse _expectedResponse;
+        private ProjectResponse _expectedResponse;
 
         private Guid _projectId;
 
@@ -191,7 +191,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 ShowNotActiveUsers = true
             };
 
-            _expectedResponse = new ProjectExpandedResponse
+            _expectedResponse = new ProjectResponse
             {
                 Project = _projectInfo,
                 Files = _projectFilesInfo,
@@ -227,8 +227,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup(x => x.Map(_dbProjectFile))
                 .Returns(_projectFilesInfo.First());
 
-            _projectExpandedResponseMapperMock = new Mock<IProjectExpandedResponseMapper>();
-            _projectExpandedResponseMapperMock
+            _projectResponseMapperMock = new Mock<IProjectResponseMapper>();
+            _projectResponseMapperMock
                 .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>(), It.IsAny<List<string>>()))
                 .Returns(_expectedResponse)
                 .Verifiable();
@@ -236,7 +236,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             _command = new GetProjectCommand(
                 _loggerMock.Object,
                 _repositoryMock.Object,
-                _projectExpandedResponseMapperMock.Object,
+                _projectResponseMapperMock.Object,
                 _projectUserInfoMapperMock.Object,
                 _projectFileInfoMapperMock.Object,
                 _departmentInfoMapperMock.Object,
@@ -303,7 +303,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         [Test]
         public void ShouldThrowExceptionWhenProjectExpandedResponseMapperThrowsIt()
         {
-            _projectExpandedResponseMapperMock
+            _projectResponseMapperMock
                 .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>(), It.IsAny<List<string>>()))
                 .Throws(new Exception());
 
@@ -313,14 +313,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         [Test]
         public void ShouldReturnProjectInfo()
         {
-            _projectExpandedResponseMapperMock
+            _projectResponseMapperMock
                 .Setup(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>(), It.IsAny<List<string>>()))
                 .Returns(_expectedResponse)
                 .Verifiable();
 
             var result = _command.Execute(_fullFilter);
 
-            _projectExpandedResponseMapperMock.Verify(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>(), It.IsAny<List<string>>()), Times.Once);
+            _projectResponseMapperMock.Verify(x => x.Map(It.IsAny<DbProject>(), It.IsAny<List<ProjectUserInfo>>(), It.IsAny<List<ProjectFileInfo>>(), It.IsAny<DepartmentInfo>(), It.IsAny<List<string>>()), Times.Once);
 
             SerializerAssert.AreEqual(_expectedResponse, result);
         }

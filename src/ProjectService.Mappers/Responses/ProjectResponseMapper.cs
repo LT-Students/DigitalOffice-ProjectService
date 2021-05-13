@@ -9,16 +9,16 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Responses
 {
-    public class ProjectExpandedResponseMapper : IProjectExpandedResponseMapper
+    public class ProjectResponseMapper : IProjectResponseMapper
     {
         private readonly IProjectInfoMapper _projectInfoMapper;
 
-        public ProjectExpandedResponseMapper(IProjectInfoMapper projectInfoMapper)
+        public ProjectResponseMapper(IProjectInfoMapper projectInfoMapper)
         {
             _projectInfoMapper = projectInfoMapper;
         }
 
-        public ProjectExpandedResponse Map(
+        public ProjectResponse Map(
             DbProject dbProject,
             IEnumerable<ProjectUserInfo> users,
             IEnumerable<ProjectFileInfo> files,
@@ -35,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
                 throw new ArgumentException("DepartmentId not valid.");
             }
 
-            return new ProjectExpandedResponse
+            return new ProjectResponse
             {
                 Project = _projectInfoMapper.Map(dbProject, department?.Name),
                 Users = users,

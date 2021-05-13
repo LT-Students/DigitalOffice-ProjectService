@@ -7,6 +7,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     [AutoInject]
     public interface IGetProjectCommand
     {
-        ProjectExpandedResponse Execute(GetProjectFilter filter);
+        ProjectResponse Execute(GetProjectFilter filter);
     }
 }

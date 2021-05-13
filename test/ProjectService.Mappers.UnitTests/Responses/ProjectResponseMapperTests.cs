@@ -14,9 +14,9 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
 {
-    internal class ProjectExpandedResponseMapperTests
+    internal class ProjectResponseMapperTests
     {
-        private IProjectExpandedResponseMapper _projectIProjectExpandedResponseMapper;
+        private IProjectResponseMapper _projectIProjectResponseMapper;
         private Mock<IProjectInfoMapper> _projectInfoMapperMock;
 
         private DbProject _dbProject;
@@ -25,7 +25,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
         private IEnumerable<ProjectFileInfo> _files;
         private DepartmentInfo _department;
         private List<string> _errors;
-        private ProjectExpandedResponse _expectedResponse;
+        private ProjectResponse _expectedResponse;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -90,7 +90,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
 
             _errors = new List<string> { "Error!!!" };
 
-            _expectedResponse = new ProjectExpandedResponse
+            _expectedResponse = new ProjectResponse
             {
                 Project = _projectInfo,
                 Users = _users,
@@ -102,13 +102,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                 .Setup(x => x.Map(_dbProject, _department.Name))
                 .Returns(_projectInfo);
 
-            _projectIProjectExpandedResponseMapper = new ProjectExpandedResponseMapper(_projectInfoMapperMock.Object);
+            _projectIProjectResponseMapper = new ProjectResponseMapper(_projectInfoMapperMock.Object);
         }
 
         [Test]
         public void ShoulThrowExceptionWhenDbProjectIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _projectIProjectExpandedResponseMapper.Map(null, _users, _files, _department, _errors));
+            Assert.Throws<ArgumentNullException>(() => _projectIProjectResponseMapper.Map(null, _users, _files, _department, _errors));
         }
 
         [Test]
@@ -116,13 +116,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
         {
             _department.Id = Guid.NewGuid();
 
-            Assert.Throws<ArgumentException>(() => _projectIProjectExpandedResponseMapper.Map(_dbProject, _users, _files, _department, _errors));
+            Assert.Throws<ArgumentException>(() => _projectIProjectResponseMapper.Map(_dbProject, _users, _files, _department, _errors));
         }
 
         [Test]
-        public void ShouldReturnProjectExpandedResponse()
+        public void ShouldReturnProjectResponse()
         {
-            var result = _projectIProjectExpandedResponseMapper.Map(_dbProject, _users, _files, _department, _errors);
+            var result = _projectIProjectResponseMapper.Map(_dbProject, _users, _files, _department, _errors);
 
             SerializerAssert.AreEqual(_expectedResponse, result);
         }

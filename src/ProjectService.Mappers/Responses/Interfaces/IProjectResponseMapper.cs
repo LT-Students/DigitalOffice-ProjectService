@@ -8,8 +8,8 @@ using System.Collections.Generic;
 namespace LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces
 {
     [AutoInject]
-    public interface IProjectExpandedResponseMapper
+    public interface IProjectResponseMapper
     {
-        ProjectExpandedResponse Map(DbProject dbProject, IEnumerable<ProjectUserInfo> users, IEnumerable<ProjectFileInfo> files, DepartmentInfo department, List<string> errors);
+        ProjectResponse Map(DbProject dbProject, IEnumerable<ProjectUserInfo> users, IEnumerable<ProjectFileInfo> files, DepartmentInfo department, List<string> errors);
     }
 }

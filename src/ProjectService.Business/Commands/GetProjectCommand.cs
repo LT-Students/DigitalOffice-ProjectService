@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     {
         private readonly ILogger<GetProjectCommand> _logger;
         private readonly IProjectRepository _repository;
-        private readonly IProjectExpandedResponseMapper _projectExpandedResponseMapper;
+        private readonly IProjectResponseMapper _projectResponseMapper;
         private readonly IProjectUserInfoMapper _projectUserInfoMapper;
         private readonly IProjectFileInfoMapper _projectFileInfoMapper;
         private readonly IDepartmentInfoMapper _departmentInfoMapper;
@@ -106,7 +106,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         public GetProjectCommand(
             ILogger<GetProjectCommand> logger,
             IProjectRepository repository,
-            IProjectExpandedResponseMapper projectExpandedResponsMapper,
+            IProjectResponseMapper projectResponsMapper,
             IProjectUserInfoMapper projectUserInfoMapper,
             IProjectFileInfoMapper projectFileInfoMapper,
             IDepartmentInfoMapper departmentInfoMapper,
@@ -115,7 +115,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             _logger = logger;
             _repository = repository;
-            _projectExpandedResponseMapper = projectExpandedResponsMapper;
+            _projectResponseMapper = projectResponsMapper;
             _projectUserInfoMapper = projectUserInfoMapper;
             _projectFileInfoMapper = projectFileInfoMapper;
             _departmentInfoMapper = departmentInfoMapper;
@@ -123,7 +123,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _usersDataRequestClient = usersDataRequestClient;
         }
 
-        public ProjectExpandedResponse Execute(GetProjectFilter filter)
+        public ProjectResponse Execute(GetProjectFilter filter)
         {
             List<string> errors = new();
 
@@ -136,7 +136,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             var filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
 
-            return _projectExpandedResponseMapper.Map(dbProject, usersInfo, filesInfo, department, errors);
+            return _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, department, errors);
         }
     }
 }
