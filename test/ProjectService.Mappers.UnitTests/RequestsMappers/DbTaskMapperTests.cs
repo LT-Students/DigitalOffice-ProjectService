@@ -16,6 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         private CreateTaskRequest _createTaskRequest;
 
         private readonly Guid authorId = Guid.NewGuid();
+        private readonly int taskNumber;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -40,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenCreateTaskRequestIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null, authorId, 0));
+            Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null, authorId, taskNumber));
         }
 
         [Test]
@@ -48,7 +49,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         {
             var authorId = Guid.NewGuid();
 
-            var dbTask = _dbTaskMapper.Map(_createTaskRequest, authorId, 0);
+            var dbTask = _dbTaskMapper.Map(_createTaskRequest, authorId, taskNumber);
 
             var expectedDbTask = new DbTask
             {
@@ -61,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 ProjectId = _createTaskRequest.ProjectId,
                 CreatedAt = dbTask.CreatedAt,
                 ParentId = _createTaskRequest.ParentId,
-                Number = 2,
+                Number = taskNumber,
                 Priority = new DbTaskProperty()
                 {
                     Id = _createTaskRequest.PriorityId

@@ -142,6 +142,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _mocker.GetMock<IRequestClient<IGetDepartmentRequest>>().Reset();
             _mocker.GetMock<Response<IOperationResult<IGetDepartmentResponse>>>().Reset();
             _mocker.GetMock<IHttpContextAccessor>().Reset();
+            _mocker.GetMock<IDataProvider>().Reset();
             ClientRequestUp(Guid.NewGuid());
             RcGetDepartment(Guid.NewGuid());
 
@@ -263,9 +264,10 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void ShouldReturnResponseWhenCreatingNewTaskAndUserIsAdmin()
         {
             _mocker.Setup<IDataProvider, IEnumerable<DbProject>>(x => x.Projects)
-                .Returns(new List<DbProject> { new DbProject { Id = Guid.NewGuid() } });
+                .Returns(new List<DbProject> { new DbProject { Id = Guid.NewGuid() } }.ToList());
 
             TaskNumber.LoadCache(_mocker.GetMock<IDataProvider>().Object);
+            TaskNumber.GetProjectTaskMaxNumber(_newRequest.ProjectId, out int taskNumber);
 
             _mocker
                   .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
@@ -276,7 +278,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                  .Returns(true);
 
             _mocker
-                .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0))
+                .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, taskNumber))
                 .Returns(_dbTask);
 
             _mocker
