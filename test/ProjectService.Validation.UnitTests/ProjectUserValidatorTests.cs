@@ -31,12 +31,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
-        public void ShoulThrowExceptionWhenRequestIsNull()
-        {
-            _validator.TestValidate(null).ShouldHaveAnyValidationError();
-        }
-
-        [Test]
         public void ShouldNotErrorsWhenRequestIsValid()
         {
             var projectUserRequest = new ProjectUserRequest
