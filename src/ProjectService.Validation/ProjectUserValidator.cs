@@ -16,6 +16,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     RuleFor(pu => pu.UserId)
                         .NotEmpty()
                         .WithMessage("Not specified user id.");
+
+                    RuleFor(pu => pu.Role)
+                        .IsInEnum();
                 });
         }
     }
