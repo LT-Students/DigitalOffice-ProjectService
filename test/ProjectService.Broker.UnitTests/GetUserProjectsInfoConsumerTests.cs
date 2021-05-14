@@ -105,7 +105,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
         }
 
         [Test]
-        public async Task ShouldThrowExceptionWhenProjectIdWasNotFound()
+        public async Task ShouldThrowExceptionWhenProjectsWasNotFound()
         {
             List<DbProjectUser> dbProject = null;
 

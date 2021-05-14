@@ -33,7 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider.ProjectsUsers.AddRange(dbProjectUsers);
         }
 
-        public List<DbProjectUser> Find(Guid userId)
+        public IEnumerable<DbProjectUser> Find(Guid userId)
         {
             return _provider.ProjectsUsers.Include(u => u.Project).Where(x => x.UserId == userId).ToList();
         }
