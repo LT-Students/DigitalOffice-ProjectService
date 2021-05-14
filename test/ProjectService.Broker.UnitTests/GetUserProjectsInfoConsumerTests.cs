@@ -1,63 +1,145 @@
 ﻿using LT.DigitalOffice.Broker.Models;
+using LT.DigitalOffice.Broker.Requests;
+using LT.DigitalOffice.Broker.Responses;
+using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.UnitTestKernel;
 using MassTransit.Testing;
 using Moq;
-using Moq.AutoMock;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
 {
     class GetUserProjectsInfoConsumerTests
     {
-        private AutoMocker _mocker;
+        private InMemoryTestHarness _harness;
         private ConsumerTestHarness<GetUserProjectsInfoConsumer> _consumer;
+        private Mock<IUserRepository> _repository;
+        private Guid _userId = Guid.NewGuid();
         private List<DbProjectUser> _userProjects;
-        private DbProject _dbProject1;
-        private DbProject _dbProject2;
 
         [SetUp]
         public void SetUp()
         {
+            _repository = new Mock<IUserRepository>();
+
             _userProjects = new List<DbProjectUser>();
-            _userProjects.Add(new DbProjectUser { ProjectId = Guid.NewGuid() });
-            _userProjects.Add(new DbProjectUser { ProjectId = Guid.NewGuid() });
-
-            _dbProject1 = new DbProject
+            _userProjects.Add(new DbProjectUser
             {
-                Id = _userProjects[0].ProjectId,
-                Name = "Name",
-                ShortName = "ShortName",
-                ShortDescription = "ShortDescription",
-                Status = 1,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _dbProject2 = new DbProject
+                Project = new DbProject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Name1",
+                    Status = 1,
+                }
+            });
+            _userProjects.Add(new DbProjectUser
             {
-                Id = _userProjects[1].ProjectId,
-                Name = "Name",
-                ShortName = "ShortName",
-                ShortDescription = "ShortDescription",
-                Status = 0,
-                CreatedAt = DateTime.UtcNow
-            };
+                Project = new DbProject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Name2",
+                    Status = 1,
+                }
+            });
 
-            _mocker = new AutoMocker();
-            _mocker
-                .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Find(It.IsAny<Guid>()))
-                .Returns(_userProjects);
-
-            _mocker
-                .Setup<IProjectRepository, DbProject>(x => x.GetProject(_userProjects[0].ProjectId))
-                .Returns(_dbProject1);
-            _mocker
-                .Setup<IProjectRepository, DbProject>(x => x.GetProject(_userProjects[1].ProjectId))
-                .Returns(_dbProject2);
-
+            _harness = new InMemoryTestHarness();
+            _consumer = _harness.Consumer(() =>
+                new GetUserProjectsInfoConsumer(_repository.Object));
         }
 
+        [Test]
+        public async Task SuccessResponce()
+        {
+            _repository
+                .Setup(x => x.Find(_userId))
+                .Returns(_userProjects);
+
+            await _harness.Start();
+
+            try
+            {
+                var requestClient = await _harness.ConnectRequestClient<IGetUserProjectsInfoRequest>();
+
+                var response = await requestClient.GetResponse<IOperationResult<IGetUserProjectsInfoResponse>>(
+                    IGetUserProjectsInfoRequest.CreateObj(_userId), default, default);
+
+                var expectedResult = new
+                {
+                    IsSuccess = true,
+                    Errors = null as List<string>,
+                    Body = IGetUserProjectsInfoResponse.CreateObj(new List<ProjectShortInfo>
+                    {
+                        new ProjectShortInfo
+                        {
+                            Id = _userProjects[0].Project.Id,
+                            Name = _userProjects[0].Project.Name,
+                            Status = ((ProjectStatusType)_userProjects[0].Project.Status).ToString()
+                        },
+                        new ProjectShortInfo
+                        {
+                            Id = _userProjects[1].Project.Id,
+                            Name = _userProjects[1].Project.Name,
+                            Status = ((ProjectStatusType)_userProjects[1].Project.Status).ToString()
+                        }
+                    })
+                };
+
+                Assert.True(response.Message.IsSuccess);
+                Assert.AreEqual(null, response.Message.Errors);
+                SerializerAssert.AreEqual(expectedResult, response.Message);
+                Assert.True(_consumer.Consumed.Select<IGetUserProjectsInfoRequest>().Any());
+                Assert.True(_harness.Sent.Select<IOperationResult<IGetUserProjectsInfoResponse>>().Any());
+                _repository.Verify(x => x.Find(_userId), Times.Once);
+            }
+            finally
+            {
+                await _harness.Stop();
+            }
+        }
+
+        [Test]
+        public async Task ShouldThrowExceptionWhenProjectIdWasNotFound()
+        {
+            List<DbProjectUser> dbProject = null;
+
+            _repository
+                .Setup(x => x.Find(_userId))
+                .Returns(dbProject);
+
+            await _harness.Start();
+
+            try
+            {
+                var requestClient = await _harness.ConnectRequestClient<IGetUserProjectsInfoRequest>();
+
+                var response = await requestClient.GetResponse<IOperationResult<IGetUserProjectsInfoResponse>>(
+                    IGetUserProjectsInfoRequest.CreateObj(_userId), default, default);
+
+                var expectedResult = new
+                {
+                    IsSuccess = false,
+                    Errors = new List<string> { $"Projects with user id: {_userId} was not found." },
+                    Body = null as object
+                };
+
+                Assert.False(response.Message.IsSuccess);
+                Assert.AreEqual(expectedResult.Errors, response.Message.Errors);
+                SerializerAssert.AreEqual(expectedResult, response.Message);
+                Assert.True(_consumer.Consumed.Select<IGetUserProjectsInfoRequest>().Any());
+                Assert.True(_harness.Sent.Select<IOperationResult<IGetUserProjectsInfoResponse>>().Any());
+                _repository.Verify(x => x.Find(_userId), Times.Once);
+            }
+            finally
+            {
+                await _harness.Stop();
+            }
+        }
     }
 }

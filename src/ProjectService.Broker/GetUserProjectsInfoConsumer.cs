@@ -17,15 +17,15 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
         private object GeUserProjects(Guid userId)
         {
-            var dbProjectUsers = _userRepository.Find(userId);
-            if (dbProjectUsers == null)
+            var dbProjectsUser = _userRepository.Find(userId);
+            if (dbProjectsUser == null)
             {
-                throw new EndpointNotFoundException();
+                throw new EndpointNotFoundException($"Projects with user id: {userId} was not found.");
             }
 
             var projectsResponse = new List<ProjectShortInfo>();
 
-            foreach (var dbProjectUser in dbProjectUsers)
+            foreach (var dbProjectUser in dbProjectsUser)
             {
                 if (dbProjectUser.Project == null)
                 {
