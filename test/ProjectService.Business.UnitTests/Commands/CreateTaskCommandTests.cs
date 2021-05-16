@@ -97,6 +97,9 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _mocker = new AutoMocker();
             _command = _mocker.CreateInstance<CreateTaskCommand>();
 
+            IConcurrentDictionary<object, object> _items = new Dictionary<object, object>();
+            _items.Add("UserId", _authorId);
+
             _newRequest = new CreateTaskRequest
             {
                 Name = "Create Smth",
