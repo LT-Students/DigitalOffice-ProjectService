@@ -9,6 +9,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Helpers.Task;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
+using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
@@ -23,6 +24,7 @@ using Moq;
 using Moq.AutoMock;
 using NUnit.Framework;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,6 +39,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private OperationResultResponse<Guid> _response;
         private readonly Guid _authorId = Guid.NewGuid();
         private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _operationResultBroker;
+        private IDataProvider _provider;
+        private IProjectRepository _repository;
+        private static ConcurrentDictionary<Guid, int> _cache = null;
+
+        private DbProject _newProject;
 
         private void ClientRequestUp(Guid newGuid)
         {
@@ -55,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             _mocker.Setup<Response<IOperationResult<IGetDepartmentResponse>>, IGetDepartmentResponse>(x => x.Message.Body).Returns(department.Object);
             _mocker.Setup<Response<IOperationResult<IGetDepartmentResponse>>, bool>(x => x.Message.IsSuccess).Returns(true);
-            _mocker.Setup<Response<IOperationResult<IGetDepartmentResponse>>, List<string>> (x => x.Message.Errors).Returns(new List<string>());
+            _mocker.Setup<Response<IOperationResult<IGetDepartmentResponse>>, List<string>>(x => x.Message.Errors).Returns(new List<string>());
 
             var responseMock = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
 
@@ -67,6 +74,21 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                .Setup<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
                    It.IsAny<object>(), default, default).Result).Returns(responseMock.Object);
+        }
+
+        private static DbSet<T> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
+        {
+            var queryable = sourceList.AsQueryable();
+
+            var dbSet = new Mock<DbSet<T>>();
+            dbSet.As<IQueryable<T>>().Setup(m => m.Provider).Returns(queryable.Provider);
+            dbSet.As<IQueryable<T>>().Setup(m => m.Expression).Returns(queryable.Expression);
+            dbSet.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
+            dbSet.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
+            dbSet.Setup(d => d.Add(It.IsAny<T>())).Callback<T>((s) => sourceList.Add(s));
+
+            return dbSet.Object;
+
         }
 
         [OneTimeSetUp]
@@ -121,6 +143,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 Status = OperationResultStatusType.FullSuccess,
                 Errors = new List<string>()
             };
+
 
             ClientRequestUp(Guid.NewGuid());
             RcGetDepartment(Guid.NewGuid());
@@ -263,11 +286,17 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [Test]
         public void ShouldReturnResponseWhenCreatingNewTaskAndUserIsAdmin()
         {
-            _mocker.Setup<IDataProvider, IEnumerable<DbProject>>(x => x.Projects)
-                .Returns(new List<DbProject> { new DbProject { Id = Guid.NewGuid() } }.ToList());
+            var lst = new List<DbProject>
+            {
+                new DbProject { Id = _newRequest.ProjectId}
+            };
 
-            TaskNumber.LoadCache(_mocker.GetMock<IDataProvider>().Object);
-            TaskNumber.GetProjectTaskMaxNumber(_newRequest.ProjectId, out int taskNumber);
+            var task = new List<DbTask>
+            {
+                new DbTask {Id = Guid.NewGuid(), ProjectId = _newRequest.ProjectId, Number = 2 }
+            };
+
+             ConcurrentDictionary<Guid, int> _cache = null;
 
             _mocker
                   .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
@@ -276,6 +305,15 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _mocker
                  .Setup<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
                  .Returns(true);
+
+            _mocker.Setup<IDataProvider, DbSet<DbProject>>(x => x.Projects)
+                   .Returns(GetQueryableMockDbSet(lst));
+
+            _mocker.Setup<IDataProvider, DbSet<DbTask>>(x => x.Tasks)
+                   .Returns(GetQueryableMockDbSet(task));
+
+            TaskNumber.LoadCache(_mocker.GetMock<IDataProvider>().Object);
+            TaskNumber.GetProjectTaskMaxNumber(_newRequest.ProjectId, out int taskNumber);
 
             _mocker
                 .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, taskNumber))
