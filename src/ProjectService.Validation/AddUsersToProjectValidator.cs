@@ -12,11 +12,11 @@ namespace LT.DigitalOffice.ProjectService.Validation
 {
     public class AddUsersToProjectValidator : AbstractValidator<AddUsersToProjectRequest>, IAddUsersToProjectValidator
     {
-        private readonly IProjectRepository _repository;
+        private readonly IUserRepository _repository;
 
         private IEnumerable<DbProjectUser> _dbPrjectUsers;
 
-        public AddUsersToProjectValidator(IProjectRepository repository)
+        public AddUsersToProjectValidator(IUserRepository repository)
         {
             _repository = repository;
 

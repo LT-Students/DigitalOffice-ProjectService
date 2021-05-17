@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -28,9 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 throw new BadRequestException("Users not specified.");
             }
 
-            const int rightId = 2;
-
-            if (!(accessValidator.IsAdmin() || accessValidator.HasRights(rightId)))
+            if (!(accessValidator.IsAdmin() || accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
