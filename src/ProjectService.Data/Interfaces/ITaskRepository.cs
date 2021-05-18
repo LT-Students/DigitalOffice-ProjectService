@@ -26,8 +26,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
         Guid CreateTask(DbTask item);
 
-        ConcurrentDictionary<Guid, int> MaxNumber();
-
         bool IsExist(Guid id);
     }
 }

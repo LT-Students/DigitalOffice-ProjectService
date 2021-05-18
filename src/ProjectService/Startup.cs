@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using MassTransit.RabbitMqTransport;
 using LT.DigitalOffice.ProjectService.Broker;
-using LT.DigitalOffice.ProjectService.Business.Helpers.Task;
+using LT.DigitalOffice.ProjectService.Mappers.Helpers;
 
 namespace LT.DigitalOffice.ProjectService
 {
@@ -45,7 +45,7 @@ namespace LT.DigitalOffice.ProjectService
                 .GetSection(BaseRabbitMqConfig.SectionName)
                 .Get<RabbitMqConfig>();
 
-            Version = "1.1.8";
+            Version = "1.1.7";
             Description = "ProjectService is an API intended to work with projects.";
             StartTime = DateTime.UtcNow;
             ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
@@ -151,7 +151,7 @@ namespace LT.DigitalOffice.ProjectService
             using var context = serviceScope.ServiceProvider.GetService<ProjectServiceDbContext>();
 
             context.Database.Migrate();
-            TaskNumber.LoadCache(context);
+            TaskNumberHelper.LoadCache(context);
         }
 
         #region configure masstransit

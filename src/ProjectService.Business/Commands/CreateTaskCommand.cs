@@ -6,7 +6,6 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
-using LT.DigitalOffice.ProjectService.Business.Helpers.Task;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
@@ -19,7 +18,6 @@ using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,8 +25,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
     public class CreateTaskCommand : ICreateTaskCommand
     {
-        //private static ConcurrentDictionary<Guid, int> _dictionary = null;
-
         private readonly ITaskRepository _repository;
         private readonly ICreateTaskValidator _validator;
         private readonly IDataProvider _provider;
@@ -98,6 +94,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             bool isAdmin = _accessValidator.IsAdmin();
 
+            _validator.ValidateAndThrowCustom(request);
+
             bool isProjectParticipant = projectUsers.FirstOrDefault(x =>
                 x.UserId == authorId) != null;
 
@@ -112,11 +110,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 throw new ForbiddenException("Not enough rights.");
             }
 
-            TaskNumber.GetProjectTaskMaxNumber(request.ProjectId, out int number);
-
-            var dbTask = _mapperTask.Map(request, authorId, number);
-
-            Guid taskId = _repository.CreateTask(dbTask);
+            Guid taskId = _repository.CreateTask(_mapperTask.Map(request));
 
             return new OperationResultResponse<Guid>
             {

@@ -75,20 +75,6 @@ namespace LT.DigitalOffice.ProjectService.Data
                 throw new NotFoundException($"Task id '{taskId}' was not found.");
         }
 
-        public ConcurrentDictionary<Guid, int> MaxNumber()
-        {
-            var dictionary = new ConcurrentDictionary<Guid, int>();
-            var projectIds = _provider.Projects.Select(x => x.Id);
-            foreach (var Id in projectIds)
-            {
-                int? taskNumber = _provider.Tasks.Where(x => x.ProjectId == Id)?.Max(n => n.Number);
-
-                dictionary[Id] = taskNumber.GetValueOrDefault();
-            }
-
-            return dictionary;
-        }
-
         public IEnumerable<DbTask> Find(
             FindTasksFilter filter,
             IEnumerable<Guid> projectIds,

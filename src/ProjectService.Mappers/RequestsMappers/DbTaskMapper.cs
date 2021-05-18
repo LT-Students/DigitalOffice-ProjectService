@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Mappers.Helpers;
+using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using System;
@@ -7,11 +8,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 {
     public class DbTaskMapper : IDbTaskMapper
     {
-        public DbTask Map(CreateTaskRequest taskRequiest, Guid authorId, int numberTask)
+        public DbTask Map(CreateTaskRequest taskRequest)
         {
-            if (taskRequiest == null)
+            if (taskRequest == null)
             {
-                throw new ArgumentNullException(nameof(taskRequiest));
+                throw new ArgumentNullException(nameof(taskRequest));
             }
 
             Guid taskId = Guid.NewGuid();
@@ -19,26 +20,26 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
             return new DbTask
             {
                 Id = taskId,
-                Name = taskRequiest.Name,
-                Description = taskRequiest.Description,
-                PlannedMinutes = taskRequiest.PlannedMinutes,
-                AssignedTo = taskRequiest.AssignedTo,
-                AuthorId = authorId,
-                ProjectId = taskRequiest.ProjectId,
+                Name = taskRequest.Name,
+                Description = taskRequest.Description,
+                PlannedMinutes = taskRequest.PlannedMinutes,
+                AssignedTo = taskRequest.AssignedTo,
+                AuthorId = taskRequest.AuthorId,
+                ProjectId = taskRequest.ProjectId,
                 CreatedAt = DateTime.UtcNow,
-                ParentId = taskRequiest.ParentId,
-                Number = numberTask,
+                ParentId = taskRequest.ParentId,
+                Number = TaskNumberHelper.GetProjectTaskNumber(taskRequest.ProjectId),
                 Priority = new DbTaskProperty
                 {
-                    Id = taskRequiest.PriorityId
+                    Id = taskRequest.PriorityId
                 },
                 Status = new DbTaskProperty
                 {
-                    Id = taskRequiest.StatusId
+                    Id = taskRequest.StatusId
                 },
                 Type = new DbTaskProperty
                 {
-                    Id = taskRequiest.TypeId
+                    Id = taskRequest.TypeId
                 }
             };
         }

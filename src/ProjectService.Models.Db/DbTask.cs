@@ -50,14 +50,14 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .HasForeignKey(t => t.AssignedTo);
 
              builder
-                 .HasOne(t => t.Author)
-                 .WithMany(pu => pu.AuthorTasks)
-                 .HasForeignKey(t => t.AuthorId);
+                .HasOne(t => t.Author)
+                .WithMany(pu => pu.AuthorTasks)
+                .HasForeignKey(t => t.AuthorId);
 
              builder
-                 .HasOne(t => t.Project)
-                 .WithMany(p => p.Tasks)
-                 .HasForeignKey(t => t.ProjectId);
+                .HasOne(t => t.Project)
+                .WithMany(p => p.Tasks)
+                .HasForeignKey(t => t.ProjectId);
 
             builder
                 .HasOne(t => t.Status)

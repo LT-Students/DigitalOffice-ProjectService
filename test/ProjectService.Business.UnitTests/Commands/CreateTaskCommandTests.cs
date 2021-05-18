@@ -6,10 +6,8 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
-using LT.DigitalOffice.ProjectService.Business.Helpers.Task;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
-using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
@@ -19,14 +17,11 @@ using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using LT.DigitalOffice.UnitTestKernel;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.AutoMock;
 using NUnit.Framework;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 {
@@ -39,11 +34,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private OperationResultResponse<Guid> _response;
         private readonly Guid _authorId = Guid.NewGuid();
         private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _operationResultBroker;
-        private IDataProvider _provider;
-        private IProjectRepository _repository;
-        private static ConcurrentDictionary<Guid, int> _cache = null;
-
-        private DbProject _newProject;
 
         private void ClientRequestUp(Guid newGuid)
         {
@@ -76,29 +66,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                    It.IsAny<object>(), default, default).Result).Returns(responseMock.Object);
         }
 
-        private static DbSet<T> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
-        {
-            var queryable = sourceList.AsQueryable();
-
-            var dbSet = new Mock<DbSet<T>>();
-            dbSet.As<IQueryable<T>>().Setup(m => m.Provider).Returns(queryable.Provider);
-            dbSet.As<IQueryable<T>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            dbSet.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            dbSet.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
-            dbSet.Setup(d => d.Add(It.IsAny<T>())).Callback<T>((s) => sourceList.Add(s));
-
-            return dbSet.Object;
-
-        }
-
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _mocker = new AutoMocker();
             _command = _mocker.CreateInstance<CreateTaskCommand>();
-
-            IConcurrentDictionary<object, object> _items = new Dictionary<object, object>();
-            _items.Add("UserId", _authorId);
 
             _newRequest = new CreateTaskRequest
             {
@@ -207,8 +179,8 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
               .Returns(true);
 
             _mocker
-               .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0))
-               .Returns(_dbTask);
+                .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest))
+                .Returns(_dbTask);
 
             _mocker
                 .Setup<ITaskRepository, Guid>(x => x.CreateTask(_dbTask))
@@ -217,7 +189,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
 
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
-            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0), Times.Once);
+            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest), Times.Once);
             _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
         }
 
@@ -231,8 +203,8 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
              .Returns(true);
 
             _mocker
-               .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0))
-               .Returns(_dbTask);
+                .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest))
+                .Returns(_dbTask);
 
             _mocker
                 .Setup<ITaskRepository, Guid>(x => x.CreateTask(_dbTask))
@@ -241,7 +213,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
 
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
-            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0), Times.Once);
+            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest), Times.Once);
             _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
         }
 
@@ -289,17 +261,15 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         [Test]
         public void ShouldReturnResponseWhenCreatingNewTaskAndUserIsAdmin()
         {
-            var lst = new List<DbProject>
+            var project = new List<DbProject>
             {
                 new DbProject { Id = _newRequest.ProjectId}
             };
 
             var task = new List<DbTask>
             {
-                new DbTask {Id = Guid.NewGuid(), ProjectId = _newRequest.ProjectId, Number = 2 }
+                new DbTask {Id = Guid.NewGuid(), ProjectId = _newRequest.ProjectId, Number = _dbTask.Number}
             };
-
-             ConcurrentDictionary<Guid, int> _cache = null;
 
             _mocker
                   .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
@@ -309,27 +279,18 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                  .Setup<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
                  .Returns(true);
 
-            _mocker.Setup<IDataProvider, DbSet<DbProject>>(x => x.Projects)
-                   .Returns(GetQueryableMockDbSet(lst));
-
-            _mocker.Setup<IDataProvider, DbSet<DbTask>>(x => x.Tasks)
-                   .Returns(GetQueryableMockDbSet(task));
-
-            TaskNumber.LoadCache(_mocker.GetMock<IDataProvider>().Object);
-            TaskNumber.GetProjectTaskMaxNumber(_newRequest.ProjectId, out int taskNumber);
-
             _mocker
-                .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, taskNumber))
+                .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest))
                 .Returns(_dbTask);
 
             _mocker
                 .Setup<ITaskRepository, Guid>(x => x.CreateTask(_dbTask))
-                .Returns(_response.Body);
+                .Returns(_dbTask.Id);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
 
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
-            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId, 0), Times.Once);
+            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest), Times.Once);
             _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
         }

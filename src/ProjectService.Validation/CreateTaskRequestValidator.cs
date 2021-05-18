@@ -1,13 +1,7 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
@@ -18,7 +12,6 @@ namespace LT.DigitalOffice.ProjectService.Validation
             IUserRepository userRepository,
             IProjectRepository projectRepository,
             ITaskPropertyRepository taskPropertyRepository)
-
         {
             RuleFor(task => task.Name)
                 .NotEmpty()
