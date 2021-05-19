@@ -4,6 +4,7 @@ using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using MassTransit;
 using System;
 using System.Collections.Generic;
@@ -17,11 +18,12 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
         private object GeUserProjects(Guid userId)
         {
-            var dbProjectsUser = _userRepository.Find(userId);
-            if (dbProjectsUser == null)
-            {
-                throw new EndpointNotFoundException($"Projects with user id: {userId} was not found.");
-            }
+            var dbProjectsUser = _userRepository.Get(
+                new GetDbProjectsUserFilter
+                {
+                    UserId = userId,
+                    IncludeProject = true
+                });
 
             var projectsResponse = new List<ProjectShortInfo>();
 

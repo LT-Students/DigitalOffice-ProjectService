@@ -16,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
         private object GetProjectIds(Guid userId)
         {
-            var dbProjectUsers = _repository.Find(userId);
+            var dbProjectUsers = _repository.Get(userId);
 
             var projectIds = dbProjectUsers.Select(x => x.ProjectId).ToList();
 

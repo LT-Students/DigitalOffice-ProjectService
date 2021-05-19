@@ -2,6 +2,7 @@
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,23 @@ namespace LT.DigitalOffice.ProjectService.Data
     public class UserRepository : IUserRepository
     {
         public readonly IDataProvider _provider;
+
+        private IQueryable<DbProjectUser> CreateGetPredicates(
+            GetDbProjectsUserFilter filter,
+            IQueryable<DbProjectUser> dbProjectUser)
+        {
+            if (filter.UserId.HasValue)
+            {
+                dbProjectUser = dbProjectUser.Where(x => x.UserId == filter.UserId);
+            }
+
+            if (filter.IncludeProject.HasValue && filter.IncludeProject.Value)
+            {
+                dbProjectUser = dbProjectUser.Include(x => x.Project);
+            }
+
+            return dbProjectUser;
+        }
 
         public UserRepository(IDataProvider provider)
         {
@@ -33,9 +51,24 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider.ProjectsUsers.AddRange(dbProjectUsers);
         }
 
-        public IEnumerable<DbProjectUser> Find(Guid userId)
+        public IEnumerable<DbProjectUser> Get(Guid userId)
         {
-            return _provider.ProjectsUsers.Include(u => u.Project).Where(x => x.UserId == userId).ToList();
+            return Get(new GetDbProjectsUserFilter { UserId = userId });
+
+        }
+
+        public IEnumerable<DbProjectUser> Get(GetDbProjectsUserFilter filter)
+        {
+            if (filter == null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
+
+            var dbProjectsUser = _provider.ProjectsUsers
+                .AsSingleQuery()
+                .AsQueryable();
+
+            return CreateGetPredicates(filter, dbProjectsUser).ToList();
         }
 
         public bool AreExist(params Guid[] ids)

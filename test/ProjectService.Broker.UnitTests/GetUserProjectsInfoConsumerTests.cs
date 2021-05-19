@@ -5,6 +5,7 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.UnitTestKernel;
 using MassTransit.Testing;
 using Moq;
@@ -58,7 +59,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
         public async Task SuccessResponce()
         {
             _repository
-                .Setup(x => x.Find(_userId))
+                .Setup(x => x.Get(It.IsAny<GetDbProjectsUserFilter>()))
                 .Returns(_userProjects);
 
             await _harness.Start();
@@ -96,45 +97,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 SerializerAssert.AreEqual(expectedResult, response.Message);
                 Assert.True(_consumer.Consumed.Select<IGetUserProjectsInfoRequest>().Any());
                 Assert.True(_harness.Sent.Select<IOperationResult<IGetUserProjectsInfoResponse>>().Any());
-                _repository.Verify(x => x.Find(_userId), Times.Once);
-            }
-            finally
-            {
-                await _harness.Stop();
-            }
-        }
-
-        [Test]
-        public async Task ShouldThrowExceptionWhenProjectsWasNotFound()
-        {
-            List<DbProjectUser> dbProject = null;
-
-            _repository
-                .Setup(x => x.Find(_userId))
-                .Returns(dbProject);
-
-            await _harness.Start();
-
-            try
-            {
-                var requestClient = await _harness.ConnectRequestClient<IGetUserProjectsInfoRequest>();
-
-                var response = await requestClient.GetResponse<IOperationResult<IGetUserProjectsInfoResponse>>(
-                    IGetUserProjectsInfoRequest.CreateObj(_userId), default, default);
-
-                var expectedResult = new
-                {
-                    IsSuccess = false,
-                    Errors = new List<string> { $"Projects with user id: {_userId} was not found." },
-                    Body = null as object
-                };
-
-                Assert.False(response.Message.IsSuccess);
-                Assert.AreEqual(expectedResult.Errors, response.Message.Errors);
-                SerializerAssert.AreEqual(expectedResult, response.Message);
-                Assert.True(_consumer.Consumed.Select<IGetUserProjectsInfoRequest>().Any());
-                Assert.True(_harness.Sent.Select<IOperationResult<IGetUserProjectsInfoResponse>>().Any());
-                _repository.Verify(x => x.Find(_userId), Times.Once);
+                _repository.Verify(x => x.Get(It.IsAny<GetDbProjectsUserFilter>()), Times.Once);
             }
             finally
             {
