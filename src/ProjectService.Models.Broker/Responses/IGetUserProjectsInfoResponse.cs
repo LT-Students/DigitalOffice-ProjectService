@@ -6,6 +6,7 @@ namespace LT.DigitalOffice.Broker.Responses
     public interface IGetUserProjectsInfoResponse
     {
         List<ProjectShortInfo> Projects { get; }
+
         static object CreateObj(List<ProjectShortInfo> projects)
         {
             return new
