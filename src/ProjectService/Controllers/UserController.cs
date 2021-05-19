@@ -12,7 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         [HttpPost("addUsersToProject")]
         public void AddUsersToProject(
             [FromServices] IAddUsersToProjectCommand command,
-            [FromQuery] AddUsersToProjectRequest request)
+            [FromBody] AddUsersToProjectRequest request)
         {
             command.Execute(request);
         }
