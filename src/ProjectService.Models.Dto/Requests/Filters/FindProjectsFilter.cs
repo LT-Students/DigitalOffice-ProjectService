@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters
+namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
 {
     public class FindProjectsFilter
     {

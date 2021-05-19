@@ -3,6 +3,7 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Broker.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using MassTransit;
 using System;
 using System.Threading.Tasks;
@@ -15,7 +16,8 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
         private object GetProjectInfo(Guid projectId)
         {
-            var dbProject = _repository.GetProject(projectId);
+            var filter = new GetProjectFilter { ProjectId = projectId };
+            var dbProject = _repository.GetProject(filter);
 
             if (dbProject == null)
             {

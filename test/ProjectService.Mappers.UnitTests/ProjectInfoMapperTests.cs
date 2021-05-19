@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers;
+﻿using LT.DigitalOffice.ProjectService.Mappers.Models;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.UnitTestKernel;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters
+namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
 {
     public class FindDbProjectsFilter
     {

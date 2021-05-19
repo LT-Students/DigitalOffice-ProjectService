@@ -11,6 +11,7 @@ using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using MassTransit;
@@ -85,7 +86,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             _validator.ValidateAndThrowCustom(request);
 
-            DbProject dbProject = _repository.GetProject(projectId);
+            var filter = new GetProjectFilter { ProjectId = projectId };
+
+            DbProject dbProject = _repository.GetProject(filter);
 
             var response = new OperationResultResponse<bool>();
 
