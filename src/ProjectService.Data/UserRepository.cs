@@ -54,7 +54,6 @@ namespace LT.DigitalOffice.ProjectService.Data
         public IEnumerable<DbProjectUser> Get(Guid userId)
         {
             return Get(new GetDbProjectsUserFilter { UserId = userId });
-
         }
 
         public IEnumerable<DbProjectUser> Get(GetDbProjectsUserFilter filter)
