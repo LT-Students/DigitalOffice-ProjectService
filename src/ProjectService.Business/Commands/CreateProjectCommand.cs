@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.Broker.Requests;
+using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             try
             {
                 var response = _requestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                IGetDepartmentRequest.CreateObj(null, departmentId)).Result;
+                IGetDepartmentRequest.CreateObj(null, departmentId), timeout: RequestTimeout.After(s: 2)).Result;
 
                 if (response.Message.IsSuccess)
                 {
