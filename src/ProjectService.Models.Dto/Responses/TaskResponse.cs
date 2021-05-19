@@ -7,18 +7,19 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
     public class TaskResponse
     {
         public Guid Id { get; set; }
-        public Guid TypeId { get; set; }
-        public Guid AuthorId { get; set; }
-        public Guid StatusId { get; set; }
-        public Guid? ParentId { get; set; }
-        public Guid ProjectId { get; set; }
-        public Guid PriorityId { get; set; }
-        public Guid? AssignedTo { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public int Number { get; set; }
         public int? PlannedMinutes { get; set; }
         public DateTime CreatedAt { get; set; }
+        
+        public DbProject Project { get; set; }
+        public DbProjectUser Author { get; set; }
+        public DbProjectUser AssignedUser { get; set; }
+        public DbTaskProperty Status { get; set; }
+        public DbTaskProperty Priority { get; set; }
+        public DbTaskProperty Type { get; set; }
+        public DbTask ParentTask { get; set; }
 
         public ICollection<DbTask> Subtasks { get; set; }
 

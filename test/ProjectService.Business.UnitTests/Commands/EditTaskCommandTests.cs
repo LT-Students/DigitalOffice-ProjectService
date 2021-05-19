@@ -111,10 +111,10 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Verifiable();
         }
 
-        private void RcGetDepartment(Guid departmentId)
+        private void RcGetDepartment(Guid userId)
         {
             var department = new Mock<IGetDepartmentResponse>();
-            department.Setup(x => x.DirectorUserId).Returns(_userId);
+            department.Setup(x => x.DirectorUserId).Returns(userId);
 
             _operationResultBrokerMock
                 .Setup(x => x.Message.Body)
@@ -267,6 +267,16 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void FullSuccessOperationWhenUserInProject()
         {
             ClientRequestUp(_userId);
+            
+            _projectRepositoryMock
+                .Setup(x => x.GetProjectUsers(_projectId, false))
+                .Returns(new List<DbProjectUser>()
+                {
+                    new DbProjectUser
+                    {
+                        UserId = _userId
+                    }
+                }).Verifiable();
 
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
 
@@ -281,6 +291,8 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         public void FullSuccessWhenUserIsDepartmentDirector()
         {
             ClientRequestUp(_userId);
+
+            RcGetDepartment(_userId);
 
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
 

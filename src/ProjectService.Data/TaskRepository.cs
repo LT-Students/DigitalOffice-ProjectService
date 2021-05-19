@@ -8,10 +8,6 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
@@ -72,7 +68,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                                 .Include(t => t.Subtasks)
                                 .FirstOrDefault(x => x.Id == taskId) ??
                 throw new NotFoundException($"Task id '{taskId}' was not found.");
-
+            
             return dbTask;
         }
 

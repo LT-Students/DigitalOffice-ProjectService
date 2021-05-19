@@ -207,12 +207,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             Assert.AreEqual(_dbTasks.Count, totalCount);
         }
 
-        [Test]
-        public void ShouldEditTask()
-        {
-            Assert.IsTrue(_repository.Edit(_repository.Get(_taskId), _patchDbTask));
-            SerializerAssert.AreEqual(_result, _provider.Tasks.FirstOrDefault(x => x.Id == _taskId));
-        }
 
         [Test]
         public void ExceptionWhenThereIsNotTask()
@@ -225,11 +219,11 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }
 
         [Test]
-        public void ShouldGetTask()
+        public void ExceptionWhenGetNonexistentTask()
         {
-            Assert.AreEqual(_dbTask, _repository.Get(_taskId));
+            Assert.Throws<NotFoundException>(() => _repository.Get(Guid.NewGuid()));
         }
-
+        
         [TearDown]
         public void Clean()
         {

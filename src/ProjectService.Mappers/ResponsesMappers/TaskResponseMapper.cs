@@ -1,3 +1,4 @@
+using System;
 using LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
@@ -8,16 +9,21 @@ namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers
     {
         public TaskResponse Map(DbTask dbTask)
         {
+            if (dbTask == null)
+            {
+                throw new ArgumentNullException(nameof(dbTask));
+            }
+
             return new TaskResponse()
             {
                 Id = dbTask.Id,
-                TypeId = dbTask.TypeId,
-                AuthorId = dbTask.AuthorId,
-                StatusId = dbTask.StatusId,
-                ParentId = dbTask.ParentId,
-                ProjectId = dbTask.ProjectId,
-                PriorityId = dbTask.PriorityId,
-                AssignedTo = dbTask.AssignedTo,
+                Type = dbTask.Type,
+                Author = dbTask.Author,
+                Status = dbTask.Status,
+                ParentTask = dbTask.ParentTask,
+                Project = dbTask.Project,
+                Priority = dbTask.Priority,
+                AssignedUser = dbTask.AssignedUser,
                 Name = dbTask.Name,
                 Description = dbTask.Description,
                 Number = dbTask.Number,
