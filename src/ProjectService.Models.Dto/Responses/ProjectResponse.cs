@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
 {
-    public class ProjectExpandedResponse
+    public class ProjectResponse
     {
         public ProjectInfo Project { get; set; }
-        public DepartmentInfo Department { get; set; }
         public IEnumerable<ProjectUserInfo> Users { get; set; }
         public IEnumerable<ProjectFileInfo> Files { get; set; }
+        public List<string> Errors { get; set; } = new();
     }
 }

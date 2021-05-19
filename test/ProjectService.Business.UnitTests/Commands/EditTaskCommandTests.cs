@@ -38,6 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
         private Mock<ITaskRepository> _taskRepositoryMock;
         private Mock<IProjectRepository> _projectRepositoryMock;
+        private Mock<IUserRepository> _userRepositoryMock;
         private Mock<IEditTaskValidator> _validatorMock;
         private Mock<IAccessValidator> _accessValidatorMock;
         private Mock<IHttpContextAccessor> _httpAccessorMock;
@@ -83,7 +84,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             Func<Times> requestClientTimes,
             Func<Times> httpAccessorTimes)
         {
-            _projectRepositoryMock.Verify(x => x.GetProjectUsers(
+            _userRepositoryMock.Verify(x => x.GetProjectUsers(
                 It.IsAny<Guid>(), It.IsAny<bool>()), projectRepositoryTimes);
 
             _taskRepositoryMock.Verify(x =>
@@ -192,6 +193,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
             _taskRepositoryMock = new Mock<ITaskRepository>();
             _projectRepositoryMock = new Mock<IProjectRepository>();
+            _userRepositoryMock = new Mock<IUserRepository>();
             _validatorMock = new Mock<IEditTaskValidator>();
             _accessValidatorMock = new Mock<IAccessValidator>();
             _httpAccessorMock = new Mock<IHttpContextAccessor>();
@@ -226,7 +228,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Setup(x => x.IsAdmin(null))
                 .Returns(false);
 
-            _projectRepositoryMock
+            _userRepositoryMock
                 .Setup(x => x.GetProjectUsers(_projectId, false))
                 .Returns(new List<DbProjectUser>()
             {
@@ -241,6 +243,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _command = new EditTaskCommand(
                 _taskRepositoryMock.Object,
                 _projectRepositoryMock.Object,
+                _userRepositoryMock.Object,
                 _validatorMock.Object,
                 _accessValidatorMock.Object,
                 _httpAccessorMock.Object,

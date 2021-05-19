@@ -1,5 +1,5 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using System;
 using System.Collections.Generic;
 

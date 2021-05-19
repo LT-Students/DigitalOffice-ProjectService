@@ -5,7 +5,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using System;
 using System.Collections.Generic;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.ResponsesMappers.Interfaces
+namespace LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces
 {
     [AutoInject]
     public interface IFindProjectsResponseMapper

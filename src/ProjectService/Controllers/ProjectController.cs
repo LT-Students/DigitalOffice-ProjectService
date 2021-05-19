@@ -4,7 +4,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Request.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using Microsoft.AspNetCore.JsonPatch;
 
@@ -24,13 +24,12 @@ namespace LT.DigitalOffice.ProjectService.Controllers
             return command.Execute(filter, skipCount, takeCount);
         }
 
-        [HttpGet("getProjectById")]
-        public ProjectExpandedResponse GetProjectById(
-            [FromServices] IGetProjectByIdCommand command,
-            [FromQuery] Guid projectId,
-            [FromQuery] bool showNotActiveUsers = false)
+        [HttpGet("get")]
+        public ProjectResponse Get(
+            [FromServices] IGetProjectCommand command,
+            [FromQuery] GetProjectFilter filter)
         {
-            return command.Execute(projectId, showNotActiveUsers).Result;
+            return command.Execute(filter);
         }
 
         [HttpPost("create")]
