@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             try
             {
                 var response = _requestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                IGetDepartmentRequest.CreateObj(null, departmentId), timeout: RequestTimeout.After(s: 2)).Result;
+                IGetDepartmentRequest.CreateObj(null, departmentId), timeout: TimeSpan.FromSeconds(2)).Result;
 
                 if (response.Message.IsSuccess)
                 {
