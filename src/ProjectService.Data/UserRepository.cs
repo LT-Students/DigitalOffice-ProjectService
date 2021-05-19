@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             {
                 dbProjectQueryable = dbProjectQueryable.Where(x => x.ProjectId == projectId && x.IsActive);
             }
-            
+
             return dbProjectQueryable;
         }
 

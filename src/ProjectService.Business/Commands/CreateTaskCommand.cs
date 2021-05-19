@@ -27,12 +27,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     {
         private readonly ITaskRepository _repository;
         private readonly ICreateTaskValidator _validator;
-        private readonly IDataProvider _provider;
+        private readonly IUserRepository _userRepository;
         private readonly IDbTaskMapper _mapperTask;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
         private readonly IAccessValidator _accessValidator;
-        private readonly IProjectRepository _projectRepository;
         private readonly ILogger<CreateTaskCommand> _logger;
 
         private IGetDepartmentResponse GetDepartment(Guid authorId, List<string> errors)
@@ -68,6 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             IDbTaskMapper mapperTask,
             IHttpContextAccessor httpContextAccessor,
             IAccessValidator accessValidator,
+            IUserRepository userRepository,
             IRequestClient<IGetDepartmentRequest> requestClient,
             ILogger<CreateTaskCommand> logger)
         {
@@ -78,7 +78,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _requestClient = requestClient;
             _accessValidator = accessValidator;
             _logger = logger;
-            _projectRepository = projectRepository;
+            _userRepository = userRepository;
         }
 
         public OperationResultResponse<Guid> Execute(CreateTaskRequest request)
@@ -88,7 +88,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var authorId = _httpContextAccessor.HttpContext.GetUserId();
 
             List<DbProjectUser> projectUsers =
-                _projectRepository.GetProjectUsers(request.ProjectId, false).ToList();
+                _userRepository.GetProjectUsers(request.ProjectId, false).ToList();
 
             IGetDepartmentResponse department = GetDepartment(authorId, errors);
 
