@@ -13,6 +13,13 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     public interface IUserRepository
     {
         /// <summary>
+        /// Returns all users from project with specified id.
+        /// </summary>
+        /// <param name="projectId">Project id.</param>
+        /// <param name="showNotActiveUsers">Include not active users.</param>
+        IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActiveUsers);
+
+        /// <summary>
         /// Add users to project.
         /// </summary>
         /// <param name="dbProjectUsers">List project users to add.</param>
@@ -24,9 +31,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         bool AreUserProjectExist(Guid userId, Guid projectId);
 
         /// <summary>
-        /// Check that users are exist
+        /// Check that users are exist.
         /// </summary>
-        /// <param name="ids">Ids to check that all of them exists</param>
+        /// <param name="ids">Ids to check that all of them exists.</param>
         bool AreExist(params Guid[] ids);
     }
 }

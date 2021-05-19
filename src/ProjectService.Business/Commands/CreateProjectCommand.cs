@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.Broker.Requests;
+using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
@@ -8,7 +8,7 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             try
             {
                 var response = _requestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                IGetDepartmentRequest.CreateObj(null, departmentId)).Result;
+                IGetDepartmentRequest.CreateObj(null, departmentId), timeout: TimeSpan.FromSeconds(2)).Result;
 
                 if (response.Message.IsSuccess)
                 {

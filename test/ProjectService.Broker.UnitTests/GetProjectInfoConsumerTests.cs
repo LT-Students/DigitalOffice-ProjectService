@@ -4,6 +4,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Broker.Requests;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.UnitTestKernel;
 using MassTransit.Testing;
 using Moq;
@@ -49,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
         public async Task ShouldResponseProjectInfoResponse()
         {
             _repository
-                .Setup(x => x.GetProject(_projectId))
+                .Setup(x => x.GetProject(It.IsAny<GetProjectFilter>()))
                 .Returns(_dbProject);
 
             await _harness.Start();
@@ -78,7 +79,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 SerializerAssert.AreEqual(expectedResult, response.Message);
                 Assert.True(_consumerTestHarness.Consumed.Select<IGetProjectRequest>().Any());
                 Assert.True(_harness.Sent.Select<IOperationResult<IProjectResponse>>().Any());
-                _repository.Verify(x => x.GetProject(_projectId), Times.Once);
+                _repository.Verify(x => x.GetProject(It.IsAny<GetProjectFilter>()), Times.Once);
             }
             finally
             {
@@ -92,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
             DbProject dbProject = null;
 
             _repository
-                .Setup(x => x.GetProject(_projectId))
+                .Setup(x => x.GetProject(It.IsAny<GetProjectFilter>()))
                 .Returns(dbProject);
 
             await _harness.Start();
@@ -116,7 +117,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 SerializerAssert.AreEqual(expectedResult, response.Message);
                 Assert.True(_consumerTestHarness.Consumed.Select<IGetProjectRequest>().Any());
                 Assert.True(_harness.Sent.Select<IOperationResult<IProjectResponse>>().Any());
-                _repository.Verify(x => x.GetProject(_projectId), Times.Once);
+                _repository.Verify(x => x.GetProject(It.IsAny<GetProjectFilter>()), Times.Once);
             }
             finally
             {

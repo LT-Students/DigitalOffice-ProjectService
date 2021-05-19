@@ -3,10 +3,6 @@
   <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
 
   <ItemGroup>
-    <PackageReference Include="LinqKit" Version="1.1.17" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ProjectService.Data.Provider\ProjectService.Data.Provider.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
     <ProjectReference Include="..\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />

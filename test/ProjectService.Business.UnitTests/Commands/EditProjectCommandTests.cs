@@ -11,6 +11,7 @@ using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using LT.DigitalOffice.UnitTestKernel;
@@ -92,7 +93,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
                 .Returns(true);
 
             _mocker
-                .Setup<IProjectRepository, DbProject>(x => x.GetProject(It.IsAny<Guid>()))
+                .Setup<IProjectRepository, DbProject>(x => x.GetProject(It.IsAny<GetProjectFilter>()))
                 .Returns(_dbProject);
 
             _httpContextData = new Dictionary<object, object>();

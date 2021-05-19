@@ -8,7 +8,7 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.ModelsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
@@ -146,7 +146,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             _mocker
                 .Setup<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
                 x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, default))
+                    IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, TimeSpan.FromSeconds(2)))
                 .Returns(Task.FromResult(_operationResultBroker.Object));
         }
 
@@ -207,7 +207,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             _mocker.Verify<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _authorId), Times.Never);
             _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
                 x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, default),
+                    IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, TimeSpan.FromSeconds(2)),
                     Times.Once);
             _mocker.Verify<ICreateProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
         }
@@ -236,7 +236,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             _mocker
                 .Setup<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
                 x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, default))
+                    IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, TimeSpan.FromSeconds(2)))
                 .Throws(new Exception());
 
             SerializerAssert.AreEqual(newResponse, _command.Execute(_newRequest));
@@ -246,7 +246,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             _mocker.Verify<ICreateProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
             _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
                 x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, default),
+                    IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, TimeSpan.FromSeconds(2)),
                     Times.Once);
         }
 
