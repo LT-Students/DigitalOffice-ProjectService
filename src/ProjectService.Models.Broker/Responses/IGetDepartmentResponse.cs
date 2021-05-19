@@ -6,7 +6,7 @@ namespace LT.DigitalOffice.Broker.Responses
     {
         Guid Id { get; }
         string Name { get; }
-        Guid DirectorUserId { get; }
+        Guid? DirectorUserId { get; }
 
         static object CreateObj(Guid id, string name, Guid directorUserId)
         {
