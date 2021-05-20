@@ -12,6 +12,5 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         public string GetProjectIdsEndpoint { get; set; }
         public string GetProjectInfoEndpoint { get; set; }
         public string GetUserProjectsInfoEndpoint { get; set; }
-        public string GetUsersDataEndpoint { get; set; }
     }
 }
