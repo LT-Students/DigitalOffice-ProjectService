@@ -21,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     public class GetTaskCommand : IGetTaskCommand
     {
         private readonly ITaskRepository _taskRepository;
-        private readonly IProjectRepository _projectRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IAccessValidator _accessValidator;
         private readonly HttpContext _httpContext;
         private readonly ITaskResponseMapper _mapper;
@@ -58,6 +58,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         public GetTaskCommand(
             ITaskRepository taskRepository,
             IProjectRepository projectRepository,
+            IUserRepository userRepository,
             IAccessValidator accessValidator,
             IHttpContextAccessor httpContextAccessor,
             ITaskResponseMapper mapper,
@@ -65,7 +66,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             IRequestClient<IGetDepartmentRequest> requestClient)
         {
             _taskRepository = taskRepository;
-            _projectRepository = projectRepository;
+            _userRepository = userRepository;
             _accessValidator = accessValidator;
             _httpContext = httpContextAccessor.HttpContext;
             _mapper = mapper;
@@ -79,7 +80,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             DbTask task = _taskRepository.Get(taskId);
             List<DbProjectUser> projectUsers = 
-                _projectRepository.GetProjectUsers(task.ProjectId, false).ToList();
+                _userRepository.GetProjectUsers(task.ProjectId, false).ToList();
 
             Guid requestUserId = _httpContext.GetUserId();
             IGetDepartmentResponse department = GetDepartment(requestUserId, errors);

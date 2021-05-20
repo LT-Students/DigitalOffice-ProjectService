@@ -271,7 +271,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         {
             ClientRequestUp(_userId);
             
-            _projectRepositoryMock
+            _userRepositoryMock
                 .Setup(x => x.GetProjectUsers(_projectId, false))
                 .Returns(new List<DbProjectUser>()
                 {
