@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
@@ -16,8 +17,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
     public class AddUsersToProjectCommand : IAddUsersToProjectCommand
     {
-        const int ACCESS_RIGHT_ID = 2;
-
         private readonly IUserRepository _repository;
         private readonly IProjectUserRequestMapper _mapper;
         private readonly IAccessValidator _accessValidator;
@@ -37,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         public void Execute(AddUsersToProjectRequest request)
         {
-            if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(ACCESS_RIGHT_ID)))
+            if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
                 throw new ForbiddenException("Not enough rights");
             }

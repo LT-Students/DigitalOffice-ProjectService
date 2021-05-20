@@ -36,11 +36,27 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
+        public IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActive)
+        {
+            IQueryable<DbProjectUser> dbProjectQueryable = _provider.ProjectsUsers.AsQueryable();
+
+            if (showNotActive)
+            {
+                dbProjectQueryable = dbProjectQueryable.Where(x => x.ProjectId == projectId);
+            }
+            else
+            {
+                dbProjectQueryable = dbProjectQueryable.Where(x => x.ProjectId == projectId && x.IsActive);
+            }
+            
+            return dbProjectQueryable;
+        }
+
         public void AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUsers , Guid projectId)
         {
             if (dbProjectUsers == null)
             {
-                throw new ArgumentNullException("List project users is null");
+                throw new ArgumentNullException(nameof(dbProjectUsers));
             }
 
             if (!_provider.Projects.Any(p => p.Id == projectId))

@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService
                 .GetSection(BaseRabbitMqConfig.SectionName)
                 .Get<RabbitMqConfig>();
 
-            Version = "1.1.8";
+            Version = "1.1.7";
             Description = "ProjectService is an API intended to work with projects.";
             StartTime = DateTime.UtcNow;
             ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
@@ -59,13 +59,7 @@ namespace LT.DigitalOffice.ProjectService
                     builder =>
                     {
                         builder
-                            .WithOrigins(
-                                "https://*.ltdo.xyz",
-                                "http://*.ltdo.xyz",
-                                "http://ltdo.xyz",
-                                "http://ltdo.xyz:9804",
-                                "http://localhost:4200",
-                                "http://localhost:4500")
+                            .AllowAnyOrigin()
                             .AllowAnyHeader()
                             .AllowAnyMethod();
                     });
