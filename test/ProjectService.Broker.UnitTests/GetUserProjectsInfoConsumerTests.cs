@@ -95,7 +95,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 Assert.True(response.Message.IsSuccess);
                 Assert.AreEqual(null, response.Message.Errors);
                 SerializerAssert.AreEqual(expectedResult, response.Message);
-                Assert.True(_consumer.Consumed.Select<IGetUserProjectsInfoRequest>().Any());
                 Assert.True(_harness.Sent.Select<IOperationResult<IGetUserProjectsInfoResponse>>().Any());
                 _repository.Verify(x => x.Find(It.IsAny<FindDbProjectsUserFilter>()), Times.Once);
             }

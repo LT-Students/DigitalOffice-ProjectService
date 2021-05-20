@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
-    class GetProjectUserTests
+    class UserRepositoryTests
     {
         private IDataProvider _provider;
         private UserRepository _userRepository;
