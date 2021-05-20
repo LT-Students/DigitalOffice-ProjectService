@@ -59,7 +59,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
         public async Task SuccessResponce()
         {
             _repository
-                .Setup(x => x.Get(It.IsAny<GetDbProjectsUserFilter>()))
+                .Setup(x => x.Find(It.IsAny<FindDbProjectsUserFilter>()))
                 .Returns(_userProjects);
 
             await _harness.Start();
@@ -97,7 +97,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 SerializerAssert.AreEqual(expectedResult, response.Message);
                 Assert.True(_consumer.Consumed.Select<IGetUserProjectsInfoRequest>().Any());
                 Assert.True(_harness.Sent.Select<IOperationResult<IGetUserProjectsInfoResponse>>().Any());
-                _repository.Verify(x => x.Get(It.IsAny<GetDbProjectsUserFilter>()), Times.Once);
+                _repository.Verify(x => x.Find(It.IsAny<FindDbProjectsUserFilter>()), Times.Once);
             }
             finally
             {

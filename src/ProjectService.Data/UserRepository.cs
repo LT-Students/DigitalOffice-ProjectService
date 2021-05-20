@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         public readonly IDataProvider _provider;
 
         private IQueryable<DbProjectUser> CreateGetPredicates(
-            GetDbProjectsUserFilter filter,
+            FindDbProjectsUserFilter filter,
             IQueryable<DbProjectUser> dbProjectUser)
         {
             if (filter.UserId.HasValue)
@@ -53,10 +53,10 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public IEnumerable<DbProjectUser> Get(Guid userId)
         {
-            return Get(new GetDbProjectsUserFilter { UserId = userId });
+            return Find(new FindDbProjectsUserFilter { UserId = userId });
         }
 
-        public IEnumerable<DbProjectUser> Get(GetDbProjectsUserFilter filter)
+        public IEnumerable<DbProjectUser> Find(FindDbProjectsUserFilter filter)
         {
             if (filter == null)
             {

@@ -26,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="userId">User Id from request</param>
         IEnumerable<DbProjectUser> Get(Guid userId);
         /// <param name="filter">Properties to filter query.</param>
-        IEnumerable<DbProjectUser> Get(GetDbProjectsUserFilter filter);
+        IEnumerable<DbProjectUser> Find(FindDbProjectsUserFilter filter);
 
         /// <summary>
         /// Check that users are exist

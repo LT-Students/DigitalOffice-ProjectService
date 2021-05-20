@@ -16,10 +16,10 @@ namespace LT.DigitalOffice.ProjectService.Broker
     {
         private readonly IUserRepository _userRepository;
 
-        private object GeUserProjects(Guid userId)
+        private object FindUserProjects(Guid userId)
         {
-            var dbProjectsUser = _userRepository.Get(
-                new GetDbProjectsUserFilter
+            var dbProjectsUser = _userRepository.Find(
+                new FindDbProjectsUserFilter
                 {
                     UserId = userId,
                     IncludeProject = true
@@ -51,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
         public async Task Consume(ConsumeContext<IGetUserProjectsInfoRequest> context)
         {
-            var response = OperationResultWrapper.CreateResponse(GeUserProjects, context.Message.UserId);
+            var response = OperationResultWrapper.CreateResponse(FindUserProjects, context.Message.UserId);
 
             await context.RespondAsync<IOperationResult<IGetUserProjectsInfoResponse>>(response);
         }
