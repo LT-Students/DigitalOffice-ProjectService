@@ -223,7 +223,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         {
             Assert.Throws<NotFoundException>(() => _repository.Get(Guid.NewGuid()));
         }
-        
+
         [TearDown]
         public void Clean()
         {

@@ -41,49 +41,49 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         {
             builder
                 .ToTable(DbTask.TableName);
-            
+
             builder
                 .HasKey(t => t.Id);
-            
+
             builder
                 .Property(t => t.Name)
                 .IsRequired();
-            
+
             builder
                 .HasOne(t => t.AssignedUser)
                 .WithMany(pu => pu.AssignedUserTasks)
                 .HasForeignKey(t => t.AssignedTo);
-            
+
             builder
                 .HasOne(t => t.Author)
                 .WithMany(pu => pu.AuthorTasks)
                 .HasForeignKey(t => t.AuthorId);
-            
+
             builder
                 .HasOne(t => t.Project)
                 .WithMany(p => p.Tasks)
                 .HasForeignKey(t => t.ProjectId);
-            
+
             builder
                 .HasOne(t => t.Status)
                 .WithMany(tp => tp.StatusTasks)
                 .HasForeignKey(t => t.StatusId);
-            
+
             builder
                 .HasOne(t => t.Type)
                 .WithMany(tp => tp.TypeTasks)
                 .HasForeignKey(t => t.TypeId);
-            
+
             builder
                 .HasOne(t => t.Priority)
                 .WithMany(tp => tp.PriorityTasks)
                 .HasForeignKey(t => t.PriorityId);
-            
+
             builder
                 .HasOne(t => t.ParentTask)
                 .WithMany(t => t.Subtasks)
                 .HasForeignKey(t => t.ParentId);
-            
+
             builder
                 .HasMany(t => t.Subtasks)
                 .WithOne(tp => tp.ParentTask)
