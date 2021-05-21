@@ -33,9 +33,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public class DbTaskConfiguration : IEntityTypeConfiguration<DbTask>
     {
         public void Configure(EntityTypeBuilder<DbTask> builder)
-         {
-             builder
-                 .ToTable(DbTask.TableName);
+        {
+            builder
+                .ToTable(DbTask.TableName);
 
             builder
                 .HasKey(t => t.Id);
@@ -49,12 +49,12 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .WithMany(pu => pu.AssignedUserTasks)
                 .HasForeignKey(t => t.AssignedTo);
 
-             builder
+            builder
                 .HasOne(t => t.Author)
                 .WithMany(pu => pu.AuthorTasks)
                 .HasForeignKey(t => t.AuthorId);
 
-             builder
+            builder
                 .HasOne(t => t.Project)
                 .WithMany(p => p.Tasks)
                 .HasForeignKey(t => t.ProjectId);

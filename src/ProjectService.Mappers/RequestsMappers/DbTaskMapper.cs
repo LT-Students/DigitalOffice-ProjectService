@@ -15,11 +15,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 throw new ArgumentNullException(nameof(taskRequest));
             }
 
-            Guid taskId = Guid.NewGuid();
-
             return new DbTask
             {
-                Id = taskId,
+                Id = Guid.NewGuid(),
                 Name = taskRequest.Name,
                 Description = taskRequest.Description,
                 PlannedMinutes = taskRequest.PlannedMinutes,

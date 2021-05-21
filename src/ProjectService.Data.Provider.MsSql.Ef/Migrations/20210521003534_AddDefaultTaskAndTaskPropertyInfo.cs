@@ -8,7 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
     [DbContext(typeof(ProjectServiceDbContext))]
     [Migration("20210521003534_AddDefaultTaskAndTaskPropertyInfo")]
-    public class AddAdminCommunications : Migration
+    public class AddDefaultTaskAndTaskPropertyInfo : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
