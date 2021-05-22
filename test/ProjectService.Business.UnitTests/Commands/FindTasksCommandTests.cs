@@ -145,19 +145,19 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var users = new List<UserData>();
             foreach (var dbTask in _dbTasks)
             {
-                users.Add(new UserData
-                {
-                    Id = dbTask.AssignedTo.Value,
-                    FirstName = "Ivan",
-                    LastName = "Ivanov"
-                });
+                users.Add(new UserData(
+                    id: dbTask.AssignedTo.Value,
+                    firstName: "Ivan",
+                    lastName: "Ivanov",
+                    middleName: "Ivanovich",
+                    isActive: true));
 
-                users.Add(new UserData
-                {
-                    Id = dbTask.AuthorId,
-                    FirstName = "Semen",
-                    LastName = "Semenov"
-                });
+                users.Add(new UserData(
+                    id: dbTask.AuthorId,
+                    firstName: "Semen",
+                    lastName: "Semenov",
+                    middleName: "Semenovich",
+                    isActive: true));
             }
 
 

@@ -119,19 +119,19 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
         [Test]
         public void ShouldReturnDbTaskSuccessful()
         {
-            UserData assignedUserData = new UserData
-            {
-                Id = Guid.NewGuid(),
-                FirstName = "Ivan",
-                LastName = "Ivanov"
-            };
+            UserData assignedUserData = new UserData(
+                    id: Guid.NewGuid(),
+                    firstName: "Ivan",
+                    lastName: "Ivanov",
+                    middleName: "Ivanovich",
+                    isActive: true);
 
-            UserData authorData = new UserData
-            {
-                Id = Guid.NewGuid(),
-                FirstName = "Semen",
-                LastName = "Semenov"
-            };
+            UserData authorData = new UserData(
+                    id: Guid.NewGuid(),
+                    firstName: "Semen",
+                    lastName: "Semenov",
+                    middleName: "Semenovich",
+                    isActive: true);
 
             SerializerAssert.AreEqual(_taskInfo, _mapper.Map(_dbTask, assignedUserData, authorData));
         }
