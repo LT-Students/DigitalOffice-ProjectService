@@ -85,7 +85,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             List<string> errors = new();
 
             var userId = _httpContextAccessor.HttpContext.GetUserId();
-            var projectUsers = _userRepository.Get(userId);
+            var projectUsers = _userRepository.Find(userId);
 
             if (!projectUsers.Any() && !_accessValidator.IsAdmin())
             {

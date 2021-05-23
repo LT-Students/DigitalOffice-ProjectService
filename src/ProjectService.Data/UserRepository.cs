@@ -67,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider.ProjectsUsers.AddRange(dbProjectUsers);
         }
 
-        public IEnumerable<DbProjectUser> Get(Guid userId)
+        public IEnumerable<DbProjectUser> Find(Guid userId)
         {
             return Find(new FindDbProjectsUserFilter { UserId = userId });
         }
@@ -80,7 +80,6 @@ namespace LT.DigitalOffice.ProjectService.Data
             }
 
             var dbProjectsUser = _provider.ProjectsUsers
-                .AsSingleQuery()
                 .AsQueryable();
 
             return CreateGetPredicates(filter, dbProjectsUser).ToList();

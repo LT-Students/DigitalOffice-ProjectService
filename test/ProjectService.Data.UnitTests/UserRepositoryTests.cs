@@ -74,7 +74,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             _provider.ProjectsUsers.AddRange(_projectsUser);
             _provider.Save();
 
-            SerializerAssert.AreEqual(_projectsUser, _userRepository.Get(_userId));
+            SerializerAssert.AreEqual(_projectsUser, _userRepository.Find(_userId));
         }
 
         [TearDown]

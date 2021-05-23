@@ -66,7 +66,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
             };
 
             _repository
-                .Setup(x => x.Get(_userId))
+                .Setup(x => x.Find(_userId))
                 .Returns(_dbProjectUsers);
 
             await _harness.Start();
@@ -93,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 SerializerAssert.AreEqual(expectedResult, response.Message);
                 Assert.True(_consumerTestHarness.Consumed.Select<IGetUserProjectsRequest>().Any());
                 Assert.True(_harness.Sent.Select<IOperationResult<IProjectsResponse>>().Any());
-                _repository.Verify(x => x.Get(_userId), Times.Once);
+                _repository.Verify(x => x.Find(_userId), Times.Once);
             }
             finally
             {

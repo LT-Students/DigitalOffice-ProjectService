@@ -315,7 +315,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 .Returns(false);
 
             _mocker
-                .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Get((Guid)_contextValues["UserId"]))
+                .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Find((Guid)_contextValues["UserId"]))
                 .Returns(_dbProjectUsers);
 
             _mocker
@@ -375,7 +375,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 .Returns(true);
 
             _mocker
-                .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Get((Guid)_contextValues["UserId"]))
+                .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Find((Guid)_contextValues["UserId"]))
                 .Returns(new List<DbProjectUser>());
 
             _mocker
@@ -441,7 +441,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 .Returns(_contextValues);
 
             _mocker
-                .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Get((Guid)_contextValues["UserId"]))
+                .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Find((Guid)_contextValues["UserId"]))
                 .Returns(_dbProjectUsers);
 
             _mocker
@@ -499,7 +499,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 .Returns(_contextValues);
 
             _mocker
-                .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Get((Guid)_contextValues["UserId"]))
+                .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Find((Guid)_contextValues["UserId"]))
                 .Returns(_dbProjectUsers);
 
             _mocker
