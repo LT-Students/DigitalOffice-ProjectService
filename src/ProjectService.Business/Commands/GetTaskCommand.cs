@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly ITaskResponseMapper _mapper;
         private readonly ILogger<GetTaskCommand> _logger;
         private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
-        
+
         private IGetDepartmentResponse GetDepartment(Guid userId, List<string> errors)
         {
             string errorMessage = "Cannot get task. Please try again later.";

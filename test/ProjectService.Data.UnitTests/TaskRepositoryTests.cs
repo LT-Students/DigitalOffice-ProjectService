@@ -225,6 +225,12 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }
 
         [Test]
+        public void ShouldGetTask()
+        {
+            SerializerAssert.AreEqual(_dbTask, _repository.Get(_taskId));
+        }
+
+        [Test]
         public void ExceptionWhenGetNonexistentTask()
         {
             Assert.Throws<NotFoundException>(() => _repository.Get(Guid.NewGuid()));
