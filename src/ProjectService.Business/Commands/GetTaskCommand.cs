@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         
         private IGetDepartmentResponse GetDepartment(Guid userId, List<string> errors)
         {
-            string errorMessage = "Cannot edit task. Please try again later.";
+            string errorMessage = "Cannot get task. Please try again later.";
 
             try
             {
