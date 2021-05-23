@@ -2,6 +2,7 @@
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -75,6 +76,14 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             _provider.Save();
 
             SerializerAssert.AreEqual(_projectsUser, _userRepository.Find(_userId));
+        }
+
+        [Test]
+        public void ThrowExceptionWhenFilterIsNull()
+        {
+            FindDbProjectsUserFilter filter = null;
+
+            Assert.Throws<ArgumentNullException>(() => _userRepository.Find(filter));
         }
 
         [TearDown]
