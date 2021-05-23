@@ -152,7 +152,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }
 
         [Test]
-        public void ShouldThrowExceptionWhenFilteIsNull()
+        public void ShouldThrowExceptionWhenFilterIsNull()
         {
             FindTasksFilter filter = null;
 
@@ -206,8 +206,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 _repository.Find(filter, _projectIds, skipCount, takeCount, out int totalCount).ToList());
             Assert.AreEqual(_dbTasks.Count, totalCount);
         }
-
-
+        
         [Test]
         public void ExceptionWhenThereIsNotTask()
         {
@@ -216,6 +215,13 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             Assert.Throws<NotFoundException>(() => _repository.Get(_taskId));
 
             Assert.Throws<NotFoundException>(() => _repository.Edit(_repository.Get(_taskId), _patchDbTask));
+        }
+
+        [Test]
+        public void ShouldEditTask()
+        {
+            Assert.IsTrue(_repository.Edit(_repository.Get(_taskId), _patchDbTask));
+            SerializerAssert.AreEqual(_result, _provider.Tasks.FirstOrDefault(x => x.Id == _taskId));
         }
 
         [Test]

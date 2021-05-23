@@ -11,6 +11,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     public interface ITaskRepository
     {
         DbTask Get(Guid taskId);
+        
+        public DbTask GetFullModel(Guid taskId);
 
         bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch);
 

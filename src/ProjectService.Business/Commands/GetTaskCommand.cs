@@ -101,7 +101,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 throw new ForbiddenException("Not enough rights.");
             }
 
-            TaskResponse response = _mapper.Map(_taskRepository.Get(taskId));
+            TaskResponse response = _mapper.Map(_taskRepository.GetFullModel(taskId));
             response.Errors = errors;
 
             return response;

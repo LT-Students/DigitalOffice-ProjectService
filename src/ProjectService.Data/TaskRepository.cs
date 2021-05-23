@@ -59,6 +59,15 @@ namespace LT.DigitalOffice.ProjectService.Data
         public DbTask Get(Guid taskId)
         {
             DbTask dbTask = _provider.Tasks
+                                .FirstOrDefault(x => x.Id == taskId) ??
+                            throw new NotFoundException($"Task id '{taskId}' was not found.");
+
+            return dbTask;
+        }
+        
+        public DbTask GetFullModel(Guid taskId)
+        {
+            DbTask dbTask = _provider.Tasks
                                 .Include(t => t.Project)
                                 .Include(t => t.Author)
                                 .Include(t => t.AssignedUser)
