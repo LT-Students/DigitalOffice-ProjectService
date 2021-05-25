@@ -79,8 +79,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                 throw new ArgumentNullException(nameof(filter));
             }
 
-            var dbProjectsUser = _provider.ProjectsUsers
-                .AsQueryable();
+            var dbProjectsUser = _provider.ProjectsUsers.AsQueryable();
 
             return CreateGetPredicates(filter, dbProjectsUser).ToList();
         }
