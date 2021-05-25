@@ -119,7 +119,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 Errors = new List<string>()
             };
 
-
             ClientRequestUp(Guid.NewGuid());
             RcGetDepartment(Guid.NewGuid());
 
@@ -227,21 +226,31 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             };
 
             _mocker
-              .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
-              .Returns(true);
+                .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
+                .Returns(true);
 
             _mocker
-               .Setup<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
-               .Returns(true);
+            .Setup<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
+            .Returns(true);
 
             _mocker
-               .Setup<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
-               x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                   It.IsAny<object>(), default, default).Result).Throws(new Exception());
+                .Setup<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
+                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
+                    It.IsAny<object>(), default, default).Result).Throws(new Exception());
+
+            _mocker
+                .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest))
+                .Returns(_dbTask);
+
+            _mocker
+                .Setup<ITaskRepository, Guid>(x => x.CreateTask(_dbTask))
+                .Returns(null);
 
             SerializerAssert.AreEqual(newResponse, _command.Execute(_newRequest));
 
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
+            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest), Times.Once);
+            _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(null), Times.Never);
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
             _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(

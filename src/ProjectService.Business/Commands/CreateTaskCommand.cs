@@ -7,7 +7,6 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
@@ -48,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     return response.Message.Body;
                 }
 
-                _logger.LogWarning($"Can not find department contain user with Id: '{authorId}'");
+                _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", authorId);
             }
             catch (Exception exc)
             {
@@ -99,13 +98,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             bool isProjectParticipant = projectUsers.FirstOrDefault(x =>
                 x.UserId == authorId) != null;
 
-            bool isDepartmentDirector = false;
-            if (department != null)
-            {
-                isDepartmentDirector = department.DirectorUserId == authorId;
-            }
-
-            if (!isAdmin && !isProjectParticipant && !isDepartmentDirector)
+            if (!isAdmin && !isProjectParticipant && department == null && !errors.Any())
             {
                 throw new ForbiddenException("Not enough rights.");
             }

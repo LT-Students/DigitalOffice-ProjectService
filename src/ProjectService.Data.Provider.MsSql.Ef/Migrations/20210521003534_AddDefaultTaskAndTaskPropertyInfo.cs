@@ -20,12 +20,12 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                     nameof(DbTaskProperty.Name),
                     nameof(DbTaskProperty.ProjectId),
                     nameof(DbTaskProperty.AuthorId),
-                    nameof(DbTaskProperty.Type),
+                    nameof(DbTaskProperty.PropertyType),
                     nameof(DbTaskProperty.Description),
                     nameof(DbTaskProperty.CreatedAt),
                     nameof(DbTaskProperty.IsActive)
                 },
-                columnTypes: new string[]
+                columnTypes: new []
                 {
                     "uniqueidentifier",
                     "nvarchar(max)",
@@ -33,15 +33,15 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                     "uniqueidentifier",
                     "int",
                     "nvarchar(max)",
-                    "DateTime",
+                    "datetime2",
                     "bit"
                 },
-                new object[]
+                values: new object[]
                 {
                     Guid.NewGuid(),
                     "normal",
-                    null,
-                    null,
+                    Guid.Empty,
+                    Guid.Empty,
                     (int)TaskPropertyType.Priority,
                     null,
                     DateTime.UtcNow,
@@ -49,19 +49,19 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: DbTaskProperty.TableName,
+            table: DbTaskProperty.TableName,
                 columns: new[]
                 {
                     nameof(DbTaskProperty.Id),
                     nameof(DbTaskProperty.Name),
                     nameof(DbTaskProperty.ProjectId),
                     nameof(DbTaskProperty.AuthorId),
-                    nameof(DbTaskProperty.Type),
+                    nameof(DbTaskProperty.PropertyType),
                     nameof(DbTaskProperty.Description),
                     nameof(DbTaskProperty.CreatedAt),
                     nameof(DbTaskProperty.IsActive)
                 },
-                columnTypes: new[]
+                columnTypes: new []
                 {
                     "uniqueidentifier",
                     "nvarchar(max)",
@@ -69,22 +69,22 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                     "uniqueidentifier",
                     "int",
                     "nvarchar(max)",
-                    "DateTime",
+                    "datetime2",
                     "bit"
                 },
-                new object[]
+                values: new object[]
                 {
                     Guid.NewGuid(),
-                    "new",
-                    null,
-                    null,
+                    "New",
+                    Guid.Empty,
+                    Guid.Empty,
                     (int)TaskPropertyType.Status,
                     null,
                     DateTime.UtcNow,
                     true
                 });
 
-            migrationBuilder.InsertData(
+                migrationBuilder.InsertData(
                 table: DbTaskProperty.TableName,
                 columns: new[]
                 {
@@ -92,12 +92,12 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                     nameof(DbTaskProperty.Name),
                     nameof(DbTaskProperty.ProjectId),
                     nameof(DbTaskProperty.AuthorId),
-                    nameof(DbTaskProperty.Type),
+                    nameof(DbTaskProperty.PropertyType),
                     nameof(DbTaskProperty.Description),
                     nameof(DbTaskProperty.CreatedAt),
                     nameof(DbTaskProperty.IsActive)
                 },
-                columnTypes: new[]
+                columnTypes: new []
                 {
                     "uniqueidentifier",
                     "nvarchar(max)",
@@ -105,15 +105,15 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                     "uniqueidentifier",
                     "int",
                     "nvarchar(max)",
-                    "DateTime",
+                    "datetime2",
                     "bit"
                 },
-                new object[]
+                values: new object[]
                 {
                     Guid.NewGuid(),
                     "Feature",
-                    null,
-                    null,
+                    Guid.Empty,
+                    Guid.Empty,
                     (int)TaskPropertyType.Type,
                     null,
                     DateTime.UtcNow,

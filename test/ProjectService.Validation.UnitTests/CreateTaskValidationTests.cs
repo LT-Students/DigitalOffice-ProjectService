@@ -87,7 +87,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 .Verifiable();
 
             _validator.ShouldHaveValidationErrorFor(x => x.ParentId, _taskRequest.ParentId.Value);
-            _taskRepository.Verify();
         }
 
         [Test]
@@ -109,7 +108,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                .Verifiable();
 
             _validator.TestValidate(_taskRequest).ShouldHaveAnyValidationError();
-            _userRepository.Verify();
         }
 
         [Test]
@@ -146,7 +144,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
               .Verifiable();
 
             _validator.TestValidate(_taskRequest).ShouldHaveAnyValidationError();
-            _userRepository.Verify();
         }
 
         [Test]
@@ -183,7 +180,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
               .Verifiable();
 
             _validator.TestValidate(_taskRequest).ShouldHaveAnyValidationError();
-            _userRepository.Verify();
         }
 
         [Test]
@@ -220,7 +216,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
               .Verifiable();
 
             _validator.TestValidate(_taskRequest).ShouldHaveAnyValidationError();
-            _userRepository.Verify();
         }
 
         [Test]
