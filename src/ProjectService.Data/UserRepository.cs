@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             {
                 dbProjectQueryable = dbProjectQueryable.Where(x => x.ProjectId == projectId && x.IsActive);
             }
-            
+
             return dbProjectQueryable;
         }
 
@@ -51,6 +51,11 @@ namespace LT.DigitalOffice.ProjectService.Data
         public IEnumerable<DbProjectUser> Find(Guid userId)
         {
             return _provider.ProjectsUsers.Where(x => x.UserId == userId);
+        }
+
+        public bool AreUserProjectExist(Guid userId, Guid projectId)
+        {
+            return _provider.ProjectsUsers.FirstOrDefault(x => x.Id == userId && x.ProjectId == projectId) != null;
         }
 
         public bool AreExist(params Guid[] ids)

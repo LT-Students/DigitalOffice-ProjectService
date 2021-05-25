@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using MassTransit.RabbitMqTransport;
 using LT.DigitalOffice.ProjectService.Broker;
+using LT.DigitalOffice.ProjectService.Mappers.Helpers;
 
 namespace LT.DigitalOffice.ProjectService
 {
@@ -144,6 +145,7 @@ namespace LT.DigitalOffice.ProjectService
             using var context = serviceScope.ServiceProvider.GetService<ProjectServiceDbContext>();
 
             context.Database.Migrate();
+            TaskNumberHelper.LoadCache(context);
         }
 
         #region configure masstransit
