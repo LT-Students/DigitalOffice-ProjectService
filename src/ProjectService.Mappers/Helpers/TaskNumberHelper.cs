@@ -11,9 +11,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Helpers
 
         public static void LoadCache(IDataProvider provider)
         {
-            foreach (var projectId in provider.Projects.Select(x => x.Id))
+            var projectsIds = provider.Projects.Select(x => x.Id).ToList();
+
+            foreach (var projectId in projectsIds)
             {
-                _cache[projectId] = provider.Tasks?.Where(x => x.ProjectId == projectId)?.Max(n => n.Number) ?? 0;
+                var tasks = provider.Tasks.Where(x => x.ProjectId == projectId).Select(x => x.Number).ToList();
+
+                _cache[projectId] = tasks.Any() ? tasks.Max(x => x) : 0;
             }
         }
 
