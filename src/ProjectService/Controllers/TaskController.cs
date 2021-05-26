@@ -36,6 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         [HttpGet("get")]
         public TaskResponse Get(
             [FromQuery] Guid taskId,
+            [FromQuery] bool isFullModel,
             [FromServices] IGetTaskCommand command)
         {
             return command.Execute(taskId);

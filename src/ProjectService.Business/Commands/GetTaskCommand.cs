@@ -42,8 +42,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     return response.Message.Body;
                 }
 
-                _logger.LogWarning($"Can not find department with this id '{userId}': " +
-                                   $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
+                _logger.LogWarning(
+                    "Can not find department with this id '{userId}': {NewLine}{errors}",
+                    userId, Environment.NewLine, string.Join('\n', response.Message.Errors));
             }
             catch (Exception exc)
             {
@@ -79,16 +80,24 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var errors = new List<string>();
 
             DbTask task = _taskRepository.Get(taskId);
-            List<DbProjectUser> projectUsers = 
-                _userRepository.GetProjectUsers(task.ProjectId, false).ToList();
+            
+            List<DbProjectUser> projectUsers = null;
+            if (task != null)
+            {
+                 projectUsers = _userRepository.GetProjectUsers(task.ProjectId, false).ToList();
+            }
 
             Guid requestUserId = _httpContext.GetUserId();
             IGetDepartmentResponse department = GetDepartment(requestUserId, errors);
 
             bool isAdmin = _accessValidator.IsAdmin();
 
-            bool isProjectParticipant = projectUsers.FirstOrDefault(x =>
-                x.UserId == requestUserId) != null;
+            bool isProjectParticipant = false;
+            if (projectUsers != null)
+            {
+                isProjectParticipant =  projectUsers.FirstOrDefault(x =>
+                    x.UserId == requestUserId) != null;
+            }
 
             bool isDepartmentDirector = false;
             if (department != null)
