@@ -35,6 +35,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="filter">Properties to filter query.</param>
         IEnumerable<DbProjectUser> Find(FindDbProjectsUserFilter filter);
 
+        bool AreUserProjectExist(Guid userId, Guid projectId);
+
         /// <summary>
         /// Check that users are exist.
         /// </summary>

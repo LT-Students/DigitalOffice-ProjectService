@@ -43,5 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds);
 
         List<DbProject> FindProjects(FindDbProjectsFilter dbFilter, int skipCount, int takeCount, out int totalCount);
+
+        bool IsExist(Guid id);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using System;
@@ -43,8 +44,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                {
                    Id = table.Column<Guid>(nullable: false),
                    Name = table.Column<string>(nullable: false),
-                   ProjectId = table.Column<Guid>(nullable: false),
-                   AuthorId = table.Column<Guid>(nullable: false),
+                   ProjectId = table.Column<Guid?>(nullable: false),
+                   AuthorId = table.Column<Guid?>(nullable: false),
                    PropertyType = table.Column<int>(nullable: false),
                    Description = table.Column<string>(nullable: true),
                    CreatedAt = table.Column<DateTime>(nullable: false),

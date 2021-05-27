@@ -22,14 +22,12 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
         {
             _mapper = new ProjectUserInfoMapper();
 
-            _userData = new UserData
-            {
-                Id = Guid.NewGuid(),
-                FirstName = "Spartak",
-                LastName = "Ryabtsev",
-                MiddleName = "Alexandrovich",
-                IsActive = true
-            };
+            _userData = new UserData(
+                id: Guid.NewGuid(),
+                firstName: "Spartak",
+                lastName: "Ryabtsev",
+                middleName: "Alexandrovich",
+                isActive: true);
 
             _dbProjectUser = new DbProjectUser
             {

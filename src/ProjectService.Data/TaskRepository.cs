@@ -1,13 +1,14 @@
+using System;
+using System.Linq;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
@@ -48,6 +49,19 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
+        public Guid CreateTask(DbTask newTask)
+        {
+            _provider.Tasks.Add(newTask);
+            _provider.Save();
+
+            return newTask.Id;
+        }
+
+        public bool IsExist(Guid id)
+        {
+            return _provider.Tasks.FirstOrDefault(x => x.ParentId == id) != null;
+        }
+
         public bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch)
         {
             taskPatch.ApplyTo(task);
@@ -55,11 +69,10 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             return true;
         }
-
         public DbTask Get(Guid taskId)
         {
             return _provider.Tasks.FirstOrDefault(x => x.Id == taskId) ??
-                   throw new NotFoundException($"Task id '{taskId}' was not found.");
+                throw new NotFoundException($"Task id '{taskId}' was not found.");
         }
 
         public IEnumerable<DbTask> Find(

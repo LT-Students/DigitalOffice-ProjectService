@@ -4,6 +4,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ProjectService.Business\ProjectService.Business.csproj" />
+    <ProjectReference Include="..\..\src\ProjectService.Data.Provider.MsSql.Ef\ProjectService.Data.Provider.MsSql.Ef.csproj" />
   </ItemGroup>
 
 </Project>
