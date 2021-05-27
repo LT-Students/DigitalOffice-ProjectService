@@ -1,11 +1,14 @@
 using HealthChecks.UI.Client;
-using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Configurations;
-using LT.DigitalOffice.Kernel.Middlewares.Token;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
+using LT.DigitalOffice.Kernel.Middlewares.Token;
+using LT.DigitalOffice.ProjectService.Broker;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
 using MassTransit;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
+using MassTransit.RabbitMqTransport;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
@@ -177,6 +180,7 @@ namespace LT.DigitalOffice.ProjectService
         {
             x.AddConsumer<GetProjectIdsConsumer>();
             x.AddConsumer<GetProjectInfoConsumer>();
+            x.AddConsumer<GetUserProjectsInfoConsumer>();
         }
 
         private void ConfigureEndpoints(
@@ -192,6 +196,11 @@ namespace LT.DigitalOffice.ProjectService
             cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectInfoEndpoint, ep =>
             {
                 ep.ConfigureConsumer<GetProjectInfoConsumer>(context);
+            });
+
+            cfg.ReceiveEndpoint(rabbitMqConfig.GetUserProjectsInfoEndpoint, ep =>
+            {
+                ep.ConfigureConsumer<GetUserProjectsInfoConsumer>(context);
             });
         }
 
