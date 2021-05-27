@@ -73,15 +73,24 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
             {
                 new DbProject { Id = _createTaskRequest.ProjectId}
             };
-
+            int maxNumber = 3;
+            var tasks = new List<DbTask>
+            {
+                new DbTask
+                {
+                    Id = Guid.NewGuid(),
+                    ProjectId = _createTaskRequest.ProjectId,
+                    Number = maxNumber
+                }
+            };
             _mocker
                 .Setup<IDataProvider, DbSet<DbProject>>(x => x.Projects)
                 .Returns(GetQueryableMockDbSet(project));
-
+            _mocker
+                .Setup<IDataProvider, DbSet<DbTask>>(x => x.Tasks)
+                .Returns(GetQueryableMockDbSet(tasks));
             TaskNumberHelper.LoadCache(_mocker.GetMock<IDataProvider>().Object);
-
             var dbTask = _dbTaskMapper.Map(_createTaskRequest);
-
             var expectedDbTask = new DbTask
             {
                 Id = dbTask.Id,
@@ -93,7 +102,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 ProjectId = _createTaskRequest.ProjectId,
                 CreatedAt = dbTask.CreatedAt,
                 ParentId = _createTaskRequest.ParentId,
-                Number = 1,
+                Number = maxNumber + 1,
                 Priority = new DbTaskProperty()
                 {
                     Id = _createTaskRequest.PriorityId
@@ -107,7 +116,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                     Id = _createTaskRequest.TypeId
                 }
             };
-
             SerializerAssert.AreEqual(expectedDbTask, dbTask);
         }
     }
