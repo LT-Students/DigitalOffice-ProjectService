@@ -1,5 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using System;
 using System.Collections.Generic;
 
@@ -26,7 +27,13 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="projectId">Project id from request.</param>
         void AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUsers, Guid projectId);
 
+        /// <summary>
+        /// Get user projects.
+        /// </summary>
+        /// <param name="userId">User Id from request</param>
         IEnumerable<DbProjectUser> Find(Guid userId);
+        /// <param name="filter">Properties to filter query.</param>
+        IEnumerable<DbProjectUser> Find(FindDbProjectsUserFilter filter);
 
         bool AreUserProjectExist(Guid userId, Guid projectId);
 
