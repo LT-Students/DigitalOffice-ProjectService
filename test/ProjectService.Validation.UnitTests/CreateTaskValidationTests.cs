@@ -1,5 +1,6 @@
 ﻿using FluentValidation.TestHelper;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Moq;
@@ -25,7 +26,11 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             _projectRepository = new Mock<IProjectRepository>();
             _taskPropertyRepository = new Mock<ITaskPropertyRepository>();
 
-            _validator = new CreateTaskRequestValidator(_taskRepository.Object, _userRepository.Object, _projectRepository.Object, _taskPropertyRepository.Object);
+            _validator = new CreateTaskRequestValidator(
+                                _taskRepository.Object,
+                                _userRepository.Object,
+                                _projectRepository.Object,
+                                _taskPropertyRepository.Object);
 
             _taskRequest = new CreateTaskRequest
             {
@@ -79,8 +84,21 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
-        public void ShouldThrowErrorWhenPerentTaskIdDoesNotExist()
+        public void ShouldThrowErrorWhenParentTaskIdDoesNotExist()
         {
+            _taskRepository
+                .Setup(x => x.IsExist(_taskRequest.ParentId.Value))
+                .Returns(false)
+                .Verifiable();
+
+            _validator.ShouldHaveValidationErrorFor(x => x.ParentId, _taskRequest.ParentId.Value);
+        }
+
+        [Test]
+        public void ShouldThrowErrorWhenParentTaskIdHasParent()
+        {
+            _taskRequest.ParentId = Guid.NewGuid();
+
             _taskRepository
                 .Setup(x => x.IsExist(_taskRequest.ParentId.Value))
                 .Returns(false)
@@ -226,9 +244,15 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 .Returns(true)
                 .Verifiable();
 
+            var parentTask = new DbTask
+            {
+                Id = _taskRequest.ParentId.Value,
+                ParentId = null
+            };
+
             _taskRepository
-                .Setup(x => x.IsExist(_taskRequest.ParentId.Value))
-                .Returns(true)
+                .Setup(x => x.Get(_taskRequest.ParentId.Value))
+                .Returns(parentTask)
                 .Verifiable();
 
             _projectRepository

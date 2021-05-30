@@ -73,7 +73,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
             {
                 new DbProject { Id = _createTaskRequest.ProjectId}
             };
+
             int maxNumber = 3;
+
             var tasks = new List<DbTask>
             {
                 new DbTask
@@ -83,12 +85,15 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                     Number = maxNumber
                 }
             };
+
             _mocker
                 .Setup<IDataProvider, DbSet<DbProject>>(x => x.Projects)
                 .Returns(GetQueryableMockDbSet(project));
+
             _mocker
                 .Setup<IDataProvider, DbSet<DbTask>>(x => x.Tasks)
                 .Returns(GetQueryableMockDbSet(tasks));
+
             TaskNumberHelper.LoadCache(_mocker.GetMock<IDataProvider>().Object);
             var dbTask = _dbTaskMapper.Map(_createTaskRequest);
             var expectedDbTask = new DbTask

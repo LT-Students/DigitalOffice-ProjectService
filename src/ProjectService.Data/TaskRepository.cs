@@ -8,7 +8,6 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.JsonPatch;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Concurrent;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {

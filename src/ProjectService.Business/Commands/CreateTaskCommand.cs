@@ -62,7 +62,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         public CreateTaskCommand(
             ITaskRepository repository,
             ICreateTaskValidator validator,
-            IProjectRepository projectRepository,
             IDbTaskMapper mapperTask,
             IHttpContextAccessor httpContextAccessor,
             IAccessValidator accessValidator,
@@ -91,17 +90,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             IGetDepartmentResponse department = GetDepartment(authorId, errors);
 
-            bool isAdmin = _accessValidator.IsAdmin();
-
-            _validator.ValidateAndThrowCustom(request);
-
             bool isProjectParticipant = projectUsers.FirstOrDefault(x =>
                 x.UserId == authorId) != null;
 
-            if (!isAdmin && !isProjectParticipant && department == null && !errors.Any())
+            if (!_accessValidator.IsAdmin()
+                && projectUsers.FirstOrDefault(u => u.UserId == authorId) == null
+                && department?.DirectorUserId != authorId)
             {
                 throw new ForbiddenException("Not enough rights.");
             }
+
+            _validator.ValidateAndThrowCustom(request);
 
             Guid taskId = _repository.CreateTask(_mapperTask.Map(request));
 
