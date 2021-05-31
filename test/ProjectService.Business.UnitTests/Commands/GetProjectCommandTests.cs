@@ -140,14 +140,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 
             _usersData = new List<UserData>
             {
-                new UserData
-                {
-                    Id = _dbProjectUser.Id,
-                    IsActive = _dbProjectUser.IsActive,
-                    FirstName = "Spartak",
-                    LastName = "Ryabtsev",
-                    MiddleName = "Alexandrovich"
-                }
+                new UserData(
+                    id: _dbProjectUser.Id,
+                    isActive: _dbProjectUser.IsActive,
+                    firstName: "Spartak",
+                    lastName: "Ryabtsev",
+                    middleName: "Alexandrovich")
             };
 
             _projectUsersInfo = new List<ProjectUserInfo>

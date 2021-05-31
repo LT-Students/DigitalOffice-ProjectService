@@ -129,5 +129,10 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             return projects.Skip(skipCount * takeCount).Take(takeCount).ToList();
         }
+
+        public bool IsExist(Guid id)
+        {
+            return provider.Projects.FirstOrDefault(x => x.Id == id) != null;
+        }
     }
 }

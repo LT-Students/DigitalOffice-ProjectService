@@ -7,6 +7,7 @@ using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.JsonPatch;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace LT.DigitalOffice.ProjectService.Data
@@ -48,6 +49,19 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
+        public Guid CreateTask(DbTask newTask)
+        {
+            _provider.Tasks.Add(newTask);
+            _provider.Save();
+
+            return newTask.Id;
+        }
+
+        public bool IsExist(Guid id)
+        {
+            return _provider.Tasks.FirstOrDefault(x => x.ParentId == id) != null;
+        }
+
         public bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch)
         {
             taskPatch.ApplyTo(task);
@@ -55,14 +69,10 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             return true;
         }
-
         public DbTask Get(Guid taskId)
         {
-            DbTask dbTask = _provider.Tasks
-                                .FirstOrDefault(x => x.Id == taskId) ??
-                            throw new NotFoundException($"Task id '{taskId}' was not found.");
-
-            return dbTask;
+            return _provider.Tasks.FirstOrDefault(x => x.Id == taskId) ??
+                throw new NotFoundException($"Task id '{taskId}' was not found.");
         }
         
         public DbTask GetFullModel(Guid taskId)

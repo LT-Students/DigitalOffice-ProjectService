@@ -26,7 +26,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     public class EditTaskCommand : IEditTaskCommand
     {
         private readonly ITaskRepository _taskRepository;
-        private readonly IProjectRepository _projectRepository;
         private readonly IUserRepository _userRepository;
         private readonly IEditTaskValidator _validator;
         private readonly IAccessValidator _accessValidator;
@@ -34,7 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IPatchDbTaskMapper _mapper;
         private readonly ILogger<EditTaskCommand> _logger;
         private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
-        
+
         private IGetDepartmentResponse GetDepartment(Guid userId, List<string> errors)
         {
             string errorMessage = "Cannot edit task. Please try again later.";
@@ -74,7 +73,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             IRequestClient<IGetDepartmentRequest> requestClient)
         {
             _taskRepository = taskRepository;
-            _projectRepository = projectRepository;
             _userRepository = userRepository;
             _validator = validator;
             _accessValidator = accessValidator;
@@ -91,7 +89,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var errors = new List<string>();
 
             DbTask task = _taskRepository.Get(taskId);
-            List<DbProjectUser> projectUsers = 
+            List<DbProjectUser> projectUsers =
                 _userRepository.GetProjectUsers(task.ProjectId, false).ToList();
 
             Guid requestUserId = _httpContext.GetUserId();
@@ -119,7 +117,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             return new OperationResultResponse<bool>
             {
-                Status = errors.Any() ? 
+                Status = errors.Any() ?
                     OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
                 Body = true,
                 Errors = errors

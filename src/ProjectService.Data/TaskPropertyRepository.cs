@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         public bool AreExist(params Guid[] ids)
         {
             var dbIds = _provider.TaskProperties.Select(x => x.Id);
-            
+
             return ids.All(x => dbIds.Contains(x));
         }
 

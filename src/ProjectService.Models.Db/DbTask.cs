@@ -11,18 +11,18 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public const string TableName = "Tasks";
 
         public Guid Id { get; set; }
-        public Guid TypeId { get; set; }
-        public Guid AuthorId { get; set; }
-        public Guid StatusId { get; set; }
-        public Guid? ParentId { get; set; }
-        public Guid ProjectId { get; set; }
-        public Guid PriorityId { get; set; }
-        public Guid? AssignedTo { get; set; }
         public string Name { get; set; }
+        public Guid ProjectId { get; set; }
         public string Description { get; set; }
-        public int Number { get; set; }
+        public Guid? AssignedTo { get; set; }
+        public Guid TypeId { get; set; }
+        public Guid StatusId { get; set; }
+        public Guid PriorityId { get; set; }
         public int? PlannedMinutes { get; set; }
+        public Guid? ParentId { get; set; }
+        public Guid AuthorId { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int Number { get; set; }
 
         public DbProject Project { get; set; }
         public DbProjectUser Author { get; set; }
@@ -34,7 +34,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
         public ICollection<DbTask> Subtasks { get; set; }
     }
-
     public class DbTaskConfiguration : IEntityTypeConfiguration<DbTask>
     {
         public void Configure(EntityTypeBuilder<DbTask> builder)
