@@ -233,12 +233,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }
 
         [Test]
-        public void ExceptionWhenThereIsNotTask()
-        {
-            SerializerAssert.AreEqual(_dbTask, _repository.Get(_taskId));
-        }
-
-        [Test]
         public void ExceptionWhenGetNonexistentTask()
         {
             _provider.Tasks.Add(_dbTask);

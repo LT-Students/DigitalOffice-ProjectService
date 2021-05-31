@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
             [FromQuery] bool isFullModel,
             [FromServices] IGetTaskCommand command)
         {
-            return command.Execute(taskId);
+            return command.Execute(taskId, isFullModel);
         }
     }
 }

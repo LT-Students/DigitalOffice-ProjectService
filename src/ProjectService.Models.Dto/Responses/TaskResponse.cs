@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
 {
@@ -13,15 +15,15 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
         public int? PlannedMinutes { get; set; }
         public DateTime CreatedAt { get; set; }
         
-        public DbProject Project { get; set; }
-        public DbProjectUser Author { get; set; }
-        public DbProjectUser AssignedUser { get; set; }
-        public DbTaskProperty Status { get; set; }
-        public DbTaskProperty Priority { get; set; }
-        public DbTaskProperty Type { get; set; }
-        public DbTask ParentTask { get; set; }
+        public ProjectInfo Project { get; set; }
+        public ProjectUserInfo Author { get; set; }
+        public ProjectUserInfo AssignedUser { get; set; }
+        public TaskPropertyInfo Status { get; set; }
+        public TaskPropertyInfo Priority { get; set; }
+        public TaskPropertyInfo Type { get; set; }
+        public TaskInfo ParentTask { get; set; }
 
-        public ICollection<DbTask> Subtasks { get; set; }
+        public ICollection<TaskInfo> Subtasks { get; set; }
 
         public List<string> Errors { get; set; } = new();
     }
