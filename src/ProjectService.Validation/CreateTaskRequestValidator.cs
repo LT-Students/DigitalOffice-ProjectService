@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                 RuleFor(task => task.ParentId)
                     .Must(x =>
                         {
-                            parentTask = tasksRepository.Get(x.Value);
+                            parentTask = tasksRepository.Get(x.Value, true);
                             return parentTask != null;
                         })
                     .WithMessage("Task does not exist.")

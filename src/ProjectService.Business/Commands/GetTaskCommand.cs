@@ -82,11 +82,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _usersDataRequestClient = userRequestClient;
         }
 
-        public TaskResponse Execute(Guid taskId)
+        public TaskResponse Execute(Guid taskId, bool isFullModel)
         {
             var errors = new List<string>();
 
-            DbTask task = _taskRepository.GetFullModel(taskId);
+            DbTask task = _taskRepository.Get(taskId, isFullModel);
             
             Authorization(task, errors, out IGetDepartmentResponse department);
 

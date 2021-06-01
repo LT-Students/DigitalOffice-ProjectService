@@ -1,6 +1,6 @@
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.JsonPatch;
-﻿using LT.DigitalOffice.Kernel.Attributes;
+ using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using System;
 using System.Collections.Generic;
@@ -18,9 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     [AutoInject]
     public interface ITaskRepository
     {
-        DbTask Get(Guid taskId);
-        
-        public DbTask GetFullModel(Guid taskId);
+        DbTask Get(Guid taskId, bool isFullModel);
 
         bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch);
 

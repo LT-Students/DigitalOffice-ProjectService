@@ -69,26 +69,26 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             return true;
         }
-        public DbTask Get(Guid taskId)
+        public DbTask Get(Guid taskId, bool isFullModel)
         {
+            if (isFullModel)
+            {
+                DbTask dbTask = _provider.Tasks
+                                    .Include(t => t.Project)
+                                    .Include(t => t.Author)
+                                    .Include(t => t.AssignedUser)
+                                    .Include(t => t.Status)
+                                    .Include(t => t.Priority)
+                                    .Include(t => t.Type)
+                                    .Include(t => t.Subtasks)
+                                    .FirstOrDefault(x => x.Id == taskId) ??
+                                throw new NotFoundException($"Task id '{taskId}' was not found.");
+            
+                return dbTask;
+            }
+            
             return _provider.Tasks.FirstOrDefault(x => x.Id == taskId) ??
                 throw new NotFoundException($"Task id '{taskId}' was not found.");
-        }
-        
-        public DbTask GetFullModel(Guid taskId)
-        {
-            DbTask dbTask = _provider.Tasks
-                                .Include(t => t.Project)
-                                .Include(t => t.Author)
-                                .Include(t => t.AssignedUser)
-                                .Include(t => t.Status)
-                                .Include(t => t.Priority)
-                                .Include(t => t.Type)
-                                .Include(t => t.Subtasks)
-                                .FirstOrDefault(x => x.Id == taskId) ??
-                throw new NotFoundException($"Task id '{taskId}' was not found.");
-            
-            return dbTask;
         }
 
         public IEnumerable<DbTask> Find(
