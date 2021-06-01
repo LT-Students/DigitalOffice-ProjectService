@@ -137,7 +137,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             
             department = GetDepartment(requestUserId, errors);
 
-            bool isAdmin = _accessValidator.IsAdmin();
+            bool isAdmin = _accessValidator.IsAdmin(requestUserId);
 
             bool isProjectParticipant = false;
             if (projectUsers != null)
