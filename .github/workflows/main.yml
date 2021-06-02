@@ -25,8 +25,12 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.200
+          
+      - name: Setup NuGet.exe
+        uses: NuGet/setup-nuget@v1.0.5
+
       - name: Restore
-        run: dotnet restore
+        run: nuget restore -Source https://baget.ltdo.xyz/v3/index.json -Source https://api.nuget.org/v3/index.json
       - name: Build
         run: dotnet build --no-restore --configuration Release
       - name: Test
