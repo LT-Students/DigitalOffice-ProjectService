@@ -1,8 +1,8 @@
-﻿using LT.DigitalOffice.Broker.Responses;
-using LT.DigitalOffice.Kernel.Broker;
+﻿using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
+using LT.DigitalOffice.Models.Broker.Requests.Project;
+using LT.DigitalOffice.Models.Broker.Responses.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Broker.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using MassTransit;
 using System;

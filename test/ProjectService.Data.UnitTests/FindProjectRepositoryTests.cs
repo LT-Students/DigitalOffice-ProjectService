@@ -3,6 +3,7 @@ using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
@@ -22,8 +23,8 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private DbProject _dbProject3;
         private DbProject _dbProject4;
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
+        [SetUp]
+        public void SetUp()
         {
             _dbProject1 = new DbProject
             {
@@ -74,11 +75,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             };
 
             CreateMemoryDb();
-        }
 
-        [SetUp]
-        public void SetUp()
-        {
             _provider.Projects.AddRange(_dbProjectsInDb);
             _provider.Save();
         }
@@ -170,6 +167,25 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         public void ShouldThrowArgumentNullExceptionWhenFilterIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => _repository.FindProjects(null, 0, 0, out int _));
+        }
+
+        [Test]
+        public void ShouldSearchProject()
+        {
+            List<DbProject> projects = new()
+            {
+                _dbProject3,
+                _dbProject4
+            };
+
+            SerializerAssert.AreEqual(projects, _repository.Search("Regular"));
+        }
+
+        [Test]
+        public void ShouldThrowNullArgumentExceptionWhenSearchTextIsNullOrEmpty()
+        {
+            Assert.Throws<ArgumentNullException>(() => _repository.Search(""));
+            Assert.Throws<ArgumentNullException>(() => _repository.Search(null));
         }
     }
 }

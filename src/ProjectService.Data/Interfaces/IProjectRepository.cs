@@ -44,6 +44,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
         List<DbProject> FindProjects(FindDbProjectsFilter dbFilter, int skipCount, int takeCount, out int totalCount);
 
+        List<DbProject> Search(string text);
+
         bool IsExist(Guid id);
     }
 }

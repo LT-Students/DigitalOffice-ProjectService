@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.Broker.Responses;
+﻿using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using System;

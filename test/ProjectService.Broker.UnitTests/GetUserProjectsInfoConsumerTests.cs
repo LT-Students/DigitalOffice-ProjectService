@@ -1,7 +1,7 @@
-﻿using LT.DigitalOffice.Broker.Models;
-using LT.DigitalOffice.Broker.Requests;
-using LT.DigitalOffice.Broker.Responses;
-using LT.DigitalOffice.Kernel.Broker;
+﻿using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Requests.Project;
+using LT.DigitalOffice.Models.Broker.Responses.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
@@ -77,18 +77,14 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                     Errors = null as List<string>,
                     Body = IGetUserProjectsInfoResponse.CreateObj(new List<ProjectShortInfo>
                     {
-                        new ProjectShortInfo
-                        {
-                            Id = _userProjects[0].Project.Id,
-                            Name = _userProjects[0].Project.Name,
-                            Status = ((ProjectStatusType)_userProjects[0].Project.Status).ToString()
-                        },
-                        new ProjectShortInfo
-                        {
-                            Id = _userProjects[1].Project.Id,
-                            Name = _userProjects[1].Project.Name,
-                            Status = ((ProjectStatusType)_userProjects[1].Project.Status).ToString()
-                        }
+                        new ProjectShortInfo(
+                            _userProjects[0].Project.Id,
+                            _userProjects[0].Project.Name,
+                            ((ProjectStatusType)_userProjects[0].Project.Status).ToString()),
+                        new ProjectShortInfo(
+                            _userProjects[1].Project.Id,
+                            _userProjects[1].Project.Name,
+                            ((ProjectStatusType)_userProjects[1].Project.Status).ToString())
                     })
                 };
 

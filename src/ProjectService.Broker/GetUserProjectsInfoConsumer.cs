@@ -1,7 +1,7 @@
-﻿using LT.DigitalOffice.Broker.Models;
-using LT.DigitalOffice.Broker.Requests;
-using LT.DigitalOffice.Broker.Responses;
-using LT.DigitalOffice.Kernel.Broker;
+﻿using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Requests.Project;
+using LT.DigitalOffice.Models.Broker.Responses.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
@@ -34,12 +34,10 @@ namespace LT.DigitalOffice.ProjectService.Broker
                     continue;
                 }
 
-                projectsResponse.Add(new ProjectShortInfo
-                {
-                    Id = dbProjectUser.Project.Id,
-                    Name = dbProjectUser.Project.Name,
-                    Status = ((ProjectStatusType)dbProjectUser.Project.Status).ToString()
-                });
+                projectsResponse.Add(new ProjectShortInfo(
+                    dbProjectUser.Project.Id,
+                    dbProjectUser.Project.Name,
+                    ((ProjectStatusType)dbProjectUser.Project.Status).ToString()));
             }
             return IGetUserProjectsInfoResponse.CreateObj(projectsResponse);
         }

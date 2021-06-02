@@ -13,7 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 {
     public class ProjectRepository : IProjectRepository
     {
-        private readonly IDataProvider provider;
+        private readonly IDataProvider _provider;
 
         private IQueryable<DbProject> CreateFindPredicates(
             FindDbProjectsFilter filter,
@@ -39,12 +39,12 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public ProjectRepository(IDataProvider provider)
         {
-            this.provider = provider;
+            this._provider = provider;
         }
 
         public DbProject GetProject(GetProjectFilter filter)
         {
-            IQueryable<DbProject> dbProjectQueryable = provider.Projects.AsQueryable();
+            IQueryable<DbProject> dbProjectQueryable = _provider.Projects.AsQueryable();
 
             if (filter.IncludeUsers.HasValue && filter.IncludeUsers.Value)
             {
@@ -75,21 +75,21 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public void CreateNewProject(DbProject newProject)
         {
-            provider.Projects.Add(newProject);
-            provider.Save();
+            _provider.Projects.Add(newProject);
+            _provider.Save();
         }
 
         public bool Edit(DbProject dbProject, JsonPatchDocument<DbProject> request)
         {
             request.ApplyTo(dbProject);
-            provider.Save();
+            _provider.Save();
 
             return true;
         }
 
         public void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds)
         {
-            DbProject dbProject = provider.Projects
+            DbProject dbProject = _provider.Projects
                 .FirstOrDefault(p => p.Id == projectId);
 
             if (dbProject == null)
@@ -109,8 +109,8 @@ namespace LT.DigitalOffice.ProjectService.Data
                 dbProjectUser.IsActive = false;
             }
 
-            provider.Projects.Update(dbProject);
-            provider.Save();
+            _provider.Projects.Update(dbProject);
+            _provider.Save();
         }
 
         public List<DbProject> FindProjects(FindDbProjectsFilter filter, int skipCount, int takeCount, out int totalCount)
@@ -120,7 +120,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                 throw new ArgumentNullException(nameof(filter));
             }
 
-            var dbProjects = provider.Projects
+            var dbProjects = _provider.Projects
                 .AsSingleQuery()
                 .AsQueryable();
 
@@ -130,9 +130,19 @@ namespace LT.DigitalOffice.ProjectService.Data
             return projects.Skip(skipCount * takeCount).Take(takeCount).ToList();
         }
 
+        public List<DbProject> Search(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            return _provider.Projects.Where(p => p.Name.Contains(text) || p.ShortName.Contains(text)).ToList();
+        }
+
         public bool IsExist(Guid id)
         {
-            return provider.Projects.FirstOrDefault(x => x.Id == id) != null;
+            return _provider.Projects.FirstOrDefault(x => x.Id == id) != null;
         }
     }
 }
