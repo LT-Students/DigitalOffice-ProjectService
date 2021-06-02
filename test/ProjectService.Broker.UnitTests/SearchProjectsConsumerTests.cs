@@ -40,25 +40,27 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 new DbProject
                 {
                     Id = Guid.NewGuid(),
-                    ShortName = "SH1"
+                    ShortName = "SH1",
+                    Name = "SName1"
                 },
                 new DbProject
                 {
                     Id = Guid.NewGuid(),
-                    ShortName = "SH2"
+                    ShortName = "SH2",
+                    Name = "SName2"
                 },
                 new DbProject
                 {
                     Id = Guid.NewGuid(),
                     ShortName = "Sawf3",
-                    Name = "SHname"
+                    Name = "SName3"
                 }
             };
 
             _result = new()
             {
-                new SearchInfo(_dbProjects[0].Id, _dbProjects[0].ShortName),
-                new SearchInfo(_dbProjects[1].Id, _dbProjects[1].ShortName),
+                new SearchInfo(_dbProjects[0].Id, _dbProjects[0].Name),
+                new SearchInfo(_dbProjects[1].Id, _dbProjects[1].Name),
                 new SearchInfo(_dbProjects[2].Id, _dbProjects[2].Name)
             };
 

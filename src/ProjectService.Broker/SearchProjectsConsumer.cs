@@ -21,10 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
             return ISearchProjectsResponse.CreateObj(
                 projects.Select(
-                    p => new SearchInfo(
-                        p.Id,
-                        p.ShortName.Contains(text, System.StringComparison.OrdinalIgnoreCase) ? p.ShortName : p.Name))
-                .ToList());
+                    p => new SearchInfo(p.Id, p.Name)).ToList());
         }
 
         public SearchProjectsConsumer(
