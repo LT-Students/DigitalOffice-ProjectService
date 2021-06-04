@@ -123,7 +123,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             };
 
             var department = new Mock<IGetDepartmentResponse>();
-            department.Setup(x => x.Id).Returns(projectInfo.Department.Id);
+            department.Setup(x => x.DepartmentId).Returns(projectInfo.Department.Id);
             department.Setup(x => x.Name).Returns(projectInfo.Department.Name);
 
             _operationResultBroker = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();

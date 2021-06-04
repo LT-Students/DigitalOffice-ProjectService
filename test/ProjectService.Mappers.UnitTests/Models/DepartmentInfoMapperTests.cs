@@ -22,14 +22,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
             _mapper = new DepartmentInfoMapper();
 
             var departmentResponseMock = new Mock<IGetDepartmentResponse>();
-            departmentResponseMock.Setup(x => x.Id).Returns(Guid.NewGuid());
+            departmentResponseMock.Setup(x => x.DepartmentId).Returns(Guid.NewGuid());
             departmentResponseMock.Setup(x => x.Name).Returns("Some department");
 
             _departmentResponse = departmentResponseMock.Object;
 
             _expectedDepartmentInfo = new DepartmentInfo
             {
-                Id = _departmentResponse.Id,
+                Id = _departmentResponse.DepartmentId,
                 Name = _departmentResponse.Name
             };
         }

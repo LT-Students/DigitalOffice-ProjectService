@@ -55,7 +55,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
             };
 
             _department = new Mock<IGetDepartmentResponse>();
-            _department.Setup(x => x.Id).Returns(_dbProject.DepartmentId);
+            _department.Setup(x => x.DepartmentId).Returns(_dbProject.DepartmentId);
             _department.Setup(x => x.Name).Returns("Some department");
         }
 

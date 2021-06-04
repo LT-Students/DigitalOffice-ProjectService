@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
         public async Task Consume(ConsumeContext<IGetProjectRequest> context)
         {
-            var response = OperationResultWrapper.CreateResponse(GetProjectInfo, context.Message.Id);
+            var response = OperationResultWrapper.CreateResponse(GetProjectInfo, context.Message.ProjectId);
 
             await context.RespondAsync<IOperationResult<IProjectResponse>>(response);
         }

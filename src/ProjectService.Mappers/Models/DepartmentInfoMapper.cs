@@ -16,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
 
             return new DepartmentInfo
             {
-                Id = departmentResponse.Id,
+                Id = departmentResponse.DepartmentId,
                 Name = departmentResponse.Name
             };
         }

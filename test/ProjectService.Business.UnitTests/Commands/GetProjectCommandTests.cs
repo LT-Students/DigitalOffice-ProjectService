@@ -82,7 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         {
             var departmentResponseMock = new Mock<IGetDepartmentResponse>();
             departmentResponseMock
-                .Setup(x => x.Id)
+                .Setup(x => x.DepartmentId)
                 .Returns(_departmentInfo.Id);
             departmentResponseMock
                 .Setup(x => x.Name)
