@@ -24,16 +24,12 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         [AutoInjectRequest(typeof(IFindDepartmentsRequest))]
         public string FindDepartmentsEndpoint { get; set; }
 
-        [AutoInjectRequest(typeof(IGetUserProjectsRequest))]
         public string GetProjectIdsEndpoint { get; set; }
 
-        [AutoInjectRequest(typeof(IGetProjectRequest))]
         public string GetProjectInfoEndpoint { get; set; }
 
-        [AutoInjectRequest(typeof(IGetUserProjectsInfoRequest))]
         public string GetUserProjectsInfoEndpoint { get; set; }
 
-        [AutoInjectRequest(typeof(ISearchProjectsRequest))]
         public string SearchProjectsEndpoint { get; set; }
     }
 }
