@@ -1,6 +1,7 @@
 // using System;
 // using System.Collections.Generic;
 // using System.Threading.Tasks;
+// using LT.DigitalOffice.Broker.Models;
 // using LT.DigitalOffice.Broker.Requests;
 // using LT.DigitalOffice.Broker.Responses;
 // using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
@@ -54,7 +55,8 @@
 //
 //         private Mock<IRequestClient<IGetUsersDataRequest>> _userDataRequestClient;
 //         private Mock<IRequestClient<IGetDepartmentRequest>> _getDepartmentRequestClient;
-//         private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _operationResultBrokerMock;
+//         private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _getDepartmentOperationResultBrokerMock;
+//         private Mock<Response<IOperationResult<IGetUserDataResponse>>> _userDataOperationResultBrokerMock;
 //
 //         private DbTask _dbTask;
 //         
@@ -96,10 +98,10 @@
 //                 It.IsAny<Guid>(), It.IsAny<bool>()), userRepositoryTimes);
 //
 //             _taskRepositoryMock.Verify(x =>
-//                 x.Get(It.IsAny<Guid>()), getInTaskRepositoryTimes);
+//                 x.Get(It.IsAny<Guid>(), false), getInTaskRepositoryTimes);
 //
 //             _taskRepositoryMock.Verify(x =>
-//                 x.GetFullModel(It.IsAny<Guid>()), getFullInTaskRepositoryTimes);
+//                 x.Get(It.IsAny<Guid>(), true), getFullInTaskRepositoryTimes);
 //
 //             _getDepartmentRequestClient.Verify(x =>
 //                 x.GetResponse<IOperationResult<IGetDepartmentResponse>>(It.IsAny<object>(),
@@ -121,20 +123,40 @@
 //                 .Verifiable();
 //         }
 //
+//         private void RcGetUsersData(Guid userId)
+//         {
+//             var user = new Mock<List<IGetUserDataResponse>>();
+//             user.Setup(x => x)
+//                 .Returns(new List<IGetUserDataResponse>());
+//
+//             _userDataOperationResultBrokerMock
+//                 .Setup(x => x.Message.Body)
+//                 .Returns(user.Object);
+//
+//             _userDataRequestClient
+//                 .Setup(x =>
+//                     x.GetResponse<IOperationResult<IGetUserDataResponse>>(
+//                         It.IsAny<object>(),
+//                         default,
+//                         default))
+//                 .Returns(Task.FromResult(_userDataOperationResultBrokerMock.Object))
+//                 .Verifiable();
+//         }
+//         
 //         private void RcGetDepartment(Guid userId)
 //         {
 //             var department = new Mock<IGetDepartmentResponse>();
 //             department.Setup(x => x.DirectorUserId).Returns(userId);
 //
-//             _operationResultBrokerMock
+//             _getDepartmentOperationResultBrokerMock
 //                 .Setup(x => x.Message.Body)
 //                 .Returns(department.Object);
 //
-//             _operationResultBrokerMock
+//             _getDepartmentOperationResultBrokerMock
 //                 .Setup(x => x.Message.IsSuccess)
 //                 .Returns(true);
 //
-//             _operationResultBrokerMock
+//             _getDepartmentOperationResultBrokerMock
 //                 .Setup(x => x.Message.Errors)
 //                 .Returns(new List<string>());
 //
@@ -144,7 +166,7 @@
 //                         It.IsAny<object>(),
 //                         default,
 //                         default))
-//                 .Returns(Task.FromResult(_operationResultBrokerMock.Object))
+//                 .Returns(Task.FromResult(_getDepartmentOperationResultBrokerMock.Object))
 //                 .Verifiable();
 //         }
 //
@@ -182,7 +204,8 @@
 //             _loggerMock = new Mock<ILogger<GetTaskCommand>>();
 //             _getDepartmentRequestClient = new Mock<IRequestClient<IGetDepartmentRequest>>();
 //             _userDataRequestClient = new Mock<IRequestClient<IGetUsersDataRequest>>();
-//             _operationResultBrokerMock = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
+//             _getDepartmentOperationResultBrokerMock = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
+//             _userDataOperationResultBrokerMock = new Mock<Response<IOperationResult<IGetUserDataResponse>>>();
 //             _projectInfoMapper = new ProjectInfoMapper();
 //             _taskPropertyInfoMapper = new TaskPropertyInfoMapper();
 //             _projectUserInfoMapper = new ProjectUserInfoMapper();
@@ -193,17 +216,17 @@
 //                 _projectUserInfoMapper);
 //             #endregion
 //
-//             ClientRequestUp(Guid.NewGuid());
+//             ClientRequestUp(_userId);
 //             RcGetDepartment(Guid.NewGuid());
 //
 //             #region Mock default setups
 //
 //             _taskRepositoryMock
-//                 .Setup(x => x.GetFullModel(_taskId))
+//                 .Setup(x => x.Get(_taskId, true))
 //                 .Returns(_dbTask).Verifiable();
 //
 //             _accessValidatorMock
-//                 .Setup(x => x.IsAdmin(null))
+//                 .Setup(x => x.IsAdmin(_userId))
 //                 .Returns(false);
 //
 //             _userRepositoryMock
@@ -234,9 +257,9 @@
 //         [Test]
 //         public void FullSuccessOperationWhenUserIsAdmin()
 //         {
-//             _accessValidatorMock.Setup(x => x.IsAdmin(null)).Returns(true);
+//             _accessValidatorMock.Setup(x => x.IsAdmin(It.IsAny<Guid>())).Returns(true);
 //
-//             SerializerAssert.AreEqual(_dbTask, _command.Execute(_taskId));
+//             SerializerAssert.AreEqual(_dbTask, _command.Execute(_taskId, true));
 //
 //             VerifyCalls(Times.Once,
 //                 Times.Once,
@@ -260,7 +283,7 @@
 //                     }
 //                 }).Verifiable();
 //             
-//             SerializerAssert.AreEqual(_dbTask, _command.Execute(_taskId));
+//             SerializerAssert.AreEqual(_dbTask, _command.Execute(_taskId, true));
 //
 //             VerifyCalls(Times.Once,
 //                 Times.Once,
@@ -276,7 +299,7 @@
 //
 //             RcGetDepartment(_userId);
 //             
-//             SerializerAssert.AreEqual(_dbTask, _command.Execute(_taskId));
+//             SerializerAssert.AreEqual(_dbTask, _command.Execute(_taskId, true));
 //
 //             VerifyCalls(Times.Once,
 //                 Times.Once,
@@ -288,7 +311,7 @@
 //         [Test]
 //         public void ExceptionWhenUserCannotEdit()
 //         {
-//             Assert.Throws<ForbiddenException>(() => _command.Execute(_taskId));
+//             Assert.Throws<ForbiddenException>(() => _command.Execute(_taskId, true));
 //
 //             VerifyCalls(Times.Once,
 //                 Times.Once,
@@ -310,7 +333,7 @@
 //                         default))
 //                 .Returns((Task<Response<IOperationResult<IGetDepartmentResponse>>>) null);
 //
-//             Assert.AreEqual(1, _command.Execute(_taskId).Errors.Count);
+//             Assert.AreEqual(1, _command.Execute(_taskId, true).Errors.Count);
 //
 //             VerifyCalls(Times.Once,
 //                 Times.Once,

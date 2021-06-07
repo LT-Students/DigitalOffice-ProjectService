@@ -82,7 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _usersDataRequestClient = userRequestClient;
         }
 
-        public TaskResponse Execute(Guid taskId, bool isFullModel)
+        public TaskResponse Execute(Guid taskId, bool isFullModel=true)
         {
             var errors = new List<string>();
 
@@ -94,13 +94,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             {
                 task.AuthorId,
                 task.AssignedUser.Id,
-                task.ParentTask.AuthorId
             };
 
-            var parentTaskAssignedTo = task.ParentTask.AssignedTo.GetValueOrDefault();
-            if (parentTaskAssignedTo != Guid.Empty)
+            if (task.ParentTask != null)
             {
-                userIds.Add(parentTaskAssignedTo);
+                userIds.Add(task.ParentTask.AuthorId);
+            }
+
+            var parentTaskAssignedTo = task.ParentTask?.AssignedTo.GetValueOrDefault();
+            if (parentTaskAssignedTo != null && parentTaskAssignedTo != Guid.Empty)
+            {
+                userIds.Add(parentTaskAssignedTo.Value);
             } 
             
             var usersDataResponse = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
