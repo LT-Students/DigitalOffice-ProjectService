@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
-using LT.DigitalOffice.Models.Broker.Responses.Project;
+using LT.DigitalOffice.Models.Broker.Responses.Search;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.UnitTestKernel;
@@ -11,7 +11,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
@@ -79,7 +78,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
             {
                 var requestClient = await _harness.ConnectRequestClient<ISearchProjectsRequest>();
 
-                var response = await requestClient.GetResponse<IOperationResult<ISearchProjectsResponse>>(
+                var response = await requestClient.GetResponse<IOperationResult<ISearchResponse>>(
                     ISearchProjectsRequest.CreateObj(ExistName), default, default);
 
                 var expectedResult = new
@@ -88,13 +87,13 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                     Errors = null as List<string>,
                     Body = new
                     {
-                        Projects = _result
+                        Entities = _result
                     }
                 };
 
                 SerializerAssert.AreEqual(expectedResult, response.Message);
                 Assert.True(_consumerTestHarness.Consumed.Select<ISearchProjectsRequest>().Any());
-                Assert.True(_harness.Sent.Select<IOperationResult<ISearchProjectsResponse>>().Any());
+                Assert.True(_harness.Sent.Select<IOperationResult<ISearchResponse>>().Any());
                 _repository.Verify(x => x.Search(ExistName), Times.Once);
             }
             finally
@@ -116,7 +115,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
             {
                 var requestClient = await _harness.ConnectRequestClient<ISearchProjectsRequest>();
 
-                var response = await requestClient.GetResponse<IOperationResult<ISearchProjectsResponse>>(
+                var response = await requestClient.GetResponse<IOperationResult<ISearchResponse>>(
                     ISearchProjectsRequest.CreateObj(ExistName), default, default);
 
                 var expectedResult = new
@@ -128,7 +127,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 Assert.IsFalse(response.Message.IsSuccess);
                 Assert.IsNotEmpty(response.Message.Errors);
                 Assert.True(_consumerTestHarness.Consumed.Select<ISearchProjectsRequest>().Any());
-                Assert.True(_harness.Sent.Select<IOperationResult<ISearchProjectsResponse>>().Any());
+                Assert.True(_harness.Sent.Select<IOperationResult<ISearchResponse>>().Any());
                 _repository.Verify(x => x.Search(ExistName), Times.Once);
             }
             finally

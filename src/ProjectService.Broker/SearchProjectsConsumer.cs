@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
-using LT.DigitalOffice.Models.Broker.Responses.Project;
+using LT.DigitalOffice.Models.Broker.Responses.Search;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using MassTransit;
@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
         {
             List<DbProject> projects = _projectRepository.Search(text);
 
-            return ISearchProjectsResponse.CreateObj(
+            return ISearchResponse.CreateObj(
                 projects.Select(
                     p => new SearchInfo(p.Id, p.Name)).ToList());
         }
@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
         {
             var response = OperationResultWrapper.CreateResponse(SearchProjects, context.Message.Value);
 
-            await context.RespondAsync<IOperationResult<ISearchProjectsResponse>>(response);
+            await context.RespondAsync<IOperationResult<ISearchResponse>>(response);
         }
     }
 }
