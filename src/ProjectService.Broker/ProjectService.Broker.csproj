@@ -4,7 +4,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectService.Data\ProjectService.Data.csproj" />
-    <ProjectReference Include="..\ProjectService.Models.Broker\ProjectService.Models.Broker.csproj" />
   </ItemGroup>
 
 </Project>

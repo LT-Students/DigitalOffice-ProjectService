@@ -28,7 +28,7 @@ jobs:
           
       - name: Setup NuGet.exe
         uses: NuGet/setup-nuget@v1.0.5
-          
+
       - name: Restore
         run: nuget restore -Source https://baget.ltdo.xyz/v3/index.json -Source https://api.nuget.org/v3/index.json
       - name: Build

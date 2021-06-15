@@ -18,10 +18,9 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using MassTransit.ExtensionsDependencyInjectionIntegration;
-using MassTransit.RabbitMqTransport;
-using LT.DigitalOffice.ProjectService.Broker;
 using LT.DigitalOffice.ProjectService.Mappers.Helpers;
+using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.AccessValidatorEngine;
 
 namespace LT.DigitalOffice.ProjectService
 {
@@ -157,6 +156,8 @@ namespace LT.DigitalOffice.ProjectService
         {
             services.AddMassTransit(busConfigurator =>
             {
+                ConfigureConsumers(busConfigurator);
+
                 busConfigurator.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(_rabbitMqConfig.Host, "/", host =>
@@ -167,8 +168,6 @@ namespace LT.DigitalOffice.ProjectService
 
                     ConfigureEndpoints(context, cfg, _rabbitMqConfig);
                 });
-
-                ConfigureConsumers(busConfigurator);
 
                 busConfigurator.AddRequestClients(_rabbitMqConfig);
             });
@@ -181,6 +180,7 @@ namespace LT.DigitalOffice.ProjectService
             x.AddConsumer<GetProjectIdsConsumer>();
             x.AddConsumer<GetProjectInfoConsumer>();
             x.AddConsumer<GetUserProjectsInfoConsumer>();
+            x.AddConsumer<SearchProjectsConsumer>();
         }
 
         private void ConfigureEndpoints(
@@ -201,6 +201,11 @@ namespace LT.DigitalOffice.ProjectService
             cfg.ReceiveEndpoint(rabbitMqConfig.GetUserProjectsInfoEndpoint, ep =>
             {
                 ep.ConfigureConsumer<GetUserProjectsInfoConsumer>(context);
+            });
+
+            cfg.ReceiveEndpoint(rabbitMqConfig.SearchProjectsEndpoint, ep =>
+            {
+                ep.ConfigureConsumer<SearchProjectsConsumer>(context);
             });
         }
 

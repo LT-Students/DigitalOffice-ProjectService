@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /app
 
 COPY . ./
-RUN dotnet restore
+RUN dotnet restore -s https://baget.ltdo.xyz/v3/index.json -s https://api.nuget.org/v3/index.json
 
 COPY . ./
 RUN dotnet publish -c Release -o out

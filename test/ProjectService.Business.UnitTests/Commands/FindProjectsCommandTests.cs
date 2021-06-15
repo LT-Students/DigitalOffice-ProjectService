@@ -3,7 +3,6 @@ using NUnit.Framework;
 using Moq.AutoMock;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
-using LT.DigitalOffice.Broker.Requests;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using MassTransit;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -12,12 +11,13 @@ using Moq;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using System;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
-using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.Broker;
 using System.Threading.Tasks;
 using LT.DigitalOffice.UnitTestKernel;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.Models.Broker.Responses.Company;
+using LT.DigitalOffice.Models.Broker.Requests.Company;
 
 namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 {

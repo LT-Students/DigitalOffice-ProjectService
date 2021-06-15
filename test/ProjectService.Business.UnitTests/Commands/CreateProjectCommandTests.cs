@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
-using LT.DigitalOffice.Broker.Requests;
-using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
+using LT.DigitalOffice.Models.Broker.Requests.Company;
+using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -123,7 +123,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             };
 
             var department = new Mock<IGetDepartmentResponse>();
-            department.Setup(x => x.Id).Returns(projectInfo.Department.Id);
+            department.Setup(x => x.DepartmentId).Returns(projectInfo.Department.Id);
             department.Setup(x => x.Name).Returns(projectInfo.Department.Name);
 
             _operationResultBroker = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();

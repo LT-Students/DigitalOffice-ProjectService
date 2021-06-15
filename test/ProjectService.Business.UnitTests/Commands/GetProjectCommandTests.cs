@@ -1,7 +1,9 @@
-using LT.DigitalOffice.Broker.Models;
-using LT.DigitalOffice.Broker.Requests;
-using LT.DigitalOffice.Broker.Responses;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Requests.Company;
+using LT.DigitalOffice.Models.Broker.Requests.User;
+using LT.DigitalOffice.Models.Broker.Responses.Company;
+using LT.DigitalOffice.Models.Broker.Responses.User;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
@@ -32,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         private Mock<IProjectUserInfoMapper> _projectUserInfoMapperMock;
         private Mock<IProjectFileInfoMapper> _projectFileInfoMapperMock;
         private Mock<IDepartmentInfoMapper> _departmentInfoMapperMock;
-        
+
         private Mock<IRequestClient<IGetDepartmentRequest>> _rcDepartmentMock;
 
         private Mock<IRequestClient<IGetUsersDataRequest>> _rcUsersDataMock;
@@ -80,7 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         {
             var departmentResponseMock = new Mock<IGetDepartmentResponse>();
             departmentResponseMock
-                .Setup(x => x.Id)
+                .Setup(x => x.DepartmentId)
                 .Returns(_departmentInfo.Id);
             departmentResponseMock
                 .Setup(x => x.Name)
