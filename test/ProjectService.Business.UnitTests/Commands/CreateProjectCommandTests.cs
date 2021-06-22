@@ -4,6 +4,7 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
+using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
@@ -38,8 +39,10 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
         private ProjectRequest _newRequest;
         private ICreateProjectCommand _command;
         private OperationResultResponse<ProjectInfo> _response;
+        private ProjectInfo _projectInfo;
 
-        private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _operationResultBroker;
+        private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _operationResultGetDepartment;
+        private Mock<Response<IOperationResult<bool>>> _operationResultCreateWorkspace;
 
         #region Setup
 
@@ -98,7 +101,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 }
             };
 
-            var projectInfo = new ProjectInfo
+            _projectInfo = new ProjectInfo
             {
                 Id = Guid.NewGuid(),
                 AuthorId = _authorId,
@@ -117,17 +120,20 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
 
             _response = new OperationResultResponse<ProjectInfo>
             {
-                Body = projectInfo,
+                Body = _projectInfo,
                 Status = OperationResultStatusType.FullSuccess,
                 Errors = new List<string>()
             };
 
             var department = new Mock<IGetDepartmentResponse>();
-            department.Setup(x => x.DepartmentId).Returns(projectInfo.Department.Id);
-            department.Setup(x => x.Name).Returns(projectInfo.Department.Name);
+            department.Setup(x => x.DepartmentId).Returns(_projectInfo.Department.Id);
+            department.Setup(x => x.Name).Returns(_projectInfo.Department.Name);
 
-            _operationResultBroker = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
-            _operationResultBroker.Setup(x => x.Message.Body).Returns(department.Object);
+            _operationResultGetDepartment = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
+            _operationResultGetDepartment.Setup(x => x.Message.Body).Returns(department.Object);
+
+            _operationResultCreateWorkspace = new Mock<Response<IOperationResult<bool>>>();
+            _operationResultCreateWorkspace.Setup(x => x.Message.Body).Returns(true);
         }
 
         [SetUp]
@@ -139,15 +145,25 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
             _mocker.GetMock<IDbProjectMapper>().Reset();
             _mocker.GetMock<IProjectRepository>().Reset();
             _mocker.GetMock<IRequestClient<IGetDepartmentRequest>>().Reset();
+            _mocker.GetMock<IRequestClient<ICreateWorkspaceRequest>>().Reset();
 
-            _operationResultBroker.Setup(x => x.Message.IsSuccess).Returns(true);
-            _operationResultBroker.Setup(x => x.Message.Errors).Returns(new List<string>());
+            _operationResultGetDepartment.Setup(x => x.Message.IsSuccess).Returns(true);
+            _operationResultGetDepartment.Setup(x => x.Message.Errors).Returns(new List<string>());
+
+            _operationResultCreateWorkspace.Setup(x => x.Message.IsSuccess).Returns(true);
+            _operationResultCreateWorkspace.Setup(x => x.Message.Errors).Returns(new List<string>());
 
             _mocker
                 .Setup<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
-                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, TimeSpan.FromSeconds(2)))
-                .Returns(Task.FromResult(_operationResultBroker.Object));
+                    x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
+                        IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, TimeSpan.FromSeconds(2)))
+                .Returns(Task.FromResult(_operationResultGetDepartment.Object));
+
+            _mocker
+                .Setup<IRequestClient<ICreateWorkspaceRequest>, Task<Response<IOperationResult<bool>>>>(
+                    x => x.GetResponse<IOperationResult<bool>>(
+                        It.IsAny<object>(), default, RequestTimeout.Default))
+                .Returns(Task.FromResult(_operationResultCreateWorkspace.Object));
         }
 
         #endregion
@@ -198,8 +214,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
                 .Setup<ICreateProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
                 .Returns(true);
 
-            _operationResultBroker.Setup(x => x.Message.IsSuccess).Returns(false);
-            _operationResultBroker.Setup(x => x.Message.Errors).Returns(new List<string>() { "Department was not found" });
+            _operationResultGetDepartment.Setup(x => x.Message.IsSuccess).Returns(false);
+            _operationResultGetDepartment.Setup(x => x.Message.Errors).Returns(new List<string>() { "Department was not found" });
 
             Assert.Throws<BadRequestException>(() => _command.Execute(_newRequest));
 
@@ -267,7 +283,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
 
             _mocker
                 .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(
-                    _newDbProject, _operationResultBroker.Object.Message.Body.Name))
+                    _newDbProject, _operationResultGetDepartment.Object.Message.Body.Name))
                 .Returns(_response.Body);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
@@ -290,10 +306,55 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests.Commands
 
             _mocker
                 .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(
-                    _newDbProject, _operationResultBroker.Object.Message.Body.Name))
+                    _newDbProject, _operationResultGetDepartment.Object.Message.Body.Name))
                 .Returns(_response.Body);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
+        }
+
+        [Test]
+        public void ShouldReturnPartialsuccessResponseWhenWorkspaceWasNotCreated()
+        {
+            _mocker
+                .Setup<ICreateProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
+                .Returns(true);
+
+            _mocker
+                .Setup<IAccessValidator, bool>(x => x.HasRights(Rights.AddEditRemoveProjects))
+                .Returns(true);
+
+            _mocker
+                .Setup<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _authorId))
+                .Returns(_newDbProject);
+
+            _mocker
+                .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(
+                    _newDbProject, _operationResultGetDepartment.Object.Message.Body.Name))
+                .Returns(_response.Body);
+
+            _operationResultCreateWorkspace.Setup(x => x.Message.IsSuccess).Returns(false);
+            _operationResultCreateWorkspace.Setup(x => x.Message.Errors).Returns(new List<string>() { "some error" });
+
+            var response = new OperationResultResponse<ProjectInfo>
+            {
+                Body = _projectInfo,
+                Status = OperationResultStatusType.PartialSuccess,
+                Errors = new List<string>() { $"Failed to create a workspace for the project {_newRequest.Name}" }
+            };
+
+            SerializerAssert.AreEqual(response, _command.Execute(_newRequest));
+
+            _mocker.Verify<IAccessValidator, bool>(x => x.HasRights(Rights.AddEditRemoveProjects), Times.Once);
+            _mocker.Verify<IDbProjectMapper, DbProject>(x => x.Map(_newRequest, _authorId), Times.Once);
+            _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
+                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
+                    IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, TimeSpan.FromSeconds(2)),
+                    Times.Once);
+            _mocker.Verify<IRequestClient<ICreateWorkspaceRequest>, Task<Response<IOperationResult<bool>>>>(
+                x => x.GetResponse<IOperationResult<bool>>(
+                    It.IsAny<object>(), default, RequestTimeout.Default),
+                    Times.Once);
+            _mocker.Verify<ICreateProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
         }
     }
 }

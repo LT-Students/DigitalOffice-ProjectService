@@ -5,6 +5,7 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
+using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -33,7 +34,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly ILogger<CreateProjectCommand> _logger;
         private readonly IProjectInfoMapper _projectInfoMapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
+        private readonly IRequestClient<IGetDepartmentRequest> _rcGetDepartment;
+        private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
 
         private IGetDepartmentResponse GetDepartment(Guid departmentId, List<string> errors)
         {
@@ -41,8 +43,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             try
             {
-                var response = _requestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                IGetDepartmentRequest.CreateObj(null, departmentId), timeout: TimeSpan.FromSeconds(2)).Result;
+                var response = _rcGetDepartment.GetResponse<IOperationResult<IGetDepartmentResponse>>(
+                    IGetDepartmentRequest.CreateObj(null, departmentId), timeout: TimeSpan.FromSeconds(2)).Result;
 
                 if (response.Message.IsSuccess)
                 {
@@ -62,6 +64,35 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             return null;
         }
 
+        private void CreateWorkspace(string projectName, Guid createrId, List<Guid> users, List<string> errors)
+        {
+            string errorMessage = $"Failed to create a workspace for the project {projectName}";
+            string logMessage = "Cannot create workspace for project {name}";
+
+            try
+            {
+                if (!users.Contains(createrId))
+                {
+                    users.Add(createrId);
+                }
+
+                var response = _rcCreateWorkspace.GetResponse<IOperationResult<bool>>(
+                    ICreateWorkspaceRequest.CreateObj(projectName, createrId, users), timeout: RequestTimeout.Default).Result;
+
+                if (!(response.Message.IsSuccess && response.Message.Body))
+                {
+                    _logger.LogWarning(logMessage, projectName);
+                    errors.Add(errorMessage);
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, logMessage, projectName);
+
+                errors.Add(errorMessage);
+            }
+        }
+
         public CreateProjectCommand(
             IProjectRepository repository,
             ICreateProjectValidator validator,
@@ -70,16 +101,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             IProjectInfoMapper projectInfoMapper,
             ILogger<CreateProjectCommand> logger,
             IHttpContextAccessor httpContextAccessor,
-            IRequestClient<IGetDepartmentRequest> requestClient)
+            IRequestClient<IGetDepartmentRequest> rcGetDepartment,
+            IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace)
         {
             _logger = logger;
             _validator = validator;
             _repository = repository;
-            _requestClient = requestClient;
+            _rcGetDepartment = rcGetDepartment;
             _dbProjectMapper = dbProjectMapper;
             _accessValidator = accessValidator;
             _projectInfoMapper = projectInfoMapper;
             _httpContextAccessor = httpContextAccessor;
+            _rcCreateWorkspace = rcCreateWorkspace;
         }
 
         public OperationResultResponse<ProjectInfo> Execute(ProjectRequest request)
@@ -114,10 +147,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             var projectInfo = _projectInfoMapper.Map(dbProject, department.Name);
 
+            CreateWorkspace(request.Name, userId, request.Users.Select(u => u.UserId).ToList(), errors);
+
             return new OperationResultResponse<ProjectInfo>
             {
                 Body = projectInfo,
-                Status = OperationResultStatusType.FullSuccess
+                Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
+                Errors = errors
             };
         }
     }

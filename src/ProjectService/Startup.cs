@@ -19,8 +19,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using LT.DigitalOffice.ProjectService.Mappers.Helpers;
-using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.AccessValidatorEngine;
 
 namespace LT.DigitalOffice.ProjectService
 {
