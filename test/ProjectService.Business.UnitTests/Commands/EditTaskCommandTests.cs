@@ -88,7 +88,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 It.IsAny<Guid>(), It.IsAny<bool>()), projectRepositoryTimes);
 
             _taskRepositoryMock.Verify(x =>
-                x.Get(It.IsAny<Guid>()), getInTaskRepositoryTimes);
+                x.Get(It.IsAny<Guid>(), It.IsAny<bool>()), getInTaskRepositoryTimes);
 
             _taskRepositoryMock.Verify(x =>
                 x.Edit(It.IsAny<DbTask>(), It.IsAny<JsonPatchDocument<DbTask>>()), editInTaskRepositoryTimes);
@@ -218,7 +218,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(true).Verifiable();
 
             _taskRepositoryMock
-                .Setup(x => x.Get(_taskId))
+                .Setup(x => x.Get(_taskId, false))
                 .Returns(new DbTask
                 {
                     ProjectId = _projectId

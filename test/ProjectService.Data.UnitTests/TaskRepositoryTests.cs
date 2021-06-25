@@ -211,7 +211,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         {
             _provider.Tasks.Add(_dbTask);
             _provider.Save();
-            Assert.IsTrue(_repository.Edit(_repository.Get(_taskId), _patchDbTask));
+            Assert.IsTrue(_repository.Edit(_repository.Get(_taskId, false), _patchDbTask));
             SerializerAssert.AreEqual(_result, _provider.Tasks.FirstOrDefault(x => x.Id == _taskId));
         }
 
@@ -227,9 +227,9 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         {
             _taskId = Guid.NewGuid();
 
-            Assert.Throws<NotFoundException>(() => _repository.Get(_taskId));
+            Assert.Throws<NotFoundException>(() => _repository.Get(_taskId, false));
 
-            Assert.Throws<NotFoundException>(() => _repository.Edit(_repository.Get(_taskId), _patchDbTask));
+            Assert.Throws<NotFoundException>(() => _repository.Edit(_repository.Get(_taskId, false), _patchDbTask));
         }
 
         [Test]
@@ -237,7 +237,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         {
             _provider.Tasks.Add(_dbTask);
             _provider.Save();
-            Assert.AreEqual(_dbTask, _repository.Get(_taskId));
+            Assert.AreEqual(_dbTask, _repository.Get(_taskId, false));
         }
 
         [TearDown]

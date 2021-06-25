@@ -251,7 +251,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             };
 
             _taskRepository
-                .Setup(x => x.Get(_taskRequest.ParentId.Value))
+                .Setup(x => x.Get(_taskRequest.ParentId.Value, false))
                 .Returns(parentTask)
                 .Verifiable();
 

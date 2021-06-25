@@ -88,7 +88,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             var errors = new List<string>();
 
-            DbTask task = _taskRepository.Get(taskId);
+            DbTask task = _taskRepository.Get(taskId, false);
             List<DbProjectUser> projectUsers =
                 _userRepository.GetProjectUsers(task.ProjectId, false).ToList();
 

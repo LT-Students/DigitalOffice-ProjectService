@@ -23,6 +23,14 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         {
             return command.Execute(filter, skipCount, takeCount);
         }
+        
+        [HttpGet("get")]
+        public TaskResponse Get(
+            [FromQuery] Guid taskId,
+            [FromServices] IGetTaskCommand command)
+        {
+            return command.Execute(taskId);
+        }
 
         [HttpPost("create")]
         public OperationResultResponse<Guid> Create(
