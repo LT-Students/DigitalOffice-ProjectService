@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -27,6 +28,25 @@ namespace LT.DigitalOffice.ProjectService.Data
         {
             return _provider.TaskProperties.FirstOrDefault(x => x.Id == propertyId) ??
                    throw new NotFoundException($"Property with id: '{propertyId}' was not found.");
+        }
+
+        public IEnumerable<DbTaskProperty> Find(Guid? projectId, string name, int skipCount, int tackeCount, out int totalCount)
+        {
+            var dbTaskProperties = _provider.TaskProperties.AsQueryable();
+
+            if (projectId.HasValue)
+            {
+                dbTaskProperties = dbTaskProperties.Where(tp => tp.ProjectId == projectId.Value);
+            }
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                dbTaskProperties = dbTaskProperties.Where(tp => tp.Name.Contains(name));
+            }
+
+            totalCount = dbTaskProperties.Count();
+
+            return dbTaskProperties.Skip(skipCount * tackeCount).Take(tackeCount).ToList();
         }
     }
 }
