@@ -64,20 +64,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             return null;
         }
 
-        private void CreateWorkspace(string projectName, Guid createrId, List<Guid> users, List<string> errors)
+        private void CreateWorkspace(string projectName, Guid creatorId, List<Guid> users, List<string> errors)
         {
             string errorMessage = $"Failed to create a workspace for the project {projectName}";
             string logMessage = "Cannot create workspace for project {name}";
 
             try
             {
-                if (!users.Contains(createrId))
+                if (!users.Contains(creatorId))
                 {
-                    users.Add(createrId);
+                    users.Add(creatorId);
                 }
 
                 var response = _rcCreateWorkspace.GetResponse<IOperationResult<bool>>(
-                    ICreateWorkspaceRequest.CreateObj(projectName, createrId, users), timeout: RequestTimeout.Default).Result;
+                    ICreateWorkspaceRequest.CreateObj(projectName, creatorId, users), timeout: RequestTimeout.Default).Result;
 
                 if (!(response.Message.IsSuccess && response.Message.Body))
                 {
