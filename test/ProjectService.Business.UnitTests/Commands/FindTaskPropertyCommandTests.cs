@@ -117,6 +117,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Returns(_taskPropertiesInfo[2]);
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
+            _mocker.Verify<ITaskPropertyRepository, IEnumerable<DbTaskProperty>>(x =>
+                x.Find(filter, skipCount, takeCount, out totalCount), Times.Once);
+            _mocker.Verify<ITaskPropertyInfoMapper, TaskPropertyInfo>(x =>
+                x.Map(It.IsAny<DbTaskProperty>()), Times.Exactly(_taskPropertiesInfo.Count));
         }
     }
 }

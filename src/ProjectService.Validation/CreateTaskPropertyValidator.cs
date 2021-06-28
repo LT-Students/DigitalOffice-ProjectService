@@ -1,11 +1,6 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
@@ -27,7 +22,6 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     .MaximumLength(32);
 
                 tp.RuleFor(tp => tp.PropertyType)
-                    .NotEmpty()
                     .IsInEnum();
 
                 tp.When(tp => tp.Description != null, () =>

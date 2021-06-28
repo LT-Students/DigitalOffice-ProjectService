@@ -43,16 +43,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         public OperationResultResponse<IEnumerable<Guid>> Execute(CreateTaskPropertyRequest request)
         {
-            _validator.ValidateAndThrowCustom(request);
-
             var userId = _httpContextAccessor.HttpContext.GetUserId();
 
-            if (_accessValidator.IsAdmin() || _userRepository.AreUserProjectExist(userId, request.ProjectId))
+            if (!(_accessValidator.IsAdmin() || _userRepository.AreUserProjectExist(userId, request.ProjectId)))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
 
-            var dbTaskProperties = request.TaskProperties.Select(x => _mapper.Map(x, userId));
+            _validator.ValidateAndThrowCustom(request);
+
+            var dbTaskProperties = request.TaskProperties.Select(x => _mapper.Map(x, userId, request.ProjectId)).ToList();
 
             _taskProperyRepository.Create(dbTaskProperties);
 

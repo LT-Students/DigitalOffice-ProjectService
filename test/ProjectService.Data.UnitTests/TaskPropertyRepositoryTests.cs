@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
@@ -32,22 +33,14 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
             _provider = new ProjectServiceDbContext(dbOptions);
 
-/*            _dbTaskProperties = new DbTaskProperty()
-            {
-                Id = _taskPropertyId,
-                Description = _description,
-                Name = _name,
-                PropertyType = _type
-            };
-*/
             _provider.TaskProperties.AddRange(_dbTaskProperties);
 
             _provider.Save();
             _repository = new TaskPropertyRepository(_provider);
         }
 
-        [OneTimeSetUp]
-        public void OneTimeSetup()
+        [SetUp]
+        public void SetUp()
         {
             _dbTaskProperties = new List<DbTaskProperty>()
             {
@@ -87,6 +80,33 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         public void Get()
         {
             SerializerAssert.AreEqual(_dbTaskProperties[0], _repository.Get(_taskPropertyId));
+        }
+
+        [Test]
+        public void CreateTaskPropertySuccessful()
+        {
+            var dbTaskProperties = new List<DbTaskProperty>()
+            {
+                new DbTaskProperty
+                {
+                    Id = Guid.NewGuid(),
+                    Name = _name,
+                    Description = _description,
+                    PropertyType = _type
+                },
+                new DbTaskProperty
+                {
+                    Id = Guid.NewGuid(),
+                    Name = _name,
+                    Description = _description,
+                    PropertyType = _type
+                }
+            };
+
+            _repository.Create(dbTaskProperties);
+            var dbIds = dbTaskProperties.Select(x => x.Id);
+
+           SerializerAssert.AreEqual(dbTaskProperties, _provider.TaskProperties.Where(x => dbIds.Contains(x.Id)).Reverse());
         }
 
         #region Find
