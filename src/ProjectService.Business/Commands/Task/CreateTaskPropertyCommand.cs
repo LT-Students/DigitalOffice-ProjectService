@@ -52,10 +52,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 throw new ForbiddenException("Not enough rights.");
             }
 
-            var dbTaskProperties = request.TaskProperties.Select(x => _mapper.Map(x));
+            var dbTaskProperties = request.TaskProperties.Select(x => _mapper.Map(x, userId));
 
             _taskProperyRepository.Create(dbTaskProperties);
-
 
             return new OperationResultResponse<IEnumerable<Guid>>
             {

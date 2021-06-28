@@ -5,6 +5,7 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
@@ -15,6 +16,12 @@ namespace LT.DigitalOffice.ProjectService.Data
         public TaskPropertyRepository(IDataProvider provider)
         {
             _provider = provider;
+        }
+
+        public void Create(IEnumerable<DbTaskProperty> dbTaskProperty)
+        {
+            _provider.TaskProperties.AddRange(dbTaskProperty);
+            _provider.Save();
         }
 
         public bool AreExist(params Guid[] ids)
@@ -30,23 +37,28 @@ namespace LT.DigitalOffice.ProjectService.Data
                    throw new NotFoundException($"Property with id: '{propertyId}' was not found.");
         }
 
-        public IEnumerable<DbTaskProperty> Find(Guid? projectId, string name, int skipCount, int tackeCount, out int totalCount)
+        public IEnumerable<DbTaskProperty> Find(FindTaskPropertiesFilter filter, int skipCount, int takeCount, out int totalCount)
         {
             var dbTaskProperties = _provider.TaskProperties.AsQueryable();
 
-            if (projectId.HasValue)
+            if (filter.ProjectId.HasValue)
             {
-                dbTaskProperties = dbTaskProperties.Where(tp => tp.ProjectId == projectId.Value);
+                dbTaskProperties = dbTaskProperties.Where(tp => tp.ProjectId == filter.ProjectId.Value);
             }
 
-            if (!string.IsNullOrEmpty(name))
+            if (filter.AuthorId.HasValue)
             {
-                dbTaskProperties = dbTaskProperties.Where(tp => tp.Name.Contains(name));
+                dbTaskProperties = dbTaskProperties.Where(tp => tp.ProjectId == filter.AuthorId.Value);
+            }
+
+            if (!string.IsNullOrEmpty(filter.Name))
+            {
+                dbTaskProperties = dbTaskProperties.Where(tp => tp.Name.Contains(filter.Name, StringComparison.OrdinalIgnoreCase));
             }
 
             totalCount = dbTaskProperties.Count();
 
-            return dbTaskProperties.Skip(skipCount * tackeCount).Take(tackeCount).ToList();
+            return dbTaskProperties.Skip(skipCount * takeCount).Take(takeCount).ToList();
         }
     }
 }

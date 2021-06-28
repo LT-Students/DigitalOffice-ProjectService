@@ -7,14 +7,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
 {
     public class DbTaskPropertyMapper : IDbTaskPropertyMapper
     {
-        public DbTaskProperty Map(TaskProperty request)
+        public DbTaskProperty Map(TaskProperty request, Guid userId)
         {
             return new DbTaskProperty
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
                 IsActive = true,
-                AuthorId = request.AuthorId,
+                AuthorId = userId,
                 CreatedAt = DateTime.UtcNow,
                 Description = request.Description,
                 PropertyType = (int)request.PropertyType,

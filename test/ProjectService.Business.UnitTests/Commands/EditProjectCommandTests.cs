@@ -27,7 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands
+namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands.UnitTests
 {
     internal class EditProjectCommandTests
     {
