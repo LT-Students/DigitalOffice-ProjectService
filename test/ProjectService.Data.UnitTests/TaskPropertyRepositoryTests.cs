@@ -47,6 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 new DbTaskProperty
                 {
                     Id = _taskPropertyId,
+                    ProjectId = Guid.NewGuid(),
                     Name = _name,
                     Description = _description,
                     PropertyType = _type
@@ -54,6 +55,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 new DbTaskProperty
                 {
                     Id = Guid.NewGuid(),
+                    ProjectId = Guid.NewGuid(),
                     Name = _name,
                     Description = _description,
                     PropertyType = _type
@@ -61,6 +63,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 new DbTaskProperty
                 {
                     Id = Guid.NewGuid(),
+                    ProjectId = Guid.NewGuid(),
                     Name = _name,
                     Description = _description,
                     PropertyType = _type
@@ -80,6 +83,22 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         public void Get()
         {
             SerializerAssert.AreEqual(_dbTaskProperties[0], _repository.Get(_taskPropertyId));
+        }
+
+        [Test]
+        public void ShouldReturnTrueWhenTaskPropertiesExist()
+        {
+            string[] propertyNames = new string [3] { "Name", "Feature", "Bug" };
+
+            Assert.IsTrue(_repository.AreExistForProject(_dbTaskProperties[0].ProjectId.Value, propertyNames));
+        }
+
+        [Test]
+        public void ShouldReturnTrueWhenTaskPropertiesDoesNotExist()
+        {
+            string[] propertyNames = new string[2] { "Feature", "Bug" };
+
+            Assert.IsFalse(_repository.AreExistForProject(_dbTaskProperties[0].ProjectId.Value, propertyNames));
         }
 
         [Test]
@@ -145,7 +164,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             var expectedResult = new List<DbTaskProperty> { _dbTaskProperties[0] };
 
             SerializerAssert.AreEqual(expectedResult, _repository.Find(filter, 0, 1, out int totalCount));
-            Assert.AreEqual(_dbTaskProperties.Count, totalCount);
+            Assert.AreEqual(expectedResult.Count, totalCount);
         }
 
         [Test]

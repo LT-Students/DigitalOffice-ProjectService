@@ -1,8 +1,10 @@
 ﻿using FluentValidation.TestHelper;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -12,12 +14,15 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
     class CreateTaskPropertyValidatorTests
     {
         private CreateTaskPropertyRequest _request;
+        private Mock<ITaskPropertyRepository> _repository;
         private ICreateTaskPropertyValidator _validator;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _validator = new CreateTaskPropertyValidator();
+            _repository = new Mock<ITaskPropertyRepository>();
+
+            _validator = new CreateTaskPropertyValidator(_repository.Object);
 
             var newProperties = new List<TaskProperty>
             {
@@ -40,6 +45,16 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 ProjectId = Guid.NewGuid(),
                 TaskProperties = newProperties
             };
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            _repository.Reset();
+
+            _repository
+                .Setup(x => x.AreExistForProject(_request.ProjectId, It.IsAny<string[]>()))
+                .Returns(false);
         }
 
         [Test]
@@ -68,6 +83,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             };
 
             _validator.TestValidate(request).ShouldHaveValidationErrorFor("TaskProperties[0].Name");
+            _repository.Verify(x => x.AreExistForProject(_request.ProjectId, It.IsAny<string[]>()), Times.Never);
         }
 
         [Test]
@@ -90,6 +106,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             };
 
             _validator.TestValidate(request).ShouldHaveValidationErrorFor("TaskProperties[0].Description");
+            _repository.Verify(x => x.AreExistForProject(_request.ProjectId, It.IsAny<string[]>()), Times.Never);
         }
 
         [Test]
@@ -112,12 +129,25 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             };
 
             _validator.TestValidate(request).ShouldHaveValidationErrorFor("TaskProperties[0].PropertyType");
+            _repository.Verify(x => x.AreExistForProject(_request.ProjectId, It.IsAny<string[]>()), Times.Never);
+        }
+
+        [Test]
+        public void ShouldHaveValidationErrorWhenPropertyIsAreadyExist()
+        {
+            _repository
+                .Setup(x => x.AreExistForProject(_request.ProjectId, It.IsAny<string[]>()))
+                .Returns(true);
+
+            _validator.TestValidate(_request).ShouldHaveAnyValidationError();
+            _repository.Verify(x => x.AreExistForProject(_request.ProjectId, It.IsAny<string[]>()), Times.Once);
         }
 
         [Test]
         public void ShouldValidRequest()
         {
             _validator.TestValidate(_request).ShouldNotHaveAnyValidationErrors();
+            _repository.Verify(x => x.AreExistForProject(_request.ProjectId, It.IsAny<string[]>()), Times.Once);
         }
     }
 }

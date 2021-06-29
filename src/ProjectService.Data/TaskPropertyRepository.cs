@@ -31,6 +31,15 @@ namespace LT.DigitalOffice.ProjectService.Data
             return ids.All(x => dbIds.Contains(x));
         }
 
+        public bool AreExistForProject(Guid projectId, params string[] propertyNames)
+        {
+            var dbPropertyNames = _provider.TaskProperties
+                .Where(tp => tp.ProjectId == projectId)
+                .Select(x => x.Name);
+
+            return propertyNames.Any(x => dbPropertyNames.Contains(x));
+        }
+
         public DbTaskProperty Get(Guid propertyId)
         {
             return _provider.TaskProperties.FirstOrDefault(x => x.Id == propertyId) ??

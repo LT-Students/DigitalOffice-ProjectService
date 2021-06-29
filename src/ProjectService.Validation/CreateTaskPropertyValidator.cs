@@ -1,35 +1,43 @@
 ﻿using FluentValidation;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
     public class CreateTaskPropertyValidator : AbstractValidator<CreateTaskPropertyRequest>, ICreateTaskPropertyValidator
     {
-        public CreateTaskPropertyValidator()
+        public CreateTaskPropertyValidator(ITaskPropertyRepository repository)
         {
             RuleFor(request => request.ProjectId)
-                .NotEmpty();
-
-            RuleForEach(request => request.TaskProperties).ChildRules(tp =>
-            {
-                tp.RuleFor(tp => tp.Name)
-                    .NotEmpty()
-                    .MaximumLength(32);
-
-                tp.RuleFor(tp => tp.Name)
-                    .NotEmpty()
-                    .MaximumLength(32);
-
-                tp.RuleFor(tp => tp.PropertyType)
-                    .IsInEnum();
-
-                tp.When(tp => tp.Description != null, () =>
+                .NotEmpty()
+                .DependentRules(() =>
                 {
-                    tp.RuleFor(tp => tp.Description)
-                        .NotEmpty();
+                    RuleForEach(request => request.TaskProperties).ChildRules(tp =>
+                    {
+                        tp.RuleFor(tp => tp.Name)
+                            .NotEmpty()
+                            .MaximumLength(32);
+
+                        tp.RuleFor(tp => tp.PropertyType)
+                            .IsInEnum();
+
+                        tp.When(tp => tp.Description != null, () =>
+                        {
+                            tp.RuleFor(tp => tp.Description)
+                                .NotEmpty();
+                        });
+                    })
+                    .DependentRules(() =>
+                    {
+                        RuleFor(request => request)
+                        .Must(request => !repository.AreExistForProject(
+                            request.ProjectId,
+                            request.TaskProperties.Select(x => x.Name).ToArray()))
+                        .WithMessage("One of the task property name already exist.");
+                    });
                 });
-            });
         }
     }
 }

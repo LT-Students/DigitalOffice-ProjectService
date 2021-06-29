@@ -13,6 +13,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
         bool AreExist(params Guid[] ids);
 
+        bool AreExistForProject(Guid projectId, params string[] propertyNames);
+
         DbTaskProperty Get(Guid propertyId);
 
         IEnumerable<DbTaskProperty> Find(FindTaskPropertiesFilter filter, int skipCount, int takeCount, out int totalCount);
