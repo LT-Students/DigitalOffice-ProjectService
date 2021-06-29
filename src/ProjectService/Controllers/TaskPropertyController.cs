@@ -4,19 +4,32 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
-    public class TaskPropertiesController
+    [Route("[controller]")]
+    [ApiController]
+    public class TaskPropertyController : ControllerBase
     {
+        private readonly IHttpContextAccessor _context;
+
+        public TaskPropertyController(IHttpContextAccessor context)
+        {
+            _context = context;
+        }
+
         [HttpPost("create")]
         public OperationResultResponse<IEnumerable<Guid>> Create(
             [FromServices] ICreateTaskPropertyCommand command,
             [FromBody] CreateTaskPropertyRequest request)
         {
+            _context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
+
             return command.Execute(request);
         }
 
