@@ -18,9 +18,9 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
-        public void Create(IEnumerable<DbTaskProperty> dbTaskProperty)
+        public void Create(IEnumerable<DbTaskProperty> dbTaskProperties)
         {
-            _provider.TaskProperties.AddRange(dbTaskProperty);
+            _provider.TaskProperties.AddRange(dbTaskProperties);
             _provider.Save();
         }
 

@@ -9,6 +9,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
     {
         public DbTaskProperty Map(TaskProperty request, Guid authorId, Guid projectId)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
             return new DbTaskProperty
             {
                 Id = Guid.NewGuid(),
