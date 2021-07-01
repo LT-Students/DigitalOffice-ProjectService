@@ -30,9 +30,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
 
         public TaskResponse Map(
             DbTask dbTask,
-            UserData authorUserData, 
+            UserData authorUserData,
             UserData parentAssignedUserData,
-            UserData parentAuthorAssignedUserData, 
+            UserData parentAuthorAssignedUserData,
             string departmentName,
             UserData assignedUserData,
             ICollection<TaskInfo> subtasksInfo)
@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
             {
                 throw new ArgumentNullException(nameof(dbTask));
             }
- 
+
             return new TaskResponse()
             {
                 Id = dbTask.Id,

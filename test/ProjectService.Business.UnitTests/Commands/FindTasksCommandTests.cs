@@ -475,7 +475,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         }
 
         [Test]
-        public void ShouldReturnFindResponseSuccesfull()
+        public void ShouldReturnFindResponseSuccessfull()
         {
             int skipCount = 0;
             int takeCount = _dbTasks.Count();

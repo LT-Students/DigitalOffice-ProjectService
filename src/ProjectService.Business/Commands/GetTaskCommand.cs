@@ -95,8 +95,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             List<Guid> userIds = new ()
             {
                 task.AuthorId,
-                task.AssignedUser.Id,
             };
+            
+            if (task.AssignedUser != null)
+            {
+                userIds.Add(task.AssignedUser.Id);
+            }
 
             if (task.ParentTask != null)
             {
@@ -109,15 +113,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 userIds.Add(parentTaskAssignedTo.Value);
             } 
             
-            var usersDataResponse = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
-                IGetUsersDataRequest.CreateObj(userIds)).Result.Message.Body.UsersData;
+            var res = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
+                IGetUsersDataRequest.CreateObj(userIds));
 
-            List<TaskInfo> subtasksInfo = new ();
-            foreach (var dbSubtask in task.Subtasks)
-            {
-                subtasksInfo.Add(_taskInfoMapper.Map(dbSubtask, null, null));
-            }
+            var usersDataResponse = res.Result.Message.Body.UsersData;
             
+            List<TaskInfo> subtasksInfo = new ();
+            if (task.Subtasks != null)
+            {
+                foreach (var dbSubtask in task.Subtasks)
+                {
+                    subtasksInfo.Add(_taskInfoMapper.Map(dbSubtask, null, null));
+                }
+            }
+
             TaskResponse response = _taskResponseMapper.Map(
                 task,
                 usersDataResponse.FirstOrDefault(x => x.Id == task.AuthorId),

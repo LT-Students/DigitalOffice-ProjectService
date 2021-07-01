@@ -25,11 +25,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
                 ShortName = value.ShortName,
                 Description = value.Description,
                 ShortDescription = value.ShortDescription,
-                Department = new DepartmentInfo
+                Department = value.DepartmentId != Guid.Empty ? new DepartmentInfo
                 {
                     Id = value.DepartmentId,
                     Name = departmentName
-                }
+                } : null
             };
         }
     }
