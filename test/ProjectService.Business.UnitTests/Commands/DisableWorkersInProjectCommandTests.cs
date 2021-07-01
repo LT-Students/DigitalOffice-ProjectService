@@ -1,6 +1,5 @@
 ﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
-using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using Moq;
@@ -8,7 +7,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 
-namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
+namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 {
     class DisableWorkersInProjectCommandTests
     {
