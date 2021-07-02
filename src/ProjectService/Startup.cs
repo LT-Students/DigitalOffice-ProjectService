@@ -110,7 +110,7 @@ namespace LT.DigitalOffice.ProjectService
 
             app.UseRouting();
 
-            //app.UseMiddleware<TokenMiddleware>();
+            app.UseMiddleware<TokenMiddleware>();
 
             app.UseCors(CorsPolicyName);
 
