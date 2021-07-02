@@ -73,7 +73,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 }
                 else
                 {
-                    userIds = projectUsers.Where(x => x.IsActive == true).Select(x => x.Id).Distinct().ToList();
+                    userIds = projectUsers.Where(x => x.IsActive == true).Select(x => x.UserId).Distinct().ToList();
                 }
 
                 errorMessage = $"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.";
@@ -81,26 +81,28 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 var usersDataResponse = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
                     IGetUsersDataRequest.CreateObj(userIds)).Result;
 
-                if (usersDataResponse.Message.IsSuccess)
-                {
-                    var usersData = usersDataResponse.Message.Body.UsersData;
+                var usersData = usersDataResponse.Message.Body.UsersData;
 
-                    projectUsersInfo = projectUsers
-                        .Select(pu => _projectUserInfoMapper.Map(usersData.First(x => x.Id == pu.UserId), pu))
-                        .ToList();
-                }
-                else
+                if (!usersDataResponse.Message.IsSuccess)
                 {
                     _logger.LogWarning(
                         $"Can not get users. Reason:{Environment.NewLine}{string.Join('\n', usersDataResponse.Message.Errors)}.");
                 }
+                else if (usersData.Any())
+                {
+                    projectUsersInfo = projectUsers
+                        .Select(pu => _projectUserInfoMapper.Map(usersData.FirstOrDefault(x => x.Id == pu.UserId), pu))
+                        .ToList();
+
+                    return projectUsersInfo;
+                }
             }
             catch (Exception exc)
             {
-                errors.Add(errorMessage);
-
                 _logger.LogError(exc, "Exception on get user information.");
             }
+
+            errors.Add(errorMessage);
 
             return projectUsersInfo;
         }
