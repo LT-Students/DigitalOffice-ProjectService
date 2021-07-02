@@ -83,12 +83,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
                 var usersData = usersDataResponse.Message.Body.UsersData;
 
-                if (!usersDataResponse.Message.IsSuccess)
-                {
-                    _logger.LogWarning(
-                        $"Can not get users. Reason:{Environment.NewLine}{string.Join('\n', usersDataResponse.Message.Errors)}.");
-                }
-                else if (usersData.Any())
+                if (usersDataResponse.Message.IsSuccess && usersData.Any())
                 {
                     projectUsersInfo = projectUsers
                         .Select(pu => _projectUserInfoMapper.Map(usersData.FirstOrDefault(x => x.Id == pu.UserId), pu))
@@ -96,13 +91,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
                     return projectUsersInfo;
                 }
+                else if (usersData.Any())
+                {
+                    errors.Add(errorMessage);
+
+                    _logger.LogWarning(
+                        $"Can not get users. Reason:{Environment.NewLine}{string.Join('\n', usersDataResponse.Message.Errors)}.");
+                }
             }
             catch (Exception exc)
             {
+                errors.Add(errorMessage);
+
                 _logger.LogError(exc, "Exception on get user information.");
             }
-
-            errors.Add(errorMessage);
 
             return projectUsersInfo;
         }
