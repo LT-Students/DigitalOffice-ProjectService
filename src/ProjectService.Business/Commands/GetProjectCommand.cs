@@ -62,7 +62,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             string errorMessage = null;
 
-            List<UserData> usersData = new();
             List<ProjectUserInfo> projectUsersInfo = new();
 
             try
@@ -83,17 +82,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 var usersDataResponse = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
                     IGetUsersDataRequest.CreateObj(userIds)).Result;
 
-                usersData = usersDataResponse.Message.Body.UsersData;
-
-                if (usersDataResponse.Message.IsSuccess && usersData.Any())
+                if (usersDataResponse.Message.IsSuccess && usersDataResponse.Message.Body.UsersData.Any())
                 {
                     projectUsersInfo = projectUsers
-                        .Select(pu => _projectUserInfoMapper.Map(usersData.FirstOrDefault(x => x.Id == pu.UserId), pu))
+                        .Select(pu => _projectUserInfoMapper.Map(
+                            usersDataResponse.Message.Body.UsersData.FirstOrDefault(x => x.Id == pu.UserId), pu))
                         .ToList();
 
                     return projectUsersInfo;
                 }
-                else if (usersData.Any())
+                else if (usersDataResponse.Message.Errors != null)
                 {
                     errors.Add(errorMessage);
 
