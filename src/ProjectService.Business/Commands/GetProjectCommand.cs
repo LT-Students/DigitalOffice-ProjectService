@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
@@ -61,6 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             string errorMessage = null;
 
+            List<UserData> usersData = new();
             List<ProjectUserInfo> projectUsersInfo = new();
 
             try
@@ -81,7 +83,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 var usersDataResponse = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
                     IGetUsersDataRequest.CreateObj(userIds)).Result;
 
-                var usersData = usersDataResponse.Message.Body.UsersData;
+                usersData = usersDataResponse.Message.Body.UsersData;
 
                 if (usersDataResponse.Message.IsSuccess && usersData.Any())
                 {
