@@ -5,6 +5,7 @@ using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
 using LT.DigitalOffice.Kernel.Middlewares.Token;
 using LT.DigitalOffice.ProjectService.Broker;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
+using LT.DigitalOffice.ProjectService.Mappers.Helpers;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
@@ -18,7 +19,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using LT.DigitalOffice.ProjectService.Mappers.Helpers;
 
 namespace LT.DigitalOffice.ProjectService
 {

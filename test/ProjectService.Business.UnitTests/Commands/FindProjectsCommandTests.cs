@@ -14,12 +14,11 @@ using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.Kernel.Broker;
 using System.Threading.Tasks;
 using LT.DigitalOffice.UnitTestKernel;
-using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 
-namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
+namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 {
     class FindProjectsCommandTests
     {
