@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
@@ -73,7 +74,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 }
                 else
                 {
-                    userIds = projectUsers.Where(x => x.IsActive == true).Select(x => x.Id).Distinct().ToList();
+                    userIds = projectUsers.Where(x => x.IsActive == true).Select(x => x.UserId).Distinct().ToList();
                 }
 
                 errorMessage = $"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.";
@@ -81,16 +82,19 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 var usersDataResponse = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
                     IGetUsersDataRequest.CreateObj(userIds)).Result;
 
-                if (usersDataResponse.Message.IsSuccess)
+                if (usersDataResponse.Message.IsSuccess && usersDataResponse.Message.Body.UsersData.Any())
                 {
-                    var usersData = usersDataResponse.Message.Body.UsersData;
-
                     projectUsersInfo = projectUsers
-                        .Select(pu => _projectUserInfoMapper.Map(usersData.First(x => x.Id == pu.UserId), pu))
+                        .Select(pu => _projectUserInfoMapper.Map(
+                            usersDataResponse.Message.Body.UsersData.FirstOrDefault(x => x.Id == pu.UserId), pu))
                         .ToList();
+
+                    return projectUsersInfo;
                 }
-                else
+                else if (usersDataResponse.Message.Errors != null)
                 {
+                    errors.Add(errorMessage);
+
                     _logger.LogWarning(
                         $"Can not get users. Reason:{Environment.NewLine}{string.Join('\n', usersDataResponse.Message.Errors)}.");
                 }

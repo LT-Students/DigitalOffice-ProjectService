@@ -1,7 +1,8 @@
-using System;
-using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using System;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Models
 {
@@ -13,17 +14,17 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
             {
                 throw new ArgumentNullException(nameof(dbTaskProperty));
             }
- 
-            return new TaskPropertyInfo()
+
+            return new TaskPropertyInfo
             {
                 Id = dbTaskProperty.Id,
-                AuthorId = dbTaskProperty.AuthorId,
                 ProjectId = dbTaskProperty.ProjectId,
-                PropertyType = dbTaskProperty.PropertyType,
+                AuthorId = dbTaskProperty.AuthorId,
                 Name = dbTaskProperty.Name,
-                Description = dbTaskProperty.Description,
                 CreatedAt = dbTaskProperty.CreatedAt,
-                IsActive = dbTaskProperty.IsActive
+                Description = dbTaskProperty.Description,
+                IsActive = dbTaskProperty.IsActive,
+                PropertyType = (TaskPropertyType)dbTaskProperty.PropertyType
             };
         }
     }

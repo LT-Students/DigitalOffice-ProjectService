@@ -2,7 +2,7 @@
 using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.File;
-using LT.DigitalOffice.Models.Broker.Requests.Project;
+using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
@@ -23,6 +23,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
         [AutoInjectRequest(typeof(IFindDepartmentsRequest))]
         public string FindDepartmentsEndpoint { get; set; }
+
+        [AutoInjectRequest(typeof(ICreateWorkspaceRequest))]
+        public string CreateWorkspaceEndpoint { get; set; }
 
         public string GetProjectIdsEndpoint { get; set; }
 
