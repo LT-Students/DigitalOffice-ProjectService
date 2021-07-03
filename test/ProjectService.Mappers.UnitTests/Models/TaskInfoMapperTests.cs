@@ -101,20 +101,20 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
             Assert.Throws<ArgumentNullException>(() => _mapper.Map(null, userData, userData));
         }
 
-        [Test]
-        public void ShouldReturnDbTaskSuccessfulWhenUserDataIsNull()
-        {
-            UserData assignedUserData = null;
-            UserData authorData = null;
-
-            _taskInfo.AssignedTo.FirstName = null;
-            _taskInfo.AssignedTo.LastName = null;
-
-            _taskInfo.Author.FirstName = null;
-            _taskInfo.Author.LastName = null;
-
-            SerializerAssert.AreEqual(_taskInfo, _mapper.Map(_dbTask, assignedUserData, authorData));
-        }
+        // [Test]
+        // public void ShouldReturnDbTaskSuccessfulWhenUserDataIsNull()
+        // {
+        //     UserData assignedUserData = null;
+        //     UserData authorData = null;
+        //
+        //     _taskInfo.AssignedTo.FirstName = null;
+        //     _taskInfo.AssignedTo.LastName = null;
+        //
+        //     _taskInfo.Author.FirstName = null;
+        //     _taskInfo.Author.LastName = null;
+        //
+        //     SerializerAssert.AreEqual(_taskInfo, _mapper.Map(_dbTask, assignedUserData, authorData));
+        // }
 
         [Test]
         public void ShouldReturnDbTaskSuccessful()

@@ -2,6 +2,7 @@ using System;
 using LT.DigitalOffice.ProjectService.Mappers.Models;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
@@ -50,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 Id = _id,
                 AuthorId = _authorId,
                 ProjectId = _projectId,
-                PropertyType = _propertyType,
+                PropertyType = (TaskPropertyType)_propertyType,
                 Name = _name,
                 Description = _description,
                 CreatedAt = _createdAt,
