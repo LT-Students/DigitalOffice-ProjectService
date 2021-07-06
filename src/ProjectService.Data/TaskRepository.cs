@@ -86,7 +86,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
                 return dbTask;
             }
-            
+
             return _provider.Tasks.FirstOrDefault(x => x.Id == taskId) ??
                    throw new NotFoundException($"Task id '{taskId}' was not found.");
         }

@@ -10,7 +10,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces
     [AutoInject]
     public interface ITaskResponseMapper
     {
-        public TaskResponse Map(
+        TaskResponse Map(
             DbTask dbTask,
             UserData authorUserData, 
             UserData parentAssignedUserData,

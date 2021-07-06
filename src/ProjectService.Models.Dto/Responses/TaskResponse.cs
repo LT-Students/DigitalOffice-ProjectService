@@ -5,7 +5,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
 {
-    public class TaskResponse
+    public record TaskResponse
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

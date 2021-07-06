@@ -5,6 +5,7 @@ using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
@@ -48,6 +49,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     return response.Message.Body;
                 }
 
+                errors.AddRange(response.Message.Errors);
                 _logger.LogWarning(
                     "Can not find department with this id '{userId}': {NewLine}{errors}",
                     userId, Environment.NewLine, string.Join('\n', response.Message.Errors));
@@ -61,7 +63,41 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             return null;
         }
-        
+
+        private void Authorization(DbTask task, List<string> errors, out IGetDepartmentResponse department)
+        {
+            List<DbProjectUser> projectUsers = null;
+            if (task != null)
+            {
+                projectUsers = _userRepository.GetProjectUsers(task.ProjectId, false).ToList();
+            }
+
+            Guid requestUserId = _httpContext.GetUserId();
+
+            department = GetDepartment(requestUserId, errors);
+
+            if (_accessValidator.IsAdmin(requestUserId))
+            {
+                throw new ForbiddenException("Not enough rights.");
+            }
+
+            if (projectUsers != null)
+            {
+                if (projectUsers.FirstOrDefault(x => x.UserId == requestUserId) == null)
+                {
+                    throw new ForbiddenException("Not enough rights.");
+                }
+            }
+            
+            if (department != null)
+            {
+                if (department.DirectorUserId != requestUserId)
+                {
+                    throw new ForbiddenException("Not enough rights.");
+                }
+            }
+        }
+
         public GetTaskCommand(
             ITaskRepository taskRepository,
             IUserRepository userRepository,
@@ -84,19 +120,19 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _usersDataRequestClient = userRequestClient;
         }
 
-        public TaskResponse Execute(Guid taskId, bool isFullModel=true)
+        public TaskResponse Execute(Guid taskId, bool isFullModel = true)
         {
             var errors = new List<string>();
 
             DbTask task = _taskRepository.Get(taskId, isFullModel);
-            
+
             Authorization(task, errors, out IGetDepartmentResponse department);
 
-            List<Guid> userIds = new ()
+            List<Guid> userIds = new()
             {
                 task.AuthorId,
             };
-            
+
             if (task.AssignedUser != null)
             {
                 userIds.Add(task.AssignedUser.Id);
@@ -111,14 +147,25 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             if (parentTaskAssignedTo != null && parentTaskAssignedTo != Guid.Empty)
             {
                 userIds.Add(parentTaskAssignedTo.Value);
-            } 
-            
-            var res = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
-                IGetUsersDataRequest.CreateObj(userIds));
+            }
 
-            var usersDataResponse = res.Result.Message.Body.UsersData;
+            List<UserData> usersDataResponse = new();
+            try
+            {
+                var res = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
+                    IGetUsersDataRequest.CreateObj(userIds)); 
+                usersDataResponse = res.Result.Message.Body.UsersData;
+            }
+            catch (Exception exc)
+            {
+                errors.Add($"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.");
+
+                _logger.LogError(exc, "Exception on get user information.");
+            }
+
             
-            List<TaskInfo> subtasksInfo = new ();
+
+            List<TaskInfo> subtasksInfo = new();
             if (task.Subtasks != null)
             {
                 foreach (var dbSubtask in task.Subtasks)
@@ -138,39 +185,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             response.Errors = errors;
 
             return response;
-        }
-
-        private void Authorization(DbTask task, List<string> errors, out IGetDepartmentResponse department)
-        {
-            List<DbProjectUser> projectUsers = null;
-            if (task != null)
-            {
-                projectUsers = _userRepository.GetProjectUsers(task.ProjectId, false).ToList();
-            }
-
-            Guid requestUserId = _httpContext.GetUserId();
-            
-            department = GetDepartment(requestUserId, errors);
-
-            bool isAdmin = _accessValidator.IsAdmin(requestUserId);
-
-            bool isProjectParticipant = false;
-            if (projectUsers != null)
-            {
-                isProjectParticipant =  projectUsers.FirstOrDefault(x =>
-                    x.UserId == requestUserId) != null;
-            }
-
-            bool isDepartmentDirector = false;
-            if (department != null)
-            {
-                isDepartmentDirector = department.DirectorUserId == requestUserId;
-            }
-
-            if (!isAdmin && !isProjectParticipant && !isDepartmentDirector)
-            {
-                throw new ForbiddenException("Not enough rights.");
-            }
         }
     }
 }
