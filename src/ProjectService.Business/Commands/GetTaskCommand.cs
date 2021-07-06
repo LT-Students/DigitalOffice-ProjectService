@@ -66,6 +66,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         private void Authorization(DbTask task, List<string> errors, out IGetDepartmentResponse department)
         {
+            bool hasRights = false;
+            
             List<DbProjectUser> projectUsers = null;
             if (task != null)
             {
@@ -78,24 +80,26 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             if (_accessValidator.IsAdmin(requestUserId))
             {
-                throw new ForbiddenException("Not enough rights.");
+                return;
             }
 
             if (projectUsers != null)
             {
-                if (projectUsers.FirstOrDefault(x => x.UserId == requestUserId) == null)
+                if (projectUsers.FirstOrDefault(x => x.UserId == requestUserId) != null)
                 {
-                    throw new ForbiddenException("Not enough rights.");
+                    return;
                 }
             }
             
             if (department != null)
             {
-                if (department.DirectorUserId != requestUserId)
+                if (department.DirectorUserId == requestUserId)
                 {
-                    throw new ForbiddenException("Not enough rights.");
+                    return;
                 }
             }
+            
+            throw new ForbiddenException("Not enough rights.");
         }
 
         public GetTaskCommand(
