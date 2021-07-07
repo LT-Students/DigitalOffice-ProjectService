@@ -102,7 +102,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _validator.ValidateAndThrowCustom(request);
 
-            Guid taskId = _repository.CreateTask(_mapperTask.Map(request));
+            Guid taskId = _repository.CreateTask(_mapperTask.Map(request, authorId));
 
             return new OperationResultResponse<Guid>
             {
