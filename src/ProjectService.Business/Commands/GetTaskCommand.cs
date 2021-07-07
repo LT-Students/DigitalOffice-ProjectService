@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Models.Broker.Models;
@@ -124,7 +125,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _usersDataRequestClient = userRequestClient;
         }
 
-        public TaskResponse Execute(Guid taskId, bool isFullModel = true)
+        public OperationResultResponse<TaskResponse> Execute(Guid taskId, bool isFullModel = true)
         {
             var errors = new List<string>();
 
@@ -186,9 +187,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 department.Name,
                 usersDataResponse.FirstOrDefault(x => x.Id == task.ParentTask.AuthorId),
                 subtasksInfo);
-            response.Errors = errors;
 
-            return response;
+            return new OperationResultResponse<TaskResponse>()
+            {
+                Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
+                Body = response,
+                Errors = errors
+            };
         }
     }
 }

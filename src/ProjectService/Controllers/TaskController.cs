@@ -25,7 +25,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         }
         
         [HttpGet("get")]
-        public TaskResponse Get(
+        public OperationResultResponse<TaskResponse> Get(
             [FromQuery] Guid taskId,
             [FromServices] IGetTaskCommand command)
         {

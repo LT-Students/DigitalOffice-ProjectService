@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
@@ -69,7 +70,12 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private readonly Guid _taskId = Guid.NewGuid();
         private readonly Guid _userId = Guid.NewGuid();
 
-        private readonly TaskResponse _fullSuccessModel = new();
+        private readonly OperationResultResponse<TaskResponse> _fullSuccessModel = new OperationResultResponse<TaskResponse>()
+        {
+            Body = new TaskResponse(),
+            Errors = new List<string>(),
+            Status = OperationResultStatusType.FullSuccess
+        };
 
         #endregion
 

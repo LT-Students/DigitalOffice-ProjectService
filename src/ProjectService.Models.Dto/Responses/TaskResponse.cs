@@ -23,7 +23,5 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
         public TaskInfo ParentTask { get; set; }
 
         public ICollection<TaskInfo> Subtasks { get; set; }
-
-        public List<string> Errors { get; set; } = new();
     }
 }

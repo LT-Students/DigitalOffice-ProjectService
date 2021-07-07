@@ -170,25 +170,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
         }
 
         [Test]
-        public void ShouldReturnTaskResponse()
-        {
-            TaskResponse result = _mapper.Map(
-                _dbTask,
-                _authorUserData,
-                _parentAssignedUserData,
-                _parentAuthorAssignedUserData,
-                _departmentName,
-                _assignedUserData,
-                _subtasksInfos
-            );
-            
-            SerializerAssert.AreEqual(
-                _taskResponse,
-                result
-            );
-        }
-
-        [Test]
         public void ExceptionWhenArgumentIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => _mapper.Map(
