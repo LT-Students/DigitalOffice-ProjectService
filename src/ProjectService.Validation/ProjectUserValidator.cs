@@ -9,8 +9,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
         public ProjectUserValidator()
         {
             RuleFor(pu => pu.UserId)
-                        .NotEmpty()
-                        .WithMessage("Not specified user id.");
+                .NotEmpty()
+                .WithMessage("Not specified user id.");
 
             RuleFor(pu => pu.Role)
                 .IsInEnum();
