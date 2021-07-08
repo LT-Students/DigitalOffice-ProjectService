@@ -6,8 +6,8 @@ using System;
 namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
     [DbContext(typeof(ProjectServiceDbContext))]
-    [Migration("20210707003534_ChangeTaskPropertiesTableColumn")]
-    public class ChangeTaskPropertiesTableColumn : Migration
+    [Migration("20210707003534_ChangeTaskPropertiesAndProjectsTablesColumns")]
+    public class ChangeTaskPropertiesAndProjectsTablesColumns : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -20,6 +20,12 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 name: nameof(DbTaskProperty.AuthorId),
                 table: DbTaskProperty.TableName,
                 nullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: nameof(DbProject.ShortName),
+                table: DbProject.TableName,
+                nullable: true,
+                maxLength: 30);
         }
     }
 }

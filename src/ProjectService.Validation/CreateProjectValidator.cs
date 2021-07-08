@@ -17,13 +17,16 @@ namespace LT.DigitalOffice.ProjectService.Validation
                 .MaximumLength(150)
                 .WithMessage("Project name is too long.");
 
-            RuleFor(project => project.ShortName)
-                .NotEmpty()
-                .MaximumLength(30)
-                .WithMessage("Project short name is too long.");
-
             RuleFor(project => project.Status)
                 .IsInEnum();
+
+            When(project => project.ShortName != null, () =>
+            {
+                RuleFor(project => project.ShortName)
+                    .NotEmpty()
+                    .MaximumLength(30)
+                    .WithMessage("Project short name is too long.");
+            });
 
             When(project => project.Users != null && project.Users.Any(), () =>
             {
@@ -39,7 +42,16 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
             When(project => project.ShortDescription != null, () =>
             {
+                RuleFor(project => project.ShortDescription)
+                    .NotEmpty()
+                    .MaximumLength(300)
+                    .WithMessage("Project short description is too long.");
+            });
+
+            When(project => project.Description != null, () =>
+            {
                 RuleFor(project => project.Description)
+                    .NotEmpty()
                     .MaximumLength(300)
                     .WithMessage("Project short description is too long.");
             });
