@@ -65,15 +65,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             return null;
         }
 
-        private void Authorization(DbTask task, List<string> errors, out IGetDepartmentResponse department)
+        private void Authorization(Guid taskProjectId, List<string> errors, out IGetDepartmentResponse department)
         {
-            bool hasRights = false;
-            
-            List<DbProjectUser> projectUsers = null;
-            if (task != null)
-            {
-                projectUsers = _userRepository.GetProjectUsers(task.ProjectId, false).ToList();
-            }
+            List<DbProjectUser> projectUsers = _userRepository
+                .GetProjectUsers(taskProjectId, false)
+                .ToList();
 
             Guid requestUserId = _httpContext.GetUserId();
 
@@ -84,14 +80,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 return;
             }
 
-            if (projectUsers != null)
+            if (projectUsers.FirstOrDefault(x => x.UserId == requestUserId) != null)
             {
-                if (projectUsers.FirstOrDefault(x => x.UserId == requestUserId) != null)
-                {
-                    return;
-                }
+                return;
             }
-            
+
             if (department != null)
             {
                 if (department.DirectorUserId == requestUserId)
@@ -99,7 +92,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     return;
                 }
             }
-            
+
             throw new ForbiddenException("Not enough rights.");
         }
 
@@ -131,7 +124,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             DbTask task = _taskRepository.Get(taskId, isFullModel);
 
-            Authorization(task, errors, out IGetDepartmentResponse department);
+            Authorization(task.ProjectId, errors, out IGetDepartmentResponse department);
 
             List<Guid> userIds = new()
             {
@@ -158,7 +151,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             try
             {
                 var res = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
-                    IGetUsersDataRequest.CreateObj(userIds)); 
+                    IGetUsersDataRequest.CreateObj(userIds));
                 usersDataResponse = res.Result.Message.Body.UsersData;
             }
             catch (Exception exc)
@@ -167,8 +160,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
                 _logger.LogError(exc, "Exception on get user information.");
             }
-
-            
 
             List<TaskInfo> subtasksInfo = new();
             if (task.Subtasks != null)
@@ -190,7 +181,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             return new OperationResultResponse<TaskResponse>()
             {
-                Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
+                Status =
+                    errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
                 Body = response,
                 Errors = errors
             };

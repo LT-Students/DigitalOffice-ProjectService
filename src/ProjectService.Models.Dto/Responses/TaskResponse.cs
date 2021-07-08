@@ -22,6 +22,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
         public TaskPropertyInfo Type { get; set; }
         public TaskInfo ParentTask { get; set; }
 
-        public ICollection<TaskInfo> Subtasks { get; set; }
+        public IEnumerable<TaskInfo> Subtasks { get; set; }
     }
 }

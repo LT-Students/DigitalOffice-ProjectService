@@ -7,6 +7,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     [AutoInject]
     public interface IGetTaskCommand
     {
-        public OperationResultResponse<TaskResponse> Execute(Guid taskId, bool isFullModel=true);
+        OperationResultResponse<TaskResponse> Execute(Guid taskId, bool isFullModel=true);
     }
 }

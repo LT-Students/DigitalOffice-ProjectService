@@ -37,9 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private IGetTaskCommand _command;
 
         private Mock<ITaskRepository> _taskRepositoryMock;
-        private Mock<IProjectRepository> _projectRepositoryMock;
         private Mock<IUserRepository> _userRepositoryMock;
-        private Mock<IEditTaskValidator> _validatorMock;
         private Mock<IAccessValidator> _accessValidatorMock;
         private Mock<IHttpContextAccessor> _httpAccessorMock;
         private Mock<ITaskResponseMapper> _taskResponseMapperMock;
@@ -60,17 +58,12 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
 
         private readonly string _name = "NewName";
         private readonly string _description = "New Description";
-        private readonly Guid _assignedTo = Guid.NewGuid();
         private readonly int _plannedMinutes = 60;
-        private readonly Guid _priorityId = Guid.NewGuid();
-        private readonly Guid _statusId = Guid.NewGuid();
-        private readonly Guid _typeId = Guid.NewGuid();
         private readonly Guid _projectId = Guid.NewGuid();
-        private readonly Guid _departmentId = Guid.NewGuid();
         private readonly Guid _taskId = Guid.NewGuid();
         private readonly Guid _userId = Guid.NewGuid();
 
-        private readonly OperationResultResponse<TaskResponse> _fullSuccessModel = new OperationResultResponse<TaskResponse>()
+        private readonly OperationResultResponse<TaskResponse> _fullSuccessModel = new()
         {
             Body = new TaskResponse(),
             Errors = new List<string>(),
@@ -154,9 +147,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             #region Mock initialization
 
             _taskRepositoryMock = new Mock<ITaskRepository>();
-            _projectRepositoryMock = new Mock<IProjectRepository>();
             _userRepositoryMock = new Mock<IUserRepository>();
-            _validatorMock = new Mock<IEditTaskValidator>();
             _accessValidatorMock = new Mock<IAccessValidator>();
             _httpAccessorMock = new Mock<IHttpContextAccessor>();
             _taskResponseMapperMock = new Mock<ITaskResponseMapper>();

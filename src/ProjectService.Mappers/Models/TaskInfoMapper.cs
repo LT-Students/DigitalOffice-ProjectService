@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
                 AssignedTo = assignedUser != null && dbTask.AssignedTo.HasValue
                     ? new UserTaskInfo
                     {
-                        Id = dbTask.AssignedTo.HasValue ? dbTask.AssignedTo.Value : null,
+                        Id = dbTask.AssignedTo.Value,
                         FirstName = assignedUser?.FirstName,
                         LastName = assignedUser?.LastName
                     }
