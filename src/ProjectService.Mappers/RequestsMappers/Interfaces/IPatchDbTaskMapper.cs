@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces
     [AutoInject]
     public interface IPatchDbTaskMapper
     {
-        public JsonPatchDocument<DbTask> Map(JsonPatchDocument<EditTaskRequest> request);
+        JsonPatchDocument<DbTask> Map(JsonPatchDocument<EditTaskRequest> request);
     }
 }

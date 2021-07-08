@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces
     [AutoInject]
     public interface IDbProjectMapper
     {
-        public DbProject Map(ProjectRequest request, Guid authorId);
+        DbProject Map(ProjectRequest request, Guid authorId);
     }
 }
