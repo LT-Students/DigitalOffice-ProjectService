@@ -13,6 +13,5 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
         public Guid PriorityId { get; set; }
         public int? PlannedMinutes { get; set; }
         public Guid? ParentId { get; set; }
-        public Guid AuthorId { get; set; }
     }
 }

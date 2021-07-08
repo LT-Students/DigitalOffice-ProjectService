@@ -8,7 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 {
     public class DbTaskMapper : IDbTaskMapper
     {
-        public DbTask Map(CreateTaskRequest taskRequest)
+        public DbTask Map(CreateTaskRequest taskRequest, Guid authorId)
         {
             if (taskRequest == null)
             {
@@ -22,23 +22,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 Description = taskRequest.Description,
                 PlannedMinutes = taskRequest.PlannedMinutes,
                 AssignedTo = taskRequest.AssignedTo,
-                AuthorId = taskRequest.AuthorId,
+                AuthorId = authorId,
                 ProjectId = taskRequest.ProjectId,
                 CreatedAt = DateTime.UtcNow,
                 ParentId = taskRequest.ParentId,
-                Number = TaskNumberHelper.GetProjectTaskNumber(taskRequest.ProjectId),
-                Priority = new DbTaskProperty
-                {
-                    Id = taskRequest.PriorityId
-                },
-                Status = new DbTaskProperty
-                {
-                    Id = taskRequest.StatusId
-                },
-                Type = new DbTaskProperty
-                {
-                    Id = taskRequest.TypeId
-                }
+                PriorityId = taskRequest.PriorityId,
+                StatusId = taskRequest.StatusId,
+                TypeId = taskRequest.TypeId,
+                Number = TaskNumberHelper.GetProjectTaskNumber(taskRequest.ProjectId)
             };
         }
     }

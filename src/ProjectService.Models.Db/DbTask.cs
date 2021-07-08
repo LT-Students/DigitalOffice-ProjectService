@@ -29,6 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public DbTaskProperty Priority { get; set; }
         public DbTaskProperty Type { get; set; }
     }
+
     public class DbTaskConfiguration : IEntityTypeConfiguration<DbTask>
     {
         public void Configure(EntityTypeBuilder<DbTask> builder)
