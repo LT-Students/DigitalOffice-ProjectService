@@ -40,8 +40,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
             When(project => project.ShortDescription != null, () =>
             {
                 RuleFor(project => project.Description)
-                .MaximumLength(300)
-                .WithMessage("Project short description is too long.");
+                    .MaximumLength(300)
+                    .WithMessage("Project short description is too long.");
             });
         }
     }

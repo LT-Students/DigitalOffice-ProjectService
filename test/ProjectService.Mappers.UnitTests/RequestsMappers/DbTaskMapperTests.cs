@@ -51,7 +51,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 Description = "Create smth in somewhere",
                 PlannedMinutes = 30,
                 AssignedTo = Guid.NewGuid(),
-                AuthorId = authorId,
                 ProjectId = Guid.NewGuid(),
                 ParentId = Guid.NewGuid(),
                 PriorityId = Guid.NewGuid(),
@@ -63,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenCreateTaskRequestIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null));
+            Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null, authorId));
         }
 
         [Test]
@@ -95,7 +94,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 .Returns(GetQueryableMockDbSet(tasks));
 
             TaskNumberHelper.LoadCache(_mocker.GetMock<IDataProvider>().Object);
-            var dbTask = _dbTaskMapper.Map(_createTaskRequest);
+            var dbTask = _dbTaskMapper.Map(_createTaskRequest, authorId);
             var expectedDbTask = new DbTask
             {
                 Id = dbTask.Id,
@@ -103,24 +102,16 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 Description = _createTaskRequest.Description,
                 PlannedMinutes = _createTaskRequest.PlannedMinutes,
                 AssignedTo = _createTaskRequest.AssignedTo,
-                AuthorId = _createTaskRequest.AuthorId,
+                AuthorId = authorId,
                 ProjectId = _createTaskRequest.ProjectId,
                 CreatedAt = dbTask.CreatedAt,
                 ParentId = _createTaskRequest.ParentId,
                 Number = maxNumber + 1,
-                Priority = new DbTaskProperty()
-                {
-                    Id = _createTaskRequest.PriorityId
-                },
-                Status = new DbTaskProperty()
-                {
-                    Id = _createTaskRequest.StatusId
-                },
-                Type = new DbTaskProperty()
-                {
-                    Id = _createTaskRequest.TypeId
-                }
+                PriorityId = _createTaskRequest.PriorityId,
+                StatusId = _createTaskRequest.StatusId,
+                TypeId = _createTaskRequest.TypeId
             };
+
             SerializerAssert.AreEqual(expectedDbTask, dbTask);
         }
     }
