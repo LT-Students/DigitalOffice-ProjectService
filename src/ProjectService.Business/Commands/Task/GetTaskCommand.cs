@@ -11,7 +11,7 @@ using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.Models.Broker.Responses.User;
-using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
@@ -22,7 +22,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands
+namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 {
     public class GetTaskCommand : IGetTaskCommand
     {
@@ -158,7 +158,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             {
                 errors.Add($"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.");
 
-                _logger.LogError(exc, "Exception on get user information.");
+                _logger.LogWarning(exc, "Exception on get user information.");
             }
 
             List<TaskInfo> subtasksInfo = new();
@@ -173,10 +173,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             TaskResponse response = _taskResponseMapper.Map(
                 task,
                 usersDataResponse.FirstOrDefault(x => x.Id == task.AuthorId),
-                usersDataResponse.FirstOrDefault(x => x.Id == task.AssignedUser.Id),
-                usersDataResponse.FirstOrDefault(x => x.Id == parentTaskAssignedTo),
-                department.Name,
-                usersDataResponse.FirstOrDefault(x => x.Id == task.ParentTask.AuthorId),
+                usersDataResponse.FirstOrDefault(x => task.AssignedUser != null && x.Id == task.AssignedUser.Id),
+                usersDataResponse.FirstOrDefault(x => parentTaskAssignedTo != null && x.Id == parentTaskAssignedTo),
+                department?.Name,
+                usersDataResponse.FirstOrDefault(x => task.ParentTask != null && x.Id == task.ParentTask.AuthorId),
                 subtasksInfo);
 
             return new OperationResultResponse<TaskResponse>()

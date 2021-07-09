@@ -45,16 +45,30 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
             return new TaskResponse()
             {
                 Id = dbTask.Id,
-                Type = _taskPropertyInfoMapper.Map(dbTask.Type),
-                Author = _projectUserInfoMapper.Map(authorUserData, dbTask.Author),
-                Status = _taskPropertyInfoMapper.Map(dbTask.Status),
-                ParentTask = _taskInfoMapper.Map(
-                    dbTask.ParentTask,
-                    parentAssignedUserData,
-                    parentAuthorAssignedUserData),
-                Project = _projectInfoMapper.Map(dbTask.Project, departmentName),
-                Priority = _taskPropertyInfoMapper.Map(dbTask.Priority),
-                AssignedUser = _projectUserInfoMapper.Map(assignedUserData, dbTask.AssignedUser),
+                Type = dbTask.Type != null 
+                    ? _taskPropertyInfoMapper.Map(dbTask.Type)
+                    : null,
+                Author = dbTask.Author != null 
+                    ? _projectUserInfoMapper.Map(authorUserData, dbTask.Author)
+                    : null,
+                Status = dbTask.Status != null 
+                    ? _taskPropertyInfoMapper.Map(dbTask.Status) 
+                    : null,
+                ParentTask = dbTask.ParentTask != null
+                    ? _taskInfoMapper.Map(
+                        dbTask.ParentTask,
+                        parentAssignedUserData,
+                        parentAuthorAssignedUserData)
+                    : null,
+                Project = dbTask.Project != null 
+                    ? _projectInfoMapper.Map(dbTask.Project, departmentName) 
+                    : null,
+                Priority = dbTask.Priority != null 
+                    ? _taskPropertyInfoMapper.Map(dbTask.Priority) 
+                    : null,
+                AssignedUser = assignedUserData != null
+                    ? _projectUserInfoMapper.Map(assignedUserData, dbTask.AssignedUser)
+                    : null,
                 Name = dbTask.Name,
                 Description = dbTask.Description,
                 Number = dbTask.Number,
