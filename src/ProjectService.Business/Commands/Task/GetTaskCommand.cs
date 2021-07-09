@@ -38,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
         private IGetDepartmentResponse GetDepartment(Guid userId, List<string> errors)
         {
-            string errorMessage = "Cannot get task. Please try again later.";
+            string errorMessage = "Cannot get user's department. Please try again later.";
 
             try
             {
@@ -52,7 +52,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
                 errors.AddRange(response.Message.Errors);
                 _logger.LogWarning(
-                    "Can not find department with this id '{userId}': {NewLine}{errors}",
+                    "Can not find department for user with this id '{userId}': {NewLine}{errors}",
                     userId, Environment.NewLine, string.Join('\n', response.Message.Errors));
             }
             catch (Exception exc)
