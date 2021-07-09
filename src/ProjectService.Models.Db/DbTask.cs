@@ -34,6 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
         public ICollection<DbTask> Subtasks { get; set; }
     }
+
     public class DbTaskConfiguration : IEntityTypeConfiguration<DbTask>
     {
         public void Configure(EntityTypeBuilder<DbTask> builder)

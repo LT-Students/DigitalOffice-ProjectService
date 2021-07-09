@@ -55,15 +55,18 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
             RuleFor(task => task.PriorityId)
                 .NotEmpty()
-                .Must(x => taskPropertyRepository.AreExist(x));
+                .Must(x => taskPropertyRepository.AreExist(x))
+                .WithMessage("Priority id does not exist.");
 
             RuleFor(task => task.StatusId)
                 .NotEmpty()
-                .Must(x => taskPropertyRepository.AreExist(x));
+                .Must(x => taskPropertyRepository.AreExist(x))
+                .WithMessage("Status id not exist.");
 
             RuleFor(task => task.TypeId)
                 .NotEmpty()
-                .Must(x => taskPropertyRepository.AreExist(x));
+                .Must(x => taskPropertyRepository.AreExist(x))
+                .WithMessage("Type id not exist.");
         }
     }
 }
