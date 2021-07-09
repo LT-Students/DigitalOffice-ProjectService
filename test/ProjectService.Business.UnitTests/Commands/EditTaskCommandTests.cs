@@ -134,7 +134,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                         It.IsAny<object>(),
                         default,
                         default))
-                .Returns(Task.FromResult(_operationResultBrokerMock.Object))
+                .Returns(System.Threading.Tasks.Task.FromResult(_operationResultBrokerMock.Object))
                 .Verifiable();
         }
 

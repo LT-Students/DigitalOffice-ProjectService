@@ -330,7 +330,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             _mocker
                 .Setup<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
                     x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default))
-                .Returns(Task.FromResult(_responseUsersData.Object));
+                .Returns(System.Threading.Tasks.Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
 
@@ -391,7 +391,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             _mocker
                 .Setup<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
                     x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default))
-                .Returns(Task.FromResult(_responseUsersData.Object));
+                .Returns(System.Threading.Tasks.Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
 
@@ -456,7 +456,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             _mocker
                 .SetupSequence<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
                     x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default))
-                .Returns(Task.FromResult(_responseUsersData.Object));
+                .Returns(System.Threading.Tasks.Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
 
@@ -514,7 +514,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             _mocker
                 .SetupSequence<IRequestClient<IGetUsersDataRequest>, Task<Response<IOperationResult<IGetUsersDataResponse>>>>(x =>
                     x.GetResponse<IOperationResult<IGetUsersDataResponse>>(It.IsAny<object>(), default, default))
-                .Returns(Task.FromResult(_responseUsersData.Object));
+                .Returns(System.Threading.Tasks.Task.FromResult(_responseUsersData.Object));
 
             SerializerAssert.AreEqual(result, _command.Execute(filter, skipCount, takeCount));
 

@@ -157,13 +157,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
                     x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
                         IGetDepartmentRequest.CreateObj(null, _newRequest.DepartmentId), default, TimeSpan.FromSeconds(2)))
-                .Returns(Task.FromResult(_operationResultGetDepartment.Object));
+                .Returns(System.Threading.Tasks.Task.FromResult(_operationResultGetDepartment.Object));
 
             _mocker
                 .Setup<IRequestClient<ICreateWorkspaceRequest>, Task<Response<IOperationResult<bool>>>>(
                     x => x.GetResponse<IOperationResult<bool>>(
                         It.IsAny<object>(), default, RequestTimeout.Default))
-                .Returns(Task.FromResult(_operationResultCreateWorkspace.Object));
+                .Returns(System.Threading.Tasks.Task.FromResult(_operationResultCreateWorkspace.Object));
         }
 
         #endregion
