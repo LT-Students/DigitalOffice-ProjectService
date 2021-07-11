@@ -135,22 +135,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         #endregion
 
         [Test]
-        public void ShouldThrowArgumentNullExceptionWhenFilterIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => _command.Execute(null, 0, 0));
-            _mocker
-                .Verify<IRequestClient<IFindDepartmentsRequest>>(x =>
-                    x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-                        It.IsAny<object>(), default, default),
-                    Times.Never);
-            _mocker
-                .Verify<IProjectRepository>(x =>
-                    x.FindProjects(
-                        It.IsAny<FindDbProjectsFilter>(), It.IsAny<int>(), It.IsAny<int>(), out _totalCount),
-                    Times.Never);
-        }
-
-        [Test]
         public void ShouldReturnFoundProjectInfosByName()
         {
             int skip = 0;

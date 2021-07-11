@@ -108,11 +108,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         public FindResponse<ProjectInfo> Execute(FindProjectsFilter filter, int skipCount, int takeCount)
         {
-            if (filter == null)
-            {
-                throw new ArgumentNullException(nameof(filter));
-            }
-
             List<string> errors = new();
 
             IDictionary<Guid, string> pairs = null;
