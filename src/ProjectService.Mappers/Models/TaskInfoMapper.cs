@@ -20,29 +20,35 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
                 Id = dbTask.Id,
                 Name = dbTask.Name,
                 Number = dbTask.Number,
-                TypeName = dbTask.Type.Name,
+                TypeName = dbTask.Type?.Name,
                 CreatedAt = dbTask.CreatedAt,
-                StatusName = dbTask.Status.Name,
+                StatusName = dbTask.Status?.Name,
                 Description = dbTask.Description,
-                PriorityName = dbTask.Priority.Name,
+                PriorityName = dbTask.Priority?.Name,
                 PlannedMinutes = dbTask.PlannedMinutes,
-                Author = new UserTaskInfo
-                {
-                    Id = dbTask.AuthorId,
-                    FirstName = author?.FirstName,
-                    LastName = author?.LastName
-                },
-                Project = new ProjectTaskInfo
-                {
-                    Id = dbTask.ProjectId,
-                    ShortName = dbTask.Project.ShortName
-                },
-                AssignedTo = new UserTaskInfo
-                {
-                    Id = dbTask.AssignedTo.HasValue ? dbTask.AssignedTo.Value : null,
-                    FirstName = assignedUser?.FirstName,
-                    LastName = assignedUser?.LastName
-                }
+                Author = author != null
+                    ? new UserTaskInfo
+                    {
+                        Id = dbTask.AuthorId,
+                        FirstName = author.FirstName,
+                        LastName = author.LastName
+                    }
+                    : null,
+                Project = dbTask.Project != null
+                    ? new ProjectTaskInfo
+                    {
+                        Id = dbTask.ProjectId,
+                        ShortName = dbTask.Project.ShortName
+                    }
+                    : null,
+                AssignedTo = assignedUser != null && dbTask.AssignedTo.HasValue
+                    ? new UserTaskInfo
+                    {
+                        Id = dbTask.AssignedTo.Value,
+                        FirstName = assignedUser.FirstName,
+                        LastName = assignedUser.LastName
+                    }
+                    : null
             };
         }
     }

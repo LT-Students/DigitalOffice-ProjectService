@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
+using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Models.Db
 {
@@ -28,6 +29,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public DbTaskProperty Status { get; set; }
         public DbTaskProperty Priority { get; set; }
         public DbTaskProperty Type { get; set; }
+        
+        public DbTask ParentTask { get; set; }
+
+        public ICollection<DbTask> Subtasks { get; set; }
     }
 
     public class DbTaskConfiguration : IEntityTypeConfiguration<DbTask>
@@ -52,7 +57,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
             builder
                 .HasOne(t => t.Author)
                 .WithMany(pu => pu.AuthorTasks)
-                .HasForeignKey(t => t.AuthorId);
+                .HasForeignKey(t => t.AuthorId)
+                .HasPrincipalKey(pu => pu.UserId);
 
             builder
                 .HasOne(t => t.Project)
@@ -73,6 +79,16 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .HasOne(t => t.Priority)
                 .WithMany(tp => tp.PriorityTasks)
                 .HasForeignKey(t => t.PriorityId);
+            
+            builder
+                .HasOne(t => t.ParentTask)
+                .WithMany(t => t.Subtasks)
+                .HasForeignKey(t => t.ParentId);
+
+            builder
+                .HasMany(t => t.Subtasks)
+                .WithOne(tp => tp.ParentTask)
+                .HasForeignKey(t => t.ParentId);
         }
     }
 }

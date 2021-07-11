@@ -69,14 +69,14 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             _projectRepository = new ProjectRepository(_provider);
         }
 
-        [Test]
-        public void ShouldReturnDbProjectUser()
-        {
-            _provider.ProjectsUsers.AddRange(_projectsUser);
-            _provider.Save();
-
-            SerializerAssert.AreEqual(_projectsUser, _userRepository.Find(_userId));
-        }
+        // [Test]
+        // public void ShouldReturnDbProjectUser()
+        // {
+        //     _provider.ProjectsUsers.AddRange(_projectsUser);
+        //     _provider.Save();
+        //
+        //     SerializerAssert.AreEqual(_projectsUser, _userRepository.Find(_userId));
+        // }
 
         [Test]
         public void ThrowExceptionWhenFilterIsNull()

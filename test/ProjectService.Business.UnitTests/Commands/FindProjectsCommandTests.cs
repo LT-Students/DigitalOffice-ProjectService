@@ -129,7 +129,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
                     x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
                         It.IsAny<object>(), default, default))
-                .Returns(Task.FromResult(_brokerFindResponseMock.Object));
+                .Returns(System.Threading.Tasks.Task.FromResult(_brokerFindResponseMock.Object));
         }
 
         #endregion
@@ -307,7 +307,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Setup<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
                     x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
                         It.IsAny<object>(), default, default))
-                .Returns(Task.FromResult(_brokerFindResponseMock.Object));
+                .Returns(System.Threading.Tasks.Task.FromResult(_brokerFindResponseMock.Object));
 
             _findProjectsFilter = new FindProjectsFilter
             {
