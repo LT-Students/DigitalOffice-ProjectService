@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
             IUserRepository userRepository
         )
         {
-            ValidatorOptions.Global.CascadeMode = CascadeMode.Stop;
+            CascadeMode = CascadeMode.Stop;
             
             _userRepository = userRepository;
 
