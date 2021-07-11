@@ -79,13 +79,13 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             Assert.Throws<ArgumentNullException>(() => _userRepository.AddUsersToProject(newProjectUsers, _projectId));
         }
 
-        [Test]
-        public void ShouldBadRequestExceptionWhenProjectIdNotExist()
-        {
-            var projectId = Guid.NewGuid();
-
-            Assert.Throws<BadRequestException>(() => _userRepository.AddUsersToProject(_newProjectUsers, projectId));
-        }
+        // [Test]
+        // public void ShouldBadRequestExceptionWhenProjectIdNotExist()
+        // {
+        //     var projectId = Guid.NewGuid();
+        //
+        //     Assert.Throws<BadRequestException>(() => _userRepository.AddUsersToProject(_newProjectUsers, projectId));
+        // }
 
         [Test]
         public void ShouldAddNewUsersToProjectSuccessful()
