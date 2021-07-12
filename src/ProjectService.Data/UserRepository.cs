@@ -52,19 +52,15 @@ namespace LT.DigitalOffice.ProjectService.Data
             return dbProjectQueryable;
         }
 
-        public void AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUsers , Guid projectId)
+        public void AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUsers, Guid projectId)
         {
             if (dbProjectUsers == null)
             {
                 throw new ArgumentNullException(nameof(dbProjectUsers));
             }
 
-            if (!_provider.Projects.Any(p => p.Id == projectId))
-            {
-                throw new BadRequestException("Project with this Id does not exist.");
-            }
-
             _provider.ProjectsUsers.AddRange(dbProjectUsers);
+            _provider.Save();
         }
 
         public IEnumerable<DbProjectUser> Find(Guid userId)
