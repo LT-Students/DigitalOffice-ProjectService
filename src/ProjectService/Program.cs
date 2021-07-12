@@ -12,16 +12,26 @@ namespace LT.DigitalOffice.ProjectService
         {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
-#if DEBUG
-                .AddJsonFile("appsettings.Development.json")
-#else
-                .AddJsonFile("appsettings.Production.json")
-#endif
                 .Build();
+
+            string seqServerUrl = Environment.GetEnvironmentVariable("seqServerUrl");
+            if (string.IsNullOrEmpty(seqServerUrl))
+            {
+                seqServerUrl = configuration["Serilog:WriteTo:1:Args:serverUrl"];
+            }
+
+            string seqApiKey = Environment.GetEnvironmentVariable("seqApiKey");
+            if (string.IsNullOrEmpty(seqApiKey))
+            {
+                seqApiKey = configuration["Serilog:WriteTo:1:Args:apiKey"];
+            }
 
             Log.Logger = new LoggerConfiguration().ReadFrom
                 .Configuration(configuration)
                 .Enrich.WithProperty("Service", "ProjectService")
+                .WriteTo.Seq(
+                    serverUrl: seqServerUrl,
+                    apiKey: seqApiKey)
                 .CreateLogger();
 
             try

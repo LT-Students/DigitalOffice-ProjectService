@@ -43,18 +43,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _validator.ValidateAndThrowCustom(request);
 
-            List<DbProjectUser> dbProjectUser = request.Users.Select(user =>
+            List<DbProjectUser> dbProjectUsers = request.Users.Select(user =>
                 GetDbProjectUsers(user, request.ProjectId)
             ).ToList();
 
-            _repository.AddUsersToProject(dbProjectUser, request.ProjectId);
+            _repository.AddUsersToProject(dbProjectUsers, request.ProjectId);
         }
 
-        public DbProjectUser GetDbProjectUsers(ProjectUserRequest projectUser, Guid projectId)
+        private DbProjectUser GetDbProjectUsers(ProjectUserRequest projectUser, Guid projectId)
         {
             DbProjectUser dbProjectUser = _mapper.Map(projectUser);
 
-            dbProjectUser.Id = projectId;
+            dbProjectUser.ProjectId = projectId;
 
             return dbProjectUser;
         }

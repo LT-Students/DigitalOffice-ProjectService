@@ -17,35 +17,37 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
     {
         private IAddUsersToProjectValidator validator;
 
-        private Mock<IUserRepository> _repository;
+        private Mock<IUserRepository> _userRepository;
+        private Mock<IProjectRepository> _projectRepository;
 
         private AddUsersToProjectRequest _request;
         private IEnumerable<DbProjectUser> _dbProjectUsers;
 
+        private Guid _projectId = Guid.NewGuid();
+
         [SetUp]
         public void SetUp()
         {
-            _repository = new Mock<IUserRepository>();
-            validator = new AddUsersToProjectValidator(_repository.Object);
-
-            var projectId = Guid.NewGuid();
+            _userRepository = new Mock<IUserRepository>();
+            _projectRepository = new Mock<IProjectRepository>();
+            validator = new AddUsersToProjectValidator(_projectRepository.Object, _userRepository.Object);
 
             _dbProjectUsers = new List<DbProjectUser>
             {
                 new DbProjectUser
                 {
                     Id = Guid.NewGuid(),
-                    ProjectId = projectId,
+                    ProjectId = _projectId,
                     UserId = Guid.NewGuid(),
-                    Role = (int)UserRoleType.ProjectAdmin,
+                    Role = (int) UserRoleType.ProjectAdmin,
                     IsActive = true
                 },
                 new DbProjectUser
                 {
                     Id = Guid.NewGuid(),
-                    ProjectId = projectId,
+                    ProjectId = _projectId,
                     UserId = Guid.NewGuid(),
-                    Role = (int)UserRoleType.ProjectAdmin,
+                    Role = (int) UserRoleType.ProjectAdmin,
                     IsActive = true
                 }
             };
@@ -54,19 +56,19 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             {
                 new ProjectUserRequest
                 {
-                    Role = (int)UserRoleType.ProjectAdmin,
+                    Role = (int) UserRoleType.ProjectAdmin,
                     UserId = Guid.NewGuid()
                 },
                 new ProjectUserRequest
                 {
-                    Role = (int)UserRoleType.ProjectAdmin,
+                    Role = (int) UserRoleType.ProjectAdmin,
                     UserId = Guid.NewGuid()
                 }
             };
 
             _request = new AddUsersToProjectRequest
             {
-                ProjectId = projectId,
+                ProjectId = _projectId,
                 Users = projectUsers
             };
         }
@@ -76,7 +78,12 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         {
             var emptyProjectId = Guid.Empty;
 
-            validator.ShouldHaveValidationErrorFor(x => x.ProjectId, emptyProjectId);
+            validator.TestValidate(new AddUsersToProjectRequest()
+                {
+                    ProjectId = emptyProjectId,
+                    Users = new List<ProjectUserRequest>() { }
+                })
+                .ShouldHaveAnyValidationError();
         }
 
         [Test]
@@ -84,37 +91,52 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         {
             var showNotActiveUsers = false;
 
-            _repository
+            IEnumerable<DbProjectUser> enumerable = new List<DbProjectUser>();
+            _userRepository
                 .Setup(x => x.GetProjectUsers(_request.ProjectId, showNotActiveUsers))
-                .Returns<IEnumerable<DbProjectUser>>(null)
-                .Verifiable();
+                .Returns(enumerable);
 
-            validator.ShouldHaveValidationErrorFor(x => x.ProjectId, _request.ProjectId);
-            _repository.Verify();
+            validator.TestValidate(new AddUsersToProjectRequest()
+                {
+                    ProjectId = _request.ProjectId,
+                    Users = new List<ProjectUserRequest>()
+                    {
+                        new ProjectUserRequest()
+                        {
+                            UserId = Guid.NewGuid(),
+                            Role = UserRoleType.ProjectAdmin
+                        }
+                    }
+                })
+                .ShouldHaveAnyValidationError();
         }
 
         [Test]
         public void ShouldHaveValidationErrorForWhenUsersIsNull()
         {
-            AddUsersToProjectRequest projectUser = new AddUsersToProjectRequest
+            AddUsersToProjectRequest projectUsersRequest = new AddUsersToProjectRequest
             {
                 ProjectId = Guid.NewGuid(),
                 Users = null
             };
 
-            validator.ShouldHaveValidationErrorFor(x => x.Users, projectUser);
+            validator
+                .TestValidate(projectUsersRequest)
+                .ShouldHaveAnyValidationError();
         }
 
         [Test]
         public void ShouldHaveValidationErrorForWhenListOfUsersIsEmpty()
         {
-            AddUsersToProjectRequest projectUser = new AddUsersToProjectRequest
+            AddUsersToProjectRequest projectUsersRequest = new AddUsersToProjectRequest
             {
                 ProjectId = Guid.NewGuid(),
                 Users = new List<ProjectUserRequest>()
             };
 
-            validator.ShouldHaveValidationErrorFor(x => x.Users, projectUser);
+            validator
+                .TestValidate(projectUsersRequest)
+                .ShouldHaveAnyValidationError();
         }
 
         [Test]
@@ -122,7 +144,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         {
             var showNotActiveUsers = false;
 
-            _repository
+            _userRepository
                 .Setup(x => x.GetProjectUsers(_request.ProjectId, showNotActiveUsers))
                 .Returns(_dbProjectUsers);
 
@@ -131,22 +153,24 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 ProjectId = Guid.NewGuid(),
                 Users = new List<ProjectUserRequest>
                 {
-
                     new ProjectUserRequest
                     {
-                        Role = (int)UserRoleType.ProjectAdmin,
+                        Role = (int) UserRoleType.ProjectAdmin,
                         UserId = _dbProjectUsers.ElementAt(0).UserId
                     }
                 }
             };
 
-            validator.TestValidate(newRequest).ShouldNotHaveAnyValidationErrors();
-            _repository.Verify();
+            validator.TestValidate(newRequest).ShouldHaveAnyValidationError();
         }
 
         [Test]
         public void ShouldNotHaveAnyValidationErrorsWhenRequestIsValid()
         {
+            DbProject project = new DbProject {Id = _projectId};
+
+            _projectRepository.Setup(p => p.IsExist(_projectId)).Returns(true);
+
             validator.TestValidate(_request).ShouldNotHaveAnyValidationErrors();
         }
     }
