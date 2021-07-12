@@ -147,7 +147,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                     isActive: _dbProjectUser.IsActive,
                     firstName: "Spartak",
                     lastName: "Ryabtsev",
-                    middleName: "Alexandrovich")
+                    middleName: "Alexandrovich",
+                    imageId: null,
+                    rate: null)
             };
 
             _projectUsersInfo = new List<ProjectUserInfo>

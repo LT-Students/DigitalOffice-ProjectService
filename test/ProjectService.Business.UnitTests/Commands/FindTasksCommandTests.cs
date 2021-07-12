@@ -150,14 +150,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                     firstName: "Ivan",
                     lastName: "Ivanov",
                     middleName: "Ivanovich",
-                    isActive: true));
+                    isActive: true,
+                    imageId: null,
+                    rate: null));
 
                 users.Add(new UserData(
-                    id: dbTask.AuthorId,
-                    firstName: "Semen",
-                    lastName: "Semenov",
-                    middleName: "Semenovich",
-                    isActive: true));
+                    id: dbTask.AssignedTo.Value,
+                    firstName: "Ivan",
+                    lastName: "Ivanov",
+                    middleName: "Ivanovich",
+                    isActive: true,
+                    imageId: null,
+                    rate: null));
             }
 
 

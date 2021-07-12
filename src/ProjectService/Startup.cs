@@ -179,6 +179,7 @@ namespace LT.DigitalOffice.ProjectService
             x.AddConsumer<GetProjectInfoConsumer>();
             x.AddConsumer<GetUserProjectsInfoConsumer>();
             x.AddConsumer<SearchProjectsConsumer>();
+            x.AddConsumer<GetDepartmentProjectsConsumer>();
         }
 
         private void ConfigureEndpoints(
@@ -204,6 +205,11 @@ namespace LT.DigitalOffice.ProjectService
             cfg.ReceiveEndpoint(rabbitMqConfig.SearchProjectsEndpoint, ep =>
             {
                 ep.ConfigureConsumer<SearchProjectsConsumer>(context);
+            });
+
+            cfg.ReceiveEndpoint(rabbitMqConfig.GetDepartmentProjectsEndpoint, ep =>
+            {
+                ep.ConfigureConsumer<GetDepartmentProjectsConsumer>(context);
             });
         }
 
