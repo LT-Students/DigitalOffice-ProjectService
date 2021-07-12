@@ -6,8 +6,8 @@ using System;
 namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
     [DbContext(typeof(ProjectServiceDbContext))]
-    [Migration("20210711203811_FixForeignKey")]
-    public class FixForeignKey : Migration {
+    [Migration("20210711203811_RemoveForeignKey")]
+    public class RemoveForeignKey : Migration {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
