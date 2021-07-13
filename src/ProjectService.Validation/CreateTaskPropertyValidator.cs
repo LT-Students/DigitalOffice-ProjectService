@@ -23,10 +23,11 @@ namespace LT.DigitalOffice.ProjectService.Validation
                         tp.RuleFor(tp => tp.PropertyType)
                             .IsInEnum();
 
-                        tp.When(tp => tp.Description != null, () =>
+                        tp.When(tp => !string.IsNullOrEmpty(tp.Description.Trim()), () =>
                         {
                             tp.RuleFor(tp => tp.Description)
-                                .NotEmpty();
+                                .MaximumLength(300)
+                                .WithMessage("Task property description is too long.");
                         });
                     })
                     .DependentRules(() =>

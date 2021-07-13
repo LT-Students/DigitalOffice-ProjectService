@@ -23,9 +23,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 AuthorId = authorId,
                 Name = request.Name,
                 Status = (int)request.Status,
-                ShortName = request.ShortName,
-                Description = request.Description,
-                ShortDescription = request.ShortDescription,
+                ShortName = request.ShortName.Trim() == "" ? null : request.ShortName.Trim(),
+                Description = request.Description.Trim() == "" ? null : request.Description.Trim(),
+                ShortDescription = request.ShortDescription.Trim() == "" ? null : request.ShortDescription.Trim(),
                 DepartmentId = request.DepartmentId,
                 CreatedAt = DateTime.UtcNow,
                 Users = request.Users?

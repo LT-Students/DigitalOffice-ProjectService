@@ -23,12 +23,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IUserRepository _userRepository;
         private readonly ICreateTaskPropertyValidator _validator;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ITaskPropertyRepository _taskProperyRepository;
+        private readonly ITaskPropertyRepository _taskPropertyRepository;
 
         public CreateTaskPropertyCommand(
             IDbTaskPropertyMapper mapper,
             IAccessValidator accessValidator,
-            ITaskPropertyRepository taskProperyRepository,
+            ITaskPropertyRepository taskPropertyRepository,
             IUserRepository userRepository,
             ICreateTaskPropertyValidator validator,
             IHttpContextAccessor httpContextAccessor)
@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _validator = validator;
             _userRepository = userRepository;
             _accessValidator = accessValidator;
-            _taskProperyRepository = taskProperyRepository;
+            _taskPropertyRepository = taskPropertyRepository;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -54,7 +54,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             var dbTaskProperties = request.TaskProperties.Select(x => _mapper.Map(x, userId, request.ProjectId)).ToList();
 
-            _taskProperyRepository.Create(dbTaskProperties);
+            _taskPropertyRepository.Create(dbTaskProperties);
 
             return new OperationResultResponse<IEnumerable<Guid>>
             {
