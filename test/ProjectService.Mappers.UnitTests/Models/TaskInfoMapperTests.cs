@@ -124,14 +124,18 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                     firstName: "Ivan",
                     lastName: "Ivanov",
                     middleName: "Ivanovich",
-                    isActive: true);
+                    isActive: true,
+                    imageId: null,
+                    rate: null);
 
             UserData authorData = new UserData(
                     id: Guid.NewGuid(),
                     firstName: "Semen",
                     lastName: "Semenov",
                     middleName: "Semenovich",
-                    isActive: true);
+                    isActive: true,
+                    imageId: null,
+                    rate: null);
 
             SerializerAssert.AreEqual(_taskInfo, _mapper.Map(_dbTask, assignedUserData, authorData));
         }
