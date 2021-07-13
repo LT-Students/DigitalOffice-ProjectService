@@ -60,9 +60,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
-        public void ShouldErrorsWhenDescriptionIsEmpty()
+        public void ShouldNotErrorsWhenDescriptionIsEmpty()
         {
-            _validator.ShouldHaveValidationErrorFor(x => x.Description, "");
+            _validator.ShouldNotHaveValidationErrorFor(x => x.Description, "");
         }
 
         [Test]

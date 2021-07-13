@@ -87,7 +87,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
-        public void ShouldHaveValidationErrorWhenDescriptionIsEmpty()
+        public void ShouldNotHaveValidationErrorWhenDescriptionIsEmpty()
         {
             var newProperties = new List<TaskProperty>
             {
@@ -105,8 +105,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 TaskProperties = newProperties
             };
 
-            _validator.TestValidate(request).ShouldHaveValidationErrorFor("TaskProperties[0].Description");
-            _repository.Verify(x => x.AreExistForProject(_request.ProjectId, It.IsAny<string[]>()), Times.Never);
+            _validator.TestValidate(request).ShouldNotHaveValidationErrorFor("TaskProperties[0].Description");
         }
 
         [Test]

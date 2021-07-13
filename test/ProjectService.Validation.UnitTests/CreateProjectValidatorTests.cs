@@ -54,27 +54,27 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         }
 
         [Test]
-        public void ShouldErrorWhenProjectShortNameIsEmpty()
+        public void ShouldNotErrorWhenProjectShortNameIsEmpty()
         {
-            _validator.ShouldHaveValidationErrorFor(x => x.ShortName, "");
+            _validator.ShouldNotHaveValidationErrorFor(x => x.ShortName, "");
         }
 
         [Test]
-        public void ShouldErrorsWhenProjectShortNameIsEmpty()
+        public void ShouldNotErrorsWhenProjectShortNameIsEmpty()
         {
-            _validator.ShouldHaveValidationErrorFor(x => x.ShortName, "");
+            _validator.ShouldNotHaveValidationErrorFor(x => x.ShortName, "");
         }
 
         [Test]
-        public void ShouldErrorWhenDescriptionIsEmpty()
+        public void ShouldNotErrorWhenDescriptionIsEmpty()
         {
-            _validator.ShouldHaveValidationErrorFor(x => x.Description, "");
+            _validator.ShouldNotHaveValidationErrorFor(x => x.Description, "");
         }
 
         [Test]
-        public void ShouldErrorWhenShortDescriptionIsEmpty()
+        public void ShouldNotErrorWhenShortDescriptionIsEmpty()
         {
-            _validator.ShouldHaveValidationErrorFor(x => x.ShortDescription, "");
+            _validator.ShouldNotHaveValidationErrorFor(x => x.ShortDescription, "");
         }
 
         [Test]

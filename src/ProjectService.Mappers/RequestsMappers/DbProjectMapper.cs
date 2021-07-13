@@ -16,16 +16,19 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
             }
 
             var projectId = Guid.NewGuid();
-
+            string shortName = request.ShortName?.Trim();
+            string description = request.Description?.Trim();
+            string shortDescription = request.ShortDescription?.Trim();
+            
             return new DbProject
             {
                 Id = projectId,
                 AuthorId = authorId,
                 Name = request.Name,
                 Status = (int)request.Status,
-                ShortName = request.ShortName,
-                Description = request.Description,
-                ShortDescription = request.ShortDescription,
+                ShortName = shortName == null || !shortName.Any() ? null : shortName,
+                Description = description == null || !description.Any() ? null : description,
+                ShortDescription = shortDescription == null || !shortDescription.Any() ? null : shortDescription,
                 DepartmentId = request.DepartmentId,
                 CreatedAt = DateTime.UtcNow,
                 Users = request.Users?
