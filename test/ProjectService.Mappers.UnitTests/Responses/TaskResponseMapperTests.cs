@@ -120,11 +120,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                 IsActive = _isActive
             };
 
-            _authorUserData = new UserData(_userId, _firstName, _middleName, _lastName, _isActive);
-            _parentUserData = new UserData(_userId, _firstName, _middleName, _lastName, _isActive);
-            _parentAssignedUserData = new UserData(_userId, _firstName, _middleName, _lastName, _isActive);
-            _parentAuthorAssignedUserData = new UserData(_userId, _firstName, _middleName, _lastName, _isActive);
-            _assignedUserData = new UserData(_userId, _firstName, _middleName, _lastName, _isActive);
+            _authorUserData = new UserData(_userId, _firstName, _middleName, _lastName, _isActive, null, null);
+            _parentUserData = new UserData(_userId, _firstName, _middleName, _lastName, _isActive, null, null);
+            _parentAssignedUserData = new UserData(_userId, _firstName, _middleName, _lastName, _isActive, null, null);
+            _parentAuthorAssignedUserData = new UserData(_userId, _firstName, _middleName, _lastName, _isActive, null, null);
+            _assignedUserData = new UserData(_userId, _firstName, _middleName, _lastName, _isActive, null, null);
 
             _mapper = new TaskResponseMapper(
                 _projectInfoMapper,

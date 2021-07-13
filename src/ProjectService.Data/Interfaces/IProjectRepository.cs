@@ -21,6 +21,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <returns>Project with specified id.</returns>
         public DbProject GetProject(GetProjectFilter filter);
 
+        public IEnumerable<DbProject> Get(Guid departmentId);
+
         /// <summary>
         /// Adds new project to the database. Returns the id of the added project.
         /// </summary>

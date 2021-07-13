@@ -73,6 +73,11 @@ namespace LT.DigitalOffice.ProjectService.Data
             return dbProject;
         }
 
+        public IEnumerable<DbProject> Get(Guid departmentId)
+        {
+            return _provider.Projects.Where(p => p.DepartmentId == departmentId);
+        }
+
         public void CreateNewProject(DbProject newProject)
         {
             _provider.Projects.Add(newProject);
