@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                 .MaximumLength(150)
                 .WithMessage("Task name is too long.");
 
-            When(task => !string.IsNullOrEmpty(task.Description), () =>
+            When(task => !string.IsNullOrEmpty(task.Description?.Trim()), () =>
             {
                 RuleFor(task => task.Description)
                     .MaximumLength(300)

@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                         tp.RuleFor(tp => tp.PropertyType)
                             .IsInEnum();
 
-                        tp.When(tp => !string.IsNullOrEmpty(tp.Description), () =>
+                        tp.When(tp => !string.IsNullOrEmpty(tp.Description?.Trim()), () =>
                         {
                             tp.RuleFor(tp => tp.Description)
                                 .MaximumLength(300)
