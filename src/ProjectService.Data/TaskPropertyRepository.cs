@@ -67,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             totalCount = dbTaskProperties.Count();
 
-            return dbTaskProperties.Skip(skipCount * takeCount).Take(takeCount).ToList();
+            return dbTaskProperties.Skip(skipCount).Take(takeCount).ToList();
         }
     }
 }

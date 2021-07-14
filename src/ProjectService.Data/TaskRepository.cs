@@ -110,7 +110,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             var tasks = CreateFindPredicates(filter, dbTasks, projectIds).ToList();
             totalCount = tasks.Count;
 
-            return tasks.Skip(skipCount * takeCount).Take(takeCount).ToList();
+            return tasks.Skip(skipCount).Take(takeCount).ToList();
         }
     }
 }

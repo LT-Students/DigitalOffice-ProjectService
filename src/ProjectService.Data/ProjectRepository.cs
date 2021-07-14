@@ -132,7 +132,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             var projects = CreateFindPredicates(filter, dbProjects).ToList();
             totalCount = projects.Count;
 
-            return projects.Skip(skipCount * takeCount).Take(takeCount).ToList();
+            return projects.Skip(skipCount).Take(takeCount).ToList();
         }
 
         public List<DbProject> Search(string text)
@@ -148,6 +148,11 @@ namespace LT.DigitalOffice.ProjectService.Data
         public bool IsExist(Guid id)
         {
             return _provider.Projects.FirstOrDefault(x => x.Id == id) != null;
+        }
+
+        public bool IsProjectNameExist(string name)
+        {
+            return _provider.Projects.Any(p => p.Name.Contains(name));
         }
     }
 }
