@@ -19,8 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ProjectController(
-            IHttpContextAccessor httpContextAccessor)
+        public ProjectController(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }
