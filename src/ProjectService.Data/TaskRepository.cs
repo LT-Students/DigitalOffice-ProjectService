@@ -98,7 +98,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             int takeCount,
             out int totalCount)
         {
-            if (takeCount <= 0)
+            if (skipCount <= 0 || takeCount <= 0)
             {
                 throw new BadRequestException("Take count can't be equal or less than 0.");
             }
