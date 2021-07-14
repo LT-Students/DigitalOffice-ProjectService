@@ -121,7 +121,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             {
                 throw new ForbiddenException("Not enough rights.");
             }
-
+            
             var errors = new List<string>();
 
             _validator.ValidateAndThrowCustom(request);
