@@ -117,11 +117,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         public OperationResultResponse<ProjectInfo> Execute(ProjectRequest request)
         {
-            /*if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
+            if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
-            */
+            
             var errors = new List<string>();
 
             _validator.ValidateAndThrowCustom(request);
@@ -140,7 +140,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 };
             }
 
-            var userId = Guid.NewGuid();//_httpContextAccessor.HttpContext.GetUserId();
+            var userId = _httpContextAccessor.HttpContext.GetUserId();
             var dbProject = _dbProjectMapper.Map(request, userId);
 
             _repository.CreateNewProject(dbProject);
