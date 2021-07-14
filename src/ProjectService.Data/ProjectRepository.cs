@@ -120,6 +120,11 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public List<DbProject> FindProjects(FindDbProjectsFilter filter, int skipCount, int takeCount, out int totalCount)
         {
+            if (takeCount <= 0)
+            {
+                throw new BadRequestException("Take count can't be equal or less than 0.");
+            }
+
             if (filter == null)
             {
                 throw new ArgumentNullException(nameof(filter));
