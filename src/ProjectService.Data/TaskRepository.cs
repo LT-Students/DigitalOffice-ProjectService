@@ -107,8 +107,8 @@ namespace LT.DigitalOffice.ProjectService.Data
                 .AsSingleQuery()
                 .AsQueryable();
 
-            var tasks = CreateFindPredicates(filter, dbTasks, projectIds).ToList();
-            totalCount = tasks.Count;
+            var tasks = CreateFindPredicates(filter, dbTasks, projectIds);
+            totalCount = tasks.Count();
 
             return tasks.Skip(skipCount * takeCount).Take(takeCount).ToList();
         }
