@@ -129,7 +129,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }
 
         #region Find
-        [Test]
+        /*[Test]
         public void ShouldDbTaskPropertiesReturnByNameSuccessful()
         {
             var filter = new FindTaskPropertiesFilter
@@ -179,7 +179,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
             SerializerAssert.AreEqual(expectedResult, _repository.Find(filter, 0, 1, out int totalCount));
             Assert.AreEqual(_dbTaskProperties.Count, totalCount);
-        }
+        }*/
 
         #endregion
 

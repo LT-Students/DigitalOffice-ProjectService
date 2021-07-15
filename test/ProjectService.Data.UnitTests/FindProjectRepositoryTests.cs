@@ -125,7 +125,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenFilterIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _repository.FindProjects(null, 0, 0, out int _));
+            Assert.Throws<ArgumentNullException>(() => _repository.FindProjects(null, 0, 1, out int _));
         }
 
         [Test]

@@ -49,5 +49,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         List<DbProject> Search(string text);
 
         bool IsExist(Guid id);
+
+        bool IsProjectNameExist(string name);
     }
 }

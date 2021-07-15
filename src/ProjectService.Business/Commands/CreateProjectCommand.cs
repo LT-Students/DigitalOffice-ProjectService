@@ -12,6 +12,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
@@ -117,44 +118,45 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         public OperationResultResponse<ProjectInfo> Execute(ProjectRequest request)
         {
-            /*if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
+            if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
-            */
-            var errors = new List<string>();
+
+            OperationResultResponse<ProjectInfo> response = new();
+
+            if (_repository.IsProjectNameExist(request.Name))
+            {
+                response.Status = OperationResultStatusType.Conflict;
+                response.Errors.Add($"Project with name '{request.Name}' already exist");
+                return response;
+            }
 
             _validator.ValidateAndThrowCustom(request);
 
-            IGetDepartmentResponse department = GetDepartment(request.DepartmentId, errors);
-            if (!errors.Any() && department == null)
+            IGetDepartmentResponse department = GetDepartment(request.DepartmentId, response.Errors);
+            if (!response.Errors.Any() && department == null)
             {
                 throw new BadRequestException("Project department not found.");
             }
-            else if (errors.Any())
+            else if (response.Errors.Any())
             {
-                return new OperationResultResponse<ProjectInfo>
-                {
-                    Status = OperationResultStatusType.Failed,
-                    Errors = errors
-                };
+                response.Status = OperationResultStatusType.Failed;
+                return response;
             }
 
-            var userId = Guid.NewGuid();//_httpContextAccessor.HttpContext.GetUserId();
-            var dbProject = _dbProjectMapper.Map(request, userId);
+            Guid userId = _httpContextAccessor.HttpContext.GetUserId();
+            DbProject dbProject = _dbProjectMapper.Map(request, userId);
 
             _repository.CreateNewProject(dbProject);
 
-            var projectInfo = _projectInfoMapper.Map(dbProject, department.Name);
+            response.Body = _projectInfoMapper.Map(dbProject, department.Name);
 
-            CreateWorkspace(request.Name, userId, request.Users.Select(u => u.UserId).ToList(), errors);
+            CreateWorkspace(request.Name, userId, request.Users.Select(u => u.UserId).ToList(), response.Errors);
 
-            return new OperationResultResponse<ProjectInfo>
-            {
-                Body = projectInfo,
-                Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
-                Errors = errors
-            };
+            response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
+
+            return response;
         }
     }
 }

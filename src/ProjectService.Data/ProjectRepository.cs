@@ -98,6 +98,16 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public List<DbProject> FindProjects(FindProjectsFilter filter, int skipCount, int takeCount, out int totalCount)
         {
+            if (skipCount < 0 )
+            {
+                throw new BadRequestException("Skip count can't be less than 0.");
+            }
+
+            if (takeCount <= 0)
+            {
+                throw new BadRequestException("Take count can't be equal or less than 0.");
+            }
+
             if (filter == null)
             {
                 throw new ArgumentNullException(nameof(filter));
@@ -134,6 +144,11 @@ namespace LT.DigitalOffice.ProjectService.Data
         public bool IsExist(Guid id)
         {
             return _provider.Projects.FirstOrDefault(x => x.Id == id) != null;
+        }
+
+        public bool IsProjectNameExist(string name)
+        {
+            return _provider.Projects.Any(p => p.Name.Contains(name));
         }
     }
 }
