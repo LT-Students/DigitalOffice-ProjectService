@@ -13,7 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
     class FindProjectRepositoryTests
     {
-        private FindDbProjectsFilter _filter;
+        private FindProjectsFilter _filter;
         private IDataProvider _provider;
         private IProjectRepository _repository;
 
@@ -62,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = "NameWithRegular2",
                 ShortName = "NWR2",
                 Description = "description",
-                DepartmentId = Guid.NewGuid(),
+                DepartmentId = _dbProject3.DepartmentId,
                 CreatedAt = DateTime.UtcNow,
             };
 
@@ -100,55 +100,14 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }
 
         [Test]
-        public void ShouldReturnProjectsByName()
-        {
-            _filter = new FindDbProjectsFilter
-            {
-                Name = "WithRegular"
-            };
-
-            var expectedProjects = new List<DbProject>
-            {
-                _dbProject3,
-                _dbProject4
-            };
-
-            var result = _repository.FindProjects(_filter, 0, 3, out int totalCount);
-
-            Assert.IsTrue(result.Contains(_dbProject4) && result.Contains(_dbProject3));
-            Assert.AreEqual(expectedProjects.Count, totalCount);
-        }
-
-        [Test]
-        public void ShouldReturnProjectsByShortName()
-        {
-            _filter = new FindDbProjectsFilter
-            {
-                ShortName = "WR"
-            };
-
-            var expectedProjects = new List<DbProject>
-            {
-                _dbProject3,
-                _dbProject4
-            };
-
-            var result = _repository.FindProjects(_filter, 0, 3, out int totalCount);
-
-            Assert.IsTrue(result.Contains(_dbProject4) && result.Contains(_dbProject3));
-            Assert.AreEqual(expectedProjects.Count, totalCount);
-        }
-
-        [Test]
-        public void ShouldReturnProjectsByDepartmentName()
+        public void ShouldReturnProjectsByDepartmentId()
         {
             var pairs = new Dictionary<Guid, string>();
             pairs.Add(_dbProject3.DepartmentId, "");
-            pairs.Add(_dbProject4.DepartmentId, "");
 
-            _filter = new FindDbProjectsFilter
+            _filter = new FindProjectsFilter
             {
-                IdNameDepartments = pairs
+                DepartmentId = _dbProject3.DepartmentId
             };
 
             var expectedProjects = new List<DbProject>
