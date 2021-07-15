@@ -48,6 +48,11 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public IEnumerable<DbTaskProperty> Find(FindTaskPropertiesFilter filter, int skipCount, int takeCount, out int totalCount)
         {
+            if (skipCount <= 0 || takeCount <= 0)
+            {
+                throw new BadRequestException("Skip count and take count can't be equal or less than 0.");
+            }
+
             var dbTaskProperties = _provider.TaskProperties.AsQueryable();
 
             if (filter.ProjectId.HasValue)
@@ -67,7 +72,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             totalCount = dbTaskProperties.Count();
 
-            return dbTaskProperties.Skip(skipCount * takeCount).Take(takeCount).ToList();
+            return dbTaskProperties.Skip(skipCount).Take(takeCount).ToList();
         }
     }
 }
