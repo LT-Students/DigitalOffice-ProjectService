@@ -100,7 +100,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         {
             if (skipCount <= 0 || takeCount <= 0)
             {
-                throw new BadRequestException("Take count can't be equal or less than 0.");
+                throw new BadRequestException("Skip count and take count can't be equal or less than 0.");
             }
 
             if (filter == null)
