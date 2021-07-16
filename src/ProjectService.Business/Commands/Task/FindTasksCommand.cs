@@ -87,7 +87,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var userId = _httpContextAccessor.HttpContext.GetUserId();
             var projectUsers = _userRepository.Find(userId);
 
-            if (!projectUsers.Any() && !_accessValidator.IsAdmin())
+            if (!(projectUsers.Any() || _accessValidator.IsAdmin()))
             {
                 return new FindResponse<TaskInfo>();
             }
