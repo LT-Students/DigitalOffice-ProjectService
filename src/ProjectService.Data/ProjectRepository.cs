@@ -15,28 +15,6 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
         private readonly IDataProvider _provider;
 
-        private IQueryable<DbProject> CreateFindPredicates(
-            FindDbProjectsFilter filter,
-            IQueryable<DbProject> dbProjects)
-        {
-            if (!string.IsNullOrEmpty(filter.Name))
-            {
-                dbProjects = dbProjects.Where(u => u.Name.ToUpper().Contains(filter.Name.ToUpper()));
-            }
-
-            if (!string.IsNullOrEmpty(filter.ShortName))
-            {
-                dbProjects = dbProjects.Where(u => u.ShortName.ToUpper().Contains(filter.ShortName.ToUpper()));
-            }
-
-            if (filter.IdNameDepartments != null)
-            {
-                dbProjects = dbProjects.Where(u => filter.IdNameDepartments.Keys.Contains(u.DepartmentId));
-            }
-
-            return dbProjects;
-        }
-
         public ProjectRepository(IDataProvider provider)
         {
             this._provider = provider;
@@ -118,11 +96,16 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider.Save();
         }
 
-        public List<DbProject> FindProjects(FindDbProjectsFilter filter, int skipCount, int takeCount, out int totalCount)
+        public List<DbProject> FindProjects(FindProjectsFilter filter, int skipCount, int takeCount, out int totalCount)
         {
-            if (skipCount <= 0 || takeCount <= 0)
+            if (skipCount < 0 )
             {
-                throw new BadRequestException("Skip count and take count can't be equal or less than 0.");
+                throw new BadRequestException("Skip count can't be less than 0.");
+            }
+
+            if (takeCount <= 0)
+            {
+                throw new BadRequestException("Take count can't be equal or less than 0.");
             }
 
             if (filter == null)
@@ -131,13 +114,19 @@ namespace LT.DigitalOffice.ProjectService.Data
             }
 
             var dbProjects = _provider.Projects
-                .AsSingleQuery()
                 .AsQueryable();
 
-            var projects = CreateFindPredicates(filter, dbProjects).ToList();
-            totalCount = projects.Count;
+            if (filter.DepartmentId.HasValue)
+            {
+                dbProjects = dbProjects.Where(p => p.DepartmentId == filter.DepartmentId.Value);
+                totalCount = dbProjects.Count(p => p.DepartmentId == filter.DepartmentId.Value);
+            }
+            else
+            {
+                totalCount = dbProjects.Count();
+            }
 
-            return projects.Skip(skipCount).Take(takeCount).ToList();
+            return dbProjects.Skip(skipCount).Take(takeCount).ToList();
         }
 
         public List<DbProject> Search(string text)

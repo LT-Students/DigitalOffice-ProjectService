@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="userIds">User ids.</param>
         void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds);
 
-        List<DbProject> FindProjects(FindDbProjectsFilter dbFilter, int skipCount, int takeCount, out int totalCount);
+        List<DbProject> FindProjects(FindProjectsFilter filter, int skipCount, int takeCount, out int totalCount);
 
         List<DbProject> Search(string text);
 
