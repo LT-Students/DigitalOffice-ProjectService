@@ -86,11 +86,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             _validator.ValidateAndThrowCustom(request);
 
-            var filter = new GetProjectFilter { ProjectId = projectId };
+            GetProjectFilter filter = new GetProjectFilter { ProjectId = projectId };
 
             DbProject dbProject = _repository.GetProject(filter);
 
-            var response = new OperationResultResponse<bool>();
+            OperationResultResponse<bool> response = new ();
 
             if (!_accessValidator.IsAdmin() &&
                 (GetDepartment(dbProject.DepartmentId, response.Errors).DirectorUserId !=
@@ -101,6 +101,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             foreach (Operation item in request.Operations)
             {
+                if (item.path == $"/{nameof(EditProjectRequest.Name)}" &&
+                    _repository.IsProjectNameExist(item.value.ToString()))
+                {
+                    response.Status = OperationResultStatusType.Conflict;
+                    response.Errors.Add($"Project with name '{item.value}' already exist");
+                    return response;
+                }
+
                 if (item.path == $"/{nameof(EditProjectRequest.DepartmentId)}")
                 {
                     var departmentData = GetDepartment(Guid.Parse(item.value.ToString()), response.Errors);

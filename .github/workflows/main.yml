@@ -6,7 +6,7 @@ on:
   push:
     branches: [ '*' ]
   pull_request:
-    branches: [ develop, master ]
+    branches: [ develop, master, 'release/*' ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
