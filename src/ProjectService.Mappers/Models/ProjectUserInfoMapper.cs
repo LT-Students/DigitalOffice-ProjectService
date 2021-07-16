@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
                 IsActive = dbProjectUser.IsActive,
                 AddedOn = dbProjectUser.AddedOn,
                 RemovedOn = dbProjectUser.RemovedOn,
-                Role = (UserRoleType)dbProjectUser.Role
+                Role = ((UserRoleType)dbProjectUser.Role).ToString()
             };
         }
     }

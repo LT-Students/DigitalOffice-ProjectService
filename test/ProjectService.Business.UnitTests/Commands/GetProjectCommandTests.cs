@@ -157,7 +157,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 new ProjectUserInfo
                 {
                     Id = _usersData.First().Id,
-                    Role = (UserRoleType)_dbProjectUser.Role,
+                    Role = ((UserRoleType)_dbProjectUser.Role).ToString(),
                     FirstName = _usersData.First().FirstName,
                     LastName = _usersData.First().LastName,
                     MiddleName = _usersData.First().MiddleName,

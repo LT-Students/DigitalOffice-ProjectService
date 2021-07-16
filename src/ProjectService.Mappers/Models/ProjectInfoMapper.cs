@@ -20,7 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
                 Id = value.Id,
                 Name = value.Name,
                 AuthorId = value.AuthorId,
-                Status = (ProjectStatusType)value.Status,
+                Status = ((ProjectStatusType)value.Status).ToString(),
                 CreatedAt = value.CreatedAt,
                 ShortName = value.ShortName,
                 Description = value.Description,

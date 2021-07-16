@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models.UnitTests
                 Name = _dbTaskProperty.Name,
                 ProjectId = _dbTaskProperty.ProjectId,
                 AuthorId = _dbTaskProperty.AuthorId,
-                PropertyType = (TaskPropertyType)_dbTaskProperty.PropertyType,
+                PropertyType = ((TaskPropertyType)_dbTaskProperty.PropertyType).ToString(),
                 Description = _dbTaskProperty.Description,
                 CreatedAt = _dbTaskProperty.CreatedAt,
                 IsActive = _dbTaskProperty.IsActive

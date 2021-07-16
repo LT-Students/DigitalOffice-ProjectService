@@ -182,7 +182,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             return new OperationResultResponse<TaskResponse>()
             {
                 Status =
-                    errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
+                    (errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess)
+                    .ToString(),
                 Body = response,
                 Errors = errors
             };

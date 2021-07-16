@@ -51,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 Id = _id,
                 AuthorId = _authorId,
                 ProjectId = _projectId,
-                PropertyType = (TaskPropertyType)_propertyType,
+                PropertyType = ((TaskPropertyType)_propertyType).ToString(),
                 Name = _name,
                 Description = _description,
                 CreatedAt = _createdAt,

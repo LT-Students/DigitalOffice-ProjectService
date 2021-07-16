@@ -83,7 +83,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                         CreatedAt = dbTaskProperty.CreatedAt,
                         Description = dbTaskProperty.Description,
                         IsActive = dbTaskProperty.IsActive,
-                        PropertyType = (TaskPropertyType)dbTaskProperty.PropertyType
+                        PropertyType = ((TaskPropertyType)dbTaskProperty.PropertyType).ToString()
                     });
             }
         }

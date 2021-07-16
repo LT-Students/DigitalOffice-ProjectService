@@ -6,6 +6,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
 {
@@ -49,7 +50,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 MiddleName = _userData.MiddleName,
                 IsActive = _userData.IsActive,
                 AddedOn = _dbProjectUser.AddedOn,
-                RemovedOn = _dbProjectUser.RemovedOn
+                RemovedOn = _dbProjectUser.RemovedOn,
+                Role = UserRoleType.ProjectAdmin.ToString()
             };
         }
 

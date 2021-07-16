@@ -12,6 +12,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
         public string Description { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsActive { get; set; }
-        public TaskPropertyType PropertyType { get; set; }
+        public string PropertyType { get; set; }
     }
 }

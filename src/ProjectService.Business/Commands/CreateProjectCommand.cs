@@ -127,7 +127,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             if (_repository.IsProjectNameExist(request.Name))
             {
-                response.Status = OperationResultStatusType.Conflict;
+                response.Status = OperationResultStatusType.Conflict.ToString();
                 response.Errors.Add($"Project with name '{request.Name}' already exist");
                 return response;
             }
@@ -141,7 +141,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             }
             else if (response.Errors.Any())
             {
-                response.Status = OperationResultStatusType.Failed;
+                response.Status = OperationResultStatusType.Failed.ToString();
                 return response;
             }
 
@@ -154,7 +154,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             CreateWorkspace(request.Name, userId, request.Users.Select(u => u.UserId).ToList(), response.Errors);
 
-            response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
+            response.Status =
+                (response.Errors.Any()
+                    ? OperationResultStatusType.PartialSuccess
+                    : OperationResultStatusType.FullSuccess).ToString();
 
             return response;
         }

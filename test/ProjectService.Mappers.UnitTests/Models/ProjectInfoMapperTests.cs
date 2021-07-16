@@ -46,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
                 CreatedAt = _dbProject.CreatedAt,
-                Status = ProjectStatusType.Active,
+                Status = ProjectStatusType.Active.ToString(),
                 Department = new DepartmentInfo
                 {
                     Id = _dbProject.DepartmentId,

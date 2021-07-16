@@ -4,6 +4,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests
 {
@@ -40,7 +41,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests
                 {
                     Id = _dbProject.DepartmentId,
                     Name = DepartmentName
-                }
+                },
+                Status = ProjectStatusType.Active.ToString()
             };
         }
 

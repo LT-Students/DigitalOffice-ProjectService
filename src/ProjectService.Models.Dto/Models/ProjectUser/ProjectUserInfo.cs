@@ -12,6 +12,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser
         public DateTime AddedOn { get; set; }
         public DateTime? RemovedOn { get; set; }
         public bool IsActive { get; set; }
-        public UserRoleType Role { get; set; }
+        public string Role { get; set; }
     }
 }

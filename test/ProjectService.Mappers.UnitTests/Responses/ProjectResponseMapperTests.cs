@@ -56,7 +56,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                     AddedOn = DateTime.UtcNow,
                     RemovedOn = DateTime.UtcNow,
                     IsActive = true,
-                    Role = UserRoleType.ProjectAdmin
+                    Role = UserRoleType.ProjectAdmin.ToString()
                 }
             };
 
@@ -85,7 +85,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                 AuthorId = _dbProject.AuthorId,
                 CreatedAt = _dbProject.CreatedAt,
                 ShortName = _dbProject.ShortName,
-                Status =(ProjectStatusType)_dbProject.Status
+                Status = ((ProjectStatusType)_dbProject.Status).ToString()
             };
 
             _errors = new List<string> { "Error!!!" };

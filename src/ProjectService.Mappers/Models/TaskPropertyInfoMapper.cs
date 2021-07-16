@@ -24,7 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
                 CreatedAt = dbTaskProperty.CreatedAt,
                 Description = dbTaskProperty.Description,
                 IsActive = dbTaskProperty.IsActive,
-                PropertyType = (TaskPropertyType)dbTaskProperty.PropertyType
+                PropertyType = ((TaskPropertyType)dbTaskProperty.PropertyType).ToString()
             };
         }
     }

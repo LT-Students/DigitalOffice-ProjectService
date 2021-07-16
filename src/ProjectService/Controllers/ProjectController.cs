@@ -49,14 +49,14 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         {
             var result = command.Execute(request);
 
-            if (result.Status == OperationResultStatusType.Conflict)
+            if (result.Status == OperationResultStatusType.Conflict.ToString())
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
 
                 return result;
             }
 
-            if (result.Status != OperationResultStatusType.Failed)
+            if (result.Status != OperationResultStatusType.Failed.ToString())
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
             }
@@ -72,7 +72,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         {
             var result = command.Execute(projectId, request);
 
-            if (result.Status == OperationResultStatusType.Conflict)
+            if (result.Status == OperationResultStatusType.Conflict.ToString())
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
             }
