@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ProjectService.Data\ProjectService.Data.csproj" />
+    <ProjectReference Include="..\..\src\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
+    <ProjectReference Include="..\..\src\ProjectService.Models.Db\ProjectService.Models.Db.csproj" />
+    <ProjectReference Include="..\..\src\ProjectService.Data.Provider.MsSql.Ef\ProjectService.Data.Provider.MsSql.Ef.csproj" />
+  </ItemGroup>
+
+</Project>

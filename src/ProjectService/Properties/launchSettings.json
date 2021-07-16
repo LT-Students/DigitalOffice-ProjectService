@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "ProjectService": {
+      "commandName": "Project",
+      "externalUrlConfiguration": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
