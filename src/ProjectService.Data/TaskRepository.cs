@@ -114,11 +114,15 @@ namespace LT.DigitalOffice.ProjectService.Data
             }
 
             var dbTasks = _provider.Tasks
-                .AsSingleQuery()
-                .AsQueryable();
+                            .Include(t => t.Priority)
+                            .Include(t => t.Type)
+                            .Include(t => t.Status)
+                            .Include(t => t.Project)
+                            .AsSingleQuery()
+                            .AsQueryable();
 
             var tasks = CreateFindPredicates(filter, dbTasks, projectIds).ToList();
-            totalCount = tasks.Count;
+            totalCount = tasks.Count();
 
             return tasks.Skip(skipCount).Take(takeCount).ToList();
         }

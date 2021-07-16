@@ -53,6 +53,11 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
             for (int i = 0; i <= 3; i++)
             {
+                Guid projectId = Guid.NewGuid();
+                Guid typeId = Guid.NewGuid();
+                Guid statusId = Guid.NewGuid();
+                Guid priorityId = Guid.NewGuid();
+
                 _dbTasks.Add(
                     new DbTask
                     {
@@ -62,17 +67,38 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                         PlannedMinutes = 30,
                         AssignedTo = _assign,
                         AuthorId = Guid.NewGuid(),
-                        ProjectId = _projectId,
+                        ProjectId = projectId,
                         CreatedAt = DateTime.UtcNow,
                         ParentId = Guid.NewGuid(),
                         Number = 2,
-                        PriorityId = Guid.NewGuid(),
-                        StatusId = Guid.NewGuid(),
-                        TypeId = Guid.NewGuid()
+                        PriorityId = priorityId,
+                        StatusId = statusId,
+                        TypeId = typeId,
+                        Project = new DbProject
+                        {
+                            Id = projectId
+                        },
+                        Status = new DbTaskProperty
+                        {
+                            Id = statusId,
+                            Name = "In progress"
+                        },
+                        Priority = new DbTaskProperty
+                        {
+                            Id = priorityId,
+                            Name = "Normal"
+                        },
+                        Type = new DbTaskProperty
+                        {
+                            Id = typeId,
+                            Name = "Feature"
+                        }
                     });
             }
 
             _dbTasks[3].Number = 5;
+            _dbTasks[1].ProjectId = _projectId;
+            _dbTasks[1].Project.Id = _projectId;
         }
 
         [SetUp]
@@ -171,8 +197,10 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             int skipCount = 0;
             int takeCount = _dbTasks.Count;
 
-            SerializerAssert.AreEqual(_dbTasks,
-                _repository.Find(filter, _projectIds, skipCount, takeCount, out int totalCount).ToList());
+            List<Guid> _expectedDbTaskIds = _dbTasks.Select(x => x.Id).ToList();
+            List<Guid> _dbTaskIds = _repository.Find(filter, _projectIds, skipCount, takeCount, out int totalCount).Select(x => x.Id).ToList();
+
+            SerializerAssert.AreEqual(_expectedDbTaskIds, _dbTaskIds);
             Assert.AreEqual(_dbTasks.Count, totalCount);
         }
 
@@ -185,10 +213,11 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             int skipCount = 0;
             int takeCount = _dbTasks.Count;
 
-            var expectedDbTaks = _dbTasks.Where(x => x.Number == filter.Number).ToList();
+            List<Guid> _expectedDbTaskIds = _dbTasks.Where(x => x.Number == filter.Number).Select(x => x.Id).ToList();
 
-            SerializerAssert.AreEqual(expectedDbTaks,
-                _repository.Find(filter, _projectIds, skipCount, takeCount, out int totalCount).ToList());
+            List<Guid> _dbTaskIds = _repository.Find(filter, _projectIds, skipCount, takeCount, out int totalCount).Select(x => x.Id).ToList();
+
+            SerializerAssert.AreEqual(_expectedDbTaskIds, _dbTaskIds);
             Assert.AreEqual(_dbTasks.Count - 1, totalCount);
         }
 
@@ -200,10 +229,11 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
             int skipCount = 0;
             int takeCount = _dbTasks.Count;
+            List<Guid> _expectedDbTaskIds = _dbTasks.Where(x => x.ProjectId == _projectId).Select(x => x.Id).ToList();
+            List<Guid> _dbTaskIds = _repository.Find(filter, _projectIds, skipCount, takeCount, out int totalCount).Select(x => x.Id).ToList();
 
-            SerializerAssert.AreEqual(_dbTasks,
-                _repository.Find(filter, _projectIds, skipCount, takeCount, out int totalCount).ToList());
-            Assert.AreEqual(_dbTasks.Count, totalCount);
+            SerializerAssert.AreEqual(_expectedDbTaskIds, _dbTaskIds);
+            Assert.AreEqual(_expectedDbTaskIds.Count, totalCount);
         }
 
         [Test]

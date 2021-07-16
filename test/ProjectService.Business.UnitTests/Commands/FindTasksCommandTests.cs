@@ -316,11 +316,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 
             _mocker
                 .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
-                .Returns(false);
+                .Returns(true);
 
             _mocker
                 .Setup<IUserRepository, IEnumerable<DbProjectUser>>(x => x.Find((Guid)_contextValues["UserId"]))
-                .Returns(_dbProjectUsers);
+                .Returns(new List<DbProjectUser>());
 
             _mocker
                 .Setup<ITaskRepository, IEnumerable<DbTask>>(x => x.Find(filter, It.IsAny<IEnumerable<Guid>>(), skipCount, takeCount, out totalCount))
@@ -340,7 +340,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 
             _mocker.Verify<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items, Times.Exactly(2));
 
-            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Never);
+            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
 
             _mocker.Verify<ITaskInfoMapper, TaskInfo>(x =>
                 x.Map(It.IsAny<DbTask>(), It.IsAny<UserData>(), It.IsAny<UserData>()), Times.Exactly(_tasksInfo.Count()));
