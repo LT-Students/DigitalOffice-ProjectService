@@ -117,8 +117,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             return new OperationResultResponse<bool>
             {
-                Status = (errors.Any() ?
-                    OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess).ToString(),
+                Status = errors.Any() ?
+                    OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
                 Body = true,
                 Errors = errors
             };

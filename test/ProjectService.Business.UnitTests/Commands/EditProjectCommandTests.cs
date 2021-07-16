@@ -69,7 +69,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands.UnitTests
         {
             _response = new OperationResultResponse<bool>();
             _response.Body = true;
-            _response.Status = OperationResultStatusType.FullSuccess.ToString();
+            _response.Status = OperationResultStatusType.FullSuccess;
 
             _getDepartmentResponse = new Mock<IGetDepartmentResponse>();
             _getDepartmentResponse.Setup(x => x.DepartmentId).Returns(_departmentId);

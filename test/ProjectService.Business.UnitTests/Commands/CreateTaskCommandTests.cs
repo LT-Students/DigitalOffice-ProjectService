@@ -113,7 +113,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             _response = new OperationResultResponse<Guid>
             {
                 Body = _dbTask.Id,
-                Status = OperationResultStatusType.FullSuccess.ToString(),
+                Status = OperationResultStatusType.FullSuccess,
                 Errors = new List<string>()
             };
 
@@ -219,7 +219,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         {
             var newResponse = new OperationResultResponse<Guid>
             {
-                Status = OperationResultStatusType.PartialSuccess.ToString(),
+                Status = OperationResultStatusType.PartialSuccess,
                 Errors = new List<string>() { "Cannot create task. Please try again later." }
             };
 

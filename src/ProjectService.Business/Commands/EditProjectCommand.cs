@@ -104,7 +104,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 if (item.path == $"/{nameof(EditProjectRequest.Name)}" &&
                     _repository.IsProjectNameExist(item.value.ToString()))
                 {
-                    response.Status = OperationResultStatusType.Conflict.ToString();
+                    response.Status = OperationResultStatusType.Conflict;
                     response.Errors.Add($"Project with name '{item.value}' already exist");
                     return response;
                 }
@@ -119,14 +119,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                     }
                     else if (response.Errors.Any())
                     {
-                        response.Status = OperationResultStatusType.Failed.ToString();
+                        response.Status = OperationResultStatusType.Failed;
                         return response;
                     }
                 };
             }
 
             response.Body = _repository.Edit(dbProject, _mapper.Map(request));
-            response.Status = OperationResultStatusType.FullSuccess.ToString();
+            response.Status = OperationResultStatusType.FullSuccess;
 
             return response;
         }

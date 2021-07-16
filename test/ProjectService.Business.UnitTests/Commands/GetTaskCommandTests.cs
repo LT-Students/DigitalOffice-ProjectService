@@ -67,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         {
             Body = new TaskResponse(),
             Errors = new List<string>(),
-            Status = OperationResultStatusType.FullSuccess.ToString()
+            Status = OperationResultStatusType.FullSuccess
         };
 
         #endregion

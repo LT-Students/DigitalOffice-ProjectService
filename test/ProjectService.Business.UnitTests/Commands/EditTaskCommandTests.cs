@@ -67,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 
         private readonly OperationResultResponse<bool> _fullSuccessModel = new()
         {
-            Status = OperationResultStatusType.FullSuccess.ToString(),
+            Status = OperationResultStatusType.FullSuccess,
             Body = true,
             Errors = new List<string>()
         };
