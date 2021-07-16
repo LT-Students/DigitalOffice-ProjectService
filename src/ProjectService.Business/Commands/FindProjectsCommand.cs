@@ -24,9 +24,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IFindProjectsResponseMapper _responseMapper;
         private readonly IRequestClient<IFindDepartmentsRequest> _findDepartmentsRequestClient;
 
-        private IDictionary<Guid, string> GetDepartmentsNames(List<DbProject> dbProjects, List<string> errors)
+        private Dictionary<Guid, string> GetDepartmentsNames(List<DbProject> dbProjects, List<string> errors)
         {
-            IDictionary<Guid, string> departmentNames = new Dictionary<Guid, string>();
+            Dictionary<Guid, string> departmentNames = new Dictionary<Guid, string>();
 
             string errorMessage = "Can not find departments names now. Please try again later.";
 
@@ -80,9 +80,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             List<DbProject> dbProject = _repository.FindProjects(filter, skipCount, takeCount, out int totalCount);
 
-            var departmentsNames = GetDepartmentsNames(dbProject, errors);
+            Dictionary<Guid, string> departmentsNames = GetDepartmentsNames(dbProject, errors);
 
-            var response = _responseMapper.Map(dbProject, totalCount, departmentsNames, errors);
+            FindResponse<ProjectInfo> response = _responseMapper.Map(dbProject, totalCount, departmentsNames, errors);
 
             return response;
         }
