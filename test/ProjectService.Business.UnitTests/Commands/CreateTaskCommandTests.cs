@@ -21,6 +21,7 @@ using Moq.AutoMock;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using LT.DigitalOffice.Kernel.Responses;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 {

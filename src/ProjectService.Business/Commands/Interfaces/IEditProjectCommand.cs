@@ -3,6 +3,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
+using LT.DigitalOffice.Kernel.Responses;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {

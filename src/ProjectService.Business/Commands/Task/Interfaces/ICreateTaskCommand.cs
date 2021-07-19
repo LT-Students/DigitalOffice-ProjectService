@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LT.DigitalOffice.Kernel.Responses;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
