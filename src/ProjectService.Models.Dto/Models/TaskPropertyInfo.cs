@@ -3,7 +3,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
 {
-    public class TaskPropertyInfo
+    public record TaskPropertyInfo
     {
         public Guid Id { get; set; }
         public Guid? ProjectId { get; set; }
