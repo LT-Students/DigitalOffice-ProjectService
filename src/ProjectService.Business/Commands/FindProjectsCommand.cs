@@ -3,7 +3,6 @@ using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
@@ -32,10 +31,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             try
             {
-                var getDepartmentsRequest = IFindDepartmentsRequest.CreateObj(
-                    null, dbProjects.Select(p => p.DepartmentId).ToList());
-                var response = _findDepartmentsRequestClient.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-                    getDepartmentsRequest).Result;
+                Response<IOperationResult<IFindDepartmentsResponse>> response = _findDepartmentsRequestClient
+                    .GetResponse<IOperationResult<IFindDepartmentsResponse>>(
+                        IFindDepartmentsRequest.CreateObj(dbProjects.Select(p => p.DepartmentId).ToList())).Result;
                 if (response.Message.IsSuccess)
                 {
                     departmentNames = response.Message.Body.IdNamePairs;

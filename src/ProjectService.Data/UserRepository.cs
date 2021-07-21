@@ -81,7 +81,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public bool AreUserProjectExist(Guid userId, Guid projectId)
         {
-            return _provider.ProjectsUsers.FirstOrDefault(x => x.Id == userId && x.ProjectId == projectId) != null;
+            return _provider.ProjectsUsers.FirstOrDefault(x => x.UserId == userId && x.ProjectId == projectId) != null;
         }
 
         public bool AreExist(params Guid[] ids)

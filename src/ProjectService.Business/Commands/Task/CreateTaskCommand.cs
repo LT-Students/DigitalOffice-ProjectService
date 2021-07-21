@@ -83,19 +83,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         {
             var errors = new List<string>();
 
-            var authorId = _httpContextAccessor.HttpContext.GetUserId();
-
-            List<DbProjectUser> projectUsers =
-                _userRepository.GetProjectUsers(request.ProjectId, false).ToList();
-
-            IGetDepartmentResponse department = GetDepartment(authorId, errors);
-
-            bool isProjectParticipant = projectUsers.FirstOrDefault(x =>
-                x.UserId == authorId) != null;
+            Guid authorId = _httpContextAccessor.HttpContext.GetUserId();
 
             if (!_accessValidator.IsAdmin()
-                && projectUsers.FirstOrDefault(u => u.UserId == authorId) == null
-                && department?.DirectorUserId != authorId)
+                && !_userRepository.AreUserProjectExist(authorId, request.ProjectId)
+                && GetDepartment(authorId, errors)?.DirectorUserId != authorId)
             {
                 throw new ForbiddenException("Not enough rights.");
             }
