@@ -24,7 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         {
             return command.Execute(filter, skipCount, takeCount);
         }
-        
+
         [HttpGet("get")]
         public OperationResultResponse<TaskResponse> Get(
             [FromQuery] Guid taskId,
