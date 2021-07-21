@@ -85,7 +85,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             List<string> errors = new();
 
             var userId = _httpContextAccessor.HttpContext.GetUserId();
-            var projectUsers = _userRepository.Find(userId);
+            var projectUsers = _userRepository.Find(userId).ToList();
 
             if (!(projectUsers.Any() || _accessValidator.IsAdmin()))
             {
@@ -93,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             }
 
             var projectIds = projectUsers.Select(x => x.ProjectId);
-            var dbTasks = _taskRepository.Find(filter, projectIds, skipCount, takeCount, out int totalCount);
+            var dbTasks = _taskRepository.Find(filter, projectIds, skipCount, takeCount, out int totalCount).ToList();
 
             var users = dbTasks.Where(x => x.AssignedTo.HasValue).Select(x => x.AssignedTo.Value).ToList();
             users.AddRange(dbTasks.Select(x => x.AuthorId).ToList());
