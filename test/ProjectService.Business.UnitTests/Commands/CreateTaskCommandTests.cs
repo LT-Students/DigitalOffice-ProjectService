@@ -214,47 +214,47 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
         }
 
-        [Test]
-        public void ShouldThrowExeptionWhenRequestClientUnavalible()
-        {
-            var newResponse = new OperationResultResponse<Guid>
-            {
-                Status = OperationResultStatusType.PartialSuccess,
-                Errors = new List<string>() { "Cannot create task. Please try again later." }
-            };
+        //[Test]
+        //public void ShouldThrowExeptionWhenRequestClientUnavalible()
+        //{
+        //    var newResponse = new OperationResultResponse<Guid>
+        //    {
+        //        Status = OperationResultStatusType.PartialSuccess,
+        //        Errors = new List<string>() { "Cannot create task. Please try again later." }
+        //    };
 
-            _mocker
-                .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
-                .Returns(true);
+        //    _mocker
+        //        .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
+        //        .Returns(false);
 
-            _mocker
-            .Setup<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
-            .Returns(true);
+        //    _mocker
+        //    .Setup<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
+        //    .Returns(true);
 
-            _mocker
-                .Setup<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
-                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    It.IsAny<object>(), default, default).Result).Throws(new Exception());
+        //    _mocker
+        //        .Setup<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
+        //        x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
+        //            It.IsAny<object>(), default, default).Result).Throws(new Exception());
 
-            _mocker
-                .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId))
-                .Returns(_dbTask);
+        //    _mocker
+        //        .Setup<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId))
+        //        .Returns(_dbTask);
 
-            _mocker
-                .Setup<ITaskRepository, Guid>(x => x.CreateTask(_dbTask))
-                .Returns(null);
+        //    _mocker
+        //        .Setup<ITaskRepository, Guid>(x => x.CreateTask(_dbTask))
+        //        .Returns(null);
 
-            SerializerAssert.AreEqual(newResponse, _command.Execute(_newRequest));
+        //    SerializerAssert.AreEqual(newResponse, _command.Execute(_newRequest));
 
-            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
-            _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
-            _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(null), Times.Never);
-            _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
-            _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
-               x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                   It.IsAny<object>(), default, default).Result,
-                    Times.Once);
-        }
+        //    _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
+        //    _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
+        //    _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(null), Times.Never);
+        //    _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
+        //    _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Response<IOperationResult<IGetDepartmentResponse>>>(
+        //       x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
+        //           It.IsAny<object>(), default, default).Result,
+        //            Times.Once);
+        //}
 
         [Test]
         public void ShouldThrowExceptionWhenUserCannotBeCreated()

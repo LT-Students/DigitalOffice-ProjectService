@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
             {
                 Id = Guid.NewGuid(),
                 Name = taskRequest.Name,
-                Description = taskRequest.Description.Trim() == "" ? null : taskRequest.Description.Trim(),
+                Description = string.IsNullOrEmpty(taskRequest.Description?.Trim()) ? null : taskRequest.Description.Trim(),
                 PlannedMinutes = taskRequest.PlannedMinutes,
                 AssignedTo = taskRequest.AssignedTo,
                 AuthorId = authorId,
