@@ -95,7 +95,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             var projectIds = projectUsers.Select(x => x.ProjectId);
             var dbTasks = _taskRepository.Find(filter, projectIds, skipCount, takeCount, out int totalCount).ToList();
 
-            var users = dbTasks.Where(x => x.AssignedTo.HasValue).Select(x => x.AssignedTo.Value).ToList();
+            var users = dbTasks.Where(x => x.AssignedUser != null).Select(x => x.AssignedUser.UserId).ToList();
             users.AddRange(dbTasks.Select(x => x.AuthorId).ToList());
 
             var usersData = GetUsersData(users, errors);
@@ -103,7 +103,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             List<TaskInfo> tasks = new();
             foreach (var dbTask in dbTasks)
             {
-                var assignedUser = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AssignedTo);
+                var assignedUser = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AssignedUser?.UserId);
                 var author = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AuthorId);
 
                 tasks.Add(_mapper.Map(dbTask, assignedUser, author));

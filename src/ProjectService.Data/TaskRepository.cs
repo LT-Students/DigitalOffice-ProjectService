@@ -75,12 +75,10 @@ namespace LT.DigitalOffice.ProjectService.Data
             {
                 DbTask dbTask = _provider.Tasks
                                     .Include(t => t.Project)
-                                    .Include(t => t.Author)
                                     .Include(t => t.AssignedUser)
                                     .Include(t => t.Status)
                                     .Include(t => t.Priority)
                                     .Include(t => t.Type)
-                                    .Include(t => t.Subtasks)
                                     .FirstOrDefault(x => x.Id == taskId) ??
                                 throw new NotFoundException($"Task id '{taskId}' was not found.");
 
@@ -113,13 +111,14 @@ namespace LT.DigitalOffice.ProjectService.Data
                 throw new ArgumentNullException(nameof(filter));
             }
 
-            var dbTasks = _provider.Tasks
-                            .Include(t => t.Priority)
-                            .Include(t => t.Type)
-                            .Include(t => t.Status)
-                            .Include(t => t.Project)
-                            .AsSingleQuery()
-                            .AsQueryable();
+            IQueryable<DbTask> dbTasks = _provider.Tasks
+                .Include(t => t.AssignedUser)
+                .Include(t => t.Priority)
+                .Include(t => t.Type)
+                .Include(t => t.Status)
+                .Include(t => t.Project)
+                .AsSingleQuery()
+                .AsQueryable();
 
             IQueryable<DbTask> tasks = CreateFindPredicates(filter, dbTasks, projectIds);
             totalCount = tasks.Count();
