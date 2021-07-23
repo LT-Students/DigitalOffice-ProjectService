@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IUserRepository _userRepository;
         private readonly IEditTaskValidator _validator;
         private readonly IAccessValidator _accessValidator;
-        private readonly HttpContext _httpContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPatchDbTaskMapper _mapper;
         private readonly ILogger<EditTaskCommand> _logger;
         private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
@@ -76,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _userRepository = userRepository;
             _validator = validator;
             _accessValidator = accessValidator;
-            _httpContext = httpContextAccessor.HttpContext;
+            _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
             _logger = logger;
             _requestClient = requestClient;
@@ -84,36 +84,23 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         public OperationResultResponse<bool> Execute(Guid taskId, JsonPatchDocument<EditTaskRequest> patch)
         {
-            _validator.ValidateAndThrowCustom(patch);
-
             var errors = new List<string>();
 
             DbTask task = _taskRepository.Get(taskId, false);
-            List<DbProjectUser> projectUsers =
-                _userRepository.GetProjectUsers(task.ProjectId, false).ToList();
 
-            Guid requestUserId = _httpContext.GetUserId();
-            IGetDepartmentResponse department = GetDepartment(requestUserId, errors);
+            Guid requestUserId = _httpContextAccessor.HttpContext.GetUserId();
 
-            bool isAdmin = _accessValidator.IsAdmin();
-
-            bool isProjectParticipant = projectUsers.FirstOrDefault(x =>
-                x.UserId == requestUserId) != null;
-
-            bool isDepartmentDirector = false;
-            if (department != null)
-            {
-                 isDepartmentDirector = department.DirectorUserId == requestUserId;
-            }
-
-            if (!isAdmin && !isProjectParticipant && !isDepartmentDirector)
+            if (!_accessValidator.IsAdmin()
+                && !(_userRepository.GetProjectUsers(task.ProjectId, false).ToList().FirstOrDefault(
+                    x => x.UserId == requestUserId) != null)
+                && !(GetDepartment(requestUserId, errors)?.DirectorUserId == requestUserId))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
 
-            var dbTaskPatch = _mapper.Map(patch);
+            _validator.ValidateAndThrowCustom(patch);
 
-            _taskRepository.Edit(task, dbTaskPatch);
+            _taskRepository.Edit(task, _mapper.Map(patch));
 
             return new OperationResultResponse<bool>
             {
