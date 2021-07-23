@@ -131,7 +131,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
                         RuleFor(x => GetOperationByPath(x, PlannedMinutes).value)
                             .NotEmpty()
-                            .Must(x => int.TryParse(x.ToString(), out _));
+                            .Must(x => int.TryParse(x.ToString(), out int minutes) && minutes > 0);
                     });
                 });
         }

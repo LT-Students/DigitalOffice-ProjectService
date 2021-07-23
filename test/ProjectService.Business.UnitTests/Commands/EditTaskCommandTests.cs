@@ -258,10 +258,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
 
-            VerifyCalls(Times.Once,
+            VerifyCalls(Times.Never,
                 Times.Once,
                 Times.Once,
-                Times.Once,
+                Times.Never,
                 Times.Once);
         }
 
@@ -301,28 +301,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             VerifyCalls(Times.Once,
                 Times.Once,
                 Times.Never,
-                Times.Once,
-                Times.Once);
-        }
-
-        [Test]
-        public void ExceptionWhenRequestClientUnavailable()
-        {
-            _accessValidatorMock.Setup(x => x.IsAdmin(null)).Returns(true);
-
-            _requestClient
-                .Setup(x =>
-                    x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                        It.IsAny<object>(),
-                        default,
-                        default))
-                .Returns((Task<Response<IOperationResult<IGetDepartmentResponse>>>) null);
-
-            Assert.AreEqual(1, _command.Execute(_taskId, _request).Errors.Count);
-
-            VerifyCalls(Times.Once,
-                Times.Once,
-                Times.Once,
                 Times.Once,
                 Times.Once);
         }
