@@ -2,7 +2,7 @@
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
 {
-    public class AuthorInfo
+    public record AuthorInfo
     {
         public Guid Id { get; set; }
         public string FirstName { get; set; }
