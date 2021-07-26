@@ -180,14 +180,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Returns(_dbTask);
 
             _mocker
-                .Setup<ITaskRepository, Guid>(x => x.CreateTask(_dbTask))
+                .Setup<ITaskRepository, Guid>(x => x.Create(_dbTask))
                 .Returns(_response.Body);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
 
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
             _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
-            _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
+            _mocker.Verify<ITaskRepository, Guid>(x => x.Create(_dbTask), Times.Once);
         }
 
         [Test]
@@ -204,14 +204,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Returns(_dbTask);
 
             _mocker
-                .Setup<ITaskRepository, Guid>(x => x.CreateTask(_dbTask))
+                .Setup<ITaskRepository, Guid>(x => x.Create(_dbTask))
                 .Returns(_response.Body);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
 
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
             _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
-            _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
+            _mocker.Verify<ITaskRepository, Guid>(x => x.Create(_dbTask), Times.Once);
         }
 
         //[Test]
@@ -291,14 +291,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Returns(_dbTask);
 
             _mocker
-                .Setup<ITaskRepository, Guid>(x => x.CreateTask(_dbTask))
+                .Setup<ITaskRepository, Guid>(x => x.Create(_dbTask))
                 .Returns(_dbTask.Id);
 
             SerializerAssert.AreEqual(_response, _command.Execute(_newRequest));
 
             _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
             _mocker.Verify<IDbTaskMapper, DbTask>(x => x.Map(_newRequest, _authorId), Times.Once);
-            _mocker.Verify<ITaskRepository, Guid>(x => x.CreateTask(_dbTask), Times.Once);
+            _mocker.Verify<ITaskRepository, Guid>(x => x.Create(_dbTask), Times.Once);
             _mocker.Verify<ICreateTaskValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, Times.Once);
         }
     }

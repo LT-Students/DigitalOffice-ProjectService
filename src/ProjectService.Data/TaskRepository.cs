@@ -48,7 +48,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
-        public Guid CreateTask(DbTask newTask)
+        public Guid Create(DbTask newTask)
         {
             _provider.Tasks.Add(newTask);
             _provider.Save();
@@ -75,10 +75,10 @@ namespace LT.DigitalOffice.ProjectService.Data
             {
                 DbTask dbTask = _provider.Tasks
                                     .Include(t => t.Project)
-                                    .Include(t => t.AssignedUser)
                                     .Include(t => t.Status)
                                     .Include(t => t.Priority)
                                     .Include(t => t.Type)
+                                    .Include(t => t.Subtasks)
                                     .FirstOrDefault(x => x.Id == taskId) ??
                                 throw new NotFoundException($"Task id '{taskId}' was not found.");
 
@@ -112,7 +112,6 @@ namespace LT.DigitalOffice.ProjectService.Data
             }
 
             IQueryable<DbTask> dbTasks = _provider.Tasks
-                .Include(t => t.AssignedUser)
                 .Include(t => t.Priority)
                 .Include(t => t.Type)
                 .Include(t => t.Status)

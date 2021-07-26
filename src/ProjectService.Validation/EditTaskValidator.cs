@@ -1,9 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
+using FluentValidation.Validators;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
@@ -16,21 +18,176 @@ namespace LT.DigitalOffice.ProjectService.Validation
         private readonly ITaskPropertyRepository _taskPropertyRepository;
         private readonly IUserRepository _userRepository;
 
-        private static List<string> Paths
-            => new() {Name, Description, AssignedTo, PriorityId, StatusId, TypeId, PlannedMinutes};
+        private void HandleInternalPropertyValidation(Operation<EditTaskRequest> requestedOperation, CustomContext context)
+        {
+            #region local functions
 
-        public static string Name => $"/{nameof(EditTaskRequest.Name)}";
-        public static string Description => $"/{nameof(EditTaskRequest.Description)}";
-        public static string AssignedTo => $"/{nameof(EditTaskRequest.AssignedTo)}";
-        public static string PriorityId => $"/{nameof(EditTaskRequest.PriorityId)}";
-        public static string StatusId => $"/{nameof(EditTaskRequest.StatusId)}";
-        public static string TypeId => $"/{nameof(EditTaskRequest.TypeId)}";
-        public static string PlannedMinutes => $"/{nameof(EditTaskRequest.PlannedMinutes)}";
+            void AddСorrectPaths(List<string> paths)
+            {
+                if (paths.FirstOrDefault(p => p.EndsWith(requestedOperation.path[1..], StringComparison.OrdinalIgnoreCase)) == null)
+                {
+                    context.AddFailure(requestedOperation.path, $"This path {requestedOperation.path} is not available");
+                }
+            }
 
-        Func<JsonPatchDocument<EditTaskRequest>, string, Operation> GetOperationByPath =>
-            (x, path) =>
-                x.Operations.FirstOrDefault(x =>
-                    string.Equals(x.path, path, StringComparison.OrdinalIgnoreCase));
+            void AddСorrectOperations(
+                string propertyName,
+                List<OperationType> types)
+            {
+                if (requestedOperation.path.EndsWith(propertyName, StringComparison.OrdinalIgnoreCase)
+                    && !types.Contains(requestedOperation.OperationType))
+                {
+                    context.AddFailure(propertyName, $"This operation {requestedOperation.OperationType} is prohibited for {propertyName}");
+                }
+            }
+
+            void AddFailureForPropertyIf(
+                string propertyName,
+                Func<OperationType, bool> type,
+                Dictionary<Func<Operation<EditTaskRequest>, bool>, string> predicates)
+            {
+                if (!requestedOperation.path.EndsWith(propertyName, StringComparison.OrdinalIgnoreCase)
+                    || !type(requestedOperation.OperationType))
+                {
+                    return;
+                }
+
+                foreach (var validateDelegate in predicates)
+                {
+                    if (!validateDelegate.Key(requestedOperation))
+                    {
+                        context.AddFailure(propertyName, validateDelegate.Value);
+                    }
+                }
+            }
+
+            #endregion
+
+            #region paths
+
+            AddСorrectPaths(
+                new List<string>
+                {
+                    nameof(EditTaskRequest.Name),
+                    nameof(EditTaskRequest.Description),
+                    nameof(EditTaskRequest.AssignedTo),
+                    nameof(EditTaskRequest.PriorityId),
+                    nameof(EditTaskRequest.StatusId),
+                    nameof(EditTaskRequest.TypeId),
+                    nameof(EditTaskRequest.PlannedMinutes)
+                });
+
+            AddСorrectOperations(nameof(EditTaskRequest.Name), new List<OperationType> { OperationType.Replace });
+            AddСorrectOperations(nameof(EditTaskRequest.Description), new List<OperationType> { OperationType.Replace });
+            AddСorrectOperations(nameof(EditTaskRequest.AssignedTo), new List<OperationType> { OperationType.Replace });
+            AddСorrectOperations(nameof(EditTaskRequest.PriorityId), new List<OperationType> { OperationType.Replace });
+            AddСorrectOperations(nameof(EditTaskRequest.StatusId), new List<OperationType> { OperationType.Replace });
+            AddСorrectOperations(nameof(EditTaskRequest.TypeId), new List<OperationType> { OperationType.Replace });
+            AddСorrectOperations(nameof(EditTaskRequest.PlannedMinutes), new List<OperationType> { OperationType.Replace });
+
+            #endregion
+
+            #region firstname
+
+            AddFailureForPropertyIf(
+                nameof(EditTaskRequest.Name),
+                x => x == OperationType.Replace || x == OperationType.Add,
+                new()
+                {
+                    { x => !string.IsNullOrEmpty(x.value.ToString()), "Name is empty." },
+                    { x => x.value.ToString().Length < 150, "Name is too long" }
+                });
+
+            #endregion
+
+            #region description
+
+            AddFailureForPropertyIf(
+                nameof(EditTaskRequest.Description),
+                x => x == OperationType.Replace || x == OperationType.Add,
+                new()
+                {
+                    {
+                        x =>
+                          {
+                              if (string.IsNullOrEmpty(x.ToString()))
+                              {
+                                  return true;
+                              }
+
+                              return x.value.ToString().Length < 150;
+                          },
+                        "Name is too long"
+                    }
+                });
+
+            #endregion
+
+            #region assignedto
+
+            AddFailureForPropertyIf(
+                nameof(EditTaskRequest.AssignedTo),
+                x => x == OperationType.Replace || x == OperationType.Add,
+                new()
+                {
+                    { x => Guid.TryParse(x.value.ToString(), out Guid _), "Incorrect format of AssignedTo." },
+                    { x => _userRepository.AreExist(Guid.Parse(x.value.ToString())), "The user must to in the project." }
+                });
+
+            #endregion
+
+            #region priorityid
+
+            AddFailureForPropertyIf(
+                nameof(EditTaskRequest.PriorityId),
+                x => x == OperationType.Replace || x == OperationType.Add,
+                new()
+                {
+                    { x => Guid.TryParse(x.value.ToString(), out Guid _), "Incorrect format of PriorityId." },
+                    { x => _taskPropertyRepository.AreExist(Guid.Parse(x.value.ToString()), TaskPropertyType.Priority), "The priority must exist." }
+                });
+
+            #endregion
+
+            #region statusid
+
+            AddFailureForPropertyIf(
+                nameof(EditTaskRequest.StatusId),
+                x => x == OperationType.Replace || x == OperationType.Add,
+                new()
+                {
+                    { x => Guid.TryParse(x.value.ToString(), out Guid _), "Incorrect format of StatusId." },
+                    { x => _taskPropertyRepository.AreExist(Guid.Parse(x.value.ToString()),
+                        TaskPropertyType.Status), "The status must exist." }
+                });
+
+            #endregion
+
+            #region typeid
+
+            AddFailureForPropertyIf(
+                nameof(EditTaskRequest.TypeId),
+                x => x == OperationType.Replace || x == OperationType.Add,
+                new()
+                {
+                    { x => Guid.TryParse(x.value.ToString(), out Guid _), "Incorrect format of TypeId." },
+                    { x => _taskPropertyRepository.AreExist(Guid.Parse(x.value.ToString()), TaskPropertyType.Type), "The type must exist." }
+                });
+
+            #endregion
+
+            #region PlannedMinutes
+
+            AddFailureForPropertyIf(
+                nameof(EditTaskRequest.PlannedMinutes),
+                x => x == OperationType.Replace || x == OperationType.Add,
+                new()
+                {
+                    { x => int.TryParse(x.value.ToString(), out int minutes) && minutes > 0, "Incorrect format of PlannedMinutes." }
+                });
+
+            #endregion
+        }
 
         public EditTaskValidator(
             ITaskPropertyRepository taskPropertyRepository,
@@ -39,101 +196,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
             _taskPropertyRepository = taskPropertyRepository;
             _userRepository = userRepository;
 
-            CascadeMode = CascadeMode.Stop;
-
-            RuleFor(x => x.Operations)
-                .Must(x =>
-                    x.Select(x => x.path)
-                        .Distinct().Count() == x.Count())
-                .WithMessage("You don't have to change the same field of Task multiple times.")
-                .Must(x => x.Any())
-                .WithMessage("You don't have changes.")
-                .ForEach(y => y
-                    .Must(x => Paths.Any(cur => string.Equals(
-                        cur,
-                        x.path,
-                        StringComparison.OrdinalIgnoreCase)))
-                    .WithMessage(
-                        $"Document contains invalid path. Only such paths are allowed: {Paths.Aggregate((x, y) => x + ", " + y)}")
-                )
-                .DependentRules(() =>
-                {
-                    When(x => GetOperationByPath(x, Name) != null, () =>
-                    {
-                        RuleFor(x => x.Operations)
-                            .UniqueOperationWithAllowedOp(Name, "replace", "add", "remove");
-
-                        RuleFor(x => (string) GetOperationByPath(x, Name).value)
-                            .NotEmpty()
-                            .MaximumLength(150)
-                            .WithMessage("Name is too long");
-                    });
-
-                    When(x => GetOperationByPath(x, Description) != null, () =>
-                    {
-                        RuleFor(x => x.Operations)
-                            .UniqueOperationWithAllowedOp(Description, "replace", "add", "remove");
-
-                        RuleFor(x => GetOperationByPath(x, Description).value)
-                            .NotNull();
-                    });
-
-                    When(x => GetOperationByPath(x, AssignedTo) != null, () =>
-                    {
-                        RuleFor(x => x.Operations)
-                            .UniqueOperationWithAllowedOp(AssignedTo, "replace", "add", "remove");
-
-                        RuleFor(x => GetOperationByPath(x, AssignedTo).value)
-                            .NotEmpty()
-                            .Must(o => Guid.TryParse(o.ToString(), out Guid _))
-                            .Must(o => _userRepository.AreExist(Guid.Parse(o.ToString())));
-                    });
-
-                    When(x => GetOperationByPath(x, PriorityId) != null, () =>
-                    {
-                        RuleFor(x => x.Operations)
-                            .UniqueOperationWithAllowedOp(PriorityId, "replace");
-
-                        RuleFor(x => GetOperationByPath(x, PriorityId).value)
-                            .NotEmpty()
-                            .Must(o => Guid.TryParse(o.ToString(), out Guid _))
-                            .Must(o => _taskPropertyRepository.AreExist(Guid.Parse(o.ToString())));
-                    });
-
-                    When(x => GetOperationByPath(x, StatusId) != null, () =>
-                    {
-                        RuleFor(x => x.Operations)
-                            .NotEmpty()
-                            .UniqueOperationWithAllowedOp(StatusId, "replace");
-
-                        RuleFor(x => GetOperationByPath(x, StatusId).value)
-                            .NotEmpty()
-                            .Must(o => Guid.TryParse(o.ToString(), out Guid _))
-                            .Must(o => _taskPropertyRepository.AreExist(Guid.Parse(o.ToString())));
-                    });
-
-                    When(x => GetOperationByPath(x, TypeId) != null, () =>
-                    {
-                        RuleFor(x => x.Operations)
-                            .NotEmpty()
-                            .UniqueOperationWithAllowedOp(StatusId, "replace");
-
-                        RuleFor(x => GetOperationByPath(x, TypeId).value)
-                            .NotEmpty()
-                            .Must(o => Guid.TryParse(o.ToString(), out Guid _))
-                            .Must(o => _taskPropertyRepository.AreExist(Guid.Parse(o.ToString())));
-                    });
-
-                    When(x => GetOperationByPath(x, PlannedMinutes) != null, () =>
-                    {
-                        RuleFor(x => x.Operations)
-                            .UniqueOperationWithAllowedOp(PlannedMinutes, "replace", "add", "remove");
-
-                        RuleFor(x => GetOperationByPath(x, PlannedMinutes).value)
-                            .NotEmpty()
-                            .Must(x => int.TryParse(x.ToString(), out int minutes) && minutes > 0);
-                    });
-                });
+            RuleForEach(x => x.Operations)
+               .Custom(HandleInternalPropertyValidation);
         }
     }
 }

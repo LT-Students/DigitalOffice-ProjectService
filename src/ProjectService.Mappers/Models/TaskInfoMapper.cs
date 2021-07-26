@@ -8,6 +8,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
 {
     public class TaskInfoMapper : ITaskInfoMapper
     {
+        private readonly IUserTaskInfoMapper _userMapper;
+
+        public TaskInfoMapper(IUserTaskInfoMapper userMapper)
+        {
+            _userMapper = userMapper;
+        }
+
         public TaskInfo Map(DbTask dbTask, UserData assignedUser, UserData author)
         {
             if (dbTask == null)
@@ -26,14 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
                 Description = dbTask.Description,
                 PriorityName = dbTask.Priority?.Name,
                 PlannedMinutes = dbTask.PlannedMinutes,
-                Author = author != null
-                    ? new UserTaskInfo
-                    {
-                        Id = dbTask.AuthorId,
-                        FirstName = author.FirstName,
-                        LastName = author.LastName
-                    }
-                    : null,
+                Author = _userMapper.Map(author),
                 Project = dbTask.Project != null
                     ? new ProjectTaskInfo
                     {
@@ -41,14 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
                         ShortName = dbTask.Project.ShortName
                     }
                     : null,
-                AssignedTo = assignedUser != null && dbTask.AssignedTo.HasValue
-                    ? new UserTaskInfo
-                    {
-                        Id = dbTask.AssignedTo.Value,
-                        FirstName = assignedUser.FirstName,
-                        LastName = assignedUser.LastName
-                    }
-                    : null
+                AssignedTo = _userMapper.Map(assignedUser)
             };
         }
     }

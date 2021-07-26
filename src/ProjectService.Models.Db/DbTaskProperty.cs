@@ -19,7 +19,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public bool IsActive { get; set; }
 
         public DbProject Project { get; set; }
-        public DbProjectUser User { get; set; }
         public ICollection<DbTask> PriorityTasks { get; set; }
         public ICollection<DbTask> TypeTasks { get; set; }
         public ICollection<DbTask> StatusTasks { get; set; }
@@ -34,11 +33,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
             builder
                 .HasKey(tp => tp.Id);
-
-            builder
-                .HasOne(tp => tp.User)
-                .WithMany(u => u.TaskProperties)
-                .HasForeignKey(tp => tp.AuthorId);
 
             builder
                 .HasOne(tp => tp.Project)
