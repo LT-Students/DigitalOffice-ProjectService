@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
         Func<JsonPatchDocument<EditTaskRequest>, string, Operation> GetOperationByPath =>
             (x, path) =>
-                x.Operations.FirstOrDefault(x => 
+                x.Operations.FirstOrDefault(x =>
                     string.Equals(x.path, path, StringComparison.OrdinalIgnoreCase));
 
         public EditTaskValidator(
@@ -86,7 +86,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                         RuleFor(x => GetOperationByPath(x, AssignedTo).value)
                             .NotEmpty()
                             .Must(o => Guid.TryParse(o.ToString(), out Guid _))
-                            .Must(o => _userRepository.AreExist((Guid) o));
+                            .Must(o => _userRepository.AreExist(Guid.Parse(o.ToString())));
                     });
 
                     When(x => GetOperationByPath(x, PriorityId) != null, () =>
@@ -97,7 +97,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                         RuleFor(x => GetOperationByPath(x, PriorityId).value)
                             .NotEmpty()
                             .Must(o => Guid.TryParse(o.ToString(), out Guid _))
-                            .Must(o => _taskPropertyRepository.AreExist((Guid) o));
+                            .Must(o => _taskPropertyRepository.AreExist(Guid.Parse(o.ToString())));
                     });
 
                     When(x => GetOperationByPath(x, StatusId) != null, () =>
@@ -109,7 +109,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                         RuleFor(x => GetOperationByPath(x, StatusId).value)
                             .NotEmpty()
                             .Must(o => Guid.TryParse(o.ToString(), out Guid _))
-                            .Must(o => _taskPropertyRepository.AreExist((Guid) o));
+                            .Must(o => _taskPropertyRepository.AreExist(Guid.Parse(o.ToString())));
                     });
 
                     When(x => GetOperationByPath(x, TypeId) != null, () =>
@@ -121,7 +121,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                         RuleFor(x => GetOperationByPath(x, TypeId).value)
                             .NotEmpty()
                             .Must(o => Guid.TryParse(o.ToString(), out Guid _))
-                            .Must(o => _taskPropertyRepository.AreExist((Guid) o));
+                            .Must(o => _taskPropertyRepository.AreExist(Guid.Parse(o.ToString())));
                     });
 
                     When(x => GetOperationByPath(x, PlannedMinutes) != null, () =>
@@ -131,7 +131,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
                         RuleFor(x => GetOperationByPath(x, PlannedMinutes).value)
                             .NotEmpty()
-                            .Must(x => (int) x >= 0);
+                            .Must(x => int.TryParse(x.ToString(), out int minutes) && minutes > 0);
                     });
                 });
         }

@@ -23,6 +23,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
         public IEnumerable<DbProject> Get(Guid departmentId);
 
+        public List<DbProject> Find(List<Guid> projectIds);
+
         /// <summary>
         /// Adds new project to the database. Returns the id of the added project.
         /// </summary>

@@ -2,7 +2,7 @@
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
 {
-    public class TaskInfo
+    public record TaskInfo
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

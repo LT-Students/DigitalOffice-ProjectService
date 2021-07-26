@@ -43,11 +43,11 @@ namespace LT.DigitalOffice.ProjectService.Controllers
 
         [HttpPatch("edit")]
         public OperationResultResponse<bool> Edit(
-            [FromQuery] Guid id,
+            [FromQuery] Guid taskId,
             [FromBody] JsonPatchDocument<EditTaskRequest> request,
             [FromServices] IEditTaskCommand command)
         {
-            return command.Execute(id, request);
+            return command.Execute(taskId, request);
         }
     }
 }
