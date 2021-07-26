@@ -149,7 +149,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             return _provider.Projects.Any(p => p.Name.Contains(name));
         }
 
-        public List<DbProject> Get(List<Guid> projectIds)
+        public List<DbProject> Find(List<Guid> projectIds)
         {
             return _provider.Projects.Where(p => projectIds.Contains(p.Id)).ToList();
         }

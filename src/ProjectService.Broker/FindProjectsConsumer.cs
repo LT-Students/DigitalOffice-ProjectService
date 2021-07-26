@@ -16,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
         private object FindProjects(IFindProjectsRequest request)
         {
-            return IFindProjectsResponse.CreateObj(_repository.Get(request.ProjectIds)
+            return IFindProjectsResponse.CreateObj(_repository.Find(request.ProjectIds)
                 .Select(p => new ProjectData(
                     p.Id,
                     p.Name,
