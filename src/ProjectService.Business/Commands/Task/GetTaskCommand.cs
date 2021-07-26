@@ -131,9 +131,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 task.AuthorId,
             };
 
-            if (task.AssignedUser != null)
+            if (task.AssignedTo.HasValue)
             {
-                userIds.Add(task.AssignedUser.Id);
+                userIds.Add(task.AssignedTo.Value);
             }
 
             if (task.ParentTask != null)
@@ -141,7 +141,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 userIds.Add(task.ParentTask.AuthorId);
             }
 
-            var parentTaskAssignedTo = task.ParentTask?.AssignedTo.GetValueOrDefault();
+            Guid? parentTaskAssignedTo = task.ParentTask?.AssignedTo;
             if (parentTaskAssignedTo != null && parentTaskAssignedTo != Guid.Empty)
             {
                 userIds.Add(parentTaskAssignedTo.Value);
@@ -173,7 +173,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             TaskResponse response = _taskResponseMapper.Map(
                 task,
                 usersDataResponse.FirstOrDefault(x => x.Id == task.AuthorId),
-                usersDataResponse.FirstOrDefault(x => task.AssignedUser != null && x.Id == task.AssignedUser.Id),
+                usersDataResponse.FirstOrDefault(x => x.Id == task.AssignedTo),
                 usersDataResponse.FirstOrDefault(x => parentTaskAssignedTo != null && x.Id == parentTaskAssignedTo),
                 department?.Name,
                 usersDataResponse.FirstOrDefault(x => task.ParentTask != null && x.Id == task.ParentTask.AuthorId),
@@ -181,8 +181,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
             return new OperationResultResponse<TaskResponse>()
             {
-                Status =
-                    errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
+                Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
                 Body = response,
                 Errors = errors
             };

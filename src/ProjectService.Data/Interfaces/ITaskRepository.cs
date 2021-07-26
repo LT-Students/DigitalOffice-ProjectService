@@ -24,7 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
         IEnumerable<DbTask> Find(FindTasksFilter filter, IEnumerable<Guid> projectIds, int skipCount, int takeCount, out int totalCount);
 
-        Guid CreateTask(DbTask item);
+        Guid Create(DbTask item);
 
         bool IsExist(Guid id);
     }

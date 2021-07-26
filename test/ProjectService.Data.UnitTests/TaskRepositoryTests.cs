@@ -248,7 +248,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         [Test]
         public void ShouldCreateNewTask()
         {
-            SerializerAssert.AreEqual(_dbTask.Id, _repository.CreateTask(_dbTask));
+            SerializerAssert.AreEqual(_dbTask.Id, _repository.Create(_dbTask));
             Assert.NotNull(_provider.Tasks.Find(_dbTask.Id));
         }
 

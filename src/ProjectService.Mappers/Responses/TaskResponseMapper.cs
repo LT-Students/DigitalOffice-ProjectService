@@ -14,18 +14,18 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
         private readonly IProjectInfoMapper _projectInfoMapper;
         private readonly ITaskInfoMapper _taskInfoMapper;
         private readonly ITaskPropertyInfoMapper _taskPropertyInfoMapper;
-        private readonly IProjectUserInfoMapper _projectUserInfoMapper;
+        private readonly IUserTaskInfoMapper _userTaskInfoMapper;
 
         public TaskResponseMapper(
             IProjectInfoMapper projectInfoMapper,
             ITaskInfoMapper taskInfoMapper,
             ITaskPropertyInfoMapper taskPropertyInfoMapper,
-            IProjectUserInfoMapper projectUserInfoMapper)
+            IUserTaskInfoMapper userTaskInfoMapper)
         {
             _projectInfoMapper = projectInfoMapper;
             _taskInfoMapper = taskInfoMapper;
             _taskPropertyInfoMapper = taskPropertyInfoMapper;
-            _projectUserInfoMapper = projectUserInfoMapper;
+            _userTaskInfoMapper = userTaskInfoMapper;
         }
 
         public TaskResponse Map(
@@ -45,14 +45,12 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
             return new TaskResponse()
             {
                 Id = dbTask.Id,
-                Type = dbTask.Type != null 
+                Type = dbTask.Type != null
                     ? _taskPropertyInfoMapper.Map(dbTask.Type)
                     : null,
-                Author = dbTask.Author != null 
-                    ? _projectUserInfoMapper.Map(authorUserData, dbTask.Author)
-                    : null,
-                Status = dbTask.Status != null 
-                    ? _taskPropertyInfoMapper.Map(dbTask.Status) 
+                Author = _userTaskInfoMapper.Map(authorUserData),
+                Status = dbTask.Status != null
+                    ? _taskPropertyInfoMapper.Map(dbTask.Status)
                     : null,
                 ParentTask = dbTask.ParentTask != null
                     ? _taskInfoMapper.Map(
@@ -60,15 +58,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
                         parentAssignedUserData,
                         parentAuthorAssignedUserData)
                     : null,
-                Project = dbTask.Project != null 
-                    ? _projectInfoMapper.Map(dbTask.Project, departmentName) 
+                Project = dbTask.Project != null
+                    ? _projectInfoMapper.Map(dbTask.Project, departmentName)
                     : null,
-                Priority = dbTask.Priority != null 
-                    ? _taskPropertyInfoMapper.Map(dbTask.Priority) 
+                Priority = dbTask.Priority != null
+                    ? _taskPropertyInfoMapper.Map(dbTask.Priority)
                     : null,
-                AssignedUser = assignedUserData != null
-                    ? _projectUserInfoMapper.Map(assignedUserData, dbTask.AssignedUser)
-                    : null,
+                AssignedUser = _userTaskInfoMapper.Map(assignedUserData),
                 Name = dbTask.Name,
                 Description = dbTask.Description,
                 Number = dbTask.Number,

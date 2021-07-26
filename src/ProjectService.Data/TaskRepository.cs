@@ -48,7 +48,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
-        public Guid CreateTask(DbTask newTask)
+        public Guid Create(DbTask newTask)
         {
             _provider.Tasks.Add(newTask);
             _provider.Save();
@@ -75,8 +75,6 @@ namespace LT.DigitalOffice.ProjectService.Data
             {
                 DbTask dbTask = _provider.Tasks
                                     .Include(t => t.Project)
-                                    .Include(t => t.Author)
-                                    .Include(t => t.AssignedUser)
                                     .Include(t => t.Status)
                                     .Include(t => t.Priority)
                                     .Include(t => t.Type)
@@ -113,13 +111,13 @@ namespace LT.DigitalOffice.ProjectService.Data
                 throw new ArgumentNullException(nameof(filter));
             }
 
-            var dbTasks = _provider.Tasks
-                            .Include(t => t.Priority)
-                            .Include(t => t.Type)
-                            .Include(t => t.Status)
-                            .Include(t => t.Project)
-                            .AsSingleQuery()
-                            .AsQueryable();
+            IQueryable<DbTask> dbTasks = _provider.Tasks
+                .Include(t => t.Priority)
+                .Include(t => t.Type)
+                .Include(t => t.Status)
+                .Include(t => t.Project)
+                .AsSingleQuery()
+                .AsQueryable();
 
             IQueryable<DbTask> tasks = CreateFindPredicates(filter, dbTasks, projectIds);
             totalCount = tasks.Count();
