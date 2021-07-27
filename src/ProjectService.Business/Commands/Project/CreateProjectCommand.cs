@@ -8,7 +8,7 @@ using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
-using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands
+namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
     public class CreateProjectCommand : ICreateProjectCommand
     {

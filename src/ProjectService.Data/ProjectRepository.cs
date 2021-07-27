@@ -20,19 +20,19 @@ namespace LT.DigitalOffice.ProjectService.Data
             this._provider = provider;
         }
 
-        public DbProject GetProject(GetProjectFilter filter)
+        public DbProject Get(GetProjectFilter filter)
         {
             IQueryable<DbProject> dbProjectQueryable = _provider.Projects.AsQueryable();
 
             if (filter.IncludeUsers.HasValue && filter.IncludeUsers.Value)
             {
-                if (filter.ShowNotActiveUsers.HasValue && !filter.ShowNotActiveUsers.Value)
+                if (filter.ShowNotActiveUsers.HasValue && filter.ShowNotActiveUsers.Value)
                 {
-                    dbProjectQueryable = dbProjectQueryable.Include(x => x.Users.Where(x => x.IsActive));
+                    dbProjectQueryable = dbProjectQueryable.Include(x => x.Users);
                 }
                 else
                 {
-                    dbProjectQueryable = dbProjectQueryable.Include(x => x.Users);
+                    dbProjectQueryable = dbProjectQueryable.Include(x => x.Users.Where(x => x.IsActive));
                 }
             }
 
@@ -96,7 +96,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider.Save();
         }
 
-        public List<DbProject> FindProjects(FindProjectsFilter filter, int skipCount, int takeCount, out int totalCount)
+        public List<DbProject> Find(FindProjectsFilter filter, int skipCount, int takeCount, out int totalCount)
         {
             if (skipCount < 0 )
             {

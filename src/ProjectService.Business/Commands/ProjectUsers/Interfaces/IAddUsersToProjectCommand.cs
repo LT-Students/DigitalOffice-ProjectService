@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
+namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces
 {
     /// <summary>
     /// Represents interface for a command in command pattern.
