@@ -5,6 +5,7 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 
 namespace LT.DigitalOffice.ProjectService.Data
@@ -78,6 +79,11 @@ namespace LT.DigitalOffice.ProjectService.Data
             totalCount = dbTaskProperties.Count();
 
             return dbTaskProperties.Skip(skipCount).Take(takeCount).ToList();
+        }
+
+        public bool AreExist(Guid id, TaskPropertyType type)
+        {
+            return _provider.TaskProperties.Any(tp => tp.Id == id && tp.IsActive && tp.PropertyType == (int)type);
         }
     }
 }

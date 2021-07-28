@@ -1,11 +1,13 @@
 ﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.User;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
@@ -92,19 +94,19 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
                 return new FindResponse<TaskInfo>();
             }
 
-            var projectIds = projectUsers.Select(x => x.ProjectId);
-            var dbTasks = _taskRepository.Find(filter, projectIds, skipCount, takeCount, out int totalCount).ToList();
+            IEnumerable<Guid> projectIds = projectUsers.Select(x => x.ProjectId);
+            List<DbTask> dbTasks = _taskRepository.Find(filter, projectIds, skipCount, takeCount, out int totalCount).ToList();
 
-            var users = dbTasks.Where(x => x.AssignedTo.HasValue).Select(x => x.AssignedTo.Value).ToList();
+            List<Guid> users = dbTasks.Where(x => x.AssignedTo.HasValue).Select(x => x.AssignedTo.Value).ToList();
             users.AddRange(dbTasks.Select(x => x.AuthorId).ToList());
 
-            var usersData = GetUsersData(users, errors);
+            IGetUsersDataResponse usersData = GetUsersData(users, errors);
 
             List<TaskInfo> tasks = new();
             foreach (var dbTask in dbTasks)
             {
-                var assignedUser = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AssignedTo);
-                var author = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AuthorId);
+                UserData assignedUser = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AssignedTo);
+                UserData author = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AuthorId);
 
                 tasks.Add(_mapper.Map(dbTask, assignedUser, author));
             }

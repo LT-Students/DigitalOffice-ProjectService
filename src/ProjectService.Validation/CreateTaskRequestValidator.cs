@@ -44,12 +44,12 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     .WithMessage("Parent task must have not to have a parent.");
             });
 
-            When(task => task.AssignedTo.HasValue, () =>
-            {
-                RuleFor(task => task)
-                    .Must(task => userRepository.AreUserProjectExist(task.AssignedTo.Value, task.ProjectId))
-                    .WithMessage("User does not exist.");
-            });
+            //When(task => task.AssignedTo.HasValue, () =>
+            //{
+            //    RuleFor(task => task)
+            //        .Must(task => userRepository.AreUserProjectExist(task.AssignedTo.Value, task.ProjectId))
+            //        .WithMessage("User does not exist.");
+            //});
 
             RuleFor(task => task.ProjectId)
                 .NotEmpty()
