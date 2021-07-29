@@ -3,7 +3,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
+namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
 {
     /// <summary>
     /// Represents interface for a command in command pattern.

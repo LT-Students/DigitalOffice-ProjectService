@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
-using LT.DigitalOffice.ProjectService.Business.Commands;
+using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;

@@ -50,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
         public async Task ShouldResponseProjectInfoResponse()
         {
             _repository
-                .Setup(x => x.GetProject(It.IsAny<GetProjectFilter>()))
+                .Setup(x => x.Get(It.IsAny<GetProjectFilter>()))
                 .Returns(_dbProject);
 
             await _harness.Start();
@@ -79,7 +79,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 SerializerAssert.AreEqual(expectedResult, response.Message);
                 Assert.True(_consumerTestHarness.Consumed.Select<IGetProjectRequest>().Any());
                 Assert.True(_harness.Sent.Select<IOperationResult<IProjectResponse>>().Any());
-                _repository.Verify(x => x.GetProject(It.IsAny<GetProjectFilter>()), Times.Once);
+                _repository.Verify(x => x.Get(It.IsAny<GetProjectFilter>()), Times.Once);
             }
             finally
             {
@@ -93,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
             DbProject dbProject = null;
 
             _repository
-                .Setup(x => x.GetProject(It.IsAny<GetProjectFilter>()))
+                .Setup(x => x.Get(It.IsAny<GetProjectFilter>()))
                 .Returns(dbProject);
 
             await _harness.Start();
@@ -117,7 +117,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                 SerializerAssert.AreEqual(expectedResult, response.Message);
                 Assert.True(_consumerTestHarness.Consumed.Select<IGetProjectRequest>().Any());
                 Assert.True(_harness.Sent.Select<IOperationResult<IProjectResponse>>().Any());
-                _repository.Verify(x => x.GetProject(It.IsAny<GetProjectFilter>()), Times.Once);
+                _repository.Verify(x => x.Get(It.IsAny<GetProjectFilter>()), Times.Once);
             }
             finally
             {

@@ -5,8 +5,8 @@ using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
-using LT.DigitalOffice.ProjectService.Business.Commands;
-using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Project;
+using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -93,7 +93,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands.UnitTests
                 .Returns(true);
 
             _mocker
-                .Setup<IProjectRepository, DbProject>(x => x.GetProject(It.IsAny<GetProjectFilter>()))
+                .Setup<IProjectRepository, DbProject>(x => x.Get(It.IsAny<GetProjectFilter>()))
                 .Returns(_dbProject);
 
             _httpContextData = new Dictionary<object, object>();

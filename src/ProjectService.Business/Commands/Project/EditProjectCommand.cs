@@ -6,7 +6,7 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
-using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -23,7 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands
+namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
     public class EditProjectCommand : IEditProjectCommand
     {
@@ -88,13 +88,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             GetProjectFilter filter = new GetProjectFilter { ProjectId = projectId };
 
-            DbProject dbProject = _repository.GetProject(filter);
+            DbProject dbProject = _repository.Get(filter);
 
-            OperationResultResponse<bool> response = new ();
+            OperationResultResponse<bool> response = new();
 
             if (!_accessValidator.IsAdmin() &&
-                (GetDepartment(dbProject.DepartmentId, response.Errors).DirectorUserId !=
-                _httpContextAccessor.HttpContext.GetUserId()))
+                GetDepartment(dbProject.DepartmentId, response.Errors).DirectorUserId !=
+                _httpContextAccessor.HttpContext.GetUserId())
             {
                 throw new ForbiddenException("Not enough rights.");
             }
