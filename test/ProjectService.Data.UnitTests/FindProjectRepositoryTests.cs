@@ -103,7 +103,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         public void ShouldReturnProjectsByDepartmentId()
         {
             var pairs = new Dictionary<Guid, string>();
-            pairs.Add(_dbProject3.DepartmentId, "");
+            pairs.Add(_dbProject3.DepartmentId.Value, "");
 
             _filter = new FindProjectsFilter
             {

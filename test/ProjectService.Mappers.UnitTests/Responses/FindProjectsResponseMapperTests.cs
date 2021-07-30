@@ -52,13 +52,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                 ShortDescription = "short description",
                 Department = new DepartmentInfo
                 {
-                    Id = _dbProject.DepartmentId,
+                    Id = _dbProject.DepartmentId.Value,
                     Name = _departmentName
                 }
             };
 
             _idNameDepartment = new Dictionary<Guid, string>();
-            _idNameDepartment.Add(_dbProject.DepartmentId, _departmentName);
+            _idNameDepartment.Add(_dbProject.DepartmentId.Value, _departmentName);
 
             _response = new FindResponse<ProjectInfo>
             {

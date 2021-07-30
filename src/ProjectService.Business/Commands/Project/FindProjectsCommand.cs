@@ -33,7 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             {
                 Response<IOperationResult<IFindDepartmentsResponse>> response = _findDepartmentsRequestClient
                     .GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-                        IFindDepartmentsRequest.CreateObj(dbProjects.Select(p => p.DepartmentId).ToList())).Result;
+                        IFindDepartmentsRequest.CreateObj(dbProjects.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList())).Result;
                 if (response.Message.IsSuccess)
                 {
                     departmentNames = response.Message.Body.IdNamePairs;

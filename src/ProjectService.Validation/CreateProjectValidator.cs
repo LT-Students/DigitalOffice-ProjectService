@@ -9,9 +9,6 @@ namespace LT.DigitalOffice.ProjectService.Validation
     {
         public CreateProjectValidator()
         {
-            RuleFor(project => project.DepartmentId)
-                .NotEmpty();
-
             RuleFor(project => project.Name)
                 .NotEmpty()
                 .MaximumLength(150)

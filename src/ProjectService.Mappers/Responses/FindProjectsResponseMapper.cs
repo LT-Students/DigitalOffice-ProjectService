@@ -5,6 +5,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Responses
 {
@@ -24,17 +25,18 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
                 throw new ArgumentNullException(nameof(dbProjects));
             }
 
-            var projectInfos = new List<ProjectInfo>();
-            foreach(var dbProject in dbProjects)
-            {
-                departmentsNames.TryGetValue(dbProject.DepartmentId, out string departmentName);
-                projectInfos.Add(_mapper.Map(dbProject, departmentName));
-            }
-
             return new FindResponse<ProjectInfo>
             {
                 TotalCount = totalCount,
-                Body = projectInfos,
+                Body = dbProjects.Select(p =>
+                {
+                    string departmentName = null;
+                    if (p.DepartmentId.HasValue)
+                    {
+                        departmentsNames.TryGetValue(p.DepartmentId.Value, out departmentName);
+                    }
+                    return _mapper.Map(p, departmentName);
+                }),
                 Errors = errors
             };
         }

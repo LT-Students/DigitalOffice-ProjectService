@@ -10,7 +10,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public const string TableName = "Projects";
 
         public Guid Id { get; set; }
-        public Guid DepartmentId { get; set; }
+        public Guid? DepartmentId { get; set; }
         public Guid AuthorId { get; set; }
         public int Status { get; set; }
         public string Name { get; set; }
