@@ -38,5 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         public string SearchProjectsEndpoint { get; set; }
 
         public string FindProjectsEndpoint { get; set; }
+
+        public string FindParseEntitiesEndpoint { get; set; }
     }
 }

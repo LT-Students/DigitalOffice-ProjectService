@@ -1,3 +1,4 @@
+using LT.DigitalOffice.Kernel.Attributes.ParseEntity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -5,6 +6,7 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Models.Db
 {
+    [ParseEntity]
     public class DbProject
     {
         public const string TableName = "Projects";
@@ -19,9 +21,13 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public string ShortDescription { get; set; }
         public DateTime CreatedAt { get; set; }
 
+        [IgnoreParse]
         public ICollection<DbTask> Tasks { get; set; }
+        [IgnoreParse]
         public ICollection<DbProjectUser> Users { get; set; }
+        [IgnoreParse]
         public ICollection<DbProjectFile> Files { get; set; }
+        [IgnoreParse]
         public ICollection<DbTaskProperty> TaskProperties { get; set; }
 
         public DbProject()
