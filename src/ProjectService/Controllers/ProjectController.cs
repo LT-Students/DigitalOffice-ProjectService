@@ -1,5 +1,4 @@
-﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using LT.DigitalOffice.Kernel.Enums;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {

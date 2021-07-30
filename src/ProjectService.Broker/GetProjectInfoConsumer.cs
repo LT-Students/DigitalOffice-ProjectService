@@ -17,7 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
         private object GetProjectInfo(Guid projectId)
         {
             var filter = new GetProjectFilter { ProjectId = projectId };
-            var dbProject = _repository.GetProject(filter);
+            var dbProject = _repository.Get(filter);
 
             if (dbProject == null)
             {

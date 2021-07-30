@@ -4,7 +4,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
+namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
 {
     /// <summary>
     /// Represents interface for a command in command pattern.

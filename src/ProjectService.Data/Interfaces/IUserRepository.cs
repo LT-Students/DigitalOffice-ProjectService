@@ -42,5 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// </summary>
         /// <param name="ids">Ids to check that all of them exists.</param>
         bool AreExist(params Guid[] ids);
+
+        List<DbProjectUser> Find(List<Guid> userIds);
     }
 }

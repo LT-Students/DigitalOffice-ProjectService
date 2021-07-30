@@ -85,7 +85,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 ProjectId = Guid.NewGuid()
             };
 
-            Assert.Throws<NotFoundException>(() => _repository.GetProject(notFoundFilter));
+            Assert.Throws<NotFoundException>(() => _repository.Get(notFoundFilter));
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 ShowNotActiveUsers = true
             };
 
-            var result = _repository.GetProject(fullFilter);
+            var result = _repository.Get(fullFilter);
 
             var expected = new DbProject
             {
@@ -132,7 +132,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                 ShowNotActiveUsers = true
             };
 
-            var result = _repository.GetProject(fullFilter);
+            var result = _repository.Get(fullFilter);
 
             var expected = new DbProject
             {

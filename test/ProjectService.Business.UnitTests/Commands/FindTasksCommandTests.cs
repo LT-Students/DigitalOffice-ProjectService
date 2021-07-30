@@ -152,7 +152,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                     middleName: "Ivanovich",
                     isActive: true,
                     imageId: null,
-                    rate: null));
+                    rate: 0,
+                    status: null));
 
                 users.Add(new UserData(
                     id: dbTask.AssignedTo.Value,
@@ -161,7 +162,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                     middleName: "Ivanovich",
                     isActive: true,
                     imageId: null,
-                    rate: null));
+                    rate: 0,
+                    status: null));
             }
 
 

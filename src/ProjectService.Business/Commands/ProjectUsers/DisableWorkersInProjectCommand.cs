@@ -1,13 +1,13 @@
 ﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
-using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands
+namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 {
     public class DisableWorkersInProjectCommand : IDisableWorkersInProjectCommand
     {

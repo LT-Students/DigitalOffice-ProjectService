@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// </summary>
         /// <param name="filter">Filter info.</param>
         /// <returns>Project with specified id.</returns>
-        public DbProject GetProject(GetProjectFilter filter);
+        public DbProject Get(GetProjectFilter filter);
 
         public IEnumerable<DbProject> Get(Guid departmentId);
 
@@ -46,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <param name="userIds">User ids.</param>
         void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds);
 
-        List<DbProject> FindProjects(FindProjectsFilter filter, int skipCount, int takeCount, out int totalCount);
+        List<DbProject> Find(FindProjectsFilter filter, int skipCount, int takeCount, out int totalCount);
 
         List<DbProject> Search(string text);
 
