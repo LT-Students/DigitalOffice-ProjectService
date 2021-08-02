@@ -1,5 +1,4 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
@@ -176,7 +175,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             var dbProject = _repository.Get(filter);
 
-            var department = GetDepartment(dbProject.DepartmentId, errors);
+            DepartmentInfo department = null;
+            if (dbProject.DepartmentId.HasValue)
+            {
+                department = GetDepartment(dbProject.DepartmentId.Value, errors);
+            }
 
             var usersInfo = GetProjectUsers(dbProject.Users, errors);
 

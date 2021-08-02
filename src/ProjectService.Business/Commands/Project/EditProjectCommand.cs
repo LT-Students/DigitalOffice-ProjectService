@@ -35,9 +35,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<CreateProjectCommand> _logger;
 
-        private IGetDepartmentResponse GetDepartment(Guid departmentId, List<string> errors)
+        private IGetDepartmentResponse GetDepartment(Guid? departmentId, List<string> errors)
         {
             string errorMessage = "Cannot edit project. Please try again later.";
+
+            if (departmentId == null)
+            {
+                return null;
+            }
 
             try
             {

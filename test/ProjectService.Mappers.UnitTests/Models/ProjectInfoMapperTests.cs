@@ -49,13 +49,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 Status = ProjectStatusType.Active,
                 Department = new DepartmentInfo
                 {
-                    Id = _dbProject.DepartmentId,
+                    Id = _dbProject.DepartmentId.Value,
                     Name = "Some department"
                }
             };
 
             _department = new Mock<IGetDepartmentResponse>();
-            _department.Setup(x => x.DepartmentId).Returns(_dbProject.DepartmentId);
+            _department.Setup(x => x.DepartmentId).Returns(_dbProject.DepartmentId.Value);
             _department.Setup(x => x.Name).Returns("Some department");
         }
 

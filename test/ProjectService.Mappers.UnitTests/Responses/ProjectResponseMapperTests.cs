@@ -71,7 +71,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
 
             _department = new DepartmentInfo
             {
-                Id = _dbProject.DepartmentId,
+                Id = _dbProject.DepartmentId.Value,
                 Name = "DepartmentName"
             };
 
