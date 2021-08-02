@@ -38,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests
                 ShortDescription = "short description",
                 Department = new DepartmentInfo
                 {
-                    Id = _dbProject.DepartmentId,
+                    Id = _dbProject.DepartmentId.Value,
                     Name = DepartmentName
                 }
             };

@@ -9,7 +9,12 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
 {
     public class ProjectUserInfoMapper : IProjectUserInfoMapper
     {
-        public ProjectUserInfo Map(UserData userData, DbProjectUser dbProjectUser)
+        public ProjectUserInfo Map(
+            UserData userData,
+            PositionData userPosition,
+            DepartmentData userDepartment,
+            DbProjectUser dbProjectUser,
+            int projectCount)
         {
             if (dbProjectUser == null)
             {
@@ -24,13 +29,31 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
             return new ProjectUserInfo
             {
                 Id = userData.Id,
+                ImageId = userData.ImageId,
                 FirstName = userData.FirstName,
                 LastName = userData.LastName,
                 MiddleName = userData.MiddleName,
+                Status = userData.Status,
+                Rate = userData.Rate,
+                ProjectCount = projectCount,
                 IsActive = dbProjectUser.IsActive,
                 AddedOn = dbProjectUser.AddedOn,
                 RemovedOn = dbProjectUser.RemovedOn,
-                Role = (UserRoleType)dbProjectUser.Role
+                Role = (UserRoleType)dbProjectUser.Role,
+                Department = userDepartment == null
+                ? null
+                : new()
+                {
+                    Id = userDepartment.Id,
+                    Name = userDepartment.Name
+                },
+                Position = userPosition == null
+                ? null
+                : new()
+                {
+                    Id = userPosition.Id,
+                    Name = userPosition.Name
+                }
             };
         }
     }

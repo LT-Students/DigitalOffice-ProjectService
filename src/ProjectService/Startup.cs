@@ -1,4 +1,5 @@
 using HealthChecks.UI.Client;
+using LT.DigitalOffice.Kernel.Broker.Consumer;
 using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
@@ -181,6 +182,7 @@ namespace LT.DigitalOffice.ProjectService
             x.AddConsumer<SearchProjectsConsumer>();
             x.AddConsumer<GetDepartmentProjectsConsumer>();
             x.AddConsumer<FindProjectsConsumer>();
+            x.AddConsumer<FindParseEntitiesConsumer>();
         }
 
         private void ConfigureEndpoints(
@@ -216,6 +218,11 @@ namespace LT.DigitalOffice.ProjectService
             cfg.ReceiveEndpoint(rabbitMqConfig.FindProjectsEndpoint, ep =>
             {
                 ep.ConfigureConsumer<FindProjectsConsumer>(context);
+            });
+
+            cfg.ReceiveEndpoint(rabbitMqConfig.FindParseEntitiesEndpoint, ep =>
+            {
+                ep.ConfigureConsumer<FindParseEntitiesConsumer>(context);
             });
         }
 

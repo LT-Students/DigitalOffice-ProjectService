@@ -8,7 +8,7 @@ using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
-using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands
+namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
     public class CreateProjectCommand : ICreateProjectCommand
     {
@@ -134,15 +134,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _validator.ValidateAndThrowCustom(request);
 
-            IGetDepartmentResponse department = GetDepartment(request.DepartmentId, response.Errors);
-            if (!response.Errors.Any() && department == null)
+            IGetDepartmentResponse department = null;
+            if (request.DepartmentId.HasValue)
             {
-                throw new BadRequestException("Project department not found.");
-            }
-            else if (response.Errors.Any())
-            {
-                response.Status = OperationResultStatusType.Failed;
-                return response;
+                department = GetDepartment(request.DepartmentId.Value, response.Errors);
+
+                if (!response.Errors.Any() && department == null)
+                {
+                    throw new BadRequestException("Project department not found.");
+                }
+                else if (response.Errors.Any())
+                {
+                    response.Status = OperationResultStatusType.Failed;
+                    return response;
+                }
             }
 
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
@@ -150,7 +155,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             _repository.CreateNewProject(dbProject);
 
-            response.Body = _projectInfoMapper.Map(dbProject, department.Name);
+            response.Body = _projectInfoMapper.Map(dbProject, department?.Name);
 
             CreateWorkspace(request.Name, userId, request.Users.Select(u => u.UserId).ToList(), response.Errors);
 

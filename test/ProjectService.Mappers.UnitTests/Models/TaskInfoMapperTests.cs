@@ -130,7 +130,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                     middleName: "Ivanovich",
                     isActive: true,
                     imageId: null,
-                    rate: null);
+                    rate: 0,
+                    status: null);
 
             UserData authorData = new UserData(
                     id: Guid.NewGuid(),
@@ -139,7 +140,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                     middleName: "Semenovich",
                     isActive: true,
                     imageId: null,
-                    rate: null);
+                    rate: 0,
+                    status: null);
 
             _userMapperMock
                 .Setup(x => x.Map(assignedUserData))

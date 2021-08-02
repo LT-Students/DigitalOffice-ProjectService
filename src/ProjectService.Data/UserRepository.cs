@@ -90,5 +90,10 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             return ids.All(x => dbIds.Contains(x));
         }
+
+        public List<DbProjectUser> Find(List<Guid> userIds)
+        {
+            return _provider.ProjectsUsers.Where(u => userIds.Contains(u.UserId)).ToList();
+        }
     }
 }

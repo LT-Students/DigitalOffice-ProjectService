@@ -8,6 +8,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces
     [AutoInject]
     public interface IProjectUserInfoMapper
     {
-        ProjectUserInfo Map(UserData userData, DbProjectUser dbProjectUser);
+        ProjectUserInfo Map(
+            UserData userData,
+            PositionData userPosition,
+            DepartmentData userDepartment,
+            DbProjectUser dbProjectUser,
+            int projectCount);
     }
 }

@@ -27,6 +27,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         [AutoInjectRequest(typeof(ICreateWorkspaceRequest))]
         public string CreateWorkspaceEndpoint { get; set; }
 
+        [AutoInjectRequest(typeof(IGetUsersDepartmentsUsersPositionsRequest))]
+        public string GetUsersDepartmentsUsersPositionsEndpoint { get; set; }
+
         public string GetProjectIdsEndpoint { get; set; }
 
         public string GetProjectInfoEndpoint { get; set; }
@@ -38,5 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         public string SearchProjectsEndpoint { get; set; }
 
         public string FindProjectsEndpoint { get; set; }
+
+        public string FindParseEntitiesEndpoint { get; set; }
     }
 }

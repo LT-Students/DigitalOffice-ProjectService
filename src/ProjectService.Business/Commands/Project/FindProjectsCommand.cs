@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
-using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands
+namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
     public class FindProjectsCommand : IFindProjectsCommand
     {
@@ -33,7 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             {
                 Response<IOperationResult<IFindDepartmentsResponse>> response = _findDepartmentsRequestClient
                     .GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-                        IFindDepartmentsRequest.CreateObj(dbProjects.Select(p => p.DepartmentId).ToList())).Result;
+                        IFindDepartmentsRequest.CreateObj(dbProjects.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList())).Result;
                 if (response.Message.IsSuccess)
                 {
                     departmentNames = response.Message.Body.IdNamePairs;
@@ -76,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
             List<string> errors = new();
 
-            List<DbProject> dbProject = _repository.FindProjects(filter, skipCount, takeCount, out int totalCount);
+            List<DbProject> dbProject = _repository.Find(filter, skipCount, takeCount, out int totalCount);
 
             Dictionary<Guid, string> departmentsNames = GetDepartmentsNames(dbProject, errors);
 

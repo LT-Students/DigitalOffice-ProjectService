@@ -103,7 +103,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         public void ShouldReturnProjectsByDepartmentId()
         {
             var pairs = new Dictionary<Guid, string>();
-            pairs.Add(_dbProject3.DepartmentId, "");
+            pairs.Add(_dbProject3.DepartmentId.Value, "");
 
             _filter = new FindProjectsFilter
             {
@@ -116,7 +116,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 _dbProject4
             };
 
-            var result = _repository.FindProjects(_filter, 0, 3, out int totalCount);
+            var result = _repository.Find(_filter, 0, 3, out int totalCount);
 
             Assert.IsTrue(result.Contains(_dbProject4) && result.Contains(_dbProject3));
             Assert.AreEqual(expectedProjects.Count, totalCount);
@@ -125,7 +125,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenFilterIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _repository.FindProjects(null, 0, 1, out int _));
+            Assert.Throws<ArgumentNullException>(() => _repository.Find(null, 0, 1, out int _));
         }
 
         [Test]
