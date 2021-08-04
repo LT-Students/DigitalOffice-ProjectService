@@ -18,6 +18,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         [AutoInjectRequest(typeof(IGetFileRequest))]
         public string GetFileEndpoint { get; set; }
 
+        [AutoInjectRequest(typeof(IGetImagesRequest))]
+        public string GetImagesEndpoint { get; set; }
+
         [AutoInjectRequest(typeof(IGetDepartmentRequest))]
         public string GetDepartmentEndpoint { get; set; }
 
