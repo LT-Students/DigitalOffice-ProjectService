@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LT.DigitalOffice.ProjectService.Models.Db;
+using Microsoft.AspNetCore.Mvc;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
@@ -13,5 +14,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
 
         [FromQuery(Name="assignedto")]
         public Guid? AssignedTo { get; set; }
+
+        [FromQuery(Name = "status")]
+        public Guid? Status { get; set; }
     }
 }
