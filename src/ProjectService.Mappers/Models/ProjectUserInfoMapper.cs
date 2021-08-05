@@ -2,6 +2,7 @@
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using System;
 
@@ -11,6 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
     {
         public ProjectUserInfo Map(
             UserData userData,
+            ImageInfo image,
             PositionData userPosition,
             DepartmentData userDepartment,
             DbProjectUser dbProjectUser,
@@ -29,7 +31,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
             return new ProjectUserInfo
             {
                 Id = userData.Id,
-                ImageId = userData.ImageId,
                 FirstName = userData.FirstName,
                 LastName = userData.LastName,
                 MiddleName = userData.MiddleName,
@@ -39,6 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
                 IsActive = dbProjectUser.IsActive,
                 AddedOn = dbProjectUser.AddedOn,
                 RemovedOn = dbProjectUser.RemovedOn,
+                AvatarImage = image,
                 Role = (UserRoleType)dbProjectUser.Role,
                 Department = userDepartment == null
                 ? null
