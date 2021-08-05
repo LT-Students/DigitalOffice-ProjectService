@@ -44,5 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         bool AreExist(params Guid[] ids);
 
         List<DbProjectUser> Find(List<Guid> userIds);
+
+        void Remove(Guid userId);
     }
 }
