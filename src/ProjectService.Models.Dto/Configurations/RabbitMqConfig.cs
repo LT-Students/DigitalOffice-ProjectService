@@ -1,5 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Kernel.Configurations;
+using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
@@ -29,6 +30,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
         [AutoInjectRequest(typeof(IGetUsersDepartmentsUsersPositionsRequest))]
         public string GetUsersDepartmentsUsersPositionsEndpoint { get; set; }
+
+        [AutoInjectRequest(typeof(ICheckUserExistence))]
+        public string CheckUserExistenceEndpoint { get; set; }
 
         public string GetProjectIdsEndpoint { get; set; }
 
