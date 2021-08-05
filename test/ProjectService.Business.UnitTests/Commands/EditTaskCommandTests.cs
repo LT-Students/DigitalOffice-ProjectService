@@ -83,8 +83,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             Func<Times> requestClientTimes,
             Func<Times> httpAccessorTimes)
         {
-            _userRepositoryMock.Verify(x => x.GetProjectUsers(
-                It.IsAny<Guid>(), It.IsAny<bool>()), projectRepositoryTimes);
+            _userRepositoryMock.Verify(x => x.AreUserProjectExist(
+                It.IsAny<Guid>(), It.IsAny<Guid>()), projectRepositoryTimes);
 
             _taskRepositoryMock.Verify(x =>
                 x.Get(It.IsAny<Guid>(), It.IsAny<bool>()), getInTaskRepositoryTimes);
@@ -228,14 +228,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Returns(false);
 
             _userRepositoryMock
-                .Setup(x => x.GetProjectUsers(_projectId, false))
-                .Returns(new List<DbProjectUser>()
-            {
-                new DbProjectUser
-                    {
-                        UserId = Guid.NewGuid()
-                    }
-            }).Verifiable();
+                .Setup(x => x.AreUserProjectExist(_userId, _projectId))
+                .Returns(true).Verifiable();
 
             #endregion
 
@@ -272,10 +266,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
 
-            VerifyCalls(Times.Once,
+           VerifyCalls(Times.Once,
                 Times.Once,
                 Times.Once,
-                Times.Once,
+                Times.Never,
                 Times.Once);
         }
 
