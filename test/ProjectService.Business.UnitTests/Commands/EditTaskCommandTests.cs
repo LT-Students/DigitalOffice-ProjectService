@@ -61,7 +61,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         private readonly Guid _statusId = Guid.NewGuid();
         private readonly Guid _typeId = Guid.NewGuid();
         private readonly Guid _projectId = Guid.NewGuid();
-        private readonly Guid _departmentId = Guid.NewGuid();
+        private readonly Guid _departmentDirectorId = Guid.NewGuid();
         private readonly Guid _taskId = Guid.NewGuid();
         private readonly Guid _userId = Guid.NewGuid();
 
@@ -114,7 +114,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         private void RcGetDepartment(Guid departmentId)
         {
             var department = new Mock<IGetDepartmentResponse>();
-            department.Setup(x => x.DirectorUserId).Returns(_userId);
+            department.Setup(x => x.DirectorUserId).Returns(_departmentDirectorId);
 
             _operationResultBrokerMock
                 .Setup(x => x.Message.Body)
@@ -276,7 +276,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         [Test]
         public void FullSuccessWhenUserIsDepartmentDirector()
         {
-            ClientRequestUp(_userId);
+            ClientRequestUp(_departmentDirectorId);
 
             SerializerAssert.AreEqual(_fullSuccessModel, _command.Execute(_taskId, _request));
 
