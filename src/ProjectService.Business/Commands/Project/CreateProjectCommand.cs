@@ -7,6 +7,7 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
+using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -37,6 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRequestClient<IGetDepartmentRequest> _rcGetDepartment;
         private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
+        private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
 
         private IGetDepartmentResponse GetDepartment(Guid departmentId, List<string> errors)
         {
@@ -94,6 +96,30 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
         }
 
+        private void CreateWorkTime(Guid projectId, List<Guid> userIds, List<string> errors)
+        {
+            string errorMessage = $"Failed to create a work time for project {projectId} with users: {string.Join(", ", userIds)}.";
+            const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
+
+            try
+            {
+                var response = _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
+                    ICreateWorkTimeRequest.CreateObj(projectId, userIds)).Result;
+
+                if (!(response.Message.IsSuccess && response.Message.Body))
+                {
+                    _logger.LogWarning(logMessage, projectId, string.Join(", ", userIds));
+                    errors.Add(errorMessage);
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, logMessage, projectId, string.Join(", ", userIds));
+
+                errors.Add(errorMessage);
+            }
+        }
+
         public CreateProjectCommand(
             IProjectRepository repository,
             ICreateProjectValidator validator,
@@ -103,7 +129,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             ILogger<CreateProjectCommand> logger,
             IHttpContextAccessor httpContextAccessor,
             IRequestClient<IGetDepartmentRequest> rcGetDepartment,
-            IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace)
+            IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
+            IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime)
         {
             _logger = logger;
             _validator = validator;
@@ -114,6 +141,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _projectInfoMapper = projectInfoMapper;
             _httpContextAccessor = httpContextAccessor;
             _rcCreateWorkspace = rcCreateWorkspace;
+            _rcCreateWorkTime = rcCreateWorkTime;
         }
 
         public OperationResultResponse<ProjectInfo> Execute(ProjectRequest request)
@@ -157,7 +185,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             response.Body = _projectInfoMapper.Map(dbProject, department?.Name);
 
-            CreateWorkspace(request.Name, userId, request.Users.Select(u => u.UserId).ToList(), response.Errors);
+            List<Guid> userIds = request.Users.Select(u => u.UserId).ToList();
+
+            CreateWorkTime(dbProject.Id, userIds, response.Errors);
+
+            CreateWorkspace(request.Name, userId, userIds, response.Errors);
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
 
