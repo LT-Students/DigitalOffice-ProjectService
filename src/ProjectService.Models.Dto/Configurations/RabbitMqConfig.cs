@@ -35,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         public string GetUsersDepartmentsUsersPositionsEndpoint { get; set; }
 
         [AutoInjectRequest(typeof(ICheckUsersExistence))]
-        public string CheckUserExistenceEndpoint { get; set; }
+        public string CheckUsersExistenceEndpoint { get; set; }
 
         public string GetProjectIdsEndpoint { get; set; }
 

@@ -171,14 +171,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             {
                 response.Status = OperationResultStatusType.PartialSuccess;
                 response.Errors.Add("Not all users exist.");
-                return response;
             }
             else if (response.Errors.Any())
             {
                 response.Status = OperationResultStatusType.Failed;
                 return response;
             }
-
+            // TODO: rework check Id department existense
             IGetDepartmentResponse department = null;
             if (request.DepartmentId.HasValue)
             {
@@ -187,11 +186,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 if (!response.Errors.Any() && department == null)
                 {
                     throw new BadRequestException("Project department not found.");
-                }
-                else if (response.Errors.Any())
-                {
-                    response.Status = OperationResultStatusType.Failed;
-                    return response;
                 }
             }
 
