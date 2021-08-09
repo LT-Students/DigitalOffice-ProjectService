@@ -38,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRequestClient<IGetDepartmentRequest> _rcGetDepartment;
         private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
-        private readonly IRequestClient<ICheckUserExistence> _rcCheckUsersExistence;
+        private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
 
         private IGetDepartmentResponse GetDepartment(Guid departmentId, List<string> errors)
         {
@@ -67,15 +67,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             return null;
         }
 
-        private ICheckUserExistence CheckUserExistence(List<Guid> userIds, List<string> errors)
+        private ICheckUsersExistence CheckUserExistence(List<Guid> userIds, List<string> errors)
         {
             string errorMessage = "Failed to check the existing users. Please try again later ";
             string logMessage = "Cannot check existing users {userIds}";
 
             try
             {
-                var response = _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUserExistence>>(
-                    ICheckUserExistence.CreateObj(userIds)).Result;
+                var response = _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUsersExistence>>(
+                    ICheckUsersExistence.CreateObj(userIds)).Result;
                 if (response.Message.IsSuccess)
                 {
                     return response.Message.Body;
@@ -132,7 +132,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IHttpContextAccessor httpContextAccessor,
             IRequestClient<IGetDepartmentRequest> rcGetDepartment,
             IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
-            IRequestClient<ICheckUserExistence> rcCheckUsersExistence)
+            IRequestClient<ICheckUsersExistence> rcCheckUsersExistence)
 
         {
             _logger = logger;
@@ -167,10 +167,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _validator.ValidateAndThrowCustom(request);
 
             var existUsers = CheckUserExistence(request.Users.Select(u => u.UserId).ToList(), response.Errors);
-            if (!response.Errors.Any() && existUsers.UserIds.Count == 0)
+            if (!response.Errors.Any() && existUsers.UserIds.Count() != request.Users.Count())
             {
-                response.Status = OperationResultStatusType.Failed;
-                response.Errors.Add("Project users don't exist.");
+                response.Status = OperationResultStatusType.PartialSuccess;
+                response.Errors.Add("Not all users exist.");
                 return response;
             }
             else if (response.Errors.Any())
