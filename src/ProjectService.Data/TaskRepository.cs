@@ -108,7 +108,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             if (takeCount < 1)
             {
-                throw new BadRequestException("Take count can't be equal or less than 0.");
+                throw new BadRequestException("Take count can't be less than 1.");
             }
 
             if (filter == null)
