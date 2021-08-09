@@ -95,5 +95,16 @@ namespace LT.DigitalOffice.ProjectService.Data
         {
             return _provider.ProjectsUsers.Where(u => userIds.Contains(u.UserId)).ToList();
         }
+
+        public void Remove(Guid userId)
+        {
+            List<DbProjectUser> users = _provider.ProjectsUsers.Where(u => u.UserId == userId && u.IsActive).ToList();
+
+            foreach(var user in users) {
+                user.IsActive = false;
+            }
+
+            _provider.Save();
+        }
     }
 }
