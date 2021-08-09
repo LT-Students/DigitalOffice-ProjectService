@@ -52,5 +52,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         public string FindParseEntitiesEndpoint { get; set; }
 
         public string GetProjectsUsersEndpoint { get; set; }
+
+        public string DisactivateUserEndpoint { get; set; }
+
     }
 }
