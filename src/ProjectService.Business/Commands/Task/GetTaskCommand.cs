@@ -177,10 +177,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             TaskResponse response = _taskResponseMapper.Map(
                 task,
                 usersDataResponse.FirstOrDefault(x => x.Id == task.AuthorId),
-                usersDataResponse.FirstOrDefault(x => x.Id == task.AssignedTo),
                 usersDataResponse.FirstOrDefault(x => parentTaskAssignedTo != null && x.Id == parentTaskAssignedTo),
-                department?.Name,
                 usersDataResponse.FirstOrDefault(x => task.ParentTask != null && x.Id == task.ParentTask.AuthorId),
+                department?.Name,
+                usersDataResponse.FirstOrDefault(x => x.Id == task.AssignedTo),
                 subtasksInfo);
 
             return new OperationResultResponse<TaskResponse>()

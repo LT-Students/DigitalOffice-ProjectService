@@ -54,9 +54,9 @@ namespace LT.DigitalOffice.ProjectService.Data
                 throw new BadRequestException("Skip count can't be less than 0.");
             }
 
-            if (takeCount <= 0)
+            if (takeCount < 1)
             {
-                throw new BadRequestException("Take count can't be equal or less than 0.");
+                throw new BadRequestException("Take count can't be less than 1.");
             }
 
             var dbTaskProperties = _provider.TaskProperties.AsQueryable();
@@ -73,7 +73,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             if (!string.IsNullOrEmpty(filter.Name))
             {
-                dbTaskProperties = dbTaskProperties.Where(tp => tp.Name.Contains(filter.Name, StringComparison.OrdinalIgnoreCase));
+                dbTaskProperties = dbTaskProperties.Where(tp => tp.Name.Contains(filter.Name));
             }
 
             totalCount = dbTaskProperties.Count();
