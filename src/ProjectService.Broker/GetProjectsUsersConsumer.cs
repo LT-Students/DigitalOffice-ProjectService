@@ -27,7 +27,5 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
             await context.RespondAsync<IOperationResult<IGetProjectsUsersResponse>>(response);
         }
-
-
     }
 }
