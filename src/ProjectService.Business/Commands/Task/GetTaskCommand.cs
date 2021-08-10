@@ -166,10 +166,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             {
                 foreach (var dbSubtask in task.Subtasks)
                 {
-                    subtasksInfo.Add(_taskInfoMapper.Map(
-                        dbSubtask,
-                        usersDataResponse.FirstOrDefault(x => x.Id == dbSubtask.AssignedTo),
-                        usersDataResponse.FirstOrDefault(x => x.Id == dbSubtask.AuthorId)));
+                    subtasksInfo.Add(
+                        _taskInfoMapper.Map(
+                            dbSubtask,
+                            usersDataResponse.FirstOrDefault(x => x.Id == dbSubtask.AssignedTo),
+                            usersDataResponse.FirstOrDefault(x => x.Id == dbSubtask.AuthorId)));
                 }
             }
 
