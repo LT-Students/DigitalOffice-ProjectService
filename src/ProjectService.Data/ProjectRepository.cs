@@ -103,7 +103,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                 throw new BadRequestException("Skip count can't be less than 0.");
             }
 
-            if (takeCount <= 0)
+            if (takeCount < 1)
             {
                 throw new BadRequestException("Take count can't be equal or less than 0.");
             }
@@ -152,6 +152,30 @@ namespace LT.DigitalOffice.ProjectService.Data
         public List<DbProject> Find(List<Guid> projectIds)
         {
             return _provider.Projects.Where(p => projectIds.Contains(p.Id)).ToList();
+        }
+
+        public Dictionary<Guid, List<Guid>> GetProjectsUsers()
+        {
+            List<Tuple<Guid, Guid>> projectsUsers = _provider
+                .ProjectsUsers
+                .Where(pu => pu.IsActive)
+                .Select(pu => new Tuple<Guid, Guid>(pu.ProjectId, pu.UserId))
+                .ToList();
+
+            Dictionary<Guid, List<Guid>> response = new();
+            foreach(var pair in projectsUsers)
+            {
+                if (!response.ContainsKey(pair.Item1))
+                {
+                    response.Add(pair.Item1, new() { pair.Item2 });
+                }
+                else
+                {
+                    response[pair.Item1].Add(pair.Item2);
+                }
+            }
+
+            return response;
         }
     }
 }

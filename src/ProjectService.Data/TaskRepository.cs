@@ -35,6 +35,11 @@ namespace LT.DigitalOffice.ProjectService.Data
                 dbTasks = dbTasks.Where(x => x.AssignedTo.Equals(filter.AssignedTo));
             }
 
+            if (filter.Status.HasValue)
+            {
+                dbTasks = dbTasks.Where(x => x.Status.Id.Equals(filter.Status));
+            }
+
             if (projectIds.Any())
             {
                 dbTasks = dbTasks.Where(x => projectIds.Contains(x.ProjectId));
@@ -101,9 +106,9 @@ namespace LT.DigitalOffice.ProjectService.Data
                 throw new BadRequestException("Skip count can't be less than 0.");
             }
 
-            if (takeCount <= 0)
+            if (takeCount < 1)
             {
-                throw new BadRequestException("Take count can't be equal or less than 0.");
+                throw new BadRequestException("Take count can't be less than 1.");
             }
 
             if (filter == null)
