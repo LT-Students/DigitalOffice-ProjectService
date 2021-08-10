@@ -163,8 +163,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IHttpContextAccessor httpContextAccessor,
             IRequestClient<IGetDepartmentRequest> rcGetDepartment,
             IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
-            IRequestClient<ICheckUsersExistence> rcCheckUsersExistence)
-            IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
+            IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
             IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime)
 
         {
@@ -232,6 +231,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             response.Body = _projectInfoMapper.Map(dbProject, department?.Name);
 
             CreateWorkspace(request.Name, userId, existUsers, response.Errors);
+
             List<Guid> userIds = request.Users.Select(u => u.UserId).ToList();
 
             CreateWorkTime(dbProject.Id, userIds, response.Errors);
