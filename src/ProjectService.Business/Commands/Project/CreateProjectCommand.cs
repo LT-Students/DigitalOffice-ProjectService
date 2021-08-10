@@ -67,9 +67,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             return null;
         }
 
-        private ICheckUsersExistence CheckUserExistence(List<Guid> userIds, List<string> errors)
+        private List<Guid> CheckUserExistence(List<Guid> userIds, List<string> errors)
         {
-            string errorMessage = "Failed to check the existing users. Please try again later ";
+            if (userIds.Count() == 0)
+            {
+                return userIds;
+            }
+
+            string errorMessage = "Failed to check the existing users.";
             string logMessage = "Cannot check existing users {userIds}";
 
             try
@@ -78,7 +83,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                     ICheckUsersExistence.CreateObj(userIds)).Result;
                 if (response.Message.IsSuccess)
                 {
-                    return response.Message.Body;
+                    return response.Message.Body.UserIds;
                 }
 
                 _logger.LogWarning($"Can not find userds with this Ids '{userIds}': " +
@@ -87,9 +92,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             catch (Exception exc)
             {
                 _logger.LogError(exc, logMessage);
-
-                errors.Add(errorMessage);
             }
+
+            errors.Add(errorMessage);
             return null;
         }
 
@@ -167,7 +172,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _validator.ValidateAndThrowCustom(request);
 
             var existUsers = CheckUserExistence(request.Users.Select(u => u.UserId).ToList(), response.Errors);
-            if (!response.Errors.Any() && existUsers.UserIds.Count() != request.Users.Count())
+            if (!response.Errors.Any()
+                && existUsers.Count() != request.Users.Count())
             {
                 response.Status = OperationResultStatusType.PartialSuccess;
                 response.Errors.Add("Not all users exist.");
@@ -190,13 +196,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
 
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
-            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers.UserIds);
+            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers);
 
             _repository.CreateNewProject(dbProject);
 
             response.Body = _projectInfoMapper.Map(dbProject, department?.Name);
 
-            CreateWorkspace(request.Name, userId, existUsers.UserIds, response.Errors);
+            CreateWorkspace(request.Name, userId, existUsers, response.Errors);
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
 
