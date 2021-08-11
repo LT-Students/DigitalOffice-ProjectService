@@ -177,7 +177,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _httpContextAccessor = httpContextAccessor;
             _rcCreateWorkspace = rcCreateWorkspace;
             _rcCheckUsersExistence = rcCheckUsersExistence;
-
             _rcCreateWorkTime = rcCreateWorkTime;
         }
 
@@ -203,7 +202,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             if (!response.Errors.Any()
                 && existUsers.Count() != request.Users.Count())
             {
-                response.Status = OperationResultStatusType.PartialSuccess;
                 response.Errors.Add("Not all users exist.");
             }
             else if (response.Errors.Any())
