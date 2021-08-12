@@ -71,7 +71,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         private List<Guid> CheckUserExistence(List<Guid> userIds, List<string> errors)
         {
-            if (userIds.Count() == 0)
+            if (!userIds.Any())
             {
                 return userIds;
             }
@@ -88,7 +88,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                     return response.Message.Body.UserIds;
                 }
 
-                _logger.LogWarning($"Can not find userds with this Ids '{userIds}': " +
+                _logger.LogWarning($"Can not find {userIds} with this Ids '{userIds}': " +
                     $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
             }
             catch (Exception exc)
