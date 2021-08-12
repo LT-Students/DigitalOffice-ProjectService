@@ -96,10 +96,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             DbProject dbProject = _repository.Get(filter);
 
             OperationResultResponse<bool> response = new();
+            Guid id = _httpContextAccessor.HttpContext.GetUserId();
 
             if (!_accessValidator.IsAdmin() &&
                 GetDepartment(dbProject.DepartmentId, response.Errors).DirectorUserId !=
-                _httpContextAccessor.HttpContext.GetUserId())
+                 id && !dbProject.Users.Any(user => user.Id == id && user.Role == 0))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
