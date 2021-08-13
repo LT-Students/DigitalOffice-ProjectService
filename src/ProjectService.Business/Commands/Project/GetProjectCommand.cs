@@ -1,5 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Kernel.Enums;
+using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.Models.Broker.Requests.User;
@@ -40,60 +42,28 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         private DepartmentInfo GetDepartment(Guid departmentId, List<string> errors)
         {
-            string errorMessage = $"Can not get department info for DepartmentId '{departmentId}'. Please try again later.";
-
-            DepartmentInfo department = null;
-
             try
             {
-                var departmentResponse = _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(null, departmentId)).Result;
+                IOperationResult<IGetDepartmentResponse> departmentResponse = 
+                    _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>
+                    (
+                        IGetDepartmentRequest.CreateObj(null, departmentId)
+                    )
+                    .Result.Message;
 
-                if (departmentResponse.Message.IsSuccess)
+                if (departmentResponse.IsSuccess)
                 {
-                    department = _departmentInfoMapper.Map(departmentResponse.Message.Body);
+                    return _departmentInfoMapper.Map(departmentResponse.Body);
                 }
             }
             catch (Exception exc)
             {
-                errors.Add(errorMessage);
-
                 _logger.LogError(exc, "Exception on get department request.");
             }
-
-            return department;
-        }
-        private IGetUsersDepartmentsUsersPositionsResponse GetUserDepartmentsAndPositions(
-            List<Guid> userIds,
-            List<string> errors)
-        {
-            string errorMessage = "Can not get user's departments and positions. Please try again later.";
-            const string logMessage = "Can not get user's departments and positions for users {UserIds}. Please try again later.";
-
-            try
+            finally
             {
-                var request = IGetUsersDepartmentsUsersPositionsRequest.CreateObj(userIds, includeDepartments: true, includePositions: true);
-                var response = _rcGetUsersDepartmentsUsersPositions
-                    .GetResponse<IOperationResult<IGetUsersDepartmentsUsersPositionsResponse>>(request)
-                    .Result;
-
-                if (response.Message.IsSuccess)
-                {
-                    return response.Message.Body;
-                }
-                else
-                {
-                    _logger.LogWarning("Errors while getting users departments and positions for users {UserIds}. Reason: {Errors}",
-                        string.Join(", ", userIds),
-                        string.Join('\n', response.Message.Errors));
-                }
+                errors.Add($"Can not get department info for DepartmentId '{departmentId}'. Please try again later.");
             }
-            catch (Exception exc)
-            {
-                _logger.LogError(exc, logMessage, userIds);
-            }
-
-            errors.Add(errorMessage);
 
             return null;
         }
@@ -140,23 +110,28 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         private List<ProjectUserInfo> GetProjectUsers(IEnumerable<DbProjectUser> projectUsers, List<string> errors)
         {
-            string errorMessage = null;
-
             List<ProjectUserInfo> projectUsersInfo = new();
+
+            if (!projectUsers.Any())
+            {
+                return projectUsersInfo;
+            }
+
+            List<Guid> userIds = projectUsers.Select(x => x.UserId).ToList();
 
             try
             {
-                List<Guid> userIds = projectUsers.Select(x => x.UserId).Distinct().ToList();
-
-                errorMessage = $"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.";
-
                 IOperationResult<IGetUsersDataResponse> usersDataResponse =
-                    _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
-                        IGetUsersDataRequest.CreateObj(userIds)).Result.Message;
+                    _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>
+                    (
+                        IGetUsersDataRequest.CreateObj(userIds)
+                    )
+                    .Result.Message;
 
                 if (usersDataResponse.IsSuccess && usersDataResponse.Body.UsersData.Any())
                 {
-                    var userPositionsAndDepartments = GetUserDepartmentsAndPositions(userIds, errors);
+                    IGetUsersDepartmentsUsersPositionsResponse userPositionsAndDepartments = 
+                        GetUserDepartmentsAndPositions(userIds, errors);
 
                     var images = GetImages(
                         usersDataResponse
@@ -184,22 +159,60 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
                     return projectUsersInfo;
                 }
-                else if (usersDataResponse.Errors != null)
+                else if (usersDataResponse.Errors.Any())
                 {
-                    errors.Add(errorMessage);
-
                     _logger.LogWarning(
                         $"Can not get users. Reason:{Environment.NewLine}{string.Join('\n', usersDataResponse.Errors)}.");
                 }
             }
             catch (Exception exc)
             {
-                errors.Add(errorMessage);
-
                 _logger.LogError(exc, "Exception on get user information.");
+            }
+            finally
+            {
+                errors.Add($"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.");
             }
 
             return projectUsersInfo;
+        }
+
+        private IGetUsersDepartmentsUsersPositionsResponse GetUserDepartmentsAndPositions(
+            List<Guid> userIds,
+            List<string> errors)
+        {
+            try
+            {
+                IOperationResult<IGetUsersDepartmentsUsersPositionsResponse> response = 
+                    _rcGetUsersDepartmentsUsersPositions.GetResponse<IOperationResult<IGetUsersDepartmentsUsersPositionsResponse>>
+                    (
+                        IGetUsersDepartmentsUsersPositionsRequest.CreateObj(userIds, includeDepartments: true, includePositions: true)
+                    )
+                    .Result.Message;
+
+                if (response.IsSuccess)
+                {
+                    return response.Body;
+                }
+                else
+                {
+                    _logger.LogWarning("Errors while getting users departments and positions for users {UserIds}. Reason: {Errors}",
+                        string.Join(", ", userIds),
+                        string.Join('\n', response.Errors));
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, 
+                    "Can not get user's departments and positions for users {UserIds}. Please try again later.", 
+                    userIds);
+            }
+            finally
+            {
+                errors.Add("Can not get user's departments and positions. Please try again later.");
+            }
+
+            return null;
         }
 
         public GetProjectCommand(
@@ -230,23 +243,24 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _rcImages = rcImages;
         }
 
-        public ProjectResponse Execute(GetProjectFilter filter)
+        public OperationResultResponse<ProjectResponse> Execute(GetProjectFilter filter)
         {
-            List<string> errors = new();
-
-            var dbProject = _repository.Get(filter);
-
+            OperationResultResponse<ProjectResponse> response = new();
             DepartmentInfo department = null;
+            DbProject dbProject = _repository.Get(filter);
+
             if (dbProject.DepartmentId.HasValue)
             {
-                department = GetDepartment(dbProject.DepartmentId.Value, errors);
+                department = GetDepartment(dbProject.DepartmentId.Value, response.Errors);
             }
 
-            List<ProjectUserInfo> usersInfo = GetProjectUsers(dbProject.Users, errors);
-
+            List<ProjectUserInfo> usersInfo = GetProjectUsers(dbProject.Users, response.Errors);
             List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
 
-            return _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, department, errors);
+            response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
+            response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, department);
+
+            return response;
         }
     }
 }
