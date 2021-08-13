@@ -30,7 +30,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IEditProjectValidator _validator;
         private readonly IAccessValidator _accessValidator;
         private readonly IPatchDbProjectMapper _mapper;
-        private readonly IProjectRepository _repository;
+        private readonly IProjectRepository _projectRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<CreateProjectCommand> _logger;
@@ -72,7 +73,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IEditProjectValidator validator,
             IAccessValidator accessValidator,
             IPatchDbProjectMapper mapper,
-            IProjectRepository repository,
+            IProjectRepository projectRepository,
+            IUserRepository userRepository,
             IRequestClient<IGetDepartmentRequest> requestClient,
             IHttpContextAccessor httpContextAccessor,
             ILogger<CreateProjectCommand> logger
@@ -81,7 +83,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _validator = validator;
             _accessValidator = accessValidator;
             _mapper = mapper;
-            _repository = repository;
+            _projectRepository = projectRepository;
+            _userRepository = userRepository;
             _requestClient = requestClient;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
@@ -93,14 +96,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             GetProjectFilter filter = new GetProjectFilter { ProjectId = projectId };
 
-            DbProject dbProject = _repository.Get(filter);
+            DbProject dbProject = _projectRepository.Get(filter);
+            IEnumerable<DbProjectUser> dbUsers = _userRepository.GetProjectUsers(projectId, false);
 
             OperationResultResponse<bool> response = new();
             Guid id = _httpContextAccessor.HttpContext.GetUserId();
 
             if (!_accessValidator.IsAdmin() &&
                 GetDepartment(dbProject.DepartmentId, response.Errors).DirectorUserId !=
-                 id && !dbProject.Users.Any(user => user.Id == id && user.Role == 0))
+                 id && !dbUsers.Any(user => user.UserId == id && user.Role == 0))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
@@ -108,7 +112,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             foreach (Operation item in request.Operations)
             {
                 if (item.path == $"/{nameof(EditProjectRequest.Name)}" &&
-                    _repository.IsProjectNameExist(item.value.ToString()))
+                    _projectRepository.IsProjectNameExist(item.value.ToString()))
                 {
                     response.Status = OperationResultStatusType.Conflict;
                     response.Errors.Add($"Project with name '{item.value}' already exist");
@@ -131,7 +135,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 };
             }
 
-            response.Body = _repository.Edit(dbProject, _mapper.Map(request));
+            response.Body = _projectRepository.Edit(dbProject, _mapper.Map(request));
             response.Status = OperationResultStatusType.FullSuccess;
 
             return response;
