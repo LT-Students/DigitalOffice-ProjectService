@@ -56,7 +56,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                     AddedOn = DateTime.UtcNow,
                     RemovedOn = DateTime.UtcNow,
                     IsActive = true,
-                    Role = UserRoleType.ProjectAdmin
+                    Role = ProjectUserRoleType.Admin
                 }
             };
 

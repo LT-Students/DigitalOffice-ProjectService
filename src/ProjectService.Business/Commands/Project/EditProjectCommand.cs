@@ -10,6 +10,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
@@ -94,17 +95,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         {
             _validator.ValidateAndThrowCustom(request);
 
-            GetProjectFilter filter = new GetProjectFilter { ProjectId = projectId };
-
-            DbProject dbProject = _projectRepository.Get(filter);
-            IEnumerable<DbProjectUser> dbUsers = _userRepository.GetProjectUsers(projectId, false);
+            DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId, IncludeUsers = true });
 
             OperationResultResponse<bool> response = new();
-            Guid id = _httpContextAccessor.HttpContext.GetUserId();
+            Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
             if (!_accessValidator.IsAdmin() &&
-                GetDepartment(dbProject.DepartmentId, response.Errors).DirectorUserId != id &&
-                !dbUsers.Any(user => user.UserId == id && user.Role == 0))
+                GetDepartment(dbProject.DepartmentId, response.Errors)?.DirectorUserId != userId &&
+                !dbProject.Users.Any(user => user.UserId == userId && user.Role == (int)ProjectUserRoleType.Admin))
             {
                 throw new ForbiddenException("Not enough rights.");
             }

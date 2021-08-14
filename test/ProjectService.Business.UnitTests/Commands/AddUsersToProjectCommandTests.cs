@@ -6,7 +6,7 @@
 //using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 //using LT.DigitalOffice.ProjectService.Models.Db;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-//using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
+//using LT.DigitalOffice.ProjectService.Models.Dto.Models.User;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 //using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 //using Moq;
@@ -36,12 +36,12 @@
 //            {
 //                new ProjectUserRequest
 //                {
-//                    Role = UserRoleType.ProjectAdmin,
+//                    Role = ProjectUserRoleType.Admin,
 //                    UserId = Guid.NewGuid()
 //                },
 //                new ProjectUserRequest
 //                {
-//                    Role = UserRoleType.ProjectAdmin,
+//                    Role = ProjectUserRoleType.Admin,
 //                    UserId = Guid.NewGuid()
 //                }
 //            };

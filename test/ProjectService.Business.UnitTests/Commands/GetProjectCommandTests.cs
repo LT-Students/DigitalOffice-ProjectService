@@ -12,7 +12,7 @@
 //using LT.DigitalOffice.ProjectService.Models.Db;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-//using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
+//using LT.DigitalOffice.ProjectService.Models.Dto.Models.User;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 //using LT.DigitalOffice.UnitTestKernel;
@@ -136,7 +136,7 @@
 //                AddedOn = DateTime.Now,
 //                RemovedOn = DateTime.Now,
 //                IsActive = true,
-//                Role = (int)UserRoleType.ProjectAdmin
+//                Role = (int)ProjectUserRoleType.Admin
 //            };
 
 //            _dbProject.Users.Add(_dbProjectUser);
@@ -159,7 +159,7 @@
 //                new ProjectUserInfo
 //                {
 //                    Id = _usersData.First().Id,
-//                    Role = (UserRoleType)_dbProjectUser.Role,
+//                    Role = (ProjectUserRoleType)_dbProjectUser.Role,
 //                    FirstName = _usersData.First().FirstName,
 //                    LastName = _usersData.First().LastName,
 //                    MiddleName = _usersData.First().MiddleName,
@@ -356,7 +356,7 @@
 //                AddedOn = DateTime.Now,
 //                RemovedOn = DateTime.Now,
 //                IsActive = false,
-//                Role = (int)UserRoleType.ProjectAdmin
+//                Role = (int)ProjectUserRoleType.Admin
 //            };
 
 //            _dbProject.Users = new List<DbProjectUser> { _dbProjectUser };

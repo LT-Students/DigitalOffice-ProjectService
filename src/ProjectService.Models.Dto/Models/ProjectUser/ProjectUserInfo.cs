@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser
         public DateTime AddedOn { get; set; }
         public DateTime? RemovedOn { get; set; }
         public bool IsActive { get; set; }
-        public UserRoleType Role { get; set; }
+        public ProjectUserRoleType Role { get; set; }
         public ImageInfo AvatarImage { get; set; }
         public DepartmentInfo Department { get; set; }
         public PositionInfo Position { get; set; }
