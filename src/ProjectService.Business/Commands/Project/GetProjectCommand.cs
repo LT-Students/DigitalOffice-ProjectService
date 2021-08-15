@@ -55,15 +55,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 {
                     return _departmentInfoMapper.Map(departmentResponse.Body);
                 }
+
+                _logger.LogWarning(
+                    $"Can not get department. Reason:{Environment.NewLine}{string.Join('\n', departmentResponse.Errors)}.");
             }
             catch (Exception exc)
             {
                 _logger.LogError(exc, "Exception on get department request.");
             }
-            finally
-            {
-                errors.Add($"Can not get department info for DepartmentId '{departmentId}'. Please try again later.");
-            }
+
+            errors.Add($"Can not get department info for DepartmentId '{departmentId}'. Please try again later.");
 
             return null;
         }
@@ -94,44 +95,45 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                         warningMessage,
                         string.Join(", ", imageIds),
                         string.Join('\n', response.Errors));
-
-                    errors.Add(errorMessage);
                 }
             }
             catch (Exception exc)
             {
                 _logger.LogError(exc, logMessage, string.Join(", ", imageIds));
-
-                errors.Add(errorMessage);
             }
+
+            errors.Add(errorMessage);
 
             return new();
         }
 
-        private List<ProjectUserInfo> GetProjectUsers(IEnumerable<DbProjectUser> projectUsers, List<string> errors)
+        private List<ProjectUserInfo> GetProjectUsersInfo(IEnumerable<DbProjectUser> projectUsers, List<string> errors)
         {
-            List<ProjectUserInfo> projectUsersInfo = new();
-
             if (!projectUsers.Any())
             {
-                return projectUsersInfo;
+                return new();
             }
 
-            List<Guid> userIds = projectUsers.Select(x => x.UserId).ToList();
+            List<Guid> usersIds = projectUsers.Select(x => x.UserId).ToList();
 
+            return GetProjectUsers(usersIds, projectUsers, ref errors);
+        }
+
+        private List<ProjectUserInfo> GetProjectUsers(List<Guid> usersIds, IEnumerable<DbProjectUser> projectUsers, ref List<string> errors)
+        {
             try
             {
                 IOperationResult<IGetUsersDataResponse> usersDataResponse =
                     _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>
                     (
-                        IGetUsersDataRequest.CreateObj(userIds)
+                        IGetUsersDataRequest.CreateObj(usersIds)
                     )
                     .Result.Message;
 
                 if (usersDataResponse.IsSuccess && usersDataResponse.Body.UsersData.Any())
                 {
-                    IGetUsersDepartmentsUsersPositionsResponse userPositionsAndDepartments = 
-                        GetUserDepartmentsAndPositions(userIds, errors);
+                    IGetUsersDepartmentsUsersPositionsResponse userPositionsAndDepartments =
+                        GetUserDepartmentsAndPositions(usersIds, errors);
 
                     var images = GetImages(
                         usersDataResponse
@@ -141,9 +143,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                             .Select(ud => ud.ImageId.Value)
                         .ToList(), errors);
 
-                    List<DbProjectUser> projectUsersForCount = _userRepository.Find(userIds);
+                    List<DbProjectUser> projectUsersForCount = _userRepository.Find(usersIds);
 
-                    projectUsersInfo = projectUsers
+                    return projectUsers
                         .Select(pu =>
                         {
                             UserData mappedUser = usersDataResponse.Body.UsersData.FirstOrDefault(x => x.Id == pu.UserId);
@@ -156,8 +158,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                             projectUsersForCount.Where(u => u.UserId == pu.UserId).Count());
                         })
                         .ToList();
-
-                    return projectUsersInfo;
                 }
                 else if (usersDataResponse.Errors.Any())
                 {
@@ -169,12 +169,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             {
                 _logger.LogError(exc, "Exception on get user information.");
             }
-            finally
-            {
-                errors.Add($"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.");
-            }
 
-            return projectUsersInfo;
+            errors.Add($"Can not get users info for UserIds {string.Join('\n', usersIds)}. Please try again later.");
+
+            return new();
         }
 
         private IGetUsersDepartmentsUsersPositionsResponse GetUserDepartmentsAndPositions(
@@ -207,10 +205,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                     "Can not get user's departments and positions for users {UserIds}. Please try again later.", 
                     userIds);
             }
-            finally
-            {
-                errors.Add("Can not get user's departments and positions. Please try again later.");
-            }
+
+            errors.Add("Can not get user's departments and positions. Please try again later.");
 
             return null;
         }
@@ -254,7 +250,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 department = GetDepartment(dbProject.DepartmentId.Value, response.Errors);
             }
 
-            List<ProjectUserInfo> usersInfo = GetProjectUsers(dbProject.Users, response.Errors);
+            List<ProjectUserInfo> usersInfo = GetProjectUsersInfo(dbProject.Users, response.Errors);
             List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
