@@ -32,7 +32,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IAccessValidator _accessValidator;
         private readonly IPatchDbProjectMapper _mapper;
         private readonly IProjectRepository _projectRepository;
-        private readonly IUserRepository _userRepository;
         private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<CreateProjectCommand> _logger;
@@ -75,7 +74,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IAccessValidator accessValidator,
             IPatchDbProjectMapper mapper,
             IProjectRepository projectRepository,
-            IUserRepository userRepository,
             IRequestClient<IGetDepartmentRequest> requestClient,
             IHttpContextAccessor httpContextAccessor,
             ILogger<CreateProjectCommand> logger
@@ -85,7 +83,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _accessValidator = accessValidator;
             _mapper = mapper;
             _projectRepository = projectRepository;
-            _userRepository = userRepository;
             _requestClient = requestClient;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
