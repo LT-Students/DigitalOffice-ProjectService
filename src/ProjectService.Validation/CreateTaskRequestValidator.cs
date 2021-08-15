@@ -48,7 +48,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
             //{
             //    RuleFor(task => task)
             //        .Must(task => userRepository.AreUserProjectExist(task.AssignedTo.Value, task.ProjectId))
-            //        .WithMessage("Employee does not exist.");
+            //        .WithMessage("User does not exist.");
             //});
 
             RuleFor(task => task.ProjectId)

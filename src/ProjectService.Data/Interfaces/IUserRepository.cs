@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <summary>
         /// Get user projects.
         /// </summary>
-        /// <param name="userId">Employee Id from request</param>
+        /// <param name="userId">User Id from request</param>
         IEnumerable<DbProjectUser> Find(Guid userId);
         /// <param name="filter">Properties to filter query.</param>
         IEnumerable<DbProjectUser> Find(FindDbProjectsUserFilter filter);
