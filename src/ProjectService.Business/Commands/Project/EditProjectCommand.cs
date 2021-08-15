@@ -102,7 +102,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             if (!_accessValidator.IsAdmin() &&
                 GetDepartment(dbProject.DepartmentId, response.Errors)?.DirectorUserId != userId &&
-                !dbProject.Users.Any(user => user.UserId == userId && user.Role == (int)ProjectUserRoleType.Admin))
+                !dbProject.Users.Any(user => user.UserId == userId && user.Role == (int)ProjectUserRoleType.Manager))
             {
                 throw new ForbiddenException("Not enough rights.");
             }

@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfa
         /// Call repository for disabling workers from project.
         /// </summary>
         /// <param name="projectId">Project id.</param>
-        /// <param name="userIds">User ids.</param>
+        /// <param name="userIds">Employee ids.</param>
         void Execute(Guid projectId, IEnumerable<Guid> userIds);
     }
 }

@@ -35,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
                     new ProjectUserRequest
                     {
                         UserId = Guid.NewGuid(),
-                        Role = ProjectUserRoleType.Admin
+                        Role = ProjectUserRoleType.Manager
                     }
                 }
             };

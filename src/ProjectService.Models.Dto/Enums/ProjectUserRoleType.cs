@@ -6,7 +6,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ProjectUserRoleType
     {
-        Admin,
-        User
+        Manager,
+        Employee
     }
 }

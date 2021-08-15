@@ -43,7 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// Disable active workers, which were previously assigned to the project.
         /// </summary>
         /// <param name="projectId">Project id.</param>
-        /// <param name="userIds">User ids.</param>
+        /// <param name="userIds">Employee ids.</param>
         void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds);
 
         List<DbProject> Find(FindProjectsFilter filter, int skipCount, int takeCount, out int totalCount);

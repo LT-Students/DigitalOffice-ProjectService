@@ -1,9 +1,9 @@
 //using LT.DigitalOffice.Kernel.Broker;
 //using LT.DigitalOffice.Models.Broker.Models;
 //using LT.DigitalOffice.Models.Broker.Requests.Company;
-//using LT.DigitalOffice.Models.Broker.Requests.User;
+//using LT.DigitalOffice.Models.Broker.Requests.Employee;
 //using LT.DigitalOffice.Models.Broker.Responses.Company;
-//using LT.DigitalOffice.Models.Broker.Responses.User;
+//using LT.DigitalOffice.Models.Broker.Responses.Employee;
 //using LT.DigitalOffice.ProjectService.Business.Commands.Project;
 //using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 //using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -12,7 +12,7 @@
 //using LT.DigitalOffice.ProjectService.Models.Db;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-//using LT.DigitalOffice.ProjectService.Models.Dto.Models.User;
+//using LT.DigitalOffice.ProjectService.Models.Dto.Models.Employee;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 //using LT.DigitalOffice.UnitTestKernel;
@@ -136,7 +136,7 @@
 //                AddedOn = DateTime.Now,
 //                RemovedOn = DateTime.Now,
 //                IsActive = true,
-//                Role = (int)ProjectUserRoleType.Admin
+//                Role = (int)ProjectUserRoleType.Manager
 //            };
 
 //            _dbProject.Users.Add(_dbProjectUser);
@@ -356,7 +356,7 @@
 //                AddedOn = DateTime.Now,
 //                RemovedOn = DateTime.Now,
 //                IsActive = false,
-//                Role = (int)ProjectUserRoleType.Admin
+//                Role = (int)ProjectUserRoleType.Manager
 //            };
 
 //            _dbProject.Users = new List<DbProjectUser> { _dbProjectUser };

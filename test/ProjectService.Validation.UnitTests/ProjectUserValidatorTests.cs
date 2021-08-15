@@ -36,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             var projectUserRequest = new ProjectUserRequest
             {
                 UserId = Guid.NewGuid(),
-                Role = ProjectUserRoleType.Admin
+                Role = ProjectUserRoleType.Manager
             };
 
             _validator.TestValidate(projectUserRequest).ShouldNotHaveAnyValidationErrors();
