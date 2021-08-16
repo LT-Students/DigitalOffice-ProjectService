@@ -103,10 +103,10 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public bool AreExist(params Guid[] ids)
         {
-            return AreExist(null, ids);
+            return AreExist(null, null, ids);
         }
 
-        public bool AreExist(bool? isManager, params Guid[] ids)
+        public bool AreExist(bool? isManager, Guid? projectId, params Guid[] ids)
         {
             if (isManager == null)
             {
@@ -115,7 +115,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             }
             else
             {
-                DbProjectUser users = _provider.ProjectsUsers.Find(ids);
+                DbProjectUser users = _provider.ProjectsUsers.Where(user => user.UserId == ids.First() && user.ProjectId == projectId).First();
                 if ((bool)isManager)
                 {
                     return users.Role == (int)ProjectUserRoleType.Manager;
