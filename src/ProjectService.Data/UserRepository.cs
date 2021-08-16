@@ -108,10 +108,9 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public bool AreExist(bool? isManager, params Guid[] ids)
         {
-            var dbIds = _provider.ProjectsUsers.Select(x => x.UserId);
-
             if (isManager == null)
             {
+                var dbIds = _provider.ProjectsUsers.Select(x => x.UserId);
                 return ids.All(x => dbIds.Contains(x));
             }
             else
