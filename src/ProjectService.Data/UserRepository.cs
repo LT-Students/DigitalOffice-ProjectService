@@ -1,6 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -84,13 +85,6 @@ namespace LT.DigitalOffice.ProjectService.Data
             return _provider.ProjectsUsers.FirstOrDefault(x => x.UserId == userId && x.ProjectId == projectId) != null;
         }
 
-        public bool AreExist(params Guid[] ids)
-        {
-            var dbIds = _provider.ProjectsUsers.Select(x => x.UserId);
-
-            return ids.All(x => dbIds.Contains(x));
-        }
-
         public List<DbProjectUser> Find(List<Guid> userIds)
         {
             return _provider.ProjectsUsers.Where(u => userIds.Contains(u.UserId)).ToList();
@@ -105,6 +99,33 @@ namespace LT.DigitalOffice.ProjectService.Data
             }
 
             _provider.Save();
+        }
+
+        public bool AreExist(params Guid[] ids)
+        {
+            return AreExist(null, ids);
+        }
+
+        public bool AreExist(bool? isManager, params Guid[] ids)
+        {
+            var dbIds = _provider.ProjectsUsers.Select(x => x.UserId);
+
+            if (isManager == null)
+            {
+                return ids.All(x => dbIds.Contains(x));
+            }
+            else
+            {
+                DbProjectUser users = _provider.ProjectsUsers.Find(ids);
+                if ((bool)isManager)
+                {
+                    return users.Role == (int)ProjectUserRoleType.Manager;
+                }
+                else
+                {
+                    return users.Role == (int)ProjectUserRoleType.Employee;
+                }
+            }
         }
     }
 }

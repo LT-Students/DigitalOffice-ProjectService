@@ -32,6 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IAccessValidator _accessValidator;
         private readonly IPatchDbProjectMapper _mapper;
         private readonly IProjectRepository _projectRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<CreateProjectCommand> _logger;
@@ -73,6 +74,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IEditProjectValidator validator,
             IAccessValidator accessValidator,
             IPatchDbProjectMapper mapper,
+            IUserRepository userRepository,
             IProjectRepository projectRepository,
             IRequestClient<IGetDepartmentRequest> requestClient,
             IHttpContextAccessor httpContextAccessor,
@@ -83,6 +85,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _accessValidator = accessValidator;
             _mapper = mapper;
             _projectRepository = projectRepository;
+            _userRepository = userRepository;
             _requestClient = requestClient;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
@@ -92,13 +95,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         {
             _validator.ValidateAndThrowCustom(request);
 
-            DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId, IncludeUsers = true });
+            DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId});
 
             OperationResultResponse<bool> response = new();
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
             if (!_accessValidator.IsAdmin() &&
-                !dbProject.Users.Any(user => user.UserId == userId && user.Role == (int)ProjectUserRoleType.Manager) &&
+                !_userRepository.AreExist(true, userId) &&
                 GetDepartment(dbProject.DepartmentId, response.Errors)?.DirectorUserId != userId)
             {
                 throw new ForbiddenException("Not enough rights.");
