@@ -77,7 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
 
             string errorMessage = "Failed to check the existing users.";
-            string logMessage = "Cannot check existing users {userIds}";
+            string logMessage = "Cannot check existing users withs this ids {userIds}";
 
             try
             {
