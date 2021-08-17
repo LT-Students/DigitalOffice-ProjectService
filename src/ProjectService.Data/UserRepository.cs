@@ -80,9 +80,18 @@ namespace LT.DigitalOffice.ProjectService.Data
             return CreateGetPredicates(filter, dbProjectsUser).ToList();
         }
 
-        public bool AreUserProjectExist(Guid userId, Guid projectId)
+        public bool AreUserProjectExist(Guid userId, Guid projectId, bool? isManager)
         {
-            return _provider.ProjectsUsers.FirstOrDefault(x => x.UserId == userId && x.ProjectId == projectId) != null;
+            if (isManager.HasValue)
+            {
+                return _provider
+                    .ProjectsUsers
+                    .FirstOrDefault(x => x.UserId == userId && x.ProjectId == projectId && x.Role == (int)ProjectUserRoleType.Manager) != null;
+            }
+
+            return _provider
+                .ProjectsUsers
+                .FirstOrDefault(x => x.UserId == userId && x.ProjectId == projectId) != null;
         }
 
         public List<DbProjectUser> Find(List<Guid> userIds)
@@ -103,28 +112,8 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public bool AreExist(params Guid[] ids)
         {
-            return AreExist(null, null, ids);
-        }
-
-        public bool AreExist(bool? isManager, Guid? projectId, params Guid[] ids)
-        {
-            if (isManager == null)
-            {
-                var dbIds = _provider.ProjectsUsers.Select(x => x.UserId);
-                return ids.All(x => dbIds.Contains(x));
-            }
-            else
-            {
-                DbProjectUser users = _provider.ProjectsUsers.Where(user => user.UserId == ids.First() && user.ProjectId == projectId).First();
-                if ((bool)isManager)
-                {
-                    return users.Role == (int)ProjectUserRoleType.Manager;
-                }
-                else
-                {
-                    return users.Role == (int)ProjectUserRoleType.Employee;
-                }
-            }
+            var dbIds = _provider.ProjectsUsers.Select(x => x.UserId);
+            return ids.All(x => dbIds.Contains(x));
         }
     }
 }

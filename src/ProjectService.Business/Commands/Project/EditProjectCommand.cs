@@ -101,12 +101,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
             if (!_accessValidator.IsAdmin() &&
-                !_userRepository.AreExist(true, projectId, userId) &&
+                !_userRepository.AreUserProjectExist(userId, projectId, true) &&
                 GetDepartment(dbProject.DepartmentId, response.Errors)?.DirectorUserId != userId)
             {
                 throw new ForbiddenException("Not enough rights.");
             }
-
 
             foreach (Operation item in request.Operations)
             {
