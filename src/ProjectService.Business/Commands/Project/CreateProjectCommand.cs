@@ -5,6 +5,7 @@ using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
@@ -38,6 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRequestClient<IGetDepartmentRequest> _rcGetDepartment;
         private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
+        private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
         private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
 
         private IGetDepartmentResponse GetDepartment(Guid departmentId, List<string> errors)
@@ -64,6 +66,37 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 errors.Add(errorMessage);
             }
 
+            return null;
+        }
+
+        private List<Guid> CheckUserExistence(List<Guid> userIds, List<string> errors)
+        {
+            if (!userIds.Any())
+            {
+                return userIds;
+            }
+
+            string errorMessage = "Failed to check the existing users.";
+            string logMessage = "Cannot check existing users withs this ids {userIds}";
+
+            try
+            {
+                var response = _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUsersExistence>>(
+                    ICheckUsersExistence.CreateObj(userIds)).Result;
+                if (response.Message.IsSuccess)
+                {
+                    return response.Message.Body.UserIds;
+                }
+
+                _logger.LogWarning($"Can not find {userIds} with this Ids '{userIds}': " +
+                    $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, logMessage);
+            }
+
+            errors.Add(errorMessage);
             return null;
         }
 
@@ -130,7 +163,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IHttpContextAccessor httpContextAccessor,
             IRequestClient<IGetDepartmentRequest> rcGetDepartment,
             IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
+            IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
             IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime)
+
         {
             _logger = logger;
             _validator = validator;
@@ -141,6 +176,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _projectInfoMapper = projectInfoMapper;
             _httpContextAccessor = httpContextAccessor;
             _rcCreateWorkspace = rcCreateWorkspace;
+            _rcCheckUsersExistence = rcCheckUsersExistence;
             _rcCreateWorkTime = rcCreateWorkTime;
         }
 
@@ -162,6 +198,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             _validator.ValidateAndThrowCustom(request);
 
+            var existUsers = CheckUserExistence(request.Users.Select(u => u.UserId).ToList(), response.Errors);
+            if (!response.Errors.Any()
+                && existUsers.Count() != request.Users.Count())
+            {
+                response.Errors.Add("Not all users exist.");
+            }
+            else if (response.Errors.Any())
+            {
+                response.Status = OperationResultStatusType.Failed;
+                return response;
+            }
+            // TODO: rework check Id department existense
             IGetDepartmentResponse department = null;
             if (request.DepartmentId.HasValue)
             {
@@ -171,19 +219,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 {
                     throw new BadRequestException("Project department not found.");
                 }
-                else if (response.Errors.Any())
-                {
-                    response.Status = OperationResultStatusType.Failed;
-                    return response;
-                }
             }
 
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
-            DbProject dbProject = _dbProjectMapper.Map(request, userId);
+            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers);
 
             _repository.CreateNewProject(dbProject);
 
             response.Body = _projectInfoMapper.Map(dbProject, department?.Name);
+
+            CreateWorkspace(request.Name, userId, existUsers, response.Errors);
 
             List<Guid> userIds = request.Users.Select(u => u.UserId).ToList();
 
