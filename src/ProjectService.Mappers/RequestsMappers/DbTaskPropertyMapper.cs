@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
                 Name = request.Name,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
-                Description = string.IsNullOrEmpty(request.Description) ? null : request.Description?.Trim(),
+                Description = string.IsNullOrEmpty(request.Description) ? null : request.Description.Trim(),
                 PropertyType = (int)request.PropertyType,
             };
         }
