@@ -82,7 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public bool AreUserProjectExist(Guid userId, Guid projectId, bool? isManager)
         {
-            if (isManager.HasValue)
+            if (isManager.HasValue && (bool)isManager)
             {
                 return _provider
                     .ProjectsUsers
