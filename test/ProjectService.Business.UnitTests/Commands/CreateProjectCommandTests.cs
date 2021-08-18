@@ -14,7 +14,7 @@
 //using LT.DigitalOffice.ProjectService.Models.Db;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-//using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
+//using LT.DigitalOffice.ProjectService.Models.Dto.Models.User;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 //using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 //using LT.DigitalOffice.ProjectService.Validation.Interfaces;
@@ -74,7 +74,7 @@
 //                    new ProjectUserRequest
 //                    {
 //                        UserId = Guid.NewGuid(),
-//                        Role = UserRoleType.ProjectAdmin
+//                        Role = ProjectUserRoleType.Manager
 //                    }
 //                }
 //            };

@@ -111,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void ShouldThrowErrorWhenAssignedToIdDoesNotExist()
         {
             _userRepository
-                .Setup(x => x.AreUserProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Setup(x => x.AreUserProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId, null))
                 .Returns(false)
                 .Verifiable();
 
@@ -132,7 +132,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void ShouldThrowErrorWhenPriorityIdIdDoesNotExist()
         {
             _userRepository
-                .Setup(x => x.AreUserProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Setup(x => x.AreUserProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId, null))
                 .Returns(false)
                 .Verifiable();
 
@@ -168,7 +168,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void ShouldThrowErrorWhenStatusIdIdDoesNotExist()
         {
             _userRepository
-                .Setup(x => x.AreUserProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Setup(x => x.AreUserProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId, null))
                 .Returns(false)
                 .Verifiable();
 
@@ -204,7 +204,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void ShouldThrowErrorWhenTypeIdIdDoesNotExist()
         {
             _userRepository
-                .Setup(x => x.AreUserProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Setup(x => x.AreUserProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId, null))
                 .Returns(false)
                 .Verifiable();
 
@@ -240,7 +240,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         public void ShouldNotErrorsWhenRequestIsValid()
         {
             _userRepository
-                .Setup(x => x.AreUserProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId))
+                .Setup(x => x.AreUserProjectExist(_taskRequest.AssignedTo.Value, _taskRequest.ProjectId, null))
                 .Returns(true)
                 .Verifiable();
 

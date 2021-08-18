@@ -84,7 +84,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             Func<Times> httpAccessorTimes)
         {
             _userRepositoryMock.Verify(x => x.AreUserProjectExist(
-                It.IsAny<Guid>(), It.IsAny<Guid>()), projectRepositoryTimes);
+                It.IsAny<Guid>(), It.IsAny<Guid>(), null), projectRepositoryTimes);
 
             _taskRepositoryMock.Verify(x =>
                 x.Get(It.IsAny<Guid>(), It.IsAny<bool>()), getInTaskRepositoryTimes);
@@ -228,7 +228,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 .Returns(false);
 
             _userRepositoryMock
-                .Setup(x => x.AreUserProjectExist(_userId, _projectId))
+                .Setup(x => x.AreUserProjectExist(_userId, _projectId, null))
                 .Returns(true).Verifiable();
 
             #endregion
