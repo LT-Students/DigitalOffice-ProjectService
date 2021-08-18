@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
                 AddedOn = dbProjectUser.AddedOn,
                 RemovedOn = dbProjectUser.RemovedOn,
                 AvatarImage = image,
-                Role = (UserRoleType)dbProjectUser.Role,
+                Role = (ProjectUserRoleType)dbProjectUser.Role,
                 Department = userDepartment == null
                 ? null
                 : new()

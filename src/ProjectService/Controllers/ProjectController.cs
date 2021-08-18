@@ -35,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         }
 
         [HttpGet("get")]
-        public ProjectResponse Get(
+        public OperationResultResponse<ProjectResponse> Get(
             [FromServices] IGetProjectCommand command,
             [FromQuery] GetProjectFilter filter)
         {

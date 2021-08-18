@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                     new DbProjectUser
                     {
                         Id = Guid.NewGuid(),
-                        Role = (int)UserRoleType.ProjectAdmin
+                        Role = (int)ProjectUserRoleType.Manager
                     }
                 }
             };

@@ -1,6 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -79,16 +80,18 @@ namespace LT.DigitalOffice.ProjectService.Data
             return CreateGetPredicates(filter, dbProjectsUser).ToList();
         }
 
-        public bool AreUserProjectExist(Guid userId, Guid projectId)
+        public bool AreUserProjectExist(Guid userId, Guid projectId, bool? isManager)
         {
-            return _provider.ProjectsUsers.FirstOrDefault(x => x.UserId == userId && x.ProjectId == projectId) != null;
-        }
+            if (isManager.HasValue && isManager.Value)
+            {
+                return _provider
+                    .ProjectsUsers
+                    .Any(x => x.UserId == userId && x.ProjectId == projectId && x.Role == (int)ProjectUserRoleType.Manager && x.IsActive);
+            }
 
-        public bool AreExist(params Guid[] ids)
-        {
-            var dbIds = _provider.ProjectsUsers.Select(x => x.UserId);
-
-            return ids.All(x => dbIds.Contains(x));
+            return _provider
+                .ProjectsUsers
+                .Any(x => x.UserId == userId && x.ProjectId == projectId && x.IsActive);
         }
 
         public List<DbProjectUser> Find(List<Guid> userIds)
@@ -100,11 +103,18 @@ namespace LT.DigitalOffice.ProjectService.Data
         {
             List<DbProjectUser> users = _provider.ProjectsUsers.Where(u => u.UserId == userId && u.IsActive).ToList();
 
-            foreach(var user in users) {
+            foreach (var user in users)
+            {
                 user.IsActive = false;
             }
 
             _provider.Save();
+        }
+
+        public bool AreExist(params Guid[] ids)
+        {
+            var dbIds = _provider.ProjectsUsers.Where(x => x.IsActive).Select(x => x.UserId);
+            return ids.All(x => dbIds.Contains(x));
         }
     }
 }

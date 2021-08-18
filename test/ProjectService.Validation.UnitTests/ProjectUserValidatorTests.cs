@@ -26,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [Test]
         public void ShouldThrowExceptionWhenRoleIsBad()
         {
-            _validator.ShouldHaveValidationErrorFor(x => x.Role, (UserRoleType)10000);
+            _validator.ShouldHaveValidationErrorFor(x => x.Role, (ProjectUserRoleType)10000);
 
         }
 
@@ -36,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             var projectUserRequest = new ProjectUserRequest
             {
                 UserId = Guid.NewGuid(),
-                Role = UserRoleType.ProjectAdmin
+                Role = ProjectUserRoleType.Manager
             };
 
             _validator.TestValidate(projectUserRequest).ShouldNotHaveAnyValidationErrors();

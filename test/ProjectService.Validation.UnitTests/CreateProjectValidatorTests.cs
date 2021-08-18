@@ -33,7 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     new ProjectUserRequest
                     {
                         UserId = Guid.NewGuid(),
-                        Role = UserRoleType.ProjectAdmin
+                        Role = ProjectUserRoleType.Manager
                     }
                 }
             };
@@ -101,7 +101,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     new ProjectUserRequest
                     {
                         UserId = Guid.Empty,
-                        Role = UserRoleType.ProjectAdmin
+                        Role = ProjectUserRoleType.Manager
                     }
                 }
             };
@@ -131,7 +131,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     new ProjectUserRequest
                     {
                         UserId = Guid.NewGuid(),
-                        Role = (UserRoleType)9
+                        Role = (ProjectUserRoleType)9
                     }
                 }
             };
