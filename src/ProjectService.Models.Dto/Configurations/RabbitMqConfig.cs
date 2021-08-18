@@ -59,5 +59,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
         public string DisactivateUserEndpoint { get; set; }
 
+        public string GetProjectUsersEndpoint { get; set; }
+
     }
 }

@@ -100,7 +100,8 @@ namespace LT.DigitalOffice.ProjectService.Data
         {
             List<DbProjectUser> users = _provider.ProjectsUsers.Where(u => u.UserId == userId && u.IsActive).ToList();
 
-            foreach(var user in users) {
+            foreach (var user in users)
+            {
                 user.IsActive = false;
             }
 
