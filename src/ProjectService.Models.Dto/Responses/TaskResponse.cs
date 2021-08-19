@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
         public DateTime CreatedAtUtc { get; set; }
 
         public ProjectInfo Project { get; set; }
-        public UserTaskInfo Author { get; set; }
+        public UserTaskInfo CreatedBy { get; set; }
         public UserTaskInfo AssignedUser { get; set; }
         public TaskPropertyInfo Status { get; set; }
         public TaskPropertyInfo Priority { get; set; }
