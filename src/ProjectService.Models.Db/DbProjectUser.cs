@@ -12,8 +12,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public Guid ProjectId { get; set; }
         public Guid UserId { get; set; }
         public int Role { get; set; }
-        public DateTime AddedOn { get; set; }
-        public DateTime? RemovedOn { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
+        public Guid CreatedBy { get; set; }
+        public DateTime? ModifiedAtUtc { get; set; }
+        public Guid? ModifiedBy { get; set; }
         public bool IsActive { get; set; }
 
         public DbProject Project { get; set; }

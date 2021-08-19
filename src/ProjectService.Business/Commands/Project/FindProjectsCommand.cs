@@ -31,9 +31,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             try
             {
+                List<Guid> departmentIds = dbProjects.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList();
+
+                if (!departmentIds.Any())
+                {
+                    return departmentNames;
+                }
+
                 Response<IOperationResult<IFindDepartmentsResponse>> response = _findDepartmentsRequestClient
                     .GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-                        IFindDepartmentsRequest.CreateObj(dbProjects.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList())).Result;
+                        IFindDepartmentsRequest.CreateObj(departmentIds)).Result;
                 if (response.Message.IsSuccess)
                 {
                     departmentNames = response.Message.Body.IdNamePairs;

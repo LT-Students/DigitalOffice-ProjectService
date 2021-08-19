@@ -6,7 +6,7 @@ using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
@@ -78,7 +78,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                     new DbTaskProperty
                     {
                         Id = Guid.NewGuid(),
-                        AuthorId = authorId,
+                        CreatedBy = authorId,
                         ProjectId = _projectId,
                         Name = dbTaskProperty.Name,
                         IsActive = true,

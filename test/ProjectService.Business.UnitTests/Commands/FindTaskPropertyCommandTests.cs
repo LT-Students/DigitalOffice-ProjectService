@@ -41,10 +41,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                     Id = Guid.NewGuid(),
                     Name = "Feature",
                     ProjectId = _projectId,
-                    AuthorId = Guid.NewGuid(),
+                    CreatedBy = Guid.NewGuid(),
                     PropertyType = (int)TaskPropertyType.Type,
                     Description = "Description",
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAtUtc = DateTime.UtcNow,
                     IsActive = true
                 },
                 new DbTaskProperty
@@ -52,10 +52,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                     Id = Guid.NewGuid(),
                     Name = "Feature",
                     ProjectId = _projectId,
-                    AuthorId = Guid.NewGuid(),
+                    CreatedBy = Guid.NewGuid(),
                     PropertyType = (int)TaskPropertyType.Type,
                     Description = "Description",
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAtUtc = DateTime.UtcNow,
                     IsActive = true
                 },
                 new DbTaskProperty
@@ -63,10 +63,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                     Id = Guid.NewGuid(),
                     Name = "Feature",
                     ProjectId = _projectId,
-                    AuthorId = Guid.NewGuid(),
+                    CreatedBy = Guid.NewGuid(),
                     PropertyType = (int)TaskPropertyType.Type,
                     Description = "Description",
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAtUtc = DateTime.UtcNow,
                     IsActive = true
                 }
             };
@@ -78,9 +78,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                     {
                         Id = dbTaskProperty.Id,
                         ProjectId = dbTaskProperty.ProjectId,
-                        AuthorId = dbTaskProperty.AuthorId,
+                        CreatedBy = dbTaskProperty.CreatedBy,
                         Name = dbTaskProperty.Name,
-                        CreatedAt = dbTaskProperty.CreatedAt,
+                        CreatedAtUtc = dbTaskProperty.CreatedAtUtc,
                         Description = dbTaskProperty.Description,
                         IsActive = dbTaskProperty.IsActive,
                         PropertyType = (TaskPropertyType)dbTaskProperty.PropertyType

@@ -23,38 +23,38 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
         private string _name = "Name";
         private string _description = "Description";
         private DateTime _createdAt = DateTime.Now;
-        private bool _isActive = true; 
-        
+        private bool _isActive = true;
+
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _mapper = new TaskPropertyInfoMapper();
         }
-        
+
         [SetUp]
         public void SetUp()
         {
             _request = new DbTaskProperty()
             {
                 Id = _id,
-                AuthorId = _authorId,
+                CreatedBy = _authorId,
                 ProjectId = _projectId,
                 PropertyType = _propertyType,
                 Name = _name,
                 Description = _description,
-                CreatedAt = _createdAt,
+                CreatedAtUtc = _createdAt,
                 IsActive = _isActive
             };
 
             _expectedResult = new TaskPropertyInfo()
             {
                 Id = _id,
-                AuthorId = _authorId,
+                CreatedBy = _authorId,
                 ProjectId = _projectId,
                 PropertyType = (TaskPropertyType)_propertyType,
                 Name = _name,
                 Description = _description,
-                CreatedAt = _createdAt,
+                CreatedAtUtc = _createdAt,
                 IsActive = _isActive
             };
         }

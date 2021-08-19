@@ -28,12 +28,12 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
                 Name = dbTask.Name,
                 Number = dbTask.Number,
                 TypeName = dbTask.Type?.Name,
-                CreatedAt = dbTask.CreatedAt,
+                CreatedAtUtc = dbTask.CreatedAtUtc,
                 StatusName = dbTask.Status?.Name,
                 Description = dbTask.Description,
                 PriorityName = dbTask.Priority?.Name,
                 PlannedMinutes = dbTask.PlannedMinutes,
-                Author = _userMapper.Map(author),
+                CreatedBy = _userMapper.Map(author),
                 Project = dbTask.Project != null
                     ? new ProjectTaskInfo
                     {

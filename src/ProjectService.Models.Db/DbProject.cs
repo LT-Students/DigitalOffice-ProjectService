@@ -13,13 +13,15 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
         public Guid Id { get; set; }
         public Guid? DepartmentId { get; set; }
-        public Guid AuthorId { get; set; }
         public int Status { get; set; }
         public string Name { get; set; }
         public string ShortName { get; set; }
         public string Description { get; set; }
         public string ShortDescription { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
+        public Guid CreatedBy { get; set; }
+        public DateTime? ModifiedAtUtc { get; set; }
+        public Guid? ModifiedBy { get; set; }
 
         [IgnoreParse]
         public ICollection<DbTask> Tasks { get; set; }

@@ -19,9 +19,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
             {
                 Id = value.Id,
                 Name = value.Name,
-                AuthorId = value.AuthorId,
+                CreatedBy = value.CreatedBy,
                 Status = (ProjectStatusType)value.Status,
-                CreatedAt = value.CreatedAt,
+                CreatedAtUtc = value.CreatedAtUtc,
                 ShortName = value.ShortName,
                 Description = value.Description,
                 ShortDescription = value.ShortDescription,

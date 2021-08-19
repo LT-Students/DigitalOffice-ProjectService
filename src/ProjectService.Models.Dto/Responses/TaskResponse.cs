@@ -11,7 +11,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
         public string Description { get; set; }
         public int Number { get; set; }
         public int? PlannedMinutes { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
 
         public ProjectInfo Project { get; set; }
         public UserTaskInfo Author { get; set; }

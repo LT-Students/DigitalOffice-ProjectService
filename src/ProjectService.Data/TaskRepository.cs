@@ -8,12 +8,15 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.JsonPatch;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using LT.DigitalOffice.Kernel.Extensions;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
     public class TaskRepository : ITaskRepository
     {
         private readonly IDataProvider _provider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         private IQueryable<DbTask> CreateFindPredicates(
             FindTasksFilter filter,
@@ -48,9 +51,12 @@ namespace LT.DigitalOffice.ProjectService.Data
             return dbTasks;
         }
 
-        public TaskRepository(IDataProvider provider)
+        public TaskRepository(
+            IDataProvider provider,
+            IHttpContextAccessor httpContextAccessor)
         {
             _provider = provider;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public Guid Create(DbTask newTask)
@@ -69,6 +75,8 @@ namespace LT.DigitalOffice.ProjectService.Data
         public bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch)
         {
             taskPatch.ApplyTo(task);
+            task.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
+            task.ModifiedAtUtc = DateTime.UtcNow;
             _provider.Save();
 
             return true;

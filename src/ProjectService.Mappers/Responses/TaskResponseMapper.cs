@@ -69,7 +69,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
                 Description = dbTask.Description,
                 Number = dbTask.Number,
                 PlannedMinutes = dbTask.PlannedMinutes,
-                CreatedAt = dbTask.CreatedAt,
+                CreatedAtUtc = dbTask.CreatedAtUtc,
                 Subtasks = subtasksInfo
             };
         }

@@ -4,7 +4,9 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -21,7 +23,9 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         private DbProject newProject;
         private List<DbProjectUser> dbProjectUsers;
         private Guid projectIdRequest;
+        private Guid _creatorId = Guid.NewGuid();
         private IEnumerable<Guid> userIdsRequest;
+        private Mock<IHttpContextAccessor> _accessorMock;
         #endregion
 
         #region setup
@@ -58,8 +62,8 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
                     Id = Guid.NewGuid(),
                     ProjectId = projectId,
                     UserId = Guid.NewGuid(),
-                    AddedOn = DateTime.Today,
-                    RemovedOn = DateTime.Today,
+                    CreatedAtUtc = DateTime.Today,
+                    ModifiedAtUtc = DateTime.Today,
                     IsActive = true
                 };
 
@@ -75,9 +79,17 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         [SetUp]
         public void SetUp()
         {
+            _accessorMock = new();
+            IDictionary<object, object> _items = new Dictionary<object, object>();
+            _items.Add("UserId", _creatorId);
+
+            _accessorMock
+                .Setup(x => x.HttpContext.Items)
+                .Returns(_items);
+
             CreateMemoryContext();
 
-            repository = new ProjectRepository(provider);
+            repository = new ProjectRepository(provider, _accessorMock.Object);
 
             provider.Projects.Add(newProject);
             provider.Save();

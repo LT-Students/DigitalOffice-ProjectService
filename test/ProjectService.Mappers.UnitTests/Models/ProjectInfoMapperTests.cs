@@ -27,25 +27,25 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
             _dbProject = new DbProject
             {
                 Id = Guid.NewGuid(),
-                AuthorId = Guid.NewGuid(),
+                CreatedBy = Guid.NewGuid(),
                 Name = "Project for Lanit-Tercom",
                 ShortName = "Project",
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow,
                 Status = (int)ProjectStatusType.Active
             };
 
             _expectedProjectInfo = new ProjectInfo
             {
                 Id = _dbProject.Id,
-                AuthorId = _dbProject.AuthorId,
+                CreatedBy = _dbProject.CreatedBy,
                 Name = "Project for Lanit-Tercom",
                 ShortName = "Project",
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
-                CreatedAt = _dbProject.CreatedAt,
+                CreatedAtUtc = _dbProject.CreatedAtUtc,
                 Status = ProjectStatusType.Active,
                 Department = new DepartmentInfo
                 {
