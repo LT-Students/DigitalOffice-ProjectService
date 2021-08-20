@@ -42,14 +42,14 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         private Mock<IHttpContextAccessor> _httpAccessorMock;
         private Mock<ITaskResponseMapper> _taskResponseMapperMock;
         private Mock<ITaskInfoMapper> _taskInfoMapper;
-        
+
         private Mock<ILogger<GetTaskCommand>> _loggerMock;
 
         private Mock<IRequestClient<IGetDepartmentRequest>> _departmentRequestClient;
         private Mock<IRequestClient<IGetUsersDataRequest>> _userRequestClient;
         private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _operationResultBrokerMock;
         private Mock<Response<IOperationResult<IGetUsersDataResponse>>> _operationResultUserBrokerMock;
-        
+
         private JsonPatchDocument<EditTaskRequest> _request;
 
         #endregion
@@ -121,7 +121,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _operationResultUserBrokerMock
                 .Setup(x => x.Message.Body)
                 .Returns(users.Object);
-            
+
             _operationResultUserBrokerMock
                 .Setup(x => x.Message.IsSuccess)
                 .Returns(true);
@@ -131,7 +131,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 .Returns(new List<string>());
 
             _userRequestClient
-                .Setup(x => 
+                .Setup(x =>
                     x.GetResponse<IOperationResult<IGetUsersDataResponse>>(
                         It.IsAny<object>(),
                         default,
@@ -158,7 +158,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _operationResultBrokerMock = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
             _operationResultUserBrokerMock = new Mock<Response<IOperationResult<IGetUsersDataResponse>>>();
             #endregion
-            
+
             #region Mock default setups
 
             _taskResponseMapperMock.Setup(x => x.Map(
@@ -178,7 +178,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 {
                     ProjectId = _projectId
                 }).Verifiable();
-            
+
             _taskRepositoryMock
                 .Setup(x => x.Get(_taskId, true))
                 .Returns(new DbTask
@@ -201,7 +201,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
                 }).Verifiable();
 
             #endregion
-            
+
             ClientRequestUp(Guid.NewGuid());
             RcGetDepartment(Guid.NewGuid());
             RcGetUser();
