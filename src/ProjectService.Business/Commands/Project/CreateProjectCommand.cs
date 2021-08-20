@@ -35,38 +35,45 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IAccessValidator _accessValidator;
         private readonly ICreateProjectValidator _validator;
         private readonly ILogger<CreateProjectCommand> _logger;
-        private readonly IProjectInfoMapper _projectInfoMapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IRequestClient<IGetDepartmentRequest> _rcGetDepartment;
         private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
         private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
         private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
+        private readonly IRequestClient<ICheckDepartmentsExistence> _rcCheckDepartmentsExistence;
 
-        private IGetDepartmentResponse GetDepartment(Guid departmentId, List<string> errors)
+        private List<Guid> CheckDepartmentExistence(Guid? departmentId, List<string> errors)
         {
-            string errorMessage = "Cannot add project. Please try again later.";
+            if (!departmentId.HasValue || departmentId == Guid.Empty)
+            {
+                return new List<Guid>();
+            }
+
+            string errorMessage = "Failed to check the existing department.";
+            string logMessage = "Department not found. {departmentIds}";
 
             try
             {
-                var response = _rcGetDepartment.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(null, departmentId), timeout: TimeSpan.FromSeconds(2)).Result;
-
+                var response = _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
+                    ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value })).Result;
                 if (response.Message.IsSuccess)
                 {
-                    return response.Message.Body;
+                    if (!response.Message.Body.DepartmentIds.Any())
+                    {
+                        errors.Add("Department Id does not exist");
+                    }
+                    return response.Message.Body.DepartmentIds;
                 }
 
-                _logger.LogWarning($"Can not find department with this id '{departmentId}': " +
+                _logger.LogWarning($"Can not find {departmentId} with this Ids '{departmentId}': " +
                     $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
             }
             catch (Exception exc)
             {
-                _logger.LogError(exc, errorMessage);
-
-                errors.Add(errorMessage);
+                _logger.LogError(exc, logMessage);
             }
 
-            return null;
+            errors.Add(errorMessage);
+            return new List<Guid>();
         }
 
         private List<Guid> CheckUserExistence(List<Guid> userIds, List<string> errors)
@@ -164,30 +171,30 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IRequestClient<IGetDepartmentRequest> rcGetDepartment,
             IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
             IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
-            IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime)
+            IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
+            IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence)
 
         {
             _logger = logger;
             _validator = validator;
             _repository = repository;
-            _rcGetDepartment = rcGetDepartment;
             _dbProjectMapper = dbProjectMapper;
             _accessValidator = accessValidator;
-            _projectInfoMapper = projectInfoMapper;
             _httpContextAccessor = httpContextAccessor;
             _rcCreateWorkspace = rcCreateWorkspace;
             _rcCheckUsersExistence = rcCheckUsersExistence;
             _rcCreateWorkTime = rcCreateWorkTime;
+            _rcCheckDepartmentsExistence = rcCheckDepartmentsExistence;
         }
 
-        public OperationResultResponse<ProjectInfo> Execute(ProjectRequest request)
+        public OperationResultResponse<Guid> Execute(ProjectRequest request)
         {
             if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
 
-            OperationResultResponse<ProjectInfo> response = new();
+            OperationResultResponse<Guid> response = new();
 
             if (_repository.IsProjectNameExist(request.Name))
             {
@@ -209,24 +216,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 response.Status = OperationResultStatusType.Failed;
                 return response;
             }
-            // TODO: rework check Id department existense
-            IGetDepartmentResponse department = null;
-            if (request.DepartmentId.HasValue)
-            {
-                department = GetDepartment(request.DepartmentId.Value, response.Errors);
-
-                if (!response.Errors.Any() && department == null)
-                {
-                    throw new BadRequestException("Project department not found.");
-                }
-            }
+            List<Guid> existDepartments = CheckDepartmentExistence(request.DepartmentId, response.Errors);
 
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
-            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers);
+            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, existDepartments);
 
-            _repository.CreateNewProject(dbProject);
-
-            response.Body = _projectInfoMapper.Map(dbProject, department?.Name);
+            response.Body = _repository.Create(dbProject);
 
             CreateWorkspace(request.Name, userId, existUsers, response.Errors);
 
