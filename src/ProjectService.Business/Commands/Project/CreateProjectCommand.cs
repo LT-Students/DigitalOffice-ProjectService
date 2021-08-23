@@ -40,7 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private List<Guid> CheckDepartmentExistence(Guid? departmentId, List<string> errors)
         {
             string errorMessage = "Failed to check the existing department.";
-            string logMessage = "Department not found. {departmentIds}";
+            string logMessage = "Department with id {id} not found.";
 
             try
             {
@@ -50,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 {
                     if (!response.Message.Body.DepartmentIds.Any())
                     {
-                        errors.Add("Department Id does not exist");
+                        errors.Add($"Department Id: {departmentId} does not exist");
                     }
                     return response.Message.Body.DepartmentIds;
                 }
