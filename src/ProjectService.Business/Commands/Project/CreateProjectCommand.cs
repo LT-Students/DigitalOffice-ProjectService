@@ -6,16 +6,12 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Common;
-using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
-using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
@@ -216,13 +212,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             response.Body = _repository.Create(dbProject);
 
+            CreateWorkTime(dbProject.Id, existUsers, response.Errors);
+
             CreateWorkspace(request.Name, userId, existUsers, response.Errors);
-
-            List<Guid> userIds = request.Users.Select(u => u.UserId).ToList();
-
-            CreateWorkTime(dbProject.Id, userIds, response.Errors);
-
-            CreateWorkspace(request.Name, userId, userIds, response.Errors);
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
 
