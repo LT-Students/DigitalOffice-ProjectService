@@ -43,11 +43,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         private List<Guid> CheckDepartmentExistence(Guid? departmentId, List<string> errors)
         {
-            if (!departmentId.HasValue || departmentId == Guid.Empty)
-            {
-                return new List<Guid>();
-            }
-
             string errorMessage = "Failed to check the existing department.";
             string logMessage = "Department not found. {departmentIds}";
 
@@ -165,10 +160,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             ICreateProjectValidator validator,
             IAccessValidator accessValidator,
             IDbProjectMapper dbProjectMapper,
-            IProjectInfoMapper projectInfoMapper,
             ILogger<CreateProjectCommand> logger,
             IHttpContextAccessor httpContextAccessor,
-            IRequestClient<IGetDepartmentRequest> rcGetDepartment,
             IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
             IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
             IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,

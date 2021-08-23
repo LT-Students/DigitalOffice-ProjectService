@@ -44,7 +44,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                     })
                     .ToList()
             };
-
         }
     }
 }
