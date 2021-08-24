@@ -60,7 +60,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                     return response.Message.Body.DepartmentIds;
                 }
 
-                _logger.LogWarning("Can not find {departmentId} with this Id: {departmentId}: " +
+                _logger.LogWarning("Can not find department with this Id: {departmentId}: " +
                     $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
             }
             catch (Exception exc)
