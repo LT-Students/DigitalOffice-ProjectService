@@ -14,6 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
         public DbSet<DbProject> Projects { get; set; }
         public DbSet<DbProjectFile> ProjectsFiles { get; set; }
         public DbSet<DbProjectUser> ProjectsUsers { get; set; }
+        public DbSet<DbProjectImage> ProjectsImages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -9,7 +9,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 {
     public class DbProjectMapper : IDbProjectMapper
     {
-        public DbProject Map(ProjectRequest request, Guid authorId, List<Guid> users)
+        public DbProject Map(ProjectRequest request, Guid authorId, List<Guid> users, List<Guid> imagesIds)
         {
             if (request == null)
             {
@@ -42,7 +42,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                         AddedOn = DateTime.UtcNow,
                         IsActive = true
                     })
-                    .ToList()
+                    .ToList(),
+                ProjectImages = imagesIds.Select(imageId => new DbProjectImage
+                {
+                    Id = Guid.NewGuid(),
+                    ImageId = imageId,
+                    ProjectId = projectId
+                }).ToList()
             };
 
         }

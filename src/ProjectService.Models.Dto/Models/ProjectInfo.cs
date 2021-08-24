@@ -1,5 +1,6 @@
 ﻿using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
 {

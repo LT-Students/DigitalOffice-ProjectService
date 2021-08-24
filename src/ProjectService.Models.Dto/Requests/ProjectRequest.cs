@@ -14,5 +14,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
         public Guid? DepartmentId { get; set; }
         public ProjectStatusType Status { get; set; }
         public IEnumerable<ProjectUserRequest> Users { get; set; }
+        public List<CreateProjectImageRequest> ProjectImages { get; set; }
     }
 }

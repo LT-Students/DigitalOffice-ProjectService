@@ -29,6 +29,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public ICollection<DbProjectFile> Files { get; set; }
         [IgnoreParse]
         public ICollection<DbTaskProperty> TaskProperties { get; set; }
+        [IgnoreParse]
+        public ICollection<DbProjectImage> ProjectImages { get; set; }
 
         public DbProject()
         {
@@ -39,6 +41,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
             Files = new HashSet<DbProjectFile>();
 
             TaskProperties = new HashSet<DbTaskProperty>();
+
+            ProjectImages = new HashSet<DbProjectImage>();
         }
     }
 
@@ -79,6 +83,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
             builder
                 .HasMany(p => p.TaskProperties)
                 .WithOne(tp => tp.Project);
+
+            builder
+               .HasMany(p => p.ProjectImages)
+               .WithOne(tp => tp.Project);
         }
     }
 }

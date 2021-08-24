@@ -6,10 +6,13 @@ using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Common;
+using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
+using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
+using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
@@ -25,6 +28,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -41,6 +45,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
         private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
         private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
+        private readonly IRequestClient<ICreateImagesProjectRequest> _requestClient;
+        private readonly ICreateImageDataMapper _createImageDataMapper;
 
         private IGetDepartmentResponse GetDepartment(Guid departmentId, List<string> errors)
         {
@@ -153,18 +159,39 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
         }
 
+        private async Task<ICreateImagesResponse> CreateImage(List<CreateProjectImageRequest> projectImages)
+        {
+            ICreateImagesResponse result = null;
+
+            List<CreateImageData> imageData = new();
+
+            foreach (CreateProjectImageRequest request in projectImages)
+            {
+                imageData.Add(_createImageDataMapper.Map(request));
+            }
+
+            var brokerResponse = await _requestClient.GetResponse<IOperationResult<ICreateImagesResponse>>(
+                   ICreateImagesProjectRequest.CreateObj(imageData));
+
+            result = brokerResponse.Message.Body;
+
+            return result;
+        }
+
         public CreateProjectCommand(
             IProjectRepository repository,
             ICreateProjectValidator validator,
             IAccessValidator accessValidator,
             IDbProjectMapper dbProjectMapper,
             IProjectInfoMapper projectInfoMapper,
+            ICreateImageDataMapper createImageDataMapper,
             ILogger<CreateProjectCommand> logger,
             IHttpContextAccessor httpContextAccessor,
             IRequestClient<IGetDepartmentRequest> rcGetDepartment,
             IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
             IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
-            IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime)
+            IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
+            IRequestClient<ICreateImagesProjectRequest> requestClient)
 
         {
             _logger = logger;
@@ -178,6 +205,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _rcCreateWorkspace = rcCreateWorkspace;
             _rcCheckUsersExistence = rcCheckUsersExistence;
             _rcCreateWorkTime = rcCreateWorkTime;
+            _requestClient = requestClient;
+            _createImageDataMapper = createImageDataMapper;
         }
 
         public OperationResultResponse<ProjectInfo> Execute(ProjectRequest request)
@@ -221,8 +250,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 }
             }
 
+            ICreateImagesResponse createImagesResponse = null;
+            if (request.ProjectImages != null)
+            {
+                createImagesResponse = CreateImage(request.ProjectImages).Result;
+            }
+
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
-            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers);
+            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, createImagesResponse.ImageIds);
 
             _repository.CreateNewProject(dbProject);
 
