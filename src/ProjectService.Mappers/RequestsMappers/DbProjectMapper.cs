@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 ShortName = shortName == null || !shortName.Any() ? null : shortName,
                 Description = description == null || !description.Any() ? null : description,
                 ShortDescription = shortDescription == null || !shortDescription.Any() ? null : shortDescription,
-                DepartmentId = departmentIds.Any() ? departmentIds[0] : null,
+                DepartmentId = departmentIds?[0],
                 CreatedAt = DateTime.UtcNow,
                 Users = users
                     .Select(userId => new DbProjectUser

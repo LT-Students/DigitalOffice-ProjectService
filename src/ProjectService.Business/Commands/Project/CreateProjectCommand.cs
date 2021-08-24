@@ -39,8 +39,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         private List<Guid> CheckDepartmentExistence(Guid? departmentId, List<string> errors)
         {
+            if (!departmentId.HasValue)
+            {
+                return null;
+            }
+
             string errorMessage = "Failed to check the existing department.";
-            string logMessage = "Department with id {id} not found.";
+            string logMessage = "Department with id: {id} not found.";
 
             try
             {
@@ -55,7 +60,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                     return response.Message.Body.DepartmentIds;
                 }
 
-                _logger.LogWarning($"Can not find {departmentId} with this Ids '{departmentId}': " +
+                _logger.LogWarning("Can not find {departmentId} with this Id: {departmentId}: " +
                     $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
             }
             catch (Exception exc)
@@ -64,7 +69,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
 
             errors.Add(errorMessage);
-            return new List<Guid>();
+            return null;
         }
 
         private List<Guid> CheckUserExistence(List<Guid> userIds, List<string> errors)
@@ -86,7 +91,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                     return response.Message.Body.UserIds;
                 }
 
-                _logger.LogWarning($"Can not find {userIds} with this Ids '{userIds}': " +
+                _logger.LogWarning("Can not find {userIds} with this Ids: {userIds}: " +
                     $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
             }
             catch (Exception exc)
