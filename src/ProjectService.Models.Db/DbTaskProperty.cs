@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public Guid? ProjectId { get; set; }
         public int PropertyType { get; set; }
         public string Description { get; set; }
-        public DateTime? CreatedAtUtc { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
         public Guid? CreatedBy { get; set; }
         public DateTime? ModifiedAtUtc { get; set; }
         public Guid? ModifiedBy { get; set; }

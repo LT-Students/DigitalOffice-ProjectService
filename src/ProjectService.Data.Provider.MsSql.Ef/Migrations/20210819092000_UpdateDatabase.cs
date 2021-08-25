@@ -117,7 +117,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                     PropertyType = table.Column<int>(nullable: false),
                     Description = table.Column<string>(nullable: true),
                     CreatedBy = table.Column<Guid?>(nullable: true),
-                    CreatedAtUtc = table.Column<DateTime?>(nullable: true),
+                    CreatedAtUtc = table.Column<DateTime>(nullable: true),
                     ModifiedBy = table.Column<Guid?>(nullable: true),
                     ModifiedAtUtc = table.Column<DateTime?>(nullable: true),
                     IsActive = table.Column<bool>(nullable: false)
