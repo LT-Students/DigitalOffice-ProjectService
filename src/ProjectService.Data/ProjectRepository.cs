@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             IDataProvider provider,
             IHttpContextAccessor httpContextAccessor)
         {
-            this._provider = provider;
+            _provider = provider;
             _httpContextAccessor = httpContextAccessor;
         }
 
