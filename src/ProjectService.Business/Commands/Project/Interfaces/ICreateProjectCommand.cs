@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
+using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
 {
@@ -17,6 +17,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
         /// </summary>
         /// <param name="request">Project data.</param>
         /// <returns>Project info</returns>
-        OperationResultResponse<ProjectInfo> Execute(ProjectRequest request);
+        OperationResultResponse<Guid> Execute(ProjectRequest request);
     }
 }

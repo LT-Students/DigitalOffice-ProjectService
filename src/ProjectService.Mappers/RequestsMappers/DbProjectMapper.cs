@@ -9,7 +9,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 {
     public class DbProjectMapper : IDbProjectMapper
     {
-        public DbProject Map(ProjectRequest request, Guid authorId, List<Guid> users)
+        public DbProject Map(ProjectRequest request, Guid authorId, List<Guid> users, List<Guid> departmentIds)
         {
             if (request == null)
             {
@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 ShortName = shortName == null || !shortName.Any() ? null : shortName,
                 Description = description == null || !description.Any() ? null : description,
                 ShortDescription = shortDescription == null || !shortDescription.Any() ? null : shortDescription,
-                DepartmentId = request.DepartmentId,
+                DepartmentId = departmentIds?[0],
                 CreatedAt = DateTime.UtcNow,
                 Users = users
                     .Select(userId => new DbProjectUser
@@ -44,7 +44,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                     })
                     .ToList()
             };
-
         }
     }
 }

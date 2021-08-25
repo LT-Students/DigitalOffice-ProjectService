@@ -41,6 +41,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         [AutoInjectRequest(typeof(ICreateWorkTimeRequest))]
         public string CreateWorkTimeEndpoint { get; set; }
 
+        [AutoInjectRequest(typeof(ICheckDepartmentsExistence))]
+        public string CheckDepartmentsExistenceEndpoint { get; set; }
+
         public string GetProjectIdsEndpoint { get; set; }
 
         public string GetProjectInfoEndpoint { get; set; }

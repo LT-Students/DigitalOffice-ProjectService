@@ -56,10 +56,12 @@ namespace LT.DigitalOffice.ProjectService.Data
             return _provider.Projects.Where(p => p.DepartmentId == departmentId);
         }
 
-        public void CreateNewProject(DbProject newProject)
+        public Guid Create(DbProject dbProject)
         {
-            _provider.Projects.Add(newProject);
+            _provider.Projects.Add(dbProject);
             _provider.Save();
+
+            return dbProject.Id;
         }
 
         public bool Edit(DbProject dbProject, JsonPatchDocument<DbProject> request)
