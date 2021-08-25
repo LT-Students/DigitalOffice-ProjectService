@@ -21,11 +21,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                {
                    Id = table.Column<Guid>(nullable: false),
                    ProjectId = table.Column<Guid>(nullable: false),
-                   ImageId = table.Column<Guid>(nullable: true)
+                   ImageId = table.Column<Guid>(nullable: false)
                },
                constraints: table =>
                {
-                   table.PrimaryKey("PK_ProjectsImages", x => x.Id);
+                   table.PrimaryKey("PK_ProjectImages", x => x.Id);
                });
         }
 

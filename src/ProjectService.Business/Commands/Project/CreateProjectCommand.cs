@@ -175,10 +175,27 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 imageData.Add(_createImageDataMapper.Map(request));
             }
 
-            var brokerResponse = await _requestClient.GetResponse<IOperationResult<ICreateImagesResponse>>(
+            try
+            {
+                Response<IOperationResult<ICreateImagesResponse>> brokerResponse = await _requestClient.GetResponse<IOperationResult<ICreateImagesResponse>>(
                    ICreateImagesProjectRequest.CreateObj(imageData));
 
-            result = brokerResponse.Message.Body;
+                if (!brokerResponse.Message.IsSuccess)
+                {
+                    _logger.LogWarning("Can't create project's image");
+                }
+                else
+                {
+                    result = brokerResponse.Message.Body;
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Exception was caught during project's image creation");
+            }
+
 
             return result;
         }
