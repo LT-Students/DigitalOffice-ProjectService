@@ -9,8 +9,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
 {
     public class DbProjectMapper : IDbProjectMapper
     {
-        public DbProject Map(ProjectRequest request, Guid authorId, List<Guid> users, List<Guid> imagesIds)
-        public DbProject Map(ProjectRequest request, Guid authorId, List<Guid> users, List<Guid> departmentIds)
+        public DbProject Map(ProjectRequest request, Guid authorId, List<Guid> users, List<Guid> departmentIds, List<Guid> imagesIds)
         {
             if (request == null)
             {

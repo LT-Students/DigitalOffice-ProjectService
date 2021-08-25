@@ -7,7 +7,6 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.Models.Broker.Models;
-using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
@@ -15,6 +14,7 @@ using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
@@ -242,17 +242,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 response.Status = OperationResultStatusType.Failed;
                 return response;
             }
-            // TODO: rework check Id department existense
-            IGetDepartmentResponse department = null;
-            if (request.DepartmentId.HasValue)
-            {
-                department = GetDepartment(request.DepartmentId.Value, response.Errors);
-
-                if (!response.Errors.Any() && department == null)
-                {
-                    throw new BadRequestException("Project department not found.");
-                }
-            }
+            List<Guid> existDepartments = CheckDepartmentExistence(request.DepartmentId, response.Errors);
 
             ICreateImagesResponse createImagesResponse = null;
             if (request.ProjectImages != null)
@@ -261,8 +251,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
 
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
-            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, createImagesResponse.ImageIds);
-            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, existDepartments);
+            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, existDepartments, createImagesResponse.ImageIds);
 
             response.Body = _repository.Create(dbProject);
 
