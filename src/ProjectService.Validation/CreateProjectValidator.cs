@@ -1,13 +1,7 @@
 ﻿using FluentValidation;
-using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
-using MassTransit;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation
@@ -56,6 +50,13 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     .MaximumLength(300)
                     .WithMessage("Project description is too long.");
             });
+
+            When(
+                news => news.DepartmentId.HasValue,
+                () =>
+                    RuleFor(news => news.DepartmentId)
+                        .Must(DepartmentId => DepartmentId != Guid.Empty)
+                        .WithMessage("Wrong type of department Id."));
         }
     }
 }

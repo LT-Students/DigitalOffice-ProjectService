@@ -15,10 +15,8 @@ using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
@@ -39,39 +37,46 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IAccessValidator _accessValidator;
         private readonly ICreateProjectValidator _validator;
         private readonly ILogger<CreateProjectCommand> _logger;
-        private readonly IProjectInfoMapper _projectInfoMapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IRequestClient<IGetDepartmentRequest> _rcGetDepartment;
         private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
         private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
         private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
         private readonly IRequestClient<ICreateImagesProjectRequest> _requestClient;
         private readonly ICreateImageDataMapper _createImageDataMapper;
+        private readonly IRequestClient<ICheckDepartmentsExistence> _rcCheckDepartmentsExistence;
 
-        private IGetDepartmentResponse GetDepartment(Guid departmentId, List<string> errors)
+        private List<Guid> CheckDepartmentExistence(Guid? departmentId, List<string> errors)
         {
-            string errorMessage = "Cannot add project. Please try again later.";
+            if (!departmentId.HasValue)
+            {
+                return null;
+            }
+
+            string errorMessage = "Failed to check the existing department.";
+            string logMessage = "Department with id: {id} not found.";
 
             try
             {
-                var response = _rcGetDepartment.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(null, departmentId), timeout: TimeSpan.FromSeconds(2)).Result;
-
+                var response = _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
+                    ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value })).Result;
                 if (response.Message.IsSuccess)
                 {
-                    return response.Message.Body;
+                    if (!response.Message.Body.DepartmentIds.Any())
+                    {
+                        errors.Add($"Department Id: {departmentId} does not exist");
+                    }
+                    return response.Message.Body.DepartmentIds;
                 }
 
-                _logger.LogWarning($"Can not find department with this id '{departmentId}': " +
+                _logger.LogWarning("Can not find department with this Id: {departmentId}: " +
                     $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
             }
             catch (Exception exc)
             {
-                _logger.LogError(exc, errorMessage);
-
-                errors.Add(errorMessage);
+                _logger.LogError(exc, logMessage);
             }
 
+            errors.Add(errorMessage);
             return null;
         }
 
@@ -94,7 +99,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                     return response.Message.Body.UserIds;
                 }
 
-                _logger.LogWarning($"Can not find {userIds} with this Ids '{userIds}': " +
+                _logger.LogWarning("Can not find {userIds} with this Ids: {userIds}: " +
                     $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
             }
             catch (Exception exc)
@@ -187,36 +192,35 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             ICreateImageDataMapper createImageDataMapper,
             ILogger<CreateProjectCommand> logger,
             IHttpContextAccessor httpContextAccessor,
-            IRequestClient<IGetDepartmentRequest> rcGetDepartment,
             IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
             IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
             IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
-            IRequestClient<ICreateImagesProjectRequest> requestClient)
+            IRequestClient<ICreateImagesProjectRequest> requestClient,
+            IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence)
 
         {
             _logger = logger;
             _validator = validator;
             _repository = repository;
-            _rcGetDepartment = rcGetDepartment;
             _dbProjectMapper = dbProjectMapper;
             _accessValidator = accessValidator;
-            _projectInfoMapper = projectInfoMapper;
             _httpContextAccessor = httpContextAccessor;
             _rcCreateWorkspace = rcCreateWorkspace;
             _rcCheckUsersExistence = rcCheckUsersExistence;
             _rcCreateWorkTime = rcCreateWorkTime;
             _requestClient = requestClient;
             _createImageDataMapper = createImageDataMapper;
+            _rcCheckDepartmentsExistence = rcCheckDepartmentsExistence;
         }
 
-        public OperationResultResponse<ProjectInfo> Execute(ProjectRequest request)
+        public OperationResultResponse<Guid> Execute(ProjectRequest request)
         {
             if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
 
-            OperationResultResponse<ProjectInfo> response = new();
+            OperationResultResponse<Guid> response = new();
 
             if (_repository.IsProjectNameExist(request.Name))
             {
@@ -258,18 +262,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
             DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, createImagesResponse.ImageIds);
+            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, existDepartments);
 
-            _repository.CreateNewProject(dbProject);
+            response.Body = _repository.Create(dbProject);
 
-            response.Body = _projectInfoMapper.Map(dbProject, department?.Name);
+            CreateWorkTime(dbProject.Id, existUsers, response.Errors);
 
             CreateWorkspace(request.Name, userId, existUsers, response.Errors);
-
-            List<Guid> userIds = request.Users.Select(u => u.UserId).ToList();
-
-            CreateWorkTime(dbProject.Id, userIds, response.Errors);
-
-            CreateWorkspace(request.Name, userId, userIds, response.Errors);
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
 

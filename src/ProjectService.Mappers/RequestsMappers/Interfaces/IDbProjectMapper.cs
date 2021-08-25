@@ -10,5 +10,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces
     public interface IDbProjectMapper
     {
         DbProject Map(ProjectRequest request, Guid authorId, List<Guid> users, List<Guid> imagesIds);
+        DbProject Map(ProjectRequest request, Guid authorId, List<Guid> users, List<Guid> departmentIds);
     }
 }

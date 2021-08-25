@@ -43,7 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         }
 
         [HttpPost("create")]
-        public OperationResultResponse<ProjectInfo> Create(
+        public OperationResultResponse<Guid> Create(
             [FromServices] ICreateProjectCommand command,
             [FromBody] ProjectRequest request)
         {
