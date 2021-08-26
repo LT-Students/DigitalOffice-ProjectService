@@ -41,6 +41,11 @@ namespace LT.DigitalOffice.ProjectService.Data
                 dbProjectQueryable = dbProjectQueryable.Include(x => x.Files);
             }
 
+            if (filter.IncludeImages.HasValue && filter.IncludeImages.Value)
+            {
+                dbProjectQueryable = dbProjectQueryable.Include(x => x.ProjectImages);
+            }
+
             var dbProject = dbProjectQueryable.FirstOrDefault(x => x.Id == filter.ProjectId);
 
             if (dbProject == null)

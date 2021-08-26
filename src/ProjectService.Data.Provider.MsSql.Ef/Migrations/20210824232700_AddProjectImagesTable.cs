@@ -11,7 +11,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
     [DbContext(typeof(ProjectServiceDbContext))]
     [Migration("20210824232700_AddProjectsImagesTable")]
-    public class AddProjectsImagesTable : Migration
+    public class AddProjectImagesTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

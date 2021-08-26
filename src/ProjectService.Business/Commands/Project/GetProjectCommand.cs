@@ -1,7 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.Models.Broker.Requests.User;
@@ -44,7 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         {
             try
             {
-                IOperationResult<IGetDepartmentResponse> departmentResponse = 
+                IOperationResult<IGetDepartmentResponse> departmentResponse =
                     _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>
                     (
                         IGetDepartmentRequest.CreateObj(null, departmentId)
@@ -181,7 +180,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         {
             try
             {
-                IOperationResult<IGetUsersDepartmentsUsersPositionsResponse> response = 
+                IOperationResult<IGetUsersDepartmentsUsersPositionsResponse> response =
                     _rcGetUsersDepartmentsUsersPositions.GetResponse<IOperationResult<IGetUsersDepartmentsUsersPositionsResponse>>
                     (
                         IGetUsersDepartmentsUsersPositionsRequest.CreateObj(userIds, includeDepartments: true, includePositions: true)
@@ -201,8 +200,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
             catch (Exception exc)
             {
-                _logger.LogError(exc, 
-                    "Can not get user's departments and positions for users {UserIds}. Please try again later.", 
+                _logger.LogError(exc,
+                    "Can not get user's departments and positions for users {UserIds}. Please try again later.",
                     userIds);
             }
 
@@ -252,6 +251,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             List<ProjectUserInfo> usersInfo = GetProjectUsersInfo(dbProject.Users, response.Errors);
             List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
+            List<ProjectImageInfo> imagesinfo ;
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
             response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, department);
