@@ -38,8 +38,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
                 Rate = userData.Rate,
                 ProjectCount = projectCount,
                 IsActive = dbProjectUser.IsActive,
-                AddedOn = dbProjectUser.AddedOn,
-                RemovedOn = dbProjectUser.RemovedOn,
+                CreatedAtUtc = dbProjectUser.CreatedAtUtc,
+                ModifiedAtUtc = dbProjectUser.ModifiedAtUtc,
                 AvatarImage = image,
                 Role = (ProjectUserRoleType)dbProjectUser.Role,
                 Department = userDepartment == null

@@ -19,8 +19,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public Guid PriorityId { get; set; }
         public int? PlannedMinutes { get; set; }
         public Guid? ParentId { get; set; }
-        public Guid AuthorId { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
+        public Guid CreatedBy { get; set; }
+        public DateTime? ModifiedAtUtc { get; set; }
+        public Guid? ModifiedBy { get; set; }
         public int Number { get; set; }
 
         public DbProject Project { get; set; }

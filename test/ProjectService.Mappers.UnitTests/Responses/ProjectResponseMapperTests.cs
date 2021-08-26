@@ -34,13 +34,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
             _dbProject = new DbProject
             {
                 Id = Guid.NewGuid(),
-                AuthorId = Guid.NewGuid(),
+                CreatedBy = Guid.NewGuid(),
                 Name = "Project for Lanit-Tercom",
                 ShortName = "Project",
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow,
                 Status = (int)ProjectStatusType.Active
             };
 
@@ -52,8 +52,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                     FirstName = "Spartak",
                     LastName = "Ryabtsev",
                     MiddleName = "Alexandrovich",
-                    AddedOn = DateTime.UtcNow,
-                    RemovedOn = DateTime.UtcNow,
+                    CreatedAtUtc = DateTime.UtcNow,
+                    ModifiedAtUtc = DateTime.UtcNow,
                     IsActive = true,
                     Role = ProjectUserRoleType.Manager
                 }
@@ -81,8 +81,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                 Description = _dbProject.Description,
                 ShortDescription = _dbProject.ShortDescription,
                 Name = _dbProject.Name,
-                AuthorId = _dbProject.AuthorId,
-                CreatedAt = _dbProject.CreatedAt,
+                CreatedBy = _dbProject.CreatedBy,
+                CreatedAtUtc = _dbProject.CreatedAtUtc,
                 ShortName = _dbProject.ShortName,
                 Status =(ProjectStatusType)_dbProject.Status
             };

@@ -1,5 +1,6 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.Models;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Mappers.Db;
+using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Models;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
@@ -36,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
             _expectedDbTaskProperty = new DbTaskProperty
             {
                 ProjectId = _projectId,
-                AuthorId = _authorId,
+                CreatedBy = _authorId,
                 Name = _taskProperty.Name,
                 IsActive = true,
                 Description = _taskProperty.Description,
@@ -48,7 +49,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         public void ShouldReturnDbTaskPropertySuccessful()
         {
             var result = _mapper.Map(_taskProperty, _authorId, _projectId);
-            _expectedDbTaskProperty.CreatedAt = result.CreatedAt;
+            _expectedDbTaskProperty.CreatedBy = result.CreatedBy;
+            _expectedDbTaskProperty.CreatedAtUtc = result.CreatedAtUtc;
             _expectedDbTaskProperty.Id = result.Id;
 
             SerializerAssert.AreEqual(_expectedDbTaskProperty, result);

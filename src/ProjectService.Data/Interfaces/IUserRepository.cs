@@ -45,6 +45,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
         List<DbProjectUser> Find(List<Guid> userIds);
 
-        void Remove(Guid userId);
+        void Remove(Guid userId, Guid removedBy);
     }
 }

@@ -1,9 +1,9 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using System;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.Models
+namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
     public class DbTaskPropertyMapper : IDbTaskPropertyMapper
     {
@@ -17,11 +17,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
             return new DbTaskProperty
             {
                 Id = Guid.NewGuid(),
-                AuthorId = authorId,
                 ProjectId = projectId,
                 Name = request.Name,
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = authorId,
                 Description = string.IsNullOrEmpty(request.Description?.Trim()) ? null : request.Description.Trim(),
                 PropertyType = (int)request.PropertyType,
             };

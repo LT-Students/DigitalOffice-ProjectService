@@ -6,7 +6,7 @@ using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     public class AddUsersToProjectCommand : IAddUsersToProjectCommand
     {
         private readonly IUserRepository _repository;
-        private readonly IProjectUserRequestMapper _mapper;
+        private readonly IDbProjectUserMapper _mapper;
         private readonly IAccessValidator _accessValidator;
         private readonly IAddUsersToProjectValidator _validator;
         private readonly ILogger<AddUsersToProjectCommand> _logger;
@@ -53,7 +53,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
         }
         public AddUsersToProjectCommand(
             IUserRepository repository,
-            IProjectUserRequestMapper mapper,
+            IDbProjectUserMapper mapper,
             IAccessValidator accessValidator,
             IAddUsersToProjectValidator validator,
             ILogger<AddUsersToProjectCommand> logger,

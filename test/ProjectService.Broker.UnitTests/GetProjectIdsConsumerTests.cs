@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                     ProjectId = Guid.NewGuid(),
                     UserId = _userId,
                     Role = 2,
-                    AddedOn = DateTime.Now,
+                    CreatedAtUtc = DateTime.UtcNow,
                     IsActive = true
                 },
                 new DbProjectUser
@@ -50,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.UnitTests
                     ProjectId = Guid.NewGuid(),
                     UserId = _userId,
                     Role = 1,
-                    AddedOn = DateTime.Now,
+                    CreatedAtUtc = DateTime.UtcNow,
                     IsActive = true
                 },
             };

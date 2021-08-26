@@ -98,7 +98,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             List<DbTask> dbTasks = _taskRepository.Find(filter, projectIds, skipCount, takeCount, out int totalCount).ToList();
 
             List<Guid> users = dbTasks.Where(x => x.AssignedTo.HasValue).Select(x => x.AssignedTo.Value).ToList();
-            users.AddRange(dbTasks.Select(x => x.AuthorId).ToList());
+            users.AddRange(dbTasks.Select(x => x.CreatedBy).ToList());
 
             IGetUsersDataResponse usersData = GetUsersData(users, errors);
 
@@ -106,7 +106,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             foreach (var dbTask in dbTasks)
             {
                 UserData assignedUser = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AssignedTo);
-                UserData author = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AuthorId);
+                UserData author = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.CreatedBy);
 
                 tasks.Add(_mapper.Map(dbTask, assignedUser, author));
             }

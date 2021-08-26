@@ -5,9 +5,11 @@ using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.UnitTestKernel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 using System;
@@ -30,7 +32,9 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private DbTask _result;
         private DbTask _dbTask;
         private JsonPatchDocument<DbTask> _patchDbTask;
+        private Mock<IHttpContextAccessor> _accessorMock;
 
+        private Guid _creatorId = Guid.NewGuid();
         private Guid _taskId;
         private string _name = "NewName";
         private string _description = "New Description";
@@ -66,9 +70,9 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                         Description = "Create smth in somewhere",
                         PlannedMinutes = 30,
                         AssignedTo = _assign,
-                        AuthorId = Guid.NewGuid(),
+                        CreatedBy = Guid.NewGuid(),
                         ProjectId = projectId,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAtUtc = DateTime.UtcNow,
                         ParentId = Guid.NewGuid(),
                         Number = 2,
                         PriorityId = priorityId,
@@ -104,6 +108,14 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         [SetUp]
         public void SetUp()
         {
+            _accessorMock = new();
+            IDictionary<object, object> _items = new Dictionary<object, object>();
+            _items.Add("UserId", _creatorId);
+
+            _accessorMock
+                .Setup(x => x.HttpContext.Items)
+                .Returns(_items);
+
             _taskId = Guid.NewGuid();
 
             _dbTask = new DbTask()
@@ -170,7 +182,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             };
 
             _provider = new ProjectServiceDbContext(_dbContextOptions);
-            _repository = new TaskRepository(_provider);
+            _repository = new TaskRepository(_provider, _accessorMock.Object);
 
             _provider.Tasks.AddRange(_dbTasks);
             _provider.Save();

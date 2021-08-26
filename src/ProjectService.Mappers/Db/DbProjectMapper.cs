@@ -1,11 +1,11 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
+namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
     public class DbProjectMapper : IDbProjectMapper
     {
@@ -24,14 +24,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
             return new DbProject
             {
                 Id = projectId,
-                AuthorId = authorId,
                 Name = request.Name,
                 Status = (int)request.Status,
                 ShortName = shortName == null || !shortName.Any() ? null : shortName,
                 Description = description == null || !description.Any() ? null : description,
                 ShortDescription = shortDescription == null || !shortDescription.Any() ? null : shortDescription,
-                DepartmentId = departmentIds?[0],
-                CreatedAt = DateTime.UtcNow,
+                DepartmentId = request.DepartmentId,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = authorId,
                 Users = users
                     .Select(userId => new DbProjectUser
                     {
@@ -39,7 +39,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                         ProjectId = projectId,
                         UserId = userId,
                         Role = (int)request.Users.FirstOrDefault(u => u.UserId == userId).Role,
-                        AddedOn = DateTime.UtcNow,
+                        CreatedAtUtc = DateTime.UtcNow,
+                        CreatedBy = authorId,
                         IsActive = true
                     })
                     .ToList()

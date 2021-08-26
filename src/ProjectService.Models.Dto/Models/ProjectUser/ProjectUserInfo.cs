@@ -12,8 +12,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser
         public string Status { get; set; }
         public double Rate { get; set; }
         public int ProjectCount { get; set; }
-        public DateTime AddedOn { get; set; }
-        public DateTime? RemovedOn { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
+        public DateTime? ModifiedAtUtc { get; set; }
         public bool IsActive { get; set; }
         public ProjectUserRoleType Role { get; set; }
         public ImageInfo AvatarImage { get; set; }

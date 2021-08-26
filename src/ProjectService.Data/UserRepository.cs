@@ -3,6 +3,7 @@ using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -99,13 +100,15 @@ namespace LT.DigitalOffice.ProjectService.Data
             return _provider.ProjectsUsers.Where(u => userIds.Contains(u.UserId)).ToList();
         }
 
-        public void Remove(Guid userId)
+        public void Remove(Guid userId, Guid removedBy)
         {
             List<DbProjectUser> users = _provider.ProjectsUsers.Where(u => u.UserId == userId && u.IsActive).ToList();
 
             foreach (var user in users)
             {
                 user.IsActive = false;
+                user.ModifiedBy = removedBy;
+                user.ModifiedAtUtc = DateTime.UtcNow;
             }
 
             _provider.Save();

@@ -3,7 +3,7 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.JsonPatch;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces
+namespace LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces
 {
     [AutoInject]
     public interface IPatchDbTaskMapper
