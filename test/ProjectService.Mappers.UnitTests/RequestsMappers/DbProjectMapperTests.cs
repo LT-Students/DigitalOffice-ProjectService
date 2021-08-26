@@ -1,13 +1,11 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
+﻿using LT.DigitalOffice.ProjectService.Mappers.Db;
+using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
 {

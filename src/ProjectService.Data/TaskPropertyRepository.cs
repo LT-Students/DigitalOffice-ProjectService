@@ -35,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         public bool AreExistForProject(Guid projectId, params string[] propertyNames)
         {
             var dbPropertyNames = _provider.TaskProperties
-                .Where(tp => tp.ProjectId == projectId)
+                .Where(tp => tp.ProjectId == projectId || tp.ProjectId == null)
                 .Select(x => x.Name);
 
             return propertyNames.Any(x => dbPropertyNames.Contains(x));
@@ -63,7 +63,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             if (filter.ProjectId.HasValue)
             {
-                dbTaskProperties = dbTaskProperties.Where(tp => tp.ProjectId == filter.ProjectId.Value);
+                dbTaskProperties = dbTaskProperties.Where(tp => tp.ProjectId == filter.ProjectId.Value || tp.ProjectId == null);
             }
 
             if (filter.AuthorId.HasValue)

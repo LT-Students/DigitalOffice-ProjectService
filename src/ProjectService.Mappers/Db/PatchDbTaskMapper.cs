@@ -1,11 +1,11 @@
 using System;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
+namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
     public class PatchDbTaskMapper : IPatchDbTaskMapper
     {

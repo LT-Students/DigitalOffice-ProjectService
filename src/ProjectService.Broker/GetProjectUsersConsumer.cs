@@ -20,7 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
             return IGetProjectUsersResponse.CreateObj(
                 users
                     .Where(dbpu => request.ProjectUsers.Any(pu => pu.projectId == dbpu.ProjectId && pu.userId == dbpu.UserId))
-                    .Select(pu => new ProjectUserData(pu.UserId, pu.ProjectId, pu.AddedOn))
+                    .Select(pu => new ProjectUserData(pu.UserId, pu.ProjectId, pu.CreatedAtUtc))
                     .ToList());
         }
 

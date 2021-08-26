@@ -1,10 +1,11 @@
 ﻿using LT.DigitalOffice.ProjectService.Data.Provider;
+using LT.DigitalOffice.ProjectService.Mappers.Db;
+using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Helpers;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.UnitTestKernel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.AutoMock;
@@ -20,8 +21,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         private IDbTaskMapper _dbTaskMapper;
         private CreateTaskRequest _createTaskRequest;
         private AutoMocker _mocker;
+        private Mock<IHttpContextAccessor> _accessorMock;
 
-        private readonly Guid authorId = Guid.NewGuid();
+        private readonly Guid _authorId = Guid.NewGuid();
 
         private static DbSet<T> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
         {
@@ -41,9 +43,17 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            _accessorMock = new();
+            IDictionary<object, object> _items = new Dictionary<object, object>();
+            _items.Add("UserId", _authorId);
+
+            _accessorMock
+                .Setup(x => x.HttpContext.Items)
+                .Returns(_items);
+
             _mocker = new AutoMocker();
 
-            _dbTaskMapper = new DbTaskMapper();
+            _dbTaskMapper = new DbTaskMapper(_accessorMock.Object);
 
             _createTaskRequest = new CreateTaskRequest
             {
@@ -62,7 +72,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
         [Test]
         public void ShouldThrowArgumentNullExceptionWhenCreateTaskRequestIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null, authorId));
+            Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null, _authorId));
         }
 
         [Test]
@@ -94,7 +104,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 .Returns(GetQueryableMockDbSet(tasks));
 
             TaskNumberHelper.LoadCache(_mocker.GetMock<IDataProvider>().Object);
-            var dbTask = _dbTaskMapper.Map(_createTaskRequest, authorId);
+            var dbTask = _dbTaskMapper.Map(_createTaskRequest, _authorId);
             var expectedDbTask = new DbTask
             {
                 Id = dbTask.Id,
@@ -102,9 +112,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 Description = _createTaskRequest.Description,
                 PlannedMinutes = _createTaskRequest.PlannedMinutes,
                 AssignedTo = _createTaskRequest.AssignedTo,
-                AuthorId = authorId,
+                CreatedBy = _authorId,
                 ProjectId = _createTaskRequest.ProjectId,
-                CreatedAt = dbTask.CreatedAt,
+                CreatedAtUtc = dbTask.CreatedAtUtc,
                 ParentId = _createTaskRequest.ParentId,
                 Number = maxNumber + 1,
                 PriorityId = _createTaskRequest.PriorityId,

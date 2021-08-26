@@ -128,7 +128,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
             List<Guid> userIds = new()
             {
-                task.AuthorId,
+                task.CreatedBy,
             };
 
             if (task.AssignedTo.HasValue)
@@ -138,7 +138,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
             if (task.ParentTask != null)
             {
-                userIds.Add(task.ParentTask.AuthorId);
+                userIds.Add(task.ParentTask.CreatedBy);
             }
 
             Guid? parentTaskAssignedTo = task.ParentTask?.AssignedTo;
@@ -170,15 +170,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                         _taskInfoMapper.Map(
                             dbSubtask,
                             usersDataResponse.FirstOrDefault(x => x.Id == dbSubtask.AssignedTo),
-                            usersDataResponse.FirstOrDefault(x => x.Id == dbSubtask.AuthorId)));
+                            usersDataResponse.FirstOrDefault(x => x.Id == dbSubtask.CreatedBy)));
                 }
             }
 
             TaskResponse response = _taskResponseMapper.Map(
                 task,
-                usersDataResponse.FirstOrDefault(x => x.Id == task.AuthorId),
+                usersDataResponse.FirstOrDefault(x => x.Id == task.CreatedBy),
                 usersDataResponse.FirstOrDefault(x => parentTaskAssignedTo != null && x.Id == parentTaskAssignedTo),
-                usersDataResponse.FirstOrDefault(x => task.ParentTask != null && x.Id == task.ParentTask.AuthorId),
+                usersDataResponse.FirstOrDefault(x => task.ParentTask != null && x.Id == task.ParentTask.CreatedBy),
                 department?.Name,
                 usersDataResponse.FirstOrDefault(x => x.Id == task.AssignedTo),
                 subtasksInfo);

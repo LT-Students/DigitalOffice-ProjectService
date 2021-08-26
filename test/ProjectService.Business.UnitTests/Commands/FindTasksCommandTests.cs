@@ -57,9 +57,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                         Description = "Create smth in somewhere",
                         PlannedMinutes = 30,
                         AssignedTo = Guid.NewGuid(),
-                        AuthorId = Guid.NewGuid(),
+                        CreatedBy = Guid.NewGuid(),
                         ProjectId = projectId,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAtUtc = DateTime.UtcNow,
                         ParentId = Guid.NewGuid(),
                         Number = 2,
                         StatusId = Guid.NewGuid(),
@@ -94,7 +94,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = _dbTasks.ElementAt(0).ProjectId,
                     UserId = (Guid)_contextValues["UserId"],
-                    AddedOn = DateTime.Now,
+                    CreatedAtUtc = DateTime.UtcNow,
                     IsActive = true
                 },
                 new DbProjectUser
@@ -102,7 +102,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = _dbTasks.ElementAt(0).ProjectId,
                     UserId = (Guid)_contextValues["UserId"],
-                    AddedOn = DateTime.Now,
+                    CreatedAtUtc = DateTime.Now,
                     IsActive = true
                 }
             };
@@ -123,9 +123,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                             FirstName = "Ivan",
                             LastName = "Ivanov"
                         },
-                        Author = new UserTaskInfo
+                        CreatedBy = new UserTaskInfo
                         {
-                            Id = dbTask.AuthorId,
+                            Id = dbTask.CreatedBy,
                             FirstName = "Semen",
                             LastName = "Semenov"
                         },
@@ -134,7 +134,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                             Id = dbTask.ProjectId,
                             ShortName = "DO"
                         },
-                        CreatedAt = dbTask.CreatedAt,
+                        CreatedAtUtc = dbTask.CreatedAtUtc,
                         Number = 2,
                         PriorityName = "First",
                         StatusName = "New",
@@ -204,9 +204,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                             FirstName = "Ivan",
                             LastName = "Ivanov"
                         },
-                        Author = new UserTaskInfo
+                        CreatedBy = new UserTaskInfo
                         {
-                            Id = dbTask.AuthorId,
+                            Id = dbTask.CreatedBy,
                             FirstName = "Semen",
                             LastName = "Semenov"
                         },
@@ -215,7 +215,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                             Id = dbTask.ProjectId,
                             ShortName = "DO"
                         },
-                        CreatedAt = dbTask.CreatedAt,
+                        CreatedAtUtc = dbTask.CreatedAtUtc,
                         Number = 2,
                         PriorityName = "First",
                         StatusName = "New",
@@ -439,7 +439,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 
             foreach (var task in _tasksInfo)
             {
-                task.Author = null;
+                task.CreatedBy = null;
             }
 
             _mocker

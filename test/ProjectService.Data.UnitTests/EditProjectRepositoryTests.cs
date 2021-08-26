@@ -4,9 +4,11 @@ using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.UnitTestKernel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 using System;
@@ -24,6 +26,8 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         private DbProject _dbProjectAfter;
         private JsonPatchDocument<DbProject> _patchProject;
         private DbContextOptions<ProjectServiceDbContext> _dbOptionsProjectService;
+        private Guid _creatorId = Guid.NewGuid();
+        private Mock<IHttpContextAccessor> _accessorMock;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -32,26 +36,26 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             {
                 Id = Guid.NewGuid(),
                 DepartmentId = Guid.NewGuid(),
-                AuthorId = Guid.NewGuid(),
+                CreatedBy = Guid.NewGuid(),
                 Status = (int)ProjectStatusType.Active,
                 Name = "Name",
                 ShortName = "ShortName",
                 Description = "Description",
                 ShortDescription = "ShortDescription",
-                CreatedAt = DateTime.UtcNow
+                CreatedAtUtc = DateTime.UtcNow
             };
 
             _dbProjectAfter = new DbProject
             {
                 Id = _dbProjectBefore.Id,
                 DepartmentId = Guid.NewGuid(),
-                AuthorId = _dbProjectBefore.AuthorId,
+                CreatedBy = _dbProjectBefore.CreatedBy,
                 Status = (int)ProjectStatusType.Closed,
                 Name = "Name1",
                 ShortName = "ShortName1",
                 Description = "Description1",
                 ShortDescription = "ShortDescription1",
-                CreatedAt = _dbProjectBefore.CreatedAt
+                CreatedAtUtc = _dbProjectBefore.CreatedAtUtc
             };
 
             _patchProject = new JsonPatchDocument<DbProject>(new List<Operation<DbProject>>
@@ -98,12 +102,20 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         [SetUp]
         public void SetUp()
         {
+            _accessorMock = new();
+            IDictionary<object, object> _items = new Dictionary<object, object>();
+            _items.Add("UserId", _creatorId);
+
+            _accessorMock
+                .Setup(x => x.HttpContext.Items)
+                .Returns(_items);
+
             _dbOptionsProjectService = new DbContextOptionsBuilder<ProjectServiceDbContext>()
                 .UseInMemoryDatabase(databaseName: "ProjectServiceTest")
                 .Options;
 
             _provider = new ProjectServiceDbContext(_dbOptionsProjectService);
-            _repository = new ProjectRepository(_provider);
+            _repository = new ProjectRepository(_provider, _accessorMock.Object);
         }
 
         [Test]
@@ -115,6 +127,8 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             SerializerAssert.AreEqual(true, _repository.Edit(_dbProjectBefore, _patchProject));
 
             var patchedProject = _provider.Projects.FirstOrDefault(p => p.Id == _dbProjectBefore.Id);
+            _dbProjectAfter.ModifiedAtUtc = patchedProject.ModifiedAtUtc;
+            _dbProjectAfter.ModifiedBy = patchedProject.ModifiedBy;
             SerializerAssert.AreEqual(_dbProjectAfter, patchedProject);
         }
 

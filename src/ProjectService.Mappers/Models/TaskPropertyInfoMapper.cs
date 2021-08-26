@@ -19,9 +19,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
             {
                 Id = dbTaskProperty.Id,
                 ProjectId = dbTaskProperty.ProjectId,
-                AuthorId = dbTaskProperty.AuthorId,
+                CreatedBy = dbTaskProperty.CreatedBy,
                 Name = dbTaskProperty.Name,
-                CreatedAt = dbTaskProperty.CreatedAt,
+                CreatedAtUtc = dbTaskProperty.CreatedAtUtc,
                 Description = dbTaskProperty.Description,
                 IsActive = dbTaskProperty.IsActive,
                 PropertyType = (TaskPropertyType)dbTaskProperty.PropertyType
