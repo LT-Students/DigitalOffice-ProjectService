@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProjectFiles", x => x.Id);
+                    table.PrimaryKey("PK_ProjectsFiles", x => x.Id);
                 });
         }
 
@@ -69,7 +69,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProjectUsers", x => x.Id);
+                    table.PrimaryKey("PK_ProjectsUsers", x => x.Id);
                 });
         }
 
@@ -113,7 +113,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                     PropertyType = table.Column<int>(nullable: false),
                     Description = table.Column<string>(nullable: true),
                     CreatedBy = table.Column<Guid?>(nullable: true),
-                    CreatedAtUtc = table.Column<DateTime>(nullable: true),
+                    CreatedAtUtc = table.Column<DateTime>(nullable: false),
                     ModifiedBy = table.Column<Guid?>(nullable: true),
                     ModifiedAtUtc = table.Column<DateTime?>(nullable: true),
                     IsActive = table.Column<bool>(nullable: false)
