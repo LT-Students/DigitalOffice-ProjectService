@@ -79,7 +79,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Id = _projectId
             };
 
-            _projectRepository.CreateNewProject(newProject);
+            _projectRepository.Create(newProject);
         }
 
         [Test]

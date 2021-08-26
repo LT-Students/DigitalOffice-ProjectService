@@ -28,8 +28,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// <summary>
         /// Adds new project to the database. Returns the id of the added project.
         /// </summary>
-        /// <param name="item">Project to add.</param>
-        void CreateNewProject(DbProject item);
+        /// <param name="dbProject">Project to add.</param>
+        Guid Create(DbProject dbProject);
 
         /// <summary>
         /// Edits the existing project in the database.
