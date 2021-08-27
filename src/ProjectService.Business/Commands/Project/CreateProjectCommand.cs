@@ -25,7 +25,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -41,7 +40,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
         private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
         private readonly IRequestClient<ICreateImagesProjectRequest> _rcImages;
-        private readonly ICreateImageDataMapper _createImageDataMapper;
         private readonly IRequestClient<ICheckDepartmentsExistence> _rcCheckDepartmentsExistence;
 
         private List<Guid> CheckDepartmentExistence(Guid? departmentId, List<string> errors)
@@ -163,7 +161,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
         }
 
-        private List<Guid> CreateImage(List<CreateProjectImageRequest> projectImages, List<string> errors)
+        private List<Guid> CreateImage(List<CreateProjectImageRequest> projectImages, Guid userId, List<string> errors)
         {
             if (projectImages == null || projectImages.Count == 0)
             {
@@ -171,36 +169,27 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
 
             string errorMessage = "Can not get images. Please try again later.";
-            const string logMessage = "Errors while getting images with ids: {Ids}.";
-
-            List<CreateImageData> imageData = new();
-
-            foreach (CreateProjectImageRequest request in projectImages)
-            {
-                imageData.Add(_createImageDataMapper.Map(request));
-            }
+            const string logMessage = "Errors while creating images.";
 
             try
             {
                 Response<IOperationResult<ICreateImagesResponse>> brokerResponse = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
-                   ICreateImagesProjectRequest.CreateObj(imageData)).Result;
+                   ICreateImagesProjectRequest.CreateObj(
+                       projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).ToList())).Result;
 
-                if (brokerResponse.Message.IsSuccess)
+                if (brokerResponse.Message.IsSuccess && brokerResponse.Message.Body != null)
                 {
                     return brokerResponse.Message.Body.ImageIds;
                 }
-                else
-                {
-                    const string warningMessage = logMessage + "Errors: {Errors}";
-                    _logger.LogWarning(
-                        warningMessage,
-                        string.Join(", ", projectImages),
-                        string.Join('\n', brokerResponse.Message.Errors));
-                }
+
+                _logger.LogWarning(
+                    logMessage,
+                    string.Join('\n', brokerResponse.Message.Errors));
+
             }
             catch (Exception exc)
             {
-                _logger.LogError(exc, logMessage, string.Join(", ", projectImages));
+                _logger.LogError(exc, logMessage);
             }
 
             errors.Add(errorMessage);
@@ -214,7 +203,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IAccessValidator accessValidator,
             IDbProjectMapper dbProjectMapper,
             IProjectInfoMapper projectInfoMapper,
-            ICreateImageDataMapper createImageDataMapper,
             ILogger<CreateProjectCommand> logger,
             IHttpContextAccessor httpContextAccessor,
             IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
@@ -234,7 +222,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _rcCheckUsersExistence = rcCheckUsersExistence;
             _rcCreateWorkTime = rcCreateWorkTime;
             _rcImages = rcImages;
-            _createImageDataMapper = createImageDataMapper;
             _rcCheckDepartmentsExistence = rcCheckDepartmentsExistence;
         }
 
@@ -269,16 +256,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
             List<Guid> existDepartments = CheckDepartmentExistence(request.DepartmentId, response.Errors);
 
-            List<Guid> imageIds = null;
-            if (request.ProjectsImages != null)
-            {
-                imageIds = CreateImage(request.ProjectsImages, response.Errors);
-            }
-
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
+
+            List<Guid> imageIds = CreateImage(request.ProjectsImages, userId, response.Errors);
+
             DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, existDepartments, imageIds);
 
-            response.Body = _repository.Create(dbProject);
+            response.Body = _repository.Create(_dbProjectMapper.Map(request, userId, existUsers, existDepartments, imageIds));
 
             CreateWorkTime(dbProject.Id, existUsers, response.Errors);
 

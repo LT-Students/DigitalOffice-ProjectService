@@ -51,6 +51,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         [AutoInjectRequest(typeof(IDeleteImagesProjectRequest))]
         public string DeleteImagesProjectEndpoint { get; set; }
 
+        [AutoInjectRequest(typeof(IGetImagesUserRequest))]
+        public string GetImagesUserEndpoint { get; set; }
+
         [AutoInjectRequest(typeof(ICheckDepartmentsExistence))]
         public string CheckDepartmentsExistenceEndpoint { get; set; }
 

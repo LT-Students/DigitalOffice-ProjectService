@@ -71,7 +71,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             return null;
         }
 
-        private List<ImageInfo> GetImages(List<Guid> imageIds, List<string> errors)
+        private List<ImageInfo> GetUserAvatars(List<Guid> imageIds, List<string> errors)
         {
             if (imageIds == null || imageIds.Count == 0)
             {
@@ -84,9 +84,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             try
             {
                 IOperationResult<IGetImagesResponse> response = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
-                    IGetImagesRequest.CreateObj(imageIds)).Result.Message;
+                    IGetImagesUserRequest.CreateObj(imageIds)).Result.Message;
 
-                if (response.IsSuccess)
+                if (response.IsSuccess && response.Body != null)
                 {
                     return response.Body.Images.Select(_imageMapper.Map).ToList();
                 }
@@ -124,7 +124,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 Response<IOperationResult<IGetImagesResponse>> brokerResponse = _rcProjectImages.GetResponse<IOperationResult<IGetImagesResponse>>(
                    IGetImagesProjectRequest.CreateObj(imageIds)).Result;
 
-                if (brokerResponse.Message.IsSuccess)
+                if (brokerResponse.Message.IsSuccess && brokerResponse.Message.Body != null)
                 {
                     return brokerResponse.Message.Body.Images.Select(_imageMapper.Map).ToList();
                 }
@@ -175,7 +175,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                     IGetUsersDepartmentsUsersPositionsResponse userPositionsAndDepartments =
                         GetUserDepartmentsAndPositions(usersIds, errors);
 
-                    var images = GetImages(
+                    var images = GetUserAvatars(
                         usersDataResponse
                             .Body
                             .UsersData
