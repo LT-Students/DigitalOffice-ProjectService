@@ -21,6 +21,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LT.DigitalOffice.Models.Broker.Requests.Image;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -38,6 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
         private readonly IRequestClient<IGetUsersDepartmentsUsersPositionsRequest> _rcGetUsersDepartmentsUsersPositions;
         private readonly IRequestClient<IGetImagesRequest> _rcImages;
+        private readonly IRequestClient<IGetImagesProjectRequest> _requestClient;
 
         private DepartmentInfo GetDepartment(Guid departmentId, List<string> errors)
         {
@@ -94,6 +97,44 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                         warningMessage,
                         string.Join(", ", imageIds),
                         string.Join('\n', response.Errors));
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, logMessage, string.Join(", ", imageIds));
+            }
+
+            errors.Add(errorMessage);
+
+            return new();
+        }
+
+        private async Task<List<ImageInfo>> GetProjectImages(List<Guid> imageIds, List<string> errors)
+        {
+            if (imageIds == null || imageIds.Count == 0)
+            {
+                return new();
+            }
+
+            string errorMessage = "Can not get images. Please try again later.";
+            const string logMessage = "Errors while getting images with ids: {Ids}.";
+
+            try
+            {
+                Response<IOperationResult<IGetImagesResponse>> brokerResponse = await _requestClient.GetResponse<IOperationResult<IGetImagesResponse>>(
+                   IGetImagesProjectRequest.CreateObj(imageIds));
+
+                if (brokerResponse.Message.IsSuccess)
+                {
+                    return brokerResponse.Message.Body.Images.Select(_imageMapper.Map).ToList();
+                }
+                else
+                {
+                    const string warningMessage = logMessage + "Errors: {Errors}";
+                    _logger.LogWarning(
+                        warningMessage,
+                        string.Join(", ", imageIds),
+                        string.Join('\n', brokerResponse.Message.Errors));
                 }
             }
             catch (Exception exc)
@@ -222,7 +263,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IRequestClient<IGetDepartmentRequest> departmentRequestClient,
             IRequestClient<IGetUsersDataRequest> usersDataRequestClient,
             IRequestClient<IGetUsersDepartmentsUsersPositionsRequest> rcGetUsersDepartmentsUsersPositions,
-            IRequestClient<IGetImagesRequest> rcImages)
+            IRequestClient<IGetImagesRequest> rcImages,
+            IRequestClient<IGetImagesProjectRequest> requestClient)
         {
             _logger = logger;
             _repository = repository;
@@ -236,6 +278,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _usersDataRequestClient = usersDataRequestClient;
             _rcGetUsersDepartmentsUsersPositions = rcGetUsersDepartmentsUsersPositions;
             _rcImages = rcImages;
+            _requestClient = requestClient;
         }
 
         public OperationResultResponse<ProjectResponse> Execute(GetProjectFilter filter)
@@ -251,10 +294,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             List<ProjectUserInfo> usersInfo = GetProjectUsersInfo(dbProject.Users, response.Errors);
             List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
-            List<ProjectImageInfo> imagesinfo ;
+            List<ImageInfo> imagesinfo = GetProjectImages(dbProject.ProjectImages.Select(x => x.ImageId).ToList(), response.Errors).Result;
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
-            response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, department);
+            response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, imagesinfo, department);
 
             return response;
         }
