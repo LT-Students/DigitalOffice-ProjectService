@@ -2,16 +2,12 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
     [DbContext(typeof(ProjectServiceDbContext))]
     [Migration("20210824232700_AddProjectsImagesTable")]
-    public class AddProjectImagesTable : Migration
+    public class AddProjectsImagesTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -25,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                },
                constraints: table =>
                {
-                   table.PrimaryKey("PK_ProjectImages", x => x.Id);
+                   table.PrimaryKey("PK_ProjectsImages", x => x.Id);
                });
         }
 

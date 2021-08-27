@@ -6,7 +6,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 {
     public class DbProjectImage
     {
-        public const string TableName = "ProjectImages";
+        public const string TableName = "ProjectsImages";
+
         public Guid Id { get; set; }
         public Guid ProjectId { get; set; }
         public Guid ImageId { get; set; }
@@ -25,12 +26,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .HasKey(p => p.Id);
 
             builder
-                .Property(P => P.ImageId)
-                .IsRequired();
-
-            builder
                 .HasOne(pu => pu.Project)
-                .WithMany(p => p.ProjectImages);
+                .WithMany(p => p.ProjectsImages);
         }
     }
 }

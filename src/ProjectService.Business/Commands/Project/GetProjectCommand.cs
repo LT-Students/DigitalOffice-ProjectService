@@ -40,7 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
         private readonly IRequestClient<IGetUsersDepartmentsUsersPositionsRequest> _rcGetUsersDepartmentsUsersPositions;
         private readonly IRequestClient<IGetImagesRequest> _rcImages;
-        private readonly IRequestClient<IGetImagesProjectRequest> _requestClient;
+        private readonly IRequestClient<IGetImagesProjectRequest> _rcProjectImages;
 
         private DepartmentInfo GetDepartment(Guid departmentId, List<string> errors)
         {
@@ -109,7 +109,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             return new();
         }
 
-        private async Task<List<ImageInfo>> GetProjectImages(List<Guid> imageIds, List<string> errors)
+        private List<ImageInfo> GetProjectImages(List<Guid> imageIds, List<string> errors)
         {
             if (imageIds == null || imageIds.Count == 0)
             {
@@ -121,8 +121,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             try
             {
-                Response<IOperationResult<IGetImagesResponse>> brokerResponse = await _requestClient.GetResponse<IOperationResult<IGetImagesResponse>>(
-                   IGetImagesProjectRequest.CreateObj(imageIds));
+                Response<IOperationResult<IGetImagesResponse>> brokerResponse = _rcProjectImages.GetResponse<IOperationResult<IGetImagesResponse>>(
+                   IGetImagesProjectRequest.CreateObj(imageIds)).Result;
 
                 if (brokerResponse.Message.IsSuccess)
                 {
@@ -264,7 +264,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IRequestClient<IGetUsersDataRequest> usersDataRequestClient,
             IRequestClient<IGetUsersDepartmentsUsersPositionsRequest> rcGetUsersDepartmentsUsersPositions,
             IRequestClient<IGetImagesRequest> rcImages,
-            IRequestClient<IGetImagesProjectRequest> requestClient)
+            IRequestClient<IGetImagesProjectRequest> rcProjectImages)
         {
             _logger = logger;
             _repository = repository;
@@ -278,7 +278,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _usersDataRequestClient = usersDataRequestClient;
             _rcGetUsersDepartmentsUsersPositions = rcGetUsersDepartmentsUsersPositions;
             _rcImages = rcImages;
-            _requestClient = requestClient;
+            _rcProjectImages = rcProjectImages;
         }
 
         public OperationResultResponse<ProjectResponse> Execute(GetProjectFilter filter)
@@ -294,7 +294,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             List<ProjectUserInfo> usersInfo = GetProjectUsersInfo(dbProject.Users, response.Errors);
             List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
-            List<ImageInfo> imagesinfo = GetProjectImages(dbProject.ProjectImages.Select(x => x.ImageId).ToList(), response.Errors).Result;
+            List<ImageInfo> imagesinfo = GetProjectImages(dbProject.ProjectsImages.Select(x => x.ImageId).ToList(), response.Errors);
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
             response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, imagesinfo, department);

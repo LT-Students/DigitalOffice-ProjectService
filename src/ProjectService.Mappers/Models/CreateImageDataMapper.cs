@@ -17,13 +17,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
 
         public CreateImageData Map(CreateProjectImageRequest request)
         {
-            CreateImageData imageData = new CreateImageData(
+            return new CreateImageData(
                 request.Name,
                 request.Content,
                 request.Extension,
                 _httpContextAccessor.HttpContext.GetUserId());
-
-            return imageData;
         }
     }
 }
