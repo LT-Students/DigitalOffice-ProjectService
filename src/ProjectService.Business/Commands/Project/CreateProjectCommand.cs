@@ -161,14 +161,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
         }
 
-        private List<Guid> CreateImage(List<CreateProjectImageRequest> projectImages, Guid userId, List<string> errors)
+        private List<Guid> CreateImage(List<Image> projectImages, Guid userId, List<string> errors)
         {
             if (projectImages == null || projectImages.Count == 0)
             {
-                return new();
+                return null;
             }
 
-            string errorMessage = "Can not get images. Please try again later.";
+            string errorMessage = "Can not create images. Please try again later.";
             const string logMessage = "Errors while creating images.";
 
             try
@@ -181,11 +181,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 {
                     return brokerResponse.Message.Body.ImageIds;
                 }
-
-                _logger.LogWarning(
-                    logMessage,
-                    string.Join('\n', brokerResponse.Message.Errors));
-
             }
             catch (Exception exc)
             {
@@ -194,7 +189,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             errors.Add(errorMessage);
 
-            return new();
+            return null;
         }
 
         public CreateProjectCommand(
@@ -225,7 +220,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _rcCheckDepartmentsExistence = rcCheckDepartmentsExistence;
         }
 
-        public OperationResultResponse<Guid> Execute(ProjectRequest request)
+        public OperationResultResponse<Guid> Execute(CreateProjectRequest request)
         {
             if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
@@ -258,13 +253,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
-            List<Guid> imageIds = CreateImage(request.ProjectsImages, userId, response.Errors);
-
-            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, existDepartments, imageIds);
+            List<Guid> imageIds = CreateImage(request.ProjectsImages.ToList(), userId, response.Errors);
 
             response.Body = _repository.Create(_dbProjectMapper.Map(request, userId, existUsers, existDepartments, imageIds));
 
-            CreateWorkTime(dbProject.Id, existUsers, response.Errors);
+            CreateWorkTime(
+                _dbProjectMapper.Map(request, userId, existUsers, existDepartments, imageIds).Id,
+                existUsers,
+                response.Errors);
 
             CreateWorkspace(request.Name, userId, existUsers, response.Errors);
 

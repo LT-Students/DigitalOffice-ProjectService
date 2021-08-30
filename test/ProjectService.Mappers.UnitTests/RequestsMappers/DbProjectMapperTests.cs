@@ -13,14 +13,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
     {
         private IDbProjectMapper _projectRequestMapper;
 
-        private ProjectRequest _newProject;
+        private CreateProjectRequest _newProject;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _projectRequestMapper = new DbProjectMapper();
 
-            _newProject = new ProjectRequest
+            _newProject = new CreateProjectRequest
             {
                 Name = "Project for Lanit-Tercom",
                 ShortName = "Project",

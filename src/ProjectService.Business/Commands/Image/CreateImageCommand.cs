@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         {
             if (images == null || images.Count == 0)
             {
-                return new();
+                return null;
             }
 
             string errorMessage = "Can not get images. Please try again later.";
@@ -49,11 +49,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 {
                     return brokerResponse.Message.Body.ImageIds;
                 }
-
-                _logger.LogWarning(
-                    logMessage,
-                    string.Join('\n', brokerResponse.Message.Errors));
-
             }
             catch (Exception exc)
             {
@@ -62,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
             errors.Add(errorMessage);
 
-            return new();
+            return null;
         }
 
         public CreateImageCommand(

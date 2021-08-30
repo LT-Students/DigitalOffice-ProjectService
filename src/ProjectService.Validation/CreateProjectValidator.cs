@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-    public class CreateProjectValidator : AbstractValidator<ProjectRequest>, ICreateProjectValidator
+    public class CreateProjectValidator : AbstractValidator<CreateProjectRequest>, ICreateProjectValidator
     {
         public CreateProjectValidator()
         {

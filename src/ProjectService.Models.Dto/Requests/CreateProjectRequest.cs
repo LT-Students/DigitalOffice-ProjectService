@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
-    public class ProjectRequest
+    public class CreateProjectRequest
     {
         public string Name { get; set; }
         public string ShortName { get; set; }
@@ -14,6 +14,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
         public Guid? DepartmentId { get; set; }
         public ProjectStatusType Status { get; set; }
         public IEnumerable<ProjectUserRequest> Users { get; set; }
-        public List<CreateProjectImageRequest> ProjectsImages { get; set; }
+        public IEnumerable<Image> ProjectsImages { get; set; }
     }
 }

@@ -74,7 +74,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         {
             if (imageIds == null || imageIds.Count == 0)
             {
-                return new();
+                return null;
             }
 
             string errorMessage = "Can not get images. Please try again later.";
@@ -105,14 +105,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             errors.Add(errorMessage);
 
-            return new();
+            return null;
         }
 
         private List<ImageInfo> GetProjectImages(List<Guid> imageIds, List<string> errors)
         {
             if (imageIds == null || imageIds.Count == 0)
             {
-                return new();
+                return null;
             }
 
             string errorMessage = "Can not get images. Please try again later.";
@@ -143,7 +143,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             errors.Add(errorMessage);
 
-            return new();
+            return null;
         }
 
         private List<ProjectUserInfo> GetProjectUsersInfo(IEnumerable<DbProjectUser> projectUsers, List<string> errors)
@@ -211,7 +211,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             errors.Add($"Can not get users info for UserIds {string.Join('\n', usersIds)}. Please try again later.");
 
-            return new();
+            return null;
         }
 
         private IGetUsersDepartmentsUsersPositionsResponse GetUserDepartmentsAndPositions(
