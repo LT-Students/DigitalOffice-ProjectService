@@ -3,7 +3,6 @@ using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -118,6 +117,15 @@ namespace LT.DigitalOffice.ProjectService.Data
         {
             var dbIds = _provider.ProjectsUsers.Where(x => x.IsActive).Select(x => x.UserId);
             return ids.All(x => dbIds.Contains(x));
+        }
+
+        public List<DbProjectUser> Find(Guid projectId, int skipCount, int takeCount, out int totalCount)
+        {
+            IQueryable<DbProjectUser> users = _provider.ProjectsUsers.Where(pu => pu.ProjectId == projectId && pu.IsActive).AsQueryable();
+
+            totalCount = users.Count();
+
+            return users.Skip(skipCount).Take(takeCount).ToList();
         }
     }
 }

@@ -64,5 +64,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
         public string GetProjectUsersEndpoint { get; set; }
 
+        public string FindProjectUsersEndpoint { get; set; }
+
     }
 }

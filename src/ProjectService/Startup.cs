@@ -186,6 +186,7 @@ namespace LT.DigitalOffice.ProjectService
             x.AddConsumer<GetProjectsUsersConsumer>();
             x.AddConsumer<DisactivateUserConsumer>();
             x.AddConsumer<GetProjectUsersConsumer>();
+            x.AddConsumer<FindProjectUsersConsumer>();
         }
 
         private void ConfigureEndpoints(
@@ -241,6 +242,11 @@ namespace LT.DigitalOffice.ProjectService
             cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectUsersEndpoint, ep =>
             {
                 ep.ConfigureConsumer<GetProjectUsersConsumer>(context);
+            });
+
+            cfg.ReceiveEndpoint(rabbitMqConfig.FindProjectUsersEndpoint, ep =>
+            {
+                ep.ConfigureConsumer<FindProjectUsersConsumer>(context);
             });
         }
 
