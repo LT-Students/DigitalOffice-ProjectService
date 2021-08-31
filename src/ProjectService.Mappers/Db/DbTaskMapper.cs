@@ -1,13 +1,22 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.Helpers;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+﻿using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Helpers;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using Microsoft.AspNetCore.Http;
 using System;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
+namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
     public class DbTaskMapper : IDbTaskMapper
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public DbTaskMapper(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+
         public DbTask Map(CreateTaskRequest taskRequest, Guid authorId)
         {
             if (taskRequest == null)
@@ -22,9 +31,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                 Description = string.IsNullOrEmpty(taskRequest.Description?.Trim()) ? null : taskRequest.Description.Trim(),
                 PlannedMinutes = taskRequest.PlannedMinutes,
                 AssignedTo = taskRequest.AssignedTo,
-                AuthorId = authorId,
                 ProjectId = taskRequest.ProjectId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
                 ParentId = taskRequest.ParentId,
                 PriorityId = taskRequest.PriorityId,
                 StatusId = taskRequest.StatusId,

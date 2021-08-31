@@ -1,8 +1,10 @@
 ﻿using LT.DigitalOffice.Kernel.Exceptions.Models;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,10 +16,14 @@ namespace LT.DigitalOffice.ProjectService.Data
     public class ProjectRepository : IProjectRepository
     {
         private readonly IDataProvider _provider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ProjectRepository(IDataProvider provider)
+        public ProjectRepository(
+            IDataProvider provider,
+            IHttpContextAccessor httpContextAccessor)
         {
-            this._provider = provider;
+            _provider = provider;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public DbProject Get(GetProjectFilter filter)
@@ -56,15 +62,19 @@ namespace LT.DigitalOffice.ProjectService.Data
             return _provider.Projects.Where(p => p.DepartmentId == departmentId);
         }
 
-        public void CreateNewProject(DbProject newProject)
+        public Guid Create(DbProject dbProject)
         {
-            _provider.Projects.Add(newProject);
+            _provider.Projects.Add(dbProject);
             _provider.Save();
+
+            return dbProject.Id;
         }
 
         public bool Edit(DbProject dbProject, JsonPatchDocument<DbProject> request)
         {
             request.ApplyTo(dbProject);
+            dbProject.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
+            dbProject.ModifiedAtUtc = DateTime.UtcNow;
             _provider.Save();
 
             return true;

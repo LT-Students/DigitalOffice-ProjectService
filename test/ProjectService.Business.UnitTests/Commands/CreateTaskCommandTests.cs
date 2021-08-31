@@ -8,7 +8,7 @@ using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
@@ -91,9 +91,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 Description = "Create smth in somewhere",
                 PlannedMinutes = _newRequest.PlannedMinutes,
                 AssignedTo = _newRequest.AssignedTo,
-                AuthorId = _authorId,
+                CreatedBy = _authorId,
                 ProjectId = _newRequest.ProjectId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow,
                 ParentId = _newRequest.ParentId,
                 Number = 2,
                 Priority = new DbTaskProperty()

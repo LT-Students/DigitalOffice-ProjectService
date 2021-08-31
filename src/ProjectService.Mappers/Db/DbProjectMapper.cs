@@ -1,15 +1,15 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
+namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
     public class DbProjectMapper : IDbProjectMapper
     {
-        public DbProject Map(ProjectRequest request, Guid authorId, List<Guid> users)
+        public DbProject Map(ProjectRequest request, Guid authorId, List<Guid> users, List<Guid> departmentIds)
         {
             if (request == null)
             {
@@ -24,14 +24,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
             return new DbProject
             {
                 Id = projectId,
-                AuthorId = authorId,
                 Name = request.Name,
                 Status = (int)request.Status,
                 ShortName = shortName == null || !shortName.Any() ? null : shortName,
                 Description = description == null || !description.Any() ? null : description,
                 ShortDescription = shortDescription == null || !shortDescription.Any() ? null : shortDescription,
                 DepartmentId = request.DepartmentId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = authorId,
                 Users = users
                     .Select(userId => new DbProjectUser
                     {
@@ -39,12 +39,12 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers
                         ProjectId = projectId,
                         UserId = userId,
                         Role = (int)request.Users.FirstOrDefault(u => u.UserId == userId).Role,
-                        AddedOn = DateTime.UtcNow,
+                        CreatedAtUtc = DateTime.UtcNow,
+                        CreatedBy = authorId,
                         IsActive = true
                     })
                     .ToList()
             };
-
         }
     }
 }

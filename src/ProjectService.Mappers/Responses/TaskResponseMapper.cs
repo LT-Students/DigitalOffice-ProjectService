@@ -48,7 +48,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
                 Type = dbTask.Type != null
                     ? _taskPropertyInfoMapper.Map(dbTask.Type)
                     : null,
-                Author = _userTaskInfoMapper.Map(authorUserData),
+                CreatedBy = _userTaskInfoMapper.Map(authorUserData),
                 Status = dbTask.Status != null
                     ? _taskPropertyInfoMapper.Map(dbTask.Status)
                     : null,
@@ -69,7 +69,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
                 Description = dbTask.Description,
                 Number = dbTask.Number,
                 PlannedMinutes = dbTask.PlannedMinutes,
-                CreatedAt = dbTask.CreatedAt,
+                CreatedAtUtc = dbTask.CreatedAtUtc,
                 Subtasks = subtasksInfo
             };
         }

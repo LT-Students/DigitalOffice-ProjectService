@@ -5,7 +5,9 @@ using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -22,16 +24,26 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
         private DbProjectFile _dbFile;
         private DbProjectUser _activeDbUser;
         private DbProjectUser _notActiveDbUser;
+        private Guid _creatorId = Guid.NewGuid();
+        private Mock<IHttpContextAccessor> _accessorMock;
 
         [SetUp]
         public void SetUp()
         {
+            _accessorMock = new();
+            IDictionary<object, object> _items = new Dictionary<object, object>();
+            _items.Add("UserId", _creatorId);
+
+            _accessorMock
+                .Setup(x => x.HttpContext.Items)
+                .Returns(_items);
+
             var dbOptions = new DbContextOptionsBuilder<ProjectServiceDbContext>()
                                     .UseInMemoryDatabase("InMemoryDatabase")
                                     .Options;
 
             _provider = new ProjectServiceDbContext(dbOptions);
-            _repository = new ProjectRepository(_provider);
+            _repository = new ProjectRepository(_provider, _accessorMock.Object);
 
             _dbProject = new DbProject
             {
