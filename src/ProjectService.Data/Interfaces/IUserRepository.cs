@@ -48,8 +48,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
         void Remove(Guid userId, Guid removedBy);
 
-        List<DbProjectUser> Get(Guid projectId, int? skipCount, int? takeCount, out int totalCount);
-
         List<DbProjectUser> Get(IGetProjectsUsersRequest request, out int totalCount);
     }
 }

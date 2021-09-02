@@ -56,7 +56,5 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         bool IsExist(Guid id);
 
         bool IsProjectNameExist(string name);
-
-        Dictionary<Guid, List<Guid>> GetProjectsUsers();
     }
 }
