@@ -1,5 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -186,6 +187,57 @@ namespace LT.DigitalOffice.ProjectService.Data
             }
 
             return response;
+        }
+
+        public List<DbProject> Get(IGetProjectsRequest request, out int totalCount)
+        {
+            IQueryable<DbProject> projects = _provider.Projects.AsQueryable();
+
+            if (request.UserId.HasValue)
+            {
+                if (request.IncludeUsers)
+                {
+                    projects = _provider.Projects
+                        .Include(pu => pu.Users)
+                        .Where(p => p.Users.Any(u => u.UserId == request.UserId.Value));
+                }
+                else
+                {
+                    projects = _provider.ProjectsUsers
+                        .Where(pu => pu.UserId == request.UserId)
+                        .Include(pu => pu.Project)
+                        .Select(pu => pu.Project);
+                }
+            }
+
+            if (request.ProjectsIds != null && request.ProjectsIds.Any())
+            {
+                projects = projects.Where(p => request.ProjectsIds.Contains(p.Id));
+            }
+
+            if (request.DepartmentId.HasValue)
+            {
+                projects = projects.Where(p => p.DepartmentId == request.DepartmentId);
+            }
+
+            totalCount = projects.Count();
+
+            if (request.SkipCount.HasValue)
+            {
+                projects = projects.Skip(request.SkipCount.Value);
+            }
+
+            if (request.TakeCount.HasValue)
+            {
+                projects = projects.Skip(request.TakeCount.Value);
+            }
+
+            if (request.IncludeUsers && !request.UserId.HasValue)
+            {
+                projects = projects.Include(p => p.Users);
+            }
+
+            return projects.ToList();
         }
     }
 }

@@ -176,17 +176,11 @@ namespace LT.DigitalOffice.ProjectService
 
         private void ConfigureConsumers(IServiceCollectionBusConfigurator x)
         {
-            x.AddConsumer<GetProjectIdsConsumer>();
-            x.AddConsumer<GetProjectInfoConsumer>();
-            x.AddConsumer<GetUserProjectsInfoConsumer>();
             x.AddConsumer<SearchProjectsConsumer>();
-            x.AddConsumer<GetDepartmentProjectsConsumer>();
-            x.AddConsumer<FindProjectsConsumer>();
             x.AddConsumer<FindParseEntitiesConsumer>();
             x.AddConsumer<GetProjectsUsersConsumer>();
             x.AddConsumer<DisactivateUserConsumer>();
-            x.AddConsumer<GetProjectUsersConsumer>();
-            x.AddConsumer<FindProjectUsersConsumer>();
+            x.AddConsumer<GetProjectsConsumer>();
         }
 
         private void ConfigureEndpoints(
@@ -194,34 +188,9 @@ namespace LT.DigitalOffice.ProjectService
             IRabbitMqBusFactoryConfigurator cfg,
             RabbitMqConfig rabbitMqConfig)
         {
-            cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectIdsEndpoint, ep =>
-            {
-                ep.ConfigureConsumer<GetProjectIdsConsumer>(context);
-            });
-
-            cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectInfoEndpoint, ep =>
-            {
-                ep.ConfigureConsumer<GetProjectInfoConsumer>(context);
-            });
-
-            cfg.ReceiveEndpoint(rabbitMqConfig.GetUserProjectsInfoEndpoint, ep =>
-            {
-                ep.ConfigureConsumer<GetUserProjectsInfoConsumer>(context);
-            });
-
             cfg.ReceiveEndpoint(rabbitMqConfig.SearchProjectsEndpoint, ep =>
             {
                 ep.ConfigureConsumer<SearchProjectsConsumer>(context);
-            });
-
-            cfg.ReceiveEndpoint(rabbitMqConfig.GetDepartmentProjectsEndpoint, ep =>
-            {
-                ep.ConfigureConsumer<GetDepartmentProjectsConsumer>(context);
-            });
-
-            cfg.ReceiveEndpoint(rabbitMqConfig.FindProjectsEndpoint, ep =>
-            {
-                ep.ConfigureConsumer<FindProjectsConsumer>(context);
             });
 
             cfg.ReceiveEndpoint(rabbitMqConfig.FindParseEntitiesEndpoint, ep =>
@@ -239,14 +208,9 @@ namespace LT.DigitalOffice.ProjectService
                 ep.ConfigureConsumer<DisactivateUserConsumer>(context);
             });
 
-            cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectUsersEndpoint, ep =>
+            cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectsEndpoint, ep =>
             {
-                ep.ConfigureConsumer<GetProjectUsersConsumer>(context);
-            });
-
-            cfg.ReceiveEndpoint(rabbitMqConfig.FindProjectUsersEndpoint, ep =>
-            {
-                ep.ConfigureConsumer<FindProjectUsersConsumer>(context);
+                ep.ConfigureConsumer<GetProjectsConsumer>(context);
             });
         }
 

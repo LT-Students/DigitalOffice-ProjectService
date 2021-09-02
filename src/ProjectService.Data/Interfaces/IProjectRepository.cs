@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
+using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.JsonPatch;
@@ -19,11 +20,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         /// </summary>
         /// <param name="filter">Filter info.</param>
         /// <returns>Project with specified id.</returns>
-        public DbProject Get(GetProjectFilter filter);
+        DbProject Get(GetProjectFilter filter);
 
-        public IEnumerable<DbProject> Get(Guid departmentId);
+        IEnumerable<DbProject> Get(Guid departmentId);
 
-        public List<DbProject> Find(List<Guid> projectIds);
+        List<DbProject> Find(List<Guid> projectIds);
 
         /// <summary>
         /// Adds new project to the database. Returns the id of the added project.
@@ -49,6 +50,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
         List<DbProject> Find(FindProjectsFilter filter, int skipCount, int takeCount, out int totalCount);
 
         List<DbProject> Search(string text);
+
+        List<DbProject> Get(IGetProjectsRequest request, out int totalCount);
 
         bool IsExist(Guid id);
 

@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
+using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using System;
@@ -47,6 +48,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
         void Remove(Guid userId, Guid removedBy);
 
-        List<DbProjectUser> Find(Guid projectId, int skipCount, int takeCount, out int totalCount);
+        List<DbProjectUser> Get(Guid projectId, int? skipCount, int? takeCount, out int totalCount);
+
+        List<DbProjectUser> Get(IGetProjectsUsersRequest request, out int totalCount);
     }
 }
