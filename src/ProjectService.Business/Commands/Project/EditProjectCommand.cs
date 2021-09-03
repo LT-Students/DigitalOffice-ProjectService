@@ -95,7 +95,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         {
             _validator.ValidateAndThrowCustom(request);
 
-            DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId});
+            DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId });
 
             OperationResultResponse<bool> response = new();
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
