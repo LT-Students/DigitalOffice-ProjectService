@@ -10,6 +10,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
@@ -94,7 +95,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         {
             _validator.ValidateAndThrowCustom(request);
 
-            DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId });
+            DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId});
 
             OperationResultResponse<bool> response = new();
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
@@ -103,11 +104,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 !_userRepository.AreUserProjectExist(userId, projectId, true) &&
                 GetDepartment(dbProject.DepartmentId, response.Errors)?.DirectorUserId != userId)
             {
-                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                response.Status = OperationResultStatusType.Failed;
-                response.Errors.Add("Not enough rights.");
-
-                return response;
+                throw new ForbiddenException("Not enough rights.");
             }
 
             foreach (Operation item in request.Operations)
