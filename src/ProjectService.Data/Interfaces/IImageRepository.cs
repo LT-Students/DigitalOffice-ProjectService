@@ -9,6 +9,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     public interface IImageRepository
     {
         bool Create(IEnumerable<DbProjectImage> images);
-        bool Delete(List<Guid> imageIds);
+        bool Remove(Guid imageId);
     }
 }

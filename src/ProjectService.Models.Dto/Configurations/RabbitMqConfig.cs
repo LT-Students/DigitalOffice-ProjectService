@@ -7,6 +7,7 @@ using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.Models.Broker.Requests.User;
+using IGetImagesRequest = LT.DigitalOffice.Models.Broker.Requests.Image.IGetImagesRequest;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 {
@@ -20,9 +21,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
         [AutoInjectRequest(typeof(IGetFileRequest))]
         public string GetFileEndpoint { get; set; }
-
-        [AutoInjectRequest(typeof(IGetImagesRequest))]
-        public string GetImagesEndpoint { get; set; }
 
         [AutoInjectRequest(typeof(IGetDepartmentRequest))]
         public string GetDepartmentEndpoint { get; set; }
@@ -42,17 +40,14 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         [AutoInjectRequest(typeof(ICreateWorkTimeRequest))]
         public string CreateWorkTimeEndpoint { get; set; }
 
-        [AutoInjectRequest(typeof(IGetImagesProjectRequest))]
-        public string GetImagesProjectEndpoint { get; set; }
+        [AutoInjectRequest(typeof(IRemoveImagesRequest))]
+        public string RemoveImagesEndpoint { get; set; }
 
-        [AutoInjectRequest(typeof(ICreateImagesProjectRequest))]
-        public string CreateImagesProjectEndpoint { get; set; }
+        [AutoInjectRequest(typeof(IGetImagesRequest))]
+        public string GetImagesEndpoint { get; set; }
 
-        [AutoInjectRequest(typeof(IDeleteImagesProjectRequest))]
-        public string DeleteImagesProjectEndpoint { get; set; }
-
-        [AutoInjectRequest(typeof(IGetImagesUserRequest))]
-        public string GetImagesUserEndpoint { get; set; }
+        [AutoInjectRequest(typeof(ICreateImageRequest))]
+        public string CreateImagesEndpoint { get; set; }
 
         [AutoInjectRequest(typeof(ICheckDepartmentsExistence))]
         public string CheckDepartmentsExistenceEndpoint { get; set; }

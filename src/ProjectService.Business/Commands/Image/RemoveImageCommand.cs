@@ -2,16 +2,11 @@
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
-using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
-using LT.DigitalOffice.Models.Broker.Responses.Image;
-using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
@@ -21,21 +16,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
+namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 {
-    public class CreateImageCommand : ICreateImageCommand
+    public class RemoveImageCommand : IRemoveImageCommand
     {
         private readonly IImageRepository _repository;
-        private readonly IRequestClient<ICreateImageRequest> _rcImages;
-        private readonly ILogger<CreateImageCommand> _logger;
+        private readonly IRequestClient<IRemoveImagesRequest> _rcImages;
+        private readonly ILogger<RemoveImageCommand> _logger;
         private readonly IAccessValidator _accessValidator;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        private List<Guid> CreateImage(List<CreateImageData> images, List<string> errors)
+        private bool RemoveImage(List<Guid> ids, List<string> errors)
         {
-            if (images == null || images.Count == 0)
+            if (ids == null || ids.Count == 0)
             {
-                return null;
+                return false;
             }
 
             string errorMessage = "Can not get images. Please try again later.";
@@ -43,12 +38,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
             try
             {
-                Response<IOperationResult<ICreateImagesResponse>> brokerResponse = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
-                   ICreateImageRequest.CreateObj(images, ImageSource.Project)).Result;
+                Response<IOperationResult<bool>> brokerResponse = _rcImages.GetResponse<IOperationResult<bool>>(
+                   IRemoveImagesRequest.CreateObj(ids, ImageSource.Project)).Result;
 
-                if (brokerResponse.Message.IsSuccess && brokerResponse.Message.Body != null)
+                if (brokerResponse.Message.IsSuccess)
                 {
-                    return brokerResponse.Message.Body.ImagesIds;
+                    return true;
                 }
             }
             catch (Exception exc)
@@ -58,13 +53,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
             errors.Add(errorMessage);
 
-            return null;
+            return false;
         }
 
-        public CreateImageCommand(
+        public RemoveImageCommand(
            IImageRepository repository,
-           IRequestClient<ICreateImageRequest> rcImages,
-           ILogger<CreateImageCommand> logger,
+           IRequestClient<IRemoveImagesRequest> rcImages,
+           ILogger<RemoveImageCommand> logger,
            IAccessValidator accessValidator,
            IHttpContextAccessor httpContextAccessor)
         {
@@ -75,7 +70,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public OperationResultResponse<bool> Execute(CreateImageRequest request)
+        public OperationResultResponse<bool> Execute(RemoveImageRequest request)
         {
             OperationResultResponse<bool> response = new();
 
@@ -88,29 +83,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 return response;
             }
 
-            List<CreateImageData> images = new List<CreateImageData>
+            List<Guid> imagesIds = new List<Guid>
             {
-                new CreateImageData(request.Name, request.Content, request.Extension, _httpContextAccessor.HttpContext.GetUserId())
+                request.Id
             };
 
-            List<Guid> imagesIds = null;
-            if (request.Image == (int)ImageType.Project)
-            {
-                imagesIds = CreateImage(images, response.Errors);
-            }
+            bool result = RemoveImage(imagesIds, response.Errors);
 
-            if (response.Errors.Any())
+            if (response.Errors.Any() && !result)
             {
                 response.Status = OperationResultStatusType.Failed;
                 return response;
             }
 
-            response.Body = _repository.Create(imagesIds.Select(imageId => new DbProjectImage
-            {
-                Id = Guid.NewGuid(),
-                ImageId = imageId,
-                ProjectId = request.Id
-            }).ToList());
+            response.Body = _repository.Remove(request.Id);
 
             response.Status = OperationResultStatusType.FullSuccess;
 

@@ -31,9 +31,13 @@ namespace LT.DigitalOffice.ProjectService.Data
             return true;
         }
 
-        public bool Delete(List<Guid> imageIds)
+        public bool Remove(Guid imageId)
         {
-            throw new NotImplementedException();
+            DbProjectImage image = _provider.ProjectsImages.Where(x => x.ImageId == imageId).FirstOrDefault();
+            _provider.ProjectsImages.Remove(image);
+            _provider.Save();
+
+            return true;
         }
     }
 }

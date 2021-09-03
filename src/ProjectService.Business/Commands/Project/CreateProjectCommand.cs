@@ -13,9 +13,7 @@ using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
@@ -25,6 +23,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LT.DigitalOffice.Models.Broker.Enums;
+using System.Net;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -39,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
         private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
         private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
-        private readonly IRequestClient<ICreateImagesProjectRequest> _rcImages;
+        private readonly IRequestClient<ICreateImageRequest> _rcImages;
         private readonly IRequestClient<ICheckDepartmentsExistence> _rcCheckDepartmentsExistence;
 
         private List<Guid> CheckDepartmentExistence(Guid? departmentId, List<string> errors)
@@ -161,7 +161,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
         }
 
-        private List<Guid> CreateImage(List<Image> projectImages, Guid userId, List<string> errors)
+        private List<Guid> CreateImage(List<ProjectImage> projectImages, Guid userId, List<string> errors)
         {
             if (projectImages == null || projectImages.Count == 0)
             {
@@ -174,12 +174,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             try
             {
                 Response<IOperationResult<ICreateImagesResponse>> brokerResponse = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
-                   ICreateImagesProjectRequest.CreateObj(
-                       projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).ToList())).Result;
+                   ICreateImageRequest.CreateObj(
+                       projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).ToList(),
+                       ImageSource.Project)).Result;
 
                 if (brokerResponse.Message.IsSuccess && brokerResponse.Message.Body != null)
                 {
-                    return brokerResponse.Message.Body.ImageIds;
+                    return brokerResponse.Message.Body.ImagesIds;
                 }
             }
             catch (Exception exc)
@@ -197,15 +198,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             ICreateProjectValidator validator,
             IAccessValidator accessValidator,
             IDbProjectMapper dbProjectMapper,
-            IProjectInfoMapper projectInfoMapper,
             ILogger<CreateProjectCommand> logger,
             IHttpContextAccessor httpContextAccessor,
             IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
             IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
             IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
-            IRequestClient<ICreateImagesProjectRequest> rcImages,
+            IRequestClient<ICreateImageRequest> rcImages,
             IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence)
-
         {
             _logger = logger;
             _validator = validator;
@@ -222,16 +221,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         public OperationResultResponse<Guid> Execute(CreateProjectRequest request)
         {
+            OperationResultResponse<Guid> response = new();
+
             if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
-                throw new ForbiddenException("Not enough rights.");
-            }
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.Status = OperationResultStatusType.Failed;
+                response.Errors.Add("Not enough rights.");
 
-            OperationResultResponse<Guid> response = new();
+                return response;
+            }
 
             if (_repository.IsProjectNameExist(request.Name))
             {
-                response.Status = OperationResultStatusType.Conflict;
+                response.Status = OperationResultStatusType.Failed;
                 response.Errors.Add($"Project with name '{request.Name}' already exist");
                 return response;
             }

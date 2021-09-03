@@ -2,10 +2,8 @@
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
-using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
-using LT.DigitalOffice.Models.Broker.Responses.File;
 using LT.DigitalOffice.Models.Broker.Responses.User;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -22,6 +20,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
+using LT.DigitalOffice.Models.Broker.Enums;
+using LT.DigitalOffice.Models.Broker.Responses.Image;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -39,7 +39,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
         private readonly IRequestClient<IGetUsersDepartmentsUsersPositionsRequest> _rcGetUsersDepartmentsUsersPositions;
         private readonly IRequestClient<IGetImagesRequest> _rcImages;
-        private readonly IRequestClient<IGetImagesProjectRequest> _rcProjectImages;
 
         private DepartmentInfo GetDepartment(Guid departmentId, List<string> errors)
         {
@@ -83,11 +82,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             try
             {
                 IOperationResult<IGetImagesResponse> response = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
-                    IGetImagesUserRequest.CreateObj(imageIds)).Result.Message;
+                    IGetImagesRequest.CreateObj(imageIds, ImageSource.User)).Result.Message;
 
                 if (response.IsSuccess && response.Body != null)
                 {
-                    return response.Body.Images.Select(_imageMapper.Map).ToList();
+                    return response.Body.ImagesData.Select(_imageMapper.Map).ToList();
                 }
                 else
                 {
@@ -120,12 +119,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             try
             {
-                Response<IOperationResult<IGetImagesResponse>> brokerResponse = _rcProjectImages.GetResponse<IOperationResult<IGetImagesResponse>>(
-                   IGetImagesProjectRequest.CreateObj(imageIds)).Result;
+                Response<IOperationResult<IGetImagesResponse>> brokerResponse = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
+                   IGetImagesRequest.CreateObj(imageIds, ImageSource.Project)).Result;
 
                 if (brokerResponse.Message.IsSuccess && brokerResponse.Message.Body != null)
                 {
-                    return brokerResponse.Message.Body.Images.Select(_imageMapper.Map).ToList();
+                    return brokerResponse.Message.Body.ImagesData.Select(_imageMapper.Map).ToList();
                 }
                 else
                 {
@@ -262,8 +261,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IRequestClient<IGetDepartmentRequest> departmentRequestClient,
             IRequestClient<IGetUsersDataRequest> usersDataRequestClient,
             IRequestClient<IGetUsersDepartmentsUsersPositionsRequest> rcGetUsersDepartmentsUsersPositions,
-            IRequestClient<IGetImagesRequest> rcImages,
-            IRequestClient<IGetImagesProjectRequest> rcProjectImages)
+            IRequestClient<IGetImagesRequest> rcImages)
         {
             _logger = logger;
             _repository = repository;
@@ -277,7 +275,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _usersDataRequestClient = usersDataRequestClient;
             _rcGetUsersDepartmentsUsersPositions = rcGetUsersDepartmentsUsersPositions;
             _rcImages = rcImages;
-            _rcProjectImages = rcProjectImages;
         }
 
         public OperationResultResponse<ProjectResponse> Execute(GetProjectFilter filter)

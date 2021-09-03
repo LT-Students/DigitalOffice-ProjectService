@@ -1,6 +1,6 @@
 ﻿namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
-    public record Image
+    public record ProjectImage
     {
         public string Name { get; set; }
         public string Content { get; set; }
