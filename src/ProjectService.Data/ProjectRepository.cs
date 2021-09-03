@@ -193,7 +193,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             if (request.DepartmentId.HasValue)
             {
-                projects = projects.Where(p => p.DepartmentId == request.DepartmentId);
+                projects = projects.Where(p => p.DepartmentId == request.DepartmentId.Value);
             }
 
             totalCount = projects.Count();
@@ -205,7 +205,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             if (request.TakeCount.HasValue)
             {
-                projects = projects.Skip(request.TakeCount.Value);
+                projects = projects.Take(request.TakeCount.Value);
             }
 
             if (request.IncludeUsers && !request.UserId.HasValue)

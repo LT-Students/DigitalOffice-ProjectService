@@ -139,11 +139,6 @@ namespace LT.DigitalOffice.ProjectService.Data
             return users.ToList();
         }
 
-        public List<DbProjectUser> Get(Guid projectId, int? skipCount, int? takeCount, out int totalCount)
-        {
-            throw new NotImplementedException();
-        }
-
         public List<DbProjectUser> Get(IGetProjectsUsersRequest request, out int totalCount)
         {
             IQueryable<DbProjectUser> projectUsers = _provider.ProjectsUsers.AsQueryable();
