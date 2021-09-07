@@ -36,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
 
             return new ProjectResponse
             {
-                Project = _projectInfoMapper.Map(dbProject, department?.Name),
+                Project = _projectInfoMapper.Map(dbProject, department),
                 Users = users,
                 Files = files,
             };

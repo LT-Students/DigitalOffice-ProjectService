@@ -1,4 +1,5 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
@@ -21,57 +22,57 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly ILogger<FindProjectsCommand> _logger;
         private readonly IProjectRepository _repository;
         private readonly IFindProjectsResponseMapper _responseMapper;
-        private readonly IRequestClient<IFindDepartmentsRequest> _findDepartmentsRequestClient;
+        private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartments;
 
-        private Dictionary<Guid, string> GetDepartmentsNames(List<DbProject> dbProjects, List<string> errors)
+        private List<DepartmentData> GetDepartments(List<DbProject> dbProjects, List<string> errors)
         {
-            Dictionary<Guid, string> departmentNames = new Dictionary<Guid, string>();
+            if (dbProjects == null || !dbProjects.Any())
+            {
+                return null;
+            }
 
-            string errorMessage = "Can not find departments names now. Please try again later.";
+            List<Guid> departmentIds = dbProjects.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList();
+
+            if (!departmentIds.Any())
+            {
+                return null;
+            }
+
+            string errorMessage = "Cannot get departments now. Please try again later.";
 
             try
             {
-                List<Guid> departmentIds = dbProjects.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList();
+                Response<IOperationResult<IGetDepartmentsResponse>> response = _rcGetDepartments
+                    .GetResponse<IOperationResult<IGetDepartmentsResponse>>(
+                        IGetDepartmentsRequest.CreateObj(departmentIds)).Result;
 
-                if (!departmentIds.Any())
-                {
-                    return departmentNames;
-                }
-
-                Response<IOperationResult<IFindDepartmentsResponse>> response = _findDepartmentsRequestClient
-                    .GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-                        IFindDepartmentsRequest.CreateObj(departmentIds)).Result;
                 if (response.Message.IsSuccess)
                 {
-                    departmentNames = response.Message.Body.IdNamePairs;
+                    return response.Message.Body.Departments;
                 }
-                else
-                {
-                    _logger.LogWarning(string.Join(", ", response.Message.Errors));
 
-                    errors.AddRange(response.Message.Errors);
-                }
+                _logger.LogWarning(string.Join(", ", response.Message.Errors));
             }
             catch (Exception exc)
             {
                 _logger.LogError(exc, errorMessage);
-
-                errors.Add(errorMessage);
             }
 
-            return departmentNames;
+            errors.Add(errorMessage);
+
+            return null;
         }
 
         public FindProjectsCommand(
             ILogger<FindProjectsCommand> logger,
             IProjectRepository repository,
             IFindProjectsResponseMapper responseMapper,
-            IRequestClient<IFindDepartmentsRequest> findDepartmentsRequestClient)
+            IRequestClient<IGetDepartmentsRequest> rcGetDepartments)
         {
             _logger = logger;
             _repository = repository;
             _responseMapper = responseMapper;
-            _findDepartmentsRequestClient = findDepartmentsRequestClient;
+            _rcGetDepartments = rcGetDepartments;
         }
 
         public FindResponse<ProjectInfo> Execute(FindProjectsFilter filter, int skipCount, int takeCount)
@@ -85,9 +86,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             List<DbProject> dbProject = _repository.Find(filter, skipCount, takeCount, out int totalCount);
 
-            Dictionary<Guid, string> departmentsNames = GetDepartmentsNames(dbProject, errors);
+            List<DepartmentData> departments = GetDepartments(dbProject, errors);
 
-            FindResponse<ProjectInfo> response = _responseMapper.Map(dbProject, totalCount, departmentsNames, errors);
+            FindResponse<ProjectInfo> response = _responseMapper.Map(dbProject, totalCount, departments, errors);
 
             return response;
         }
