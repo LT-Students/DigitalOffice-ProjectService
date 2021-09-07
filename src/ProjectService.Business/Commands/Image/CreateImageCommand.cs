@@ -94,8 +94,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 return response;
             }
 
-            List<Guid> imagesIds = null;
-            imagesIds = CreateImage(
+            List<Guid> imagesIds = CreateImage(
                 request,
                 _httpContextAccessor.HttpContext.GetUserId(),
                 response.Errors);
