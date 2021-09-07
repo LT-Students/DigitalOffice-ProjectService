@@ -87,7 +87,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
                 return response;
             }
 
-            List<Guid> imagesIds = request.
+            List<Guid> imagesIds =
+                request.
                 Select(x => x.ProjectOrTaskId).
                 ToList();
 

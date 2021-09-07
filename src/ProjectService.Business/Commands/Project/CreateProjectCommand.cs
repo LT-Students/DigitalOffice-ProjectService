@@ -255,6 +255,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
             else if (response.Errors.Any())
             {
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 response.Status = OperationResultStatusType.Failed;
                 return response;
             }

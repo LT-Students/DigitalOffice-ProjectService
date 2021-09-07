@@ -90,9 +90,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 }
                 else
                 {
-                    const string warningMessage = logMessage + "Errors: {Errors}";
                     _logger.LogWarning(
-                        warningMessage,
+                        logMessage,
                         string.Join(", ", imageIds),
                         string.Join('\n', response.Errors));
                 }
@@ -128,9 +127,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 }
                 else
                 {
-                    const string warningMessage = logMessage + "Errors: {Errors}";
                     _logger.LogWarning(
-                        warningMessage,
+                        logMessage,
                         string.Join(", ", imageIds),
                         string.Join('\n', brokerResponse.Message.Errors));
                 }

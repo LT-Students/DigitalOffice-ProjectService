@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
@@ -38,6 +36,11 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public bool Remove(IEnumerable<Guid> imagesIds)
         {
+            if (imagesIds == null)
+            {
+                return false;
+            }
+
             IEnumerable<DbProjectImage> images =
                 _provider.
                 ProjectsImages.
