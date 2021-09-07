@@ -2,12 +2,23 @@
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
     public class CreateProjectValidator : AbstractValidator<CreateProjectRequest>, ICreateProjectValidator
     {
+        private readonly List<string> imageFormats = new()
+        {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".bmp",
+            ".gif",
+            ".tga"
+        };
+
         public CreateProjectValidator()
         {
             RuleFor(project => project.Name)
@@ -35,6 +46,15 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     user.RuleFor(user => user.Role)
                         .IsInEnum();
                 });
+            });
+
+            When(project => project.ProjectImages != null && project.ProjectImages.Any(), () =>
+            {
+                RuleForEach(project => project.ProjectImages)
+                    .Must(x => !string.IsNullOrEmpty(x.Content))
+                    .WithMessage("Content can't be empty")
+                    .Must(x => imageFormats.Contains(x.Extension))
+                    .WithMessage("Wrong extension");
             });
 
             When(project => !string.IsNullOrEmpty(project.ShortDescription?.Trim()), () =>

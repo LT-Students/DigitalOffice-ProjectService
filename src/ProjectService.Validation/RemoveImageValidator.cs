@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
-using System;
 using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Validation
@@ -10,13 +9,17 @@ namespace LT.DigitalOffice.ProjectService.Validation
     {
         public RemoveImageValidator()
         {
-            RuleFor(pu => pu)
-                .NotNull()
-                .WithMessage("List must not be null");
+            RuleFor(list => list)
+                .NotNull().WithMessage("List must not be null");
 
-            RuleFor(pu => pu)
-                .NotEmpty()
-                .WithMessage("List must not be empty");
+            RuleFor(list => list)
+                .NotEmpty().WithMessage("List must not be empty");
+
+            RuleForEach(list => list).ChildRules(list =>
+            {
+                list.RuleFor(list => list.ImageId)
+                    .NotEmpty().WithMessage("Image's Id must not be empty");
+            });
         }
     }
 }

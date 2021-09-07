@@ -161,7 +161,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
         }
 
-        private List<Guid> CreateImage(List<ProjectImage> projectImages, Guid userId, List<string> errors)
+        private List<Guid> CreateImage(List<ImageContext> projectImages, Guid userId, List<string> errors)
         {
             if (projectImages == null || projectImages.Count == 0)
             {

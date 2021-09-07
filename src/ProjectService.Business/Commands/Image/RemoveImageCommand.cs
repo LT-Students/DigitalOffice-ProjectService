@@ -2,12 +2,14 @@
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
+using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -25,6 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         private readonly ILogger<RemoveImageCommand> _logger;
         private readonly IAccessValidator _accessValidator;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRemoveImageValidator _validator;
 
         private bool RemoveImage(List<Guid> ids, List<string> errors)
         {
@@ -65,13 +68,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
            IRequestClient<IRemoveImagesRequest> rcImages,
            ILogger<RemoveImageCommand> logger,
            IAccessValidator accessValidator,
-           IHttpContextAccessor httpContextAccessor)
+           IHttpContextAccessor httpContextAccessor,
+           IRemoveImageValidator validator)
         {
             _repository = repository;
             _rcImages = rcImages;
             _logger = logger;
             _accessValidator = accessValidator;
             _httpContextAccessor = httpContextAccessor;
+            _validator = validator;
         }
 
         public OperationResultResponse<bool> Execute(List<RemoveImageRequest> request)
@@ -87,9 +92,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
                 return response;
             }
 
+            _validator.ValidateAndThrowCustom(request);
+
             List<Guid> imagesIds =
                 request.
-                Select(x => x.ProjectOrTaskId).
+                Select(x => x.ImageId).
                 ToList();
 
             bool result = RemoveImage(imagesIds, response.Errors);

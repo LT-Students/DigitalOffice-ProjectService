@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces
     [AutoInject]
     public interface ICreateImageCommand
     {
-        OperationResultResponse<bool> Execute(List<CreateImageRequest> request);
+        OperationResultResponse<bool> Execute(CreateImageRequest request);
     }
 }

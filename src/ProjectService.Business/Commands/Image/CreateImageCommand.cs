@@ -3,6 +3,7 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
@@ -12,6 +13,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -30,11 +32,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         private readonly IAccessValidator _accessValidator;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDbProjectImageMapper _dbProjectImageMapper;
+        private readonly ICreateImageValidator _validator;
 
-        private List<Guid> CreateImage(List<CreateImageRequest> request, Guid userId, List<string> errors)
+        private List<Guid> CreateImage(List<ImageContext> context, Guid userId, List<string> errors)
         {
             List<CreateImageData> images =
-                request.
+                context.
                 Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).
                 ToList();
 
@@ -71,7 +74,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
            ILogger<CreateImageCommand> logger,
            IAccessValidator accessValidator,
            IHttpContextAccessor httpContextAccessor,
-           IDbProjectImageMapper dbProjectImageMapper)
+           IDbProjectImageMapper dbProjectImageMapper,
+           ICreateImageValidator validator)
         {
             _repository = repository;
             _rcImages = rcImages;
@@ -79,9 +83,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             _accessValidator = accessValidator;
             _httpContextAccessor = httpContextAccessor;
             _dbProjectImageMapper = dbProjectImageMapper;
+            _validator = validator;
         }
 
-        public OperationResultResponse<bool> Execute(List<CreateImageRequest> request)
+        public OperationResultResponse<bool> Execute(CreateImageRequest request)
         {
             OperationResultResponse<bool> response = new();
 
@@ -94,8 +99,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 return response;
             }
 
+            _validator.ValidateAndThrowCustom(request);
+
             List<Guid> imagesIds = CreateImage(
-                request,
+                request.Images,
                 _httpContextAccessor.HttpContext.GetUserId(),
                 response.Errors);
 
@@ -108,7 +115,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             }
 
             response.Body = _repository.Create(imagesIds.Select(imageId =>
-                _dbProjectImageMapper.Map(request[0], imageId)).
+                _dbProjectImageMapper.Map(request, imageId)).
                 ToList());
 
             response.Status = OperationResultStatusType.FullSuccess;

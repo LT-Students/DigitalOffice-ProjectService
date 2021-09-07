@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         [HttpPost("create")]
         public OperationResultResponse<bool> Create(
             [FromServices] ICreateImageCommand command,
-            [FromBody] List<CreateImageRequest> request)
+            [FromBody] CreateImageRequest request)
         {
             return command.Execute(request);
         }

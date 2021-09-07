@@ -5,17 +5,36 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-    public class CreateImageValidator : AbstractValidator<List<CreateImageRequest>>, ICreateImageValidator
+    public class CreateImageValidator : AbstractValidator<CreateImageRequest>, ICreateImageValidator
     {
+        private readonly List<string> imageFormats = new()
+        {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".bmp",
+            ".gif",
+            ".tga"
+        };
+
         public CreateImageValidator()
         {
-            RuleFor(pu => pu)
-                .NotNull()
-                .WithMessage("List must not be null");
+            RuleFor(images => images)
+                .NotNull().WithMessage("List must not be null");
 
-            RuleFor(pu => pu)
-                .NotEmpty()
-                .WithMessage("List must not be empty");
+            RuleFor(images => images)
+                .NotEmpty().WithMessage("List must not be empty");
+
+            RuleFor(images => images.ProjectOrTaskId)
+                .NotEmpty().WithMessage("Image's Id must not be empty");
+
+            RuleForEach(images => images.Images)
+                    .Must(images => !string.IsNullOrEmpty(images.Content))
+                    .WithMessage("Content can't be empty")
+                    .Must(images => imageFormats.Contains(images.Extension))
+                    .WithMessage("Wrong extension")
+                    .Must(images => images.Name.Length < 150)
+                    .WithMessage("Name's length must be less than 150 letters");
         }
     }
 }
