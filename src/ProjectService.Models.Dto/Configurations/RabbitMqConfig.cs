@@ -46,31 +46,18 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         [AutoInjectRequest(typeof(IGetImagesRequest))]
         public string GetImagesEndpoint { get; set; }
 
-        [AutoInjectRequest(typeof(ICreateImageRequest))]
+        [AutoInjectRequest(typeof(ICreateImagesRequest))]
         public string CreateImagesEndpoint { get; set; }
 
         [AutoInjectRequest(typeof(ICheckDepartmentsExistence))]
         public string CheckDepartmentsExistenceEndpoint { get; set; }
 
-        public string GetProjectIdsEndpoint { get; set; }
-
-        public string GetProjectInfoEndpoint { get; set; }
-
-        public string GetDepartmentProjectsEndpoint { get; set; }
-
-        public string GetUserProjectsInfoEndpoint { get; set; }
 
         public string SearchProjectsEndpoint { get; set; }
-
-        public string FindProjectsEndpoint { get; set; }
-
         public string FindParseEntitiesEndpoint { get; set; }
-
         public string GetProjectsUsersEndpoint { get; set; }
-
+        public string GetProjectsEndpoint { get; set; }
         public string DisactivateUserEndpoint { get; set; }
-
-        public string GetProjectUsersEndpoint { get; set; }
 
     }
 }

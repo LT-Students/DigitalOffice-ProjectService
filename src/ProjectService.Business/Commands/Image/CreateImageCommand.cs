@@ -25,7 +25,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
     public class CreateImageCommand : ICreateImageCommand
     {
         private readonly IImageRepository _repository;
-        private readonly IRequestClient<ICreateImageRequest> _rcImages;
+        private readonly IRequestClient<ICreateImagesRequest> _rcImages;
         private readonly ILogger<CreateImageCommand> _logger;
         private readonly IAccessValidator _accessValidator;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             try
             {
                 Response<IOperationResult<ICreateImagesResponse>> brokerResponse = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
-                   ICreateImageRequest.CreateObj(images, ImageSource.Project)).Result;
+                   ICreateImagesRequest.CreateObj(images, ImageSource.Project)).Result;
 
                 if (brokerResponse.Message.IsSuccess && brokerResponse.Message.Body != null)
                 {
@@ -67,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
         public CreateImageCommand(
            IImageRepository repository,
-           IRequestClient<ICreateImageRequest> rcImages,
+           IRequestClient<ICreateImagesRequest> rcImages,
            ILogger<CreateImageCommand> logger,
            IAccessValidator accessValidator,
            IHttpContextAccessor httpContextAccessor,

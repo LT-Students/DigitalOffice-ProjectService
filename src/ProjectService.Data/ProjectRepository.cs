@@ -1,5 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -169,28 +170,55 @@ namespace LT.DigitalOffice.ProjectService.Data
             return _provider.Projects.Where(p => projectIds.Contains(p.Id)).ToList();
         }
 
-        public Dictionary<Guid, List<Guid>> GetProjectsUsers()
+        public List<DbProject> Get(IGetProjectsRequest request, out int totalCount)
         {
-            List<Tuple<Guid, Guid>> projectsUsers = _provider
-                .ProjectsUsers
-                .Where(pu => pu.IsActive)
-                .Select(pu => new Tuple<Guid, Guid>(pu.ProjectId, pu.UserId))
-                .ToList();
+            IQueryable<DbProject> projects = _provider.Projects.AsQueryable();
 
-            Dictionary<Guid, List<Guid>> response = new();
-            foreach(var pair in projectsUsers)
+            if (request.UserId.HasValue)
             {
-                if (!response.ContainsKey(pair.Item1))
+                if (request.IncludeUsers)
                 {
-                    response.Add(pair.Item1, new() { pair.Item2 });
+                    projects = _provider.Projects
+                        .Include(pu => pu.Users)
+                        .Where(p => p.Users.Any(u => u.UserId == request.UserId.Value));
                 }
                 else
                 {
-                    response[pair.Item1].Add(pair.Item2);
+                    projects = _provider.ProjectsUsers
+                        .Where(pu => pu.UserId == request.UserId)
+                        .Include(pu => pu.Project)
+                        .Select(pu => pu.Project);
                 }
             }
 
-            return response;
+            if (request.ProjectsIds != null && request.ProjectsIds.Any())
+            {
+                projects = projects.Where(p => request.ProjectsIds.Contains(p.Id));
+            }
+
+            if (request.DepartmentId.HasValue)
+            {
+                projects = projects.Where(p => p.DepartmentId == request.DepartmentId.Value);
+            }
+
+            totalCount = projects.Count();
+
+            if (request.SkipCount.HasValue)
+            {
+                projects = projects.Skip(request.SkipCount.Value);
+            }
+
+            if (request.TakeCount.HasValue)
+            {
+                projects = projects.Take(request.TakeCount.Value);
+            }
+
+            if (request.IncludeUsers && !request.UserId.HasValue)
+            {
+                projects = projects.Include(p => p.Users);
+            }
+
+            return projects.ToList();
         }
     }
 }

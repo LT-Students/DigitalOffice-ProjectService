@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LT.DigitalOffice.Models.Broker.Enums;
 using System.Net;
+using LT.DigitalOffice.ProjectService.Models.Db;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -38,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
         private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
         private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
-        private readonly IRequestClient<ICreateImageRequest> _rcImages;
+        private readonly IRequestClient<ICreateImagesRequest> _rcImages;
         private readonly IRequestClient<ICheckDepartmentsExistence> _rcCheckDepartmentsExistence;
 
         private List<Guid> CheckDepartmentExistence(Guid? departmentId, List<string> errors)
@@ -136,6 +137,30 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
         }
 
+        private void CreateWorkTime(Guid projectId, List<Guid> userIds, List<string> errors)
+        {
+            string errorMessage = $"Failed to create a work time for project {projectId} with users: {string.Join(", ", userIds)}.";
+            const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
+
+            try
+            {
+                var response = _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
+                    ICreateWorkTimeRequest.CreateObj(projectId, userIds)).Result;
+
+                if (!(response.Message.IsSuccess && response.Message.Body))
+                {
+                    _logger.LogWarning(logMessage, projectId, string.Join(", ", userIds));
+                    errors.Add(errorMessage);
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, logMessage, projectId, string.Join(", ", userIds));
+
+                errors.Add(errorMessage);
+            }
+        }
+
         private List<Guid> CreateImage(List<ProjectImage> projectImages, Guid userId, List<string> errors)
         {
             if (projectImages == null || projectImages.Count == 0)
@@ -149,7 +174,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             try
             {
                 Response<IOperationResult<ICreateImagesResponse>> brokerResponse = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
-                   ICreateImageRequest.CreateObj(
+                   ICreateImagesRequest.CreateObj(
                        projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).ToList(),
                        ImageSource.Project)).Result;
 
@@ -182,7 +207,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
             IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
             IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
-            IRequestClient<ICreateImageRequest> rcImages,
+            IRequestClient<ICreateImagesRequest> rcImages,
             IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence)
         {
             _logger = logger;
@@ -233,13 +258,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 response.Status = OperationResultStatusType.Failed;
                 return response;
             }
+
             List<Guid> existDepartments = CheckDepartmentExistence(request.DepartmentId, response.Errors);
 
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
             List<Guid> imageIds = CreateImage(request.ProjectImages.ToList(), userId, response.Errors);
 
-            response.Body = _repository.Create(_dbProjectMapper.Map(request, userId, existUsers, existDepartments, imageIds));
+            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, existDepartments, imageIds);
+
+            response.Body = _repository.Create(dbProject);
+
+            CreateWorkTime(dbProject.Id, existUsers, response.Errors);
 
             CreateWorkspace(request.Name, userId, existUsers, response.Errors);
 

@@ -1,9 +1,9 @@
-﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
+﻿using LT.DigitalOffice.Models.Broker.Requests.Project;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -118,6 +118,59 @@ namespace LT.DigitalOffice.ProjectService.Data
         {
             var dbIds = _provider.ProjectsUsers.Where(x => x.IsActive).Select(x => x.UserId);
             return ids.All(x => dbIds.Contains(x));
+        }
+
+        public List<DbProjectUser> Find(Guid projectId, int? skipCount, int? takeCount, out int totalCount)
+        {
+            IQueryable<DbProjectUser> users = _provider.ProjectsUsers.Where(pu => pu.ProjectId == projectId && pu.IsActive).AsQueryable();
+
+            totalCount = users.Count();
+
+            if (skipCount.HasValue)
+            {
+                users = users.Skip(skipCount.Value);
+            }
+
+            if (takeCount.HasValue)
+            {
+                users = users.Take(takeCount.Value);
+            }
+
+            return users.ToList();
+        }
+
+        public List<DbProjectUser> Get(IGetProjectsUsersRequest request, out int totalCount)
+        {
+            IQueryable<DbProjectUser> projectUsers = _provider.ProjectsUsers.AsQueryable();
+
+            if (request.UsersIds != null && request.UsersIds.Any())
+            {
+                projectUsers = projectUsers.Where(pu => request.UsersIds.Contains(pu.UserId));
+            }
+
+            if (request.ProjectsIds != null && request.ProjectsIds.Any())
+            {
+                projectUsers = projectUsers.Where(pu => request.ProjectsIds.Contains(pu.ProjectId));
+            }
+
+            if (!request.IncludeDisactivated)
+            {
+                projectUsers = projectUsers.Where(pu => pu.IsActive);
+            }
+
+            totalCount = projectUsers.Count();
+
+            if (request.SkipCount.HasValue)
+            {
+                projectUsers = projectUsers.Skip(request.SkipCount.Value);
+            }
+
+            if (request.TakeCount.HasValue)
+            {
+                projectUsers = projectUsers.Take(request.TakeCount.Value);
+            }
+
+            return projectUsers.ToList();
         }
     }
 }
