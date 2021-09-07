@@ -3,9 +3,9 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
-    public class CreateImageRequest
+    public record CreateImageRequest
     {
-        public Guid Id { get; set; }
+        public Guid ProjectOrTaskId { get; set; }
         public string Name { get; set; }
         public string Content { get; set; }
         public string Extension { get; set; }

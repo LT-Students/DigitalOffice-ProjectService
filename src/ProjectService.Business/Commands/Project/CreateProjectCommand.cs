@@ -2,7 +2,6 @@ using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Common;
@@ -137,30 +136,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
         }
 
-        private void CreateWorkTime(Guid projectId, List<Guid> userIds, List<string> errors)
-        {
-            string errorMessage = $"Failed to create a work time for project {projectId} with users: {string.Join(", ", userIds)}.";
-            const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
-
-            try
-            {
-                var response = _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
-                    ICreateWorkTimeRequest.CreateObj(projectId, userIds)).Result;
-
-                if (!(response.Message.IsSuccess && response.Message.Body))
-                {
-                    _logger.LogWarning(logMessage, projectId, string.Join(", ", userIds));
-                    errors.Add(errorMessage);
-                }
-            }
-            catch (Exception exc)
-            {
-                _logger.LogError(exc, logMessage, projectId, string.Join(", ", userIds));
-
-                errors.Add(errorMessage);
-            }
-        }
-
         private List<Guid> CreateImage(List<ProjectImage> projectImages, Guid userId, List<string> errors)
         {
             if (projectImages == null || projectImages.Count == 0)
@@ -182,6 +157,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 {
                     return brokerResponse.Message.Body.ImagesIds;
                 }
+
+                _logger.LogWarning(
+                    logMessage,
+                    string.Join('\n', brokerResponse.Message.Errors));
             }
             catch (Exception exc)
             {
@@ -225,7 +204,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
-                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Status = OperationResultStatusType.Failed;
                 response.Errors.Add("Not enough rights.");
 
@@ -234,8 +213,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             if (_repository.IsProjectNameExist(request.Name))
             {
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
                 response.Status = OperationResultStatusType.Failed;
                 response.Errors.Add($"Project with name '{request.Name}' already exist");
+
                 return response;
             }
 
@@ -256,14 +237,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
-            List<Guid> imageIds = CreateImage(request.ProjectsImages.ToList(), userId, response.Errors);
+            List<Guid> imageIds = CreateImage(request.ProjectImages.ToList(), userId, response.Errors);
 
             response.Body = _repository.Create(_dbProjectMapper.Map(request, userId, existUsers, existDepartments, imageIds));
-
-            CreateWorkTime(
-                _dbProjectMapper.Map(request, userId, existUsers, existDepartments, imageIds).Id,
-                existUsers,
-                response.Errors);
 
             CreateWorkspace(request.Name, userId, existUsers, response.Errors);
 

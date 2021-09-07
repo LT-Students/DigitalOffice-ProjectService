@@ -10,8 +10,7 @@ using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
@@ -30,15 +29,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         private readonly ILogger<CreateImageCommand> _logger;
         private readonly IAccessValidator _accessValidator;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IDbProjectImageMapper _dbProjectImageMapper;
 
-        private List<Guid> CreateImage(List<CreateImageData> images, List<string> errors)
+        private List<Guid> CreateImage(List<CreateImageRequest> request, Guid userId, List<string> errors)
         {
-            if (images == null || images.Count == 0)
-            {
-                return null;
-            }
+            List<CreateImageData> images =
+                request.
+                Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).
+                ToList();
 
-            string errorMessage = "Can not get images. Please try again later.";
+            string errorMessage = "Can not create images. Please try again later.";
             const string logMessage = "Errors while creating images.";
 
             try
@@ -50,6 +50,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 {
                     return brokerResponse.Message.Body.ImagesIds;
                 }
+
+                _logger.LogWarning(
+                    logMessage,
+                    string.Join('\n', brokerResponse.Message.Errors));
             }
             catch (Exception exc)
             {
@@ -66,53 +70,50 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
            IRequestClient<ICreateImageRequest> rcImages,
            ILogger<CreateImageCommand> logger,
            IAccessValidator accessValidator,
-           IHttpContextAccessor httpContextAccessor)
+           IHttpContextAccessor httpContextAccessor,
+           IDbProjectImageMapper dbProjectImageMapper)
         {
             _repository = repository;
             _rcImages = rcImages;
             _logger = logger;
             _accessValidator = accessValidator;
             _httpContextAccessor = httpContextAccessor;
+            _dbProjectImageMapper = dbProjectImageMapper;
         }
 
-        public OperationResultResponse<bool> Execute(CreateImageRequest request)
+        public OperationResultResponse<bool> Execute(List<CreateImageRequest> request)
         {
             OperationResultResponse<bool> response = new();
 
             if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
-                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Status = OperationResultStatusType.Failed;
                 response.Errors.Add("Not enough rights.");
 
                 return response;
             }
 
-            List<CreateImageData> images = new List<CreateImageData>
-            {
-                new CreateImageData(request.Name, request.Content, request.Extension, _httpContextAccessor.HttpContext.GetUserId())
-            };
-
             List<Guid> imagesIds = null;
-            if (request.Image == (int)ImageType.Project)
-            {
-                imagesIds = CreateImage(images, response.Errors);
-            }
+            imagesIds = CreateImage(
+                request,
+                _httpContextAccessor.HttpContext.GetUserId(),
+                response.Errors);
 
             if (response.Errors.Any())
             {
                 response.Status = OperationResultStatusType.Failed;
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
                 return response;
             }
 
-            response.Body = _repository.Create(imagesIds.Select(imageId => new DbProjectImage
-            {
-                Id = Guid.NewGuid(),
-                ImageId = imageId,
-                ProjectId = request.Id
-            }).ToList());
+            response.Body = _repository.Create(imagesIds.Select(imageId =>
+                _dbProjectImageMapper.Map(request[0], imageId)).
+                ToList());
 
             response.Status = OperationResultStatusType.FullSuccess;
+            _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
             return response;
         }

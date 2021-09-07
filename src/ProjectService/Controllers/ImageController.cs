@@ -1,11 +1,9 @@
-﻿using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Responses;
+﻿using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
@@ -13,41 +11,20 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [ApiController]
     public class ImageController : ControllerBase
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public ImageController(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
         [HttpPost("create")]
         public OperationResultResponse<bool> Create(
             [FromServices] ICreateImageCommand command,
-            [FromBody] CreateImageRequest request)
+            [FromBody] List<CreateImageRequest> request)
         {
-            var result = command.Execute(request);
-
-            if (result.Status != OperationResultStatusType.Failed)
-            {
-                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
-            }
-
-            return result;
+            return command.Execute(request);
         }
 
         [HttpDelete("remove")]
         public OperationResultResponse<bool> Remove(
             [FromServices] IRemoveImageCommand command,
-            [FromBody] RemoveImageRequest request)
+            [FromBody] List<RemoveImageRequest> request)
         {
-            var result = command.Execute(request);
-
-            if (result.Status != OperationResultStatusType.Failed)
-            {
-                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
-            }
-
-            return result;
+            return command.Execute(request);
         }
     }
 }

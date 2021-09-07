@@ -33,18 +33,22 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
                 return false;
             }
 
-            string errorMessage = "Can not get images. Please try again later.";
-            const string logMessage = "Errors while creating images.";
+            string errorMessage = "Can not remove images. Please try again later.";
+            const string logMessage = "Errors while removing images.";
 
             try
             {
                 Response<IOperationResult<bool>> brokerResponse = _rcImages.GetResponse<IOperationResult<bool>>(
                    IRemoveImagesRequest.CreateObj(ids, ImageSource.Project)).Result;
 
-                if (brokerResponse.Message.IsSuccess)
+                if (brokerResponse.Message.IsSuccess && brokerResponse.Message.Body)
                 {
                     return true;
                 }
+
+                _logger.LogWarning(
+                    errorMessage,
+                    string.Join('\n', brokerResponse.Message.Errors));
             }
             catch (Exception exc)
             {
@@ -70,35 +74,36 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public OperationResultResponse<bool> Execute(RemoveImageRequest request)
+        public OperationResultResponse<bool> Execute(List<RemoveImageRequest> request)
         {
             OperationResultResponse<bool> response = new();
 
             if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
-                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Status = OperationResultStatusType.Failed;
                 response.Errors.Add("Not enough rights.");
 
                 return response;
             }
 
-            List<Guid> imagesIds = new List<Guid>
-            {
-                request.Id
-            };
+            List<Guid> imagesIds = request.
+                Select(x => x.ProjectOrTaskId).
+                ToList();
 
             bool result = RemoveImage(imagesIds, response.Errors);
 
             if (response.Errors.Any() && !result)
             {
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 response.Status = OperationResultStatusType.Failed;
+
                 return response;
             }
 
-            response.Body = _repository.Remove(request.Id);
-
+            response.Body = _repository.Remove(imagesIds);
             response.Status = OperationResultStatusType.FullSuccess;
+            _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
             return response;
         }

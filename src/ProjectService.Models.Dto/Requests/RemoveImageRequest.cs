@@ -3,9 +3,9 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
-    public class RemoveImageRequest
+    public record RemoveImageRequest
     {
-        public Guid Id { get; set; }
-        public ImageType Image { get; set; }
+        public Guid ProjectOrTaskId { get; set; }
+        public ImageType ImageType { get; set; }
     }
 }

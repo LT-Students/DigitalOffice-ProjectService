@@ -23,11 +23,25 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                {
                    table.PrimaryKey("PK_ProjectsImages", x => x.Id);
                });
+
+            migrationBuilder.CreateTable(
+               name: DbTaskImage.TableName,
+               columns: table => new
+               {
+                   Id = table.Column<Guid>(nullable: false),
+                   TaskId = table.Column<Guid>(nullable: false),
+                   ImageId = table.Column<Guid>(nullable: false)
+               },
+               constraints: table =>
+               {
+                   table.PrimaryKey("PK_TasksImages", x => x.Id);
+               });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(DbProjectImage.TableName);
+            migrationBuilder.DropTable(DbTaskImage.TableName);
         }
     }
 }

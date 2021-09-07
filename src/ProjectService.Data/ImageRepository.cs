@@ -25,16 +25,26 @@ namespace LT.DigitalOffice.ProjectService.Data
 
         public bool Create(IEnumerable<DbProjectImage> images)
         {
+            if (images == null)
+            {
+                return false;
+            }
+
             _provider.ProjectsImages.AddRange(images);
             _provider.Save();
 
             return true;
         }
 
-        public bool Remove(Guid imageId)
+        public bool Remove(IEnumerable<Guid> imagesIds)
         {
-            DbProjectImage image = _provider.ProjectsImages.Where(x => x.ImageId == imageId).FirstOrDefault();
-            _provider.ProjectsImages.Remove(image);
+            IEnumerable<DbProjectImage> images =
+                _provider.
+                ProjectsImages.
+                Where(x => imagesIds.
+                Contains(x.ImageId));
+
+            _provider.ProjectsImages.RemoveRange(images);
             _provider.Save();
 
             return true;
