@@ -169,7 +169,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
 
             string errorMessage = "Can not create images. Please try again later.";
-            const string logMessage = "Errors while creating images.";
+            const string logMessage = "Errors while creating images. Errors: {Errors}";
 
             try
             {

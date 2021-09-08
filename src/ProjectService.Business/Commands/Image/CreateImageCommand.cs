@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 .ToList();
 
             string errorMessage = "Can not create images. Please try again later.";
-            const string logMessage = "Errors while creating images.";
+            const string logMessage = "Errors while creating images for user id {userId}. Errors: {Errors}";
 
             try
             {
@@ -55,6 +55,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
                 _logger.LogWarning(
                     logMessage,
+                    string.Join('\n', userId),
                     string.Join('\n', brokerResponse.Message.Errors));
             }
             catch (Exception exc)

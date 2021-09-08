@@ -2,6 +2,7 @@
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
@@ -37,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
             }
 
             string errorMessage = "Can not remove images. Please try again later.";
-            const string logMessage = "Errors while removing images.";
+            const string logMessage = "Errors while creating images for user id {userId}. Errors: {Errors}";
 
             try
             {
@@ -50,7 +51,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
                 }
 
                 _logger.LogWarning(
-                    errorMessage,
+                    logMessage,
+                    string.Join('\n', _httpContextAccessor.HttpContext.GetUserId()),
                     string.Join('\n', brokerResponse.Message.Errors));
             }
             catch (Exception exc)

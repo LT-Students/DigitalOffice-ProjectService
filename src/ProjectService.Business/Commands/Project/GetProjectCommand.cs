@@ -77,7 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
 
             string errorMessage = "Can not get images. Please try again later.";
-            const string logMessage = "Errors while getting images with ids: {Ids}.";
+            const string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
 
             try
             {
@@ -114,7 +114,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
 
             string errorMessage = "Can not get images. Please try again later.";
-            const string logMessage = "Errors while getting images with ids: {Ids}.";
+            const string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
 
             try
             {
