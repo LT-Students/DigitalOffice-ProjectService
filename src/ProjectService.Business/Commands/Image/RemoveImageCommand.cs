@@ -36,8 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
                 return false;
             }
 
-            string errorMessage = "Can not remove images. Please try again later.";
-            const string logMessage = "Errors while removing images ids {ids}. Errors: {Errors}";
+            string logMessage = "Errors while removing images ids {ids}. Errors: {Errors}";
 
             try
             {
@@ -59,7 +58,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
                 _logger.LogError(exc, logMessage);
             }
 
-            errors.Add(errorMessage);
+            errors.Add("Can not remove images. Please try again later.");
 
             return false;
         }
@@ -83,7 +82,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         public OperationResultResponse<bool> Execute(List<RemoveImageRequest> request)
         {
             OperationResultResponse<bool> response = new();
-            List<string> errors = new();
 
             if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
             {
@@ -93,6 +91,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
                 return response;
             }
+
+            List<string> errors = new();
 
             if (!_validator.ValidateCustom(request, out errors))
             {

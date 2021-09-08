@@ -40,30 +40,28 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 .Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId))
                 .ToList();
 
-            string errorMessage = "Can not create images. Please try again later.";
-            const string logMessage = "Errors while creating images for user id {userId}. Errors: {Errors}";
+            string logMessage = $"Errors while creating images for user id {userId}. ";
 
             try
             {
-                Response<IOperationResult<ICreateImagesResponse>> brokerResponse = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
-                   ICreateImagesRequest.CreateObj(images, ImageSource.Project)).Result;
+                IOperationResult<ICreateImagesResponse> response = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
+                   ICreateImagesRequest.CreateObj(images, ImageSource.Project)).Result.Message;
 
-                if (brokerResponse.Message.IsSuccess && brokerResponse.Message.Body != null)
+                if (response.IsSuccess && response.Body != null)
                 {
-                    return brokerResponse.Message.Body.ImagesIds;
+                    return response.Body.ImagesIds;
                 }
 
                 _logger.LogWarning(
-                    logMessage,
-                    string.Join('\n', userId),
-                    string.Join('\n', brokerResponse.Message.Errors));
+                    logMessage + "Errors: { Errors}",
+                    string.Join('\n', response.Errors));
             }
             catch (Exception exc)
             {
                 _logger.LogError(exc, logMessage);
             }
 
-            errors.Add(errorMessage);
+            errors.Add("Can not create images. Please try again later.");
 
             return null;
         }
@@ -89,7 +87,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         public OperationResultResponse<List<Guid>> Execute(CreateImageRequest request)
         {
             OperationResultResponse<List<Guid>> response = new();
-            List<string> errors = new();
 
             if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
             {
@@ -99,6 +96,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
                 return response;
             }
+
+            List<string> errors = new();
 
             if (!_validator.ValidateCustom(request, out errors))
             {

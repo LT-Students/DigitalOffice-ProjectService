@@ -77,7 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
 
             string errorMessage = "Can not get images. Please try again later.";
-            const string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
+            string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
 
             try
             {
@@ -113,24 +113,23 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 return null;
             }
 
-            string errorMessage = "Can not get images. Please try again later.";
-            const string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
+            string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
 
             try
             {
-                Response<IOperationResult<IGetImagesResponse>> brokerResponse = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
-                   IGetImagesRequest.CreateObj(imageIds, ImageSource.Project)).Result;
+                IOperationResult<IGetImagesResponse> response = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
+                   IGetImagesRequest.CreateObj(imageIds, ImageSource.Project)).Result.Message;
 
-                if (brokerResponse.Message.IsSuccess && brokerResponse.Message.Body != null)
+                if (response.IsSuccess && response.Body != null)
                 {
-                    return brokerResponse.Message.Body.ImagesData.Select(_imageMapper.Map).ToList();
+                    return response.Body.ImagesData.Select(_imageMapper.Map).ToList();
                 }
                 else
                 {
                     _logger.LogWarning(
                         logMessage,
                         string.Join(", ", imageIds),
-                        string.Join('\n', brokerResponse.Message.Errors));
+                        string.Join('\n', response.Errors));
                 }
             }
             catch (Exception exc)
@@ -138,7 +137,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 _logger.LogError(exc, logMessage, string.Join(", ", imageIds));
             }
 
-            errors.Add(errorMessage);
+            errors.Add("Can not get images. Please try again later.");
 
             return null;
         }

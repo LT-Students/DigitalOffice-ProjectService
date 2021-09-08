@@ -50,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
 
             string errorMessage = "Failed to check the existing department.";
-            string logMessage = "Department with id: {id} not found.";
+            const string logMessage = "Department with id: {id} not found.";
 
             try
             {
@@ -111,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private void CreateWorkspace(string projectName, Guid creatorId, List<Guid> users, List<string> errors)
         {
             string errorMessage = $"Failed to create a workspace for the project {projectName}";
-            string logMessage = "Cannot create workspace for project {name}";
+            const string logMessage = "Cannot create workspace for project {name}";
 
             try
             {
@@ -168,31 +168,30 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 return null;
             }
 
-            string errorMessage = "Can not create images. Please try again later.";
-            const string logMessage = "Errors while creating images. Errors: {Errors}";
+            string logMessage = "Errors while creating images. Errors: {Errors}";
 
             try
             {
-                Response<IOperationResult<ICreateImagesResponse>> brokerResponse = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
+                IOperationResult<ICreateImagesResponse> response = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
                    ICreateImagesRequest.CreateObj(
                        projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).ToList(),
-                       ImageSource.Project)).Result;
+                       ImageSource.Project)).Result.Message;
 
-                if (brokerResponse.Message.IsSuccess && brokerResponse.Message.Body != null)
+                if (response.IsSuccess && response.Body != null)
                 {
-                    return brokerResponse.Message.Body.ImagesIds;
+                    return response.Body.ImagesIds;
                 }
 
                 _logger.LogWarning(
                     logMessage,
-                    string.Join('\n', brokerResponse.Message.Errors));
+                    string.Join('\n', response.Errors));
             }
             catch (Exception exc)
             {
                 _logger.LogError(exc, logMessage);
             }
 
-            errors.Add(errorMessage);
+            errors.Add("Can not create images. Please try again later.");
 
             return null;
         }
@@ -226,7 +225,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         public OperationResultResponse<Guid> Execute(CreateProjectRequest request)
         {
             OperationResultResponse<Guid> response = new();
-            List<string> errors = new();
 
             if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
             {
@@ -245,6 +243,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
                 return response;
             }
+
+            List<string> errors = new();
 
             if (!_validator.ValidateCustom(request, out errors))
             {
