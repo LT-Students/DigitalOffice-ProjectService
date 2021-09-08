@@ -40,10 +40,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
             try
             {
-                Response<IOperationResult<bool>> brokerResponse = _rcImages.GetResponse<IOperationResult<bool>>(
-                   IRemoveImagesRequest.CreateObj(ids, ImageSource.Project)).Result;
+                IOperationResult<bool> response = _rcImages.GetResponse<IOperationResult<bool>>(
+                   IRemoveImagesRequest.CreateObj(ids, ImageSource.Project)).Result.Message;
 
-                if (brokerResponse.Message.IsSuccess && brokerResponse.Message.Body)
+                if (response.IsSuccess)
                 {
                     return true;
                 }
@@ -51,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
                 _logger.LogWarning(
                     logMessage,
                     string.Join('\n', ids),
-                    string.Join('\n', brokerResponse.Message.Errors));
+                    string.Join('\n', response.Errors));
             }
             catch (Exception exc)
             {
@@ -109,7 +109,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
             bool result = RemoveImage(imagesIds, response.Errors);
 
-            if (response.Errors.Any() && !result)
+            if (!result)
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 response.Status = OperationResultStatusType.Failed;

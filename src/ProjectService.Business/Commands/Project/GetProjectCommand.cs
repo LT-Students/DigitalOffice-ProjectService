@@ -76,7 +76,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 return null;
             }
 
-            string errorMessage = "Can not get images. Please try again later.";
             string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
 
             try
@@ -84,7 +83,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 IOperationResult<IGetImagesResponse> response = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
                     IGetImagesRequest.CreateObj(imageIds, ImageSource.User)).Result.Message;
 
-                if (response.IsSuccess && response.Body != null)
+                if (response.IsSuccess && response.Body.ImagesData != null)
                 {
                     return response.Body.ImagesData.Select(_imageMapper.Map).ToList();
                 }
@@ -101,7 +100,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 _logger.LogError(exc, logMessage, string.Join(", ", imageIds));
             }
 
-            errors.Add(errorMessage);
+            errors.Add("Can not get images. Please try again later.");
 
             return null;
         }

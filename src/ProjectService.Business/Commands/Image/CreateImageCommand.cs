@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 IOperationResult<ICreateImagesResponse> response = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
                    ICreateImagesRequest.CreateObj(images, ImageSource.Project)).Result.Message;
 
-                if (response.IsSuccess && response.Body != null)
+                if (response.IsSuccess && response.Body.ImagesIds != null)
                 {
                     return response.Body.ImagesIds;
                 }

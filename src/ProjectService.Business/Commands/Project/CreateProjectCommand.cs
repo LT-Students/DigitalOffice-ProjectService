@@ -177,7 +177,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                        projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).ToList(),
                        ImageSource.Project)).Result.Message;
 
-                if (response.IsSuccess && response.Body != null)
+                if (response.IsSuccess && response.Body.ImagesIds != null)
                 {
                     return response.Body.ImagesIds;
                 }
@@ -255,7 +255,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 return response;
             }
 
-            var existUsers = CheckUserExistence(request.Users.Select(u => u.UserId).ToList(), response.Errors);
+            List<Guid> existUsers = CheckUserExistence(request.Users.Select(u => u.UserId).ToList(), response.Errors);
             if (!response.Errors.Any()
                 && existUsers.Count() != request.Users.Count())
             {
