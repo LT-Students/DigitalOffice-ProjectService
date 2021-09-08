@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
     {
         public Guid ProjectOrTaskId { get; set; }
         public List<ImageContext> Images { get; set; }
-        public ImageType Image { get; set; }
+        public ImageType ImageType { get; set; }
     }
 }
