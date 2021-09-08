@@ -82,6 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         public OperationResultResponse<bool> Execute(List<RemoveImageRequest> request)
         {
             OperationResultResponse<bool> response = new();
+            List<string> errors = new();
 
             if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
@@ -92,10 +93,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
                 return response;
             }
 
-            _validator.ValidateAndThrowCustom(request);
+            if (!_validator.ValidateCustom(request, out errors))
+            {
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.Status = OperationResultStatusType.Failed;
+                response.Errors.AddRange(errors);
 
-            List<Guid> imagesIds =
-                request.
+                return response;
+            }
+
+            List<Guid> imagesIds = request.
                 Select(x => x.ImageId).
                 ToList();
 
@@ -111,7 +118,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
             response.Body = _repository.Remove(imagesIds);
             response.Status = OperationResultStatusType.FullSuccess;
-            _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
             return response;
         }

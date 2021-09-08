@@ -226,6 +226,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         public OperationResultResponse<Guid> Execute(CreateProjectRequest request)
         {
             OperationResultResponse<Guid> response = new();
+            List<string> errors = new();
 
             if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
@@ -245,7 +246,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 return response;
             }
 
-            _validator.ValidateAndThrowCustom(request);
+            if (!_validator.ValidateCustom(request, out errors))
+            {
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.Status = OperationResultStatusType.Failed;
+                response.Errors.AddRange(errors);
+
+                return response;
+            }
 
             var existUsers = CheckUserExistence(request.Users.Select(u => u.UserId).ToList(), response.Errors);
             if (!response.Errors.Any()

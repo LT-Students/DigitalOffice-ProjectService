@@ -36,8 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
         private List<Guid> CreateImage(List<ImageContext> context, Guid userId, List<string> errors)
         {
-            List<CreateImageData> images =
-                context.
+            List<CreateImageData> images = context.
                 Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).
                 ToList();
 
@@ -86,9 +85,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             _validator = validator;
         }
 
-        public OperationResultResponse<bool> Execute(CreateImageRequest request)
+        public OperationResultResponse<List<Guid>> Execute(CreateImageRequest request)
         {
-            OperationResultResponse<bool> response = new();
+            OperationResultResponse<List<Guid>> response = new();
+            List<string> errors = new();
 
             if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
             {
@@ -99,7 +99,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 return response;
             }
 
-            _validator.ValidateAndThrowCustom(request);
+            if (!_validator.ValidateCustom(request, out errors))
+            {
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.Status = OperationResultStatusType.Failed;
+                response.Errors.AddRange(errors);
+
+                return response;
+            }
 
             List<Guid> imagesIds = CreateImage(
                 request.Images,

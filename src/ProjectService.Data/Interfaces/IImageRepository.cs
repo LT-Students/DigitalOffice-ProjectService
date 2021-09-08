@@ -8,7 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     [AutoInject]
     public interface IImageRepository
     {
-        bool Create(IEnumerable<DbProjectImage> images);
+        List<Guid> Create(IEnumerable<DbProjectImage> images);
 
         bool Remove(IEnumerable<Guid> imagesIds);
     }

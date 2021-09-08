@@ -3,6 +3,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
@@ -12,7 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     public class ImageController : ControllerBase
     {
         [HttpPost("create")]
-        public OperationResultResponse<bool> Create(
+        public OperationResultResponse<List<Guid>> Create(
             [FromServices] ICreateImageCommand command,
             [FromBody] CreateImageRequest request)
         {

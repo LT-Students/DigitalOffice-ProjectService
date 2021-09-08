@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Validation
@@ -34,7 +35,19 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     .Must(images => imageFormats.Contains(images.Extension))
                     .WithMessage("Wrong extension")
                     .Must(images => images.Name.Length < 150)
-                    .WithMessage("Name's length must be less than 150 letters");
+                    .WithMessage("Name's length must be less than 150 letters")
+                    .Must(images =>
+                    {
+                        try
+                        {
+                            var byteString = new Span<byte>(new byte[images.Content.Length]);
+                            return Convert.TryFromBase64String(images.Content, byteString, out _);
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                    }).WithMessage("Wrong image content.");
         }
     }
 }

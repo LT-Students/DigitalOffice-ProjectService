@@ -11,27 +11,24 @@ namespace LT.DigitalOffice.ProjectService.Data
     public class ImageRepository : IImageRepository
     {
         private readonly IDataProvider _provider;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public ImageRepository(
-            IDataProvider provider,
-            IHttpContextAccessor httpContextAccessor)
+            IDataProvider provider)
         {
             _provider = provider;
-            _httpContextAccessor = httpContextAccessor;
         }
 
-        public bool Create(IEnumerable<DbProjectImage> images)
+        public List<Guid> Create(IEnumerable<DbProjectImage> images)
         {
             if (images == null)
             {
-                return false;
+                return null;
             }
 
             _provider.ProjectsImages.AddRange(images);
             _provider.Save();
 
-            return true;
+            return images.Select(x => x.ImageId).ToList();
         }
 
         public bool Remove(IEnumerable<Guid> imagesIds)
@@ -41,8 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                 return false;
             }
 
-            IEnumerable<DbProjectImage> images =
-                _provider.
+            IEnumerable<DbProjectImage> images = _provider.
                 ProjectsImages.
                 Where(x => imagesIds.
                 Contains(x.ImageId));
