@@ -36,9 +36,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
         private List<Guid> CreateImage(List<ImageContext> context, Guid userId, List<string> errors)
         {
-            List<CreateImageData> images = context.
-                Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).
-                ToList();
+            List<CreateImageData> images = context
+                .Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId))
+                .ToList();
 
             string errorMessage = "Can not create images. Please try again later.";
             const string logMessage = "Errors while creating images.";
@@ -122,8 +122,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             }
 
             response.Body = _repository.Create(imagesIds.Select(imageId =>
-                _dbProjectImageMapper.Map(request, imageId)).
-                ToList());
+                _dbProjectImageMapper.Map(request, imageId))
+                .ToList());
 
             response.Status = OperationResultStatusType.FullSuccess;
             _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;

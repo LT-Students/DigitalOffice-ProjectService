@@ -102,9 +102,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
                 return response;
             }
 
-            List<Guid> imagesIds = request.
-                Select(x => x.ImageId).
-                ToList();
+            List<Guid> imagesIds = request
+                .Select(x => x.ImageId)
+                .ToList();
 
             bool result = RemoveImage(imagesIds, response.Errors);
 

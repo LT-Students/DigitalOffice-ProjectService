@@ -1,7 +1,6 @@
 ﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,10 +37,10 @@ namespace LT.DigitalOffice.ProjectService.Data
                 return false;
             }
 
-            IEnumerable<DbProjectImage> images = _provider.
-                ProjectsImages.
-                Where(x => imagesIds.
-                Contains(x.ImageId));
+            IEnumerable<DbProjectImage> images = _provider
+                .ProjectsImages
+                .Where(x => imagesIds
+                .Contains(x.ImageId));
 
             _provider.ProjectsImages.RemoveRange(images);
             _provider.Save();
