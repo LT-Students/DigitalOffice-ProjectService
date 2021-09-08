@@ -161,7 +161,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
         }
 
-        private List<Guid> CreateImage(List<ImageContext> projectImages, Guid userId, List<string> errors)
+        private List<Guid> CreateImage(List<ImageContent> projectImages, Guid userId, List<string> errors)
         {
             if (projectImages == null || projectImages.Count == 0)
             {
@@ -228,7 +228,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             OperationResultResponse<Guid> response = new();
             List<string> errors = new();
 
-            if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
+            if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Status = OperationResultStatusType.Failed;

@@ -65,12 +65,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         }
 
         public RemoveImageCommand(
-           IImageRepository repository,
-           IRequestClient<IRemoveImagesRequest> rcImages,
-           ILogger<RemoveImageCommand> logger,
-           IAccessValidator accessValidator,
-           IHttpContextAccessor httpContextAccessor,
-           IRemoveImageValidator validator)
+            IImageRepository repository,
+            IRequestClient<IRemoveImagesRequest> rcImages,
+            ILogger<RemoveImageCommand> logger,
+            IAccessValidator accessValidator,
+            IHttpContextAccessor httpContextAccessor,
+            IRemoveImageValidator validator)
         {
             _repository = repository;
             _rcImages = rcImages;
@@ -85,7 +85,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
             OperationResultResponse<bool> response = new();
             List<string> errors = new();
 
-            if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
+            if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Status = OperationResultStatusType.Failed;

@@ -7,7 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
     public record CreateImageRequest
     {
         public Guid ProjectOrTaskId { get; set; }
-        public List<ImageContext> Images { get; set; }
+        public List<ImageContent> Images { get; set; }
         public ImageType ImageType { get; set; }
     }
 }

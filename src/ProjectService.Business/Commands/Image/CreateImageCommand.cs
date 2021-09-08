@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         private readonly IDbProjectImageMapper _dbProjectImageMapper;
         private readonly ICreateImageValidator _validator;
 
-        private List<Guid> CreateImage(List<ImageContext> context, Guid userId, List<string> errors)
+        private List<Guid> CreateImage(List<ImageContent> context, Guid userId, List<string> errors)
         {
             List<CreateImageData> images = context
                 .Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId))
@@ -69,13 +69,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         }
 
         public CreateImageCommand(
-           IImageRepository repository,
-           IRequestClient<ICreateImagesRequest> rcImages,
-           ILogger<CreateImageCommand> logger,
-           IAccessValidator accessValidator,
-           IHttpContextAccessor httpContextAccessor,
-           IDbProjectImageMapper dbProjectImageMapper,
-           ICreateImageValidator validator)
+            IImageRepository repository,
+            IRequestClient<ICreateImagesRequest> rcImages,
+            ILogger<CreateImageCommand> logger,
+            IAccessValidator accessValidator,
+            IHttpContextAccessor httpContextAccessor,
+            IDbProjectImageMapper dbProjectImageMapper,
+            ICreateImageValidator validator)
         {
             _repository = repository;
             _rcImages = rcImages;
@@ -91,7 +91,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             OperationResultResponse<List<Guid>> response = new();
             List<string> errors = new();
 
-            if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
+            if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 response.Status = OperationResultStatusType.Failed;

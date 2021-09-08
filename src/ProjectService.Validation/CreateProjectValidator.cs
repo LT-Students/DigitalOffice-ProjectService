@@ -11,12 +11,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
     {
         private readonly List<string> imageFormats = new()
         {
-            ".jpg",
-            ".jpeg",
-            ".png",
-            ".bmp",
-            ".gif",
-            ".tga"
+            ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tga"
         };
 
         public CreateProjectValidator()
