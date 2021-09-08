@@ -50,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
 
             string errorMessage = "Failed to check the existing department.";
-            const string logMessage = "Department with id: {id} not found.";
+            string logMessage = "Department with id: {id} not found.";
 
             try
             {
@@ -111,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private void CreateWorkspace(string projectName, Guid creatorId, List<Guid> users, List<string> errors)
         {
             string errorMessage = $"Failed to create a workspace for the project {projectName}";
-            const string logMessage = "Cannot create workspace for project {name}";
+            string logMessage = "Cannot create workspace for project {name}";
 
             try
             {
