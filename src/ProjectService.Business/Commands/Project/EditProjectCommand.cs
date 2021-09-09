@@ -10,7 +10,6 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
@@ -78,8 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IProjectRepository projectRepository,
             IRequestClient<IGetDepartmentRequest> requestClient,
             IHttpContextAccessor httpContextAccessor,
-            ILogger<CreateProjectCommand> logger
-        )
+            ILogger<CreateProjectCommand> logger)
         {
             _validator = validator;
             _accessValidator = accessValidator;
@@ -95,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         {
             _validator.ValidateAndThrowCustom(request);
 
-            DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId});
+            DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId });
 
             OperationResultResponse<bool> response = new();
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
@@ -112,7 +110,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 if (item.path == $"/{nameof(EditProjectRequest.Name)}" &&
                     _projectRepository.IsProjectNameExist(item.value.ToString()))
                 {
-                    response.Status = OperationResultStatusType.Conflict;
+                    response.Status = OperationResultStatusType.Failed;
                     response.Errors.Add($"Project with name '{item.value}' already exist");
                     return response;
                 }
