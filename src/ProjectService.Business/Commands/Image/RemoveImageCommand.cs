@@ -86,17 +86,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
             if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+
                 response.Status = OperationResultStatusType.Failed;
                 response.Errors.Add("Not enough rights.");
 
                 return response;
             }
 
-            List<string> errors = new();
-
-            if (!_validator.ValidateCustom(request, out errors))
+            if (!_validator.ValidateCustom(request, out List<string> errors))
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
                 response.Status = OperationResultStatusType.Failed;
                 response.Errors.AddRange(errors);
 

@@ -16,9 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         public CreateImageValidator()
         {
             RuleFor(images => images)
-                .NotNull().WithMessage("List must not be null");
-
-            RuleFor(images => images)
+                .NotNull().WithMessage("List must not be null")
                 .NotEmpty().WithMessage("List must not be empty");
 
             RuleFor(images => images.ProjectOrTaskId)

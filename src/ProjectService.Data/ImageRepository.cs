@@ -39,8 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             IEnumerable<DbProjectImage> images = _provider
                 .ProjectsImages
-                .Where(x => imagesIds
-                .Contains(x.ImageId));
+                .Where(x => imagesIds.Contains(x.ImageId));
 
             _provider.ProjectsImages.RemoveRange(images);
             _provider.Save();
