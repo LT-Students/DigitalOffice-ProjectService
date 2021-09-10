@@ -2,13 +2,12 @@
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using System;
-using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces
 {
     [AutoInject]
-    public interface IDbProjectMapper
+    public interface IDbProjectImageMapper
     {
-        DbProject Map(CreateProjectRequest request, Guid authorId, List<Guid> users, List<Guid> departmentIds, List<Guid> imagesIds);
+        DbProjectImage Map(CreateImageRequest request, Guid imageId);
     }
 }

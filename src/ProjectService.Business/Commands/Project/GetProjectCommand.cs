@@ -1,11 +1,12 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Enums;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
-using LT.DigitalOffice.Models.Broker.Requests.File;
+using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
-using LT.DigitalOffice.Models.Broker.Responses.File;
+using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.Models.Broker.Responses.User;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -66,30 +67,28 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             return null;
         }
 
-        private List<ImageInfo> GetImages(List<Guid> imageIds, List<string> errors)
+        private List<ImageInfo> GetUserAvatars(List<Guid> imageIds, List<string> errors)
         {
             if (imageIds == null || imageIds.Count == 0)
             {
-                return new();
+                return null;
             }
 
-            string errorMessage = "Can not get images. Please try again later.";
-            const string logMessage = "Errors while getting images with ids: {Ids}.";
+            string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
 
             try
             {
                 IOperationResult<IGetImagesResponse> response = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
-                    IGetImagesRequest.CreateObj(imageIds)).Result.Message;
+                    IGetImagesRequest.CreateObj(imageIds, ImageSource.User)).Result.Message;
 
-                if (response.IsSuccess)
+                if (response.IsSuccess && response.Body.ImagesData != null)
                 {
-                    return response.Body.Images.Select(_imageMapper.Map).ToList();
+                    return response.Body.ImagesData.Select(_imageMapper.Map).ToList();
                 }
                 else
                 {
-                    const string warningMessage = logMessage + "Errors: {Errors}";
                     _logger.LogWarning(
-                        warningMessage,
+                        logMessage,
                         string.Join(", ", imageIds),
                         string.Join('\n', response.Errors));
                 }
@@ -99,9 +98,45 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 _logger.LogError(exc, logMessage, string.Join(", ", imageIds));
             }
 
-            errors.Add(errorMessage);
+            errors.Add("Can not get images. Please try again later.");
 
-            return new();
+            return null;
+        }
+
+        private List<ImageInfo> GetProjectImages(List<Guid> imageIds, List<string> errors)
+        {
+            if (imageIds == null || imageIds.Count == 0)
+            {
+                return null;
+            }
+
+            string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
+
+            try
+            {
+                IOperationResult<IGetImagesResponse> response = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
+                   IGetImagesRequest.CreateObj(imageIds, ImageSource.Project)).Result.Message;
+
+                if (response.IsSuccess && response.Body != null)
+                {
+                    return response.Body.ImagesData.Select(_imageMapper.Map).ToList();
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        logMessage,
+                        string.Join(", ", imageIds),
+                        string.Join('\n', response.Errors));
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, logMessage, string.Join(", ", imageIds));
+            }
+
+            errors.Add("Can not get images. Please try again later.");
+
+            return null;
         }
 
         private List<ProjectUserInfo> GetProjectUsersInfo(IEnumerable<DbProjectUser> projectUsers, List<string> errors)
@@ -132,7 +167,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                     IGetCompanyEmployeesResponse userPositionsAndDepartments =
                         GetCompanyEmployees(usersIds, errors);
 
-                    var images = GetImages(
+                    var images = GetUserAvatars(
                         usersDataResponse
                             .Body
                             .UsersData
@@ -169,7 +204,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             errors.Add($"Can not get users info for UserIds {string.Join('\n', usersIds)}. Please try again later.");
 
-            return new();
+            return null;
         }
 
         private IGetCompanyEmployeesResponse GetCompanyEmployees(
@@ -247,9 +282,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             List<ProjectUserInfo> usersInfo = GetProjectUsersInfo(dbProject.Users, response.Errors);
             List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
+            List<ImageInfo> imagesinfo = GetProjectImages(dbProject.ProjectsImages.Select(x => x.ImageId).ToList(), response.Errors);
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
-            response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, department);
+            response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, imagesinfo, department);
 
             return response;
         }

@@ -2,16 +2,17 @@ using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Common;
+using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
+using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
@@ -21,6 +22,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LT.DigitalOffice.Models.Broker.Enums;
+using System.Net;
+using LT.DigitalOffice.ProjectService.Models.Db;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -35,6 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
         private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
         private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
+        private readonly IRequestClient<ICreateImagesRequest> _rcImages;
         private readonly IRequestClient<ICheckDepartmentsExistence> _rcCheckDepartmentsExistence;
 
         private List<Guid> CheckDepartmentExistence(Guid? departmentId, List<string> errors)
@@ -156,6 +161,41 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
         }
 
+        private List<Guid> CreateImage(List<ImageContent> projectImages, Guid userId, List<string> errors)
+        {
+            if (projectImages == null || projectImages.Count == 0)
+            {
+                return null;
+            }
+
+            string logMessage = "Errors while creating images. Errors: {Errors}";
+
+            try
+            {
+                IOperationResult<ICreateImagesResponse> response = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
+                   ICreateImagesRequest.CreateObj(
+                       projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).ToList(),
+                       ImageSource.Project)).Result.Message;
+
+                if (response.IsSuccess && response.Body.ImagesIds != null)
+                {
+                    return response.Body.ImagesIds;
+                }
+
+                _logger.LogWarning(
+                    logMessage,
+                    string.Join('\n', response.Errors));
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, logMessage);
+            }
+
+            errors.Add("Can not create images. Please try again later.");
+
+            return null;
+        }
+
         public CreateProjectCommand(
             IProjectRepository repository,
             ICreateProjectValidator validator,
@@ -166,8 +206,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
             IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
             IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
+            IRequestClient<ICreateImagesRequest> rcImages,
             IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence)
-
         {
             _logger = logger;
             _validator = validator;
@@ -178,28 +218,45 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _rcCreateWorkspace = rcCreateWorkspace;
             _rcCheckUsersExistence = rcCheckUsersExistence;
             _rcCreateWorkTime = rcCreateWorkTime;
+            _rcImages = rcImages;
             _rcCheckDepartmentsExistence = rcCheckDepartmentsExistence;
         }
 
-        public OperationResultResponse<Guid> Execute(ProjectRequest request)
+        public OperationResultResponse<Guid> Execute(CreateProjectRequest request)
         {
-            if (!(_accessValidator.IsAdmin() || _accessValidator.HasRights(Rights.AddEditRemoveProjects)))
-            {
-                throw new ForbiddenException("Not enough rights.");
-            }
-
             OperationResultResponse<Guid> response = new();
 
-            if (_repository.IsProjectNameExist(request.Name))
+            if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
             {
-                response.Status = OperationResultStatusType.Conflict;
-                response.Errors.Add($"Project with name '{request.Name}' already exist");
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+
+                response.Status = OperationResultStatusType.Failed;
+                response.Errors.Add("Not enough rights.");
+
                 return response;
             }
 
-            _validator.ValidateAndThrowCustom(request);
+            if (_repository.IsProjectNameExist(request.Name))
+            {
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
 
-            var existUsers = CheckUserExistence(request.Users.Select(u => u.UserId).ToList(), response.Errors);
+                response.Status = OperationResultStatusType.Failed;
+                response.Errors.Add($"Project with name '{request.Name}' already exist");
+
+                return response;
+            }
+
+            if (!_validator.ValidateCustom(request, out List<string> errors))
+            {
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+                response.Status = OperationResultStatusType.Failed;
+                response.Errors.AddRange(errors);
+
+                return response;
+            }
+
+            List<Guid> existUsers = CheckUserExistence(request.Users.Select(u => u.UserId).ToList(), response.Errors);
             if (!response.Errors.Any()
                 && existUsers.Count() != request.Users.Count())
             {
@@ -207,13 +264,19 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
             else if (response.Errors.Any())
             {
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
                 response.Status = OperationResultStatusType.Failed;
                 return response;
             }
+
             List<Guid> existDepartments = CheckDepartmentExistence(request.DepartmentId, response.Errors);
 
             Guid userId = _httpContextAccessor.HttpContext.GetUserId();
-            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, existDepartments);
+
+            List<Guid> imageIds = CreateImage(request.ProjectImages.ToList(), userId, response.Errors);
+
+            DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, existDepartments, imageIds);
 
             response.Body = _repository.Create(dbProject);
 

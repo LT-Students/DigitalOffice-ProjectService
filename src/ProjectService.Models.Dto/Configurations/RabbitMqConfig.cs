@@ -3,9 +3,11 @@ using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.File;
+using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.Models.Broker.Requests.User;
+using IGetImagesRequest = LT.DigitalOffice.Models.Broker.Requests.Image.IGetImagesRequest;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 {
@@ -22,8 +24,16 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
         [AutoInjectRequest(typeof(IGetFileRequest))]
         public string GetFileEndpoint { get; set; }
 
+        // image
+
+        [AutoInjectRequest(typeof(IRemoveImagesRequest))]
+        public string RemoveImagesEndpoint { get; set; }
+
         [AutoInjectRequest(typeof(IGetImagesRequest))]
         public string GetImagesEndpoint { get; set; }
+
+        [AutoInjectRequest(typeof(ICreateImagesRequest))]
+        public string CreateImagesEndpoint { get; set; }
 
         // company
 
