@@ -39,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
         private DepartmentData GetDepartment(Guid authorId, List<string> errors)
         {
-            string errorMessage = "Cannot create task. Please try again later.";
+            string errorMessage = "Cannot get department. Please try again later.";
 
             try
             {
