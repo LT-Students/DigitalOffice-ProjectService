@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -13,17 +14,20 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
     {
         private readonly IProjectInfoMapper _projectInfoMapper;
         private readonly ITaskInfoMapper _taskInfoMapper;
+        private readonly IDepartmentInfoMapper _departmentInfoMapper;
         private readonly ITaskPropertyInfoMapper _taskPropertyInfoMapper;
         private readonly IUserTaskInfoMapper _userTaskInfoMapper;
 
         public TaskResponseMapper(
             IProjectInfoMapper projectInfoMapper,
             ITaskInfoMapper taskInfoMapper,
+            IDepartmentInfoMapper departmentInfoMapper,
             ITaskPropertyInfoMapper taskPropertyInfoMapper,
             IUserTaskInfoMapper userTaskInfoMapper)
         {
             _projectInfoMapper = projectInfoMapper;
             _taskInfoMapper = taskInfoMapper;
+            _departmentInfoMapper = departmentInfoMapper;
             _taskPropertyInfoMapper = taskPropertyInfoMapper;
             _userTaskInfoMapper = userTaskInfoMapper;
         }
@@ -33,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
             UserData authorUserData,
             UserData parentAssignedUserData,
             UserData parentAuthorAssignedUserData,
-            string departmentName,
+            DepartmentData department,
             UserData assignedUserData,
             ICollection<TaskInfo> subtasksInfo)
         {
@@ -59,7 +63,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
                         parentAuthorAssignedUserData)
                     : null,
                 Project = dbTask.Project != null
-                    ? _projectInfoMapper.Map(dbTask.Project, departmentName)
+                    ? _projectInfoMapper.Map(dbTask.Project, _departmentInfoMapper.Map(department))
                     : null,
                 Priority = dbTask.Priority != null
                     ? _taskPropertyInfoMapper.Map(dbTask.Priority)

@@ -4,6 +4,7 @@ using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
@@ -32,27 +33,27 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IPatchDbProjectMapper _mapper;
         private readonly IProjectRepository _projectRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
+        private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartments;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<CreateProjectCommand> _logger;
 
-        private IGetDepartmentResponse GetDepartment(Guid? departmentId, List<string> errors)
+        private DepartmentData GetDepartment(Guid? departmentId, List<string> errors)
         {
             string errorMessage = "Cannot edit project. Please try again later.";
 
-            if (departmentId == null)
+            if (!departmentId.HasValue)
             {
                 return null;
             }
 
             try
             {
-                var response = _requestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                IGetDepartmentRequest.CreateObj(null, departmentId)).Result;
+                var response = _rcGetDepartments.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
+                IGetDepartmentsRequest.CreateObj(new() { departmentId.Value })).Result;
 
                 if (response.Message.IsSuccess)
                 {
-                    return response.Message.Body;
+                    return response.Message.Body.Departments.FirstOrDefault();
                 }
 
                 _logger.LogWarning(
@@ -75,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IPatchDbProjectMapper mapper,
             IUserRepository userRepository,
             IProjectRepository projectRepository,
-            IRequestClient<IGetDepartmentRequest> requestClient,
+            IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
             IHttpContextAccessor httpContextAccessor,
             ILogger<CreateProjectCommand> logger)
         {
@@ -84,7 +85,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _mapper = mapper;
             _projectRepository = projectRepository;
             _userRepository = userRepository;
-            _requestClient = requestClient;
+            _rcGetDepartments = rcGetDepartments;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
@@ -117,6 +118,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
                 if (item.path == $"/{nameof(EditProjectRequest.DepartmentId)}")
                 {
+                    // TODO rework to department existence
                     var departmentData = GetDepartment(Guid.Parse(item.value.ToString()), response.Errors);
 
                     if (!response.Errors.Any() && departmentData == null)
