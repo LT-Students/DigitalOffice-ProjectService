@@ -282,7 +282,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             List<ProjectUserInfo> usersInfo = GetProjectUsersInfo(dbProject.Users, response.Errors);
             List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
-            List<ImageInfo> imagesinfo = GetProjectImages(dbProject.ProjectsImages.Select(x => x.ImageId).ToList(), response.Errors);
+            List<ImageInfo> imagesinfo = GetProjectImages(dbProject.Images.Select(x => x.ImageId).ToList(), response.Errors);
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
             response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, imagesinfo, department);

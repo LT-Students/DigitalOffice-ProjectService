@@ -31,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         private readonly ILogger<CreateImageCommand> _logger;
         private readonly IAccessValidator _accessValidator;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IDbProjectImageMapper _dbProjectImageMapper;
+        private readonly IDbImageMapper _dbProjectImageMapper;
         private readonly ICreateImageValidator _validator;
 
         private List<Guid> CreateImage(List<ImageContent> context, Guid userId, List<string> errors)
@@ -72,7 +72,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             ILogger<CreateImageCommand> logger,
             IAccessValidator accessValidator,
             IHttpContextAccessor httpContextAccessor,
-            IDbProjectImageMapper dbProjectImageMapper,
+            IDbImageMapper dbProjectImageMapper,
             ICreateImageValidator validator)
         {
             _repository = repository;

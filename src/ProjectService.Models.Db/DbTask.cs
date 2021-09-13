@@ -36,11 +36,11 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public ICollection<DbTask> Subtasks { get; set; }
 
         [IgnoreParse]
-        public ICollection<DbTaskImage> TasksImages { get; set; }
+        public ICollection<DbEntityImage> Images { get; set; }
 
         public DbTask()
         {
-            TasksImages = new HashSet<DbTaskImage>();
+            Images = new HashSet<DbEntityImage>();
         }
     }
 
@@ -89,7 +89,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .HasForeignKey(t => t.ParentId);
 
             builder
-                .HasMany(p => p.TasksImages)
+                .HasMany(p => p.Images)
                 .WithOne(tp => tp.Task);
         }
     }

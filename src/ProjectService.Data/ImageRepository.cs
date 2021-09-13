@@ -17,14 +17,14 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
-        public List<Guid> Create(IEnumerable<DbProjectImage> images)
+        public List<Guid> Create(IEnumerable<DbEntityImage> images)
         {
             if (images == null)
             {
                 return null;
             }
 
-            _provider.ProjectsImages.AddRange(images);
+            _provider.Images.AddRange(images);
             _provider.Save();
 
             return images.Select(x => x.ImageId).ToList();
@@ -37,11 +37,10 @@ namespace LT.DigitalOffice.ProjectService.Data
                 return false;
             }
 
-            IEnumerable<DbProjectImage> images = _provider
-                .ProjectsImages
+            IEnumerable<DbEntityImage> images = _provider.Images
                 .Where(x => imagesIds.Contains(x.ImageId));
 
-            _provider.ProjectsImages.RemoveRange(images);
+            _provider.Images.RemoveRange(images);
             _provider.Save();
 
             return true;
