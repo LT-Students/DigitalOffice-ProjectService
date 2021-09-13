@@ -18,7 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
             {
                 Id = Guid.NewGuid(),
                 ImageId = imageId,
-                Entity = request.ProjectOrTaskId
+                EntityId = request.ProjectOrTaskId
             };
         }
     }
