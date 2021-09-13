@@ -17,7 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider = provider;
         }
 
-        public List<Guid> Create(IEnumerable<DbImage> images)
+        public List<Guid> Create(IEnumerable<DbEntityImage> images)
         {
             if (images == null)
             {
@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                 return false;
             }
 
-            IEnumerable<DbImage> images = _provider
+            IEnumerable<DbEntityImage> images = _provider
                 .Images
                 .Where(x => imagesIds.Contains(x.ImageId));
 

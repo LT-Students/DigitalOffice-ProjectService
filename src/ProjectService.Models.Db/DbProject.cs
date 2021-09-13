@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         [IgnoreParse]
         public ICollection<DbTaskProperty> TaskProperties { get; set; }
         [IgnoreParse]
-        public ICollection<DbImage> Images { get; set; }
+        public ICollection<DbEntityImage> Images { get; set; }
 
         public DbProject()
         {
@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
             TaskProperties = new HashSet<DbTaskProperty>();
 
-            Images = new HashSet<DbImage>();
+            Images = new HashSet<DbEntityImage>();
         }
     }
 

@@ -36,11 +36,11 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public ICollection<DbTask> Subtasks { get; set; }
 
         [IgnoreParse]
-        public ICollection<DbImage> Images { get; set; }
+        public ICollection<DbEntityImage> Images { get; set; }
 
         public DbTask()
         {
-            Images = new HashSet<DbImage>();
+            Images = new HashSet<DbEntityImage>();
         }
     }
 

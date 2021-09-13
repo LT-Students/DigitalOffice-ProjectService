@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
                         IsActive = true
                     })
                     .ToList(),
-                Images = imagesIds.Select(imageId => new DbImage
+                Images = imagesIds.Select(imageId => new DbEntityImage
                 {
                     Id = Guid.NewGuid(),
                     ImageId = imageId,

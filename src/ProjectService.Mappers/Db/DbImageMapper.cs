@@ -7,14 +7,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
     public class DbImageMapper : IDbImageMapper
     {
-        public DbImage Map(CreateImageRequest request, Guid imageId)
+        public DbEntityImage Map(CreateImageRequest request, Guid imageId)
         {
             if (request == null)
             {
                 throw new ArgumentNullException(nameof(request));
             }
 
-            return new DbImage
+            return new DbEntityImage
             {
                 Id = Guid.NewGuid(),
                 ImageId = imageId,

@@ -6,13 +6,13 @@ using System;
 namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
     [DbContext(typeof(ProjectServiceDbContext))]
-    [Migration("20210824232700_AddImagesTable")]
-    public class AddImagesTable : Migration
+    [Migration("20210824232700_AddEntityImagesTable")]
+    public class AddEntityImagesTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-               name: DbImage.TableName,
+               name: DbEntityImage.TableName,
                columns: table => new
                {
                    Id = table.Column<Guid>(nullable: false),
@@ -21,13 +21,13 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                },
                constraints: table =>
                {
-                   table.PrimaryKey("PK_Images", x => x.Id);
+                   table.PrimaryKey("PK_EntityImages", x => x.Id);
                });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(DbImage.TableName);
+            migrationBuilder.DropTable(DbEntityImage.TableName);
         }
     }
 }
