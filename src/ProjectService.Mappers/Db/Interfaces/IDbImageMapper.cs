@@ -6,8 +6,8 @@ using System;
 namespace LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces
 {
     [AutoInject]
-    public interface IDbProjectImageMapper
+    public interface IDbImageMapper
     {
-        DbProjectImage Map(CreateImageRequest request, Guid imageId);
+        DbImage Map(CreateImageRequest request, Guid imageId);
     }
 }

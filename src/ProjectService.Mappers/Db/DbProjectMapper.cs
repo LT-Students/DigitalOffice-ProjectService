@@ -44,11 +44,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
                         IsActive = true
                     })
                     .ToList(),
-                ProjectsImages = imagesIds.Select(imageId => new DbProjectImage
+                Images = imagesIds.Select(imageId => new DbImage
                 {
                     Id = Guid.NewGuid(),
                     ImageId = imageId,
-                    ProjectId = projectId
+                    ProjectOrTaskId = projectId
                 }).ToList()
             };
         }
