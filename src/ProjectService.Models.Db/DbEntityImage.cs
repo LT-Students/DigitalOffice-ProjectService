@@ -6,7 +6,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 {
     public class DbEntityImage
     {
-        public const string TableName = "EntityImages";
+        public const string TableName = "EntitiesImages";
 
         public Guid Id { get; set; }
         public Guid EntityId { get; set; }

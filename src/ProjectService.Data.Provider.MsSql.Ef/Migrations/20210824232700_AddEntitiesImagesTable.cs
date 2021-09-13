@@ -6,8 +6,8 @@ using System;
 namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
     [DbContext(typeof(ProjectServiceDbContext))]
-    [Migration("20210824232700_AddEntityImagesTable")]
-    public class AddEntityImagesTable : Migration
+    [Migration("20210824232700_AddEntitiesImagesTable")]
+    public class AddEntitiesImagesTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -21,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                },
                constraints: table =>
                {
-                   table.PrimaryKey("PK_EntityImages", x => x.Id);
+                   table.PrimaryKey("PK_EntitiesImages", x => x.Id);
                });
         }
 
