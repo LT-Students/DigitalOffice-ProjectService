@@ -37,8 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                 return false;
             }
 
-            IEnumerable<DbEntityImage> images = _provider
-                .Images
+            IEnumerable<DbEntityImage> images = _provider.Images
                 .Where(x => imagesIds.Contains(x.ImageId));
 
             _provider.Images.RemoveRange(images);
