@@ -24,7 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Data
                 return null;
             }
 
-            _provider.ProjectsImages.AddRange(images);
+            _provider.Images.AddRange(images);
             _provider.Save();
 
             return images.Select(x => x.ImageId).ToList();
@@ -38,10 +38,10 @@ namespace LT.DigitalOffice.ProjectService.Data
             }
 
             IEnumerable<DbImage> images = _provider
-                .ProjectsImages
+                .Images
                 .Where(x => imagesIds.Contains(x.ImageId));
 
-            _provider.ProjectsImages.RemoveRange(images);
+            _provider.Images.RemoveRange(images);
             _provider.Save();
 
             return true;
