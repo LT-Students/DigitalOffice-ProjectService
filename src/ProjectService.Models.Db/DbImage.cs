@@ -9,7 +9,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public const string TableName = "Images";
 
         public Guid Id { get; set; }
-        public Guid ProjectOrTaskId { get; set; }
+        public Guid Entity { get; set; }
         public Guid ImageId { get; set; }
 
         public DbProject Project { get; set; }

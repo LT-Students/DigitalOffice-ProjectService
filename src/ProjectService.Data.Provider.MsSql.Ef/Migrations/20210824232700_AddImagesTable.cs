@@ -16,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                columns: table => new
                {
                    Id = table.Column<Guid>(nullable: false),
-                   ProjectOrTaskId = table.Column<Guid>(nullable: false),
+                   Entity = table.Column<Guid>(nullable: false),
                    ImageId = table.Column<Guid>(nullable: false)
                },
                constraints: table =>
