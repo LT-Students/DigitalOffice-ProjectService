@@ -1,11 +1,18 @@
-﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+using LT.DigitalOffice.Models.Broker.Enums;
+using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
+using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
+using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
@@ -15,93 +22,128 @@ using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
-    public class CreateTaskCommand : ICreateTaskCommand
+  public class CreateTaskCommand : ICreateTaskCommand
+  {
+    private readonly ITaskRepository _repository;
+    private readonly ICreateTaskValidator _validator;
+    private readonly IUserRepository _userRepository;
+    private readonly IDbTaskMapper _mapperTask;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
+    private readonly IAccessValidator _accessValidator;
+    private readonly ILogger<CreateTaskCommand> _logger;
+    private readonly IRequestClient<ICreateImagesRequest> _rcImages;
+
+    private IGetDepartmentResponse GetDepartment(Guid authorId, List<string> errors)
     {
-        private readonly ITaskRepository _repository;
-        private readonly ICreateTaskValidator _validator;
-        private readonly IUserRepository _userRepository;
-        private readonly IDbTaskMapper _mapperTask;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
-        private readonly IAccessValidator _accessValidator;
-        private readonly ILogger<CreateTaskCommand> _logger;
+      string errorMessage = "Cannot create task. Please try again later.";
 
-        private IGetDepartmentResponse GetDepartment(Guid authorId, List<string> errors)
+      try
+      {
+        var response = _requestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
+          IGetDepartmentRequest.CreateObj(authorId, null)).Result;
+
+        if (response.Message.IsSuccess)
         {
-            string errorMessage = "Cannot create task. Please try again later.";
-
-            try
-            {
-                var response = _requestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(authorId, null)).Result;
-
-                if (response.Message.IsSuccess)
-                {
-                    return response.Message.Body;
-                }
-
-                _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", authorId);
-            }
-            catch (Exception exc)
-            {
-                _logger.LogError(exc, errorMessage);
-
-                errors.Add(errorMessage);
-            }
-
-            return null;
+          return response.Message.Body;
         }
 
-        public CreateTaskCommand(
-            ITaskRepository repository,
-            ICreateTaskValidator validator,
-            IDbTaskMapper mapperTask,
-            IHttpContextAccessor httpContextAccessor,
-            IAccessValidator accessValidator,
-            IUserRepository userRepository,
-            IRequestClient<IGetDepartmentRequest> requestClient,
-            ILogger<CreateTaskCommand> logger)
-        {
-            _repository = repository;
-            _validator = validator;
-            _mapperTask = mapperTask;
-            _httpContextAccessor = httpContextAccessor;
-            _requestClient = requestClient;
-            _accessValidator = accessValidator;
-            _logger = logger;
-            _userRepository = userRepository;
-        }
+        _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", authorId);
+      }
+      catch (Exception exc)
+      {
+        _logger.LogError(exc, errorMessage);
 
-        public OperationResultResponse<Guid> Execute(CreateTaskRequest request)
-        {
-            var errors = new List<string>();
+        errors.Add(errorMessage);
+      }
 
-            Guid authorId = _httpContextAccessor.HttpContext.GetUserId();
-
-            if (!_accessValidator.IsAdmin()
-                && !_userRepository.AreUserProjectExist(authorId, request.ProjectId)
-                && GetDepartment(authorId, errors)?.DirectorUserId != authorId)
-            {
-                throw new ForbiddenException("Not enough rights.");
-            }
-
-            _validator.ValidateAndThrowCustom(request);
-
-            Guid taskId = _repository.Create(_mapperTask.Map(request, authorId));
-
-            return new OperationResultResponse<Guid>
-            {
-                Body = taskId,
-                Status = !errors.Any() ?
-                    OperationResultStatusType.FullSuccess : OperationResultStatusType.PartialSuccess,
-                Errors = errors
-            };
-        }
+      return null;
     }
+
+    private List<Guid> CreateImage(List<ImageContent> projectImages, Guid userId, List<string> errors)
+    {
+      if (projectImages == null || projectImages.Count == 0)
+      {
+        return null;
+      }
+
+      string logMessage = "Errors while creating images. Errors: {Errors}";
+
+      try
+      {
+        IOperationResult<ICreateImagesResponse> response = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
+          ICreateImagesRequest.CreateObj(
+            projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).ToList(),
+            ImageSource.Project)).Result.Message;
+
+        if (response.IsSuccess && response.Body.ImagesIds != null)
+        {
+          return response.Body.ImagesIds;
+        }
+
+        _logger.LogWarning(
+            logMessage,
+            string.Join('\n', response.Errors));
+      }
+      catch (Exception exc)
+      {
+        _logger.LogError(exc, logMessage);
+      }
+
+      errors.Add("Can not create images. Please try again later.");
+
+      return null;
+    }
+
+    public CreateTaskCommand(
+      ITaskRepository repository,
+      ICreateTaskValidator validator,
+      IDbTaskMapper mapperTask,
+      IHttpContextAccessor httpContextAccessor,
+      IAccessValidator accessValidator,
+      IUserRepository userRepository,
+      IRequestClient<IGetDepartmentRequest> requestClient,
+      ILogger<CreateTaskCommand> logger,
+      IRequestClient<ICreateImagesRequest> rcImages)
+    {
+      _repository = repository;
+      _validator = validator;
+      _mapperTask = mapperTask;
+      _httpContextAccessor = httpContextAccessor;
+      _requestClient = requestClient;
+      _accessValidator = accessValidator;
+      _logger = logger;
+      _userRepository = userRepository;
+      _rcImages = rcImages;
+    }
+
+    public OperationResultResponse<Guid> Execute(CreateTaskRequest request)
+    {
+      var errors = new List<string>();
+
+      Guid authorId = _httpContextAccessor.HttpContext.GetUserId();
+
+      if (!_accessValidator.IsAdmin()
+        && !_userRepository.AreUserProjectExist(authorId, request.ProjectId)
+        && GetDepartment(authorId, errors)?.DirectorUserId != authorId)
+      {
+        throw new ForbiddenException("Not enough rights.");
+      }
+
+      _validator.ValidateAndThrowCustom(request);
+
+      Guid taskId = _repository.Create(_mapperTask.Map(request, authorId));
+
+      return new OperationResultResponse<Guid>
+      {
+        Body = taskId,
+        Status = !errors.Any() ?
+          OperationResultStatusType.FullSuccess : OperationResultStatusType.PartialSuccess,
+        Errors = errors
+      };
+    }
+  }
 }
