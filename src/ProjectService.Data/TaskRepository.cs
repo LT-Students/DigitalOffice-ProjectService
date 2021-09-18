@@ -19,9 +19,9 @@ namespace LT.DigitalOffice.ProjectService.Data
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     private IQueryable<DbTask> CreateFindPredicates(
-        FindTasksFilter filter,
-        IQueryable<DbTask> dbTasks,
-        IEnumerable<Guid> projectIds)
+      FindTasksFilter filter,
+      IQueryable<DbTask> dbTasks,
+      IEnumerable<Guid> projectIds)
     {
       if (filter.Number.HasValue)
       {
@@ -52,8 +52,8 @@ namespace LT.DigitalOffice.ProjectService.Data
     }
 
     public TaskRepository(
-        IDataProvider provider,
-        IHttpContextAccessor httpContextAccessor)
+      IDataProvider provider,
+      IHttpContextAccessor httpContextAccessor)
     {
       _provider = provider;
       _httpContextAccessor = httpContextAccessor;
@@ -87,28 +87,28 @@ namespace LT.DigitalOffice.ProjectService.Data
       if (isFullModel)
       {
         DbTask dbTask = _provider.Tasks
-                            .Include(t => t.Project)
-                            .Include(t => t.Status)
-                            .Include(t => t.Priority)
-                            .Include(t => t.Type)
-                            .Include(t => t.Subtasks)
-                            .Include(t => t.Images)
-                            .FirstOrDefault(x => x.Id == taskId) ??
-                        throw new NotFoundException($"Task id '{taskId}' was not found.");
+          .Include(t => t.Project)
+          .Include(t => t.Status)
+          .Include(t => t.Priority)
+          .Include(t => t.Type)
+          .Include(t => t.Subtasks)
+          .Include(t => t.Images)
+          .FirstOrDefault(x => x.Id == taskId) ??
+            throw new NotFoundException($"Task id '{taskId}' was not found.");
 
         return dbTask;
       }
 
       return _provider.Tasks.FirstOrDefault(x => x.Id == taskId) ??
-             throw new NotFoundException($"Task id '{taskId}' was not found.");
+        throw new NotFoundException($"Task id '{taskId}' was not found.");
     }
 
     public IEnumerable<DbTask> Find(
-        FindTasksFilter filter,
-        IEnumerable<Guid> projectIds,
-        int skipCount,
-        int takeCount,
-        out int totalCount)
+      FindTasksFilter filter,
+      IEnumerable<Guid> projectIds,
+      int skipCount,
+      int takeCount,
+      out int totalCount)
     {
       if (skipCount < 0)
       {
@@ -126,12 +126,12 @@ namespace LT.DigitalOffice.ProjectService.Data
       }
 
       IQueryable<DbTask> dbTasks = _provider.Tasks
-          .Include(t => t.Priority)
-          .Include(t => t.Type)
-          .Include(t => t.Status)
-          .Include(t => t.Project)
-          .AsSingleQuery()
-          .AsQueryable();
+        .Include(t => t.Priority)
+        .Include(t => t.Type)
+        .Include(t => t.Status)
+        .Include(t => t.Project)
+        .AsSingleQuery()
+        .AsQueryable();
 
       IQueryable<DbTask> tasks = CreateFindPredicates(filter, dbTasks, projectIds);
       totalCount = tasks.Count();

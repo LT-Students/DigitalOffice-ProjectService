@@ -39,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       try
       {
         IOperationResult<bool> response = _rcImages.GetResponse<IOperationResult<bool>>(
-           IRemoveImagesRequest.CreateObj(ids, ImageSource.Project)).Result.Message;
+          IRemoveImagesRequest.CreateObj(ids, ImageSource.Project)).Result.Message;
 
         if (response.IsSuccess)
         {
@@ -47,9 +47,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         }
 
         _logger.LogWarning(
-            logMessage,
-            string.Join('\n', ids),
-            string.Join('\n', response.Errors));
+          logMessage,
+          string.Join('\n', ids),
+          string.Join('\n', response.Errors));
       }
       catch (Exception exc)
       {
@@ -62,12 +62,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     }
 
     public RemoveImageCommand(
-        IImageRepository repository,
-        IRequestClient<IRemoveImagesRequest> rcImages,
-        ILogger<RemoveImageCommand> logger,
-        IAccessValidator accessValidator,
-        IHttpContextAccessor httpContextAccessor,
-        IRemoveImageValidator validator)
+      IImageRepository repository,
+      IRequestClient<IRemoveImagesRequest> rcImages,
+      ILogger<RemoveImageCommand> logger,
+      IAccessValidator accessValidator,
+      IHttpContextAccessor httpContextAccessor,
+      IRemoveImageValidator validator)
     {
       _repository = repository;
       _rcImages = rcImages;

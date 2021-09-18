@@ -6,7 +6,6 @@ using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
@@ -57,8 +56,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         }
 
         _logger.LogWarning(
-            "Can not find department with this id {departmentId}: " +
-            "{Environment.NewLine}{string.Join('\n', response.Message.Errors)}", departmentId);
+          "Can not find department with this id {departmentId}: " +
+          "{Environment.NewLine}{string.Join('\n', response.Message.Errors)}", departmentId);
       }
       catch (Exception exc)
       {
@@ -71,13 +70,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     }
 
     public EditProjectCommand(
-        IEditProjectValidator validator,
-        IAccessValidator accessValidator,
-        IPatchDbProjectMapper mapper,
-        IProjectRepository projectRepository,
-        IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
-        IHttpContextAccessor httpContextAccessor,
-        ILogger<CreateProjectCommand> logger)
+      IEditProjectValidator validator,
+      IAccessValidator accessValidator,
+      IPatchDbProjectMapper mapper,
+      IProjectRepository projectRepository,
+      IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
+      IHttpContextAccessor httpContextAccessor,
+      ILogger<CreateProjectCommand> logger)
     {
       _validator = validator;
       _accessValidator = accessValidator;
@@ -109,7 +108,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       foreach (Operation item in request.Operations)
       {
         if (item.path == $"/{nameof(EditProjectRequest.Name)}" &&
-            _projectRepository.IsProjectNameExist(item.value.ToString()))
+          _projectRepository.IsProjectNameExist(item.value.ToString()))
         {
           response.Status = OperationResultStatusType.Failed;
           response.Errors.Add($"Project with name '{item.value}' already exist");

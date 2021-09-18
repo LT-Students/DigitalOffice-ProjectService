@@ -49,8 +49,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
       _items.Add("UserId", _authorId);
 
       _accessorMock
-          .Setup(x => x.HttpContext.Items)
-          .Returns(_items);
+        .Setup(x => x.HttpContext.Items)
+        .Returns(_items);
 
       _mocker = new AutoMocker();
 
@@ -82,29 +82,29 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
     public void ShouldReturnDbTaskWhenCreateTaskRequestIsMapped()
     {
       var project = new List<DbProject>
-            {
-                new DbProject { Id = _createTaskRequest.ProjectId}
-            };
+        {
+          new DbProject { Id = _createTaskRequest.ProjectId}
+        };
 
       int maxNumber = 3;
 
       var tasks = new List<DbTask>
-            {
-                new DbTask
-                {
-                    Id = Guid.NewGuid(),
-                    ProjectId = _createTaskRequest.ProjectId,
-                    Number = maxNumber
-                }
-            };
+        {
+          new DbTask
+          {
+            Id = Guid.NewGuid(),
+            ProjectId = _createTaskRequest.ProjectId,
+            Number = maxNumber
+          }
+        };
 
       _mocker
-          .Setup<IDataProvider, DbSet<DbProject>>(x => x.Projects)
-          .Returns(GetQueryableMockDbSet(project));
+        .Setup<IDataProvider, DbSet<DbProject>>(x => x.Projects)
+        .Returns(GetQueryableMockDbSet(project));
 
       _mocker
-          .Setup<IDataProvider, DbSet<DbTask>>(x => x.Tasks)
-          .Returns(GetQueryableMockDbSet(tasks));
+        .Setup<IDataProvider, DbSet<DbTask>>(x => x.Tasks)
+        .Returns(GetQueryableMockDbSet(tasks));
 
       TaskNumberHelper.LoadCache(_mocker.GetMock<IDataProvider>().Object);
       var dbTask = _dbTaskMapper.Map(_createTaskRequest, _authorId, _imagesIds);

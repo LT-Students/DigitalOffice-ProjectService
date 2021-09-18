@@ -8,17 +8,17 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces
 {
-    [AutoInject]
-    public interface ITaskResponseMapper
-    {
-        TaskResponse Map(
-            DbTask dbTask,
-            UserData authorUserData,
-            UserData parentAssignedUserData,
-            UserData parentAuthorAssignedUserData,
-            DepartmentData department,
-            UserData assignedUserData,
-            ICollection<TaskInfo> subtasksInfo,
-            List<ImageInfo> imagesinfo);
-    }
+  [AutoInject]
+  public interface ITaskResponseMapper
+  {
+    TaskResponse Map(
+      DbTask dbTask,
+      UserData authorUserData,
+      UserData parentAssignedUserData,
+      UserData parentAuthorAssignedUserData,
+      DepartmentData department,
+      UserData assignedUserData,
+      ICollection<TaskInfo> subtasksInfo,
+      List<ImageInfo> imagesinfo);
+  }
 }

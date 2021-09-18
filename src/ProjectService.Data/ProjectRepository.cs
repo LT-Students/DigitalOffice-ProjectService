@@ -74,7 +74,6 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider.Save();
 
             return dbProject.Id;
-
         }
 
         public bool Edit(DbProject dbProject, JsonPatchDocument<DbProject> request)

@@ -14,16 +14,16 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   {
     [HttpPost("create")]
     public OperationResultResponse<List<Guid>> Create(
-        [FromServices] ICreateImageCommand command,
-        [FromBody] CreateImageRequest request)
+      [FromServices] ICreateImageCommand command,
+      [FromBody] CreateImageRequest request)
     {
       return command.Execute(request);
     }
 
     [HttpDelete("remove")]
     public OperationResultResponse<bool> Remove(
-        [FromServices] IRemoveImageCommand command,
-        [FromBody] List<Guid> request)
+      [FromServices] IRemoveImageCommand command,
+      [FromBody] List<Guid> request)
     {
       return command.Execute(request);
     }

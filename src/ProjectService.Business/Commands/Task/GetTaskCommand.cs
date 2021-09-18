@@ -49,7 +49,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       try
       {
         var response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
-            IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
+          IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
 
         if (response.Message.IsSuccess)
         {
@@ -71,8 +71,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
     private void Authorization(Guid taskProjectId, List<string> errors, out DepartmentData department)
     {
       List<DbProjectUser> projectUsers = _userRepository
-          .GetProjectUsers(taskProjectId, false)
-          .ToList();
+        .GetProjectUsers(taskProjectId, false)
+        .ToList();
 
       Guid requestUserId = _httpContext.GetUserId();
 
@@ -111,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       try
       {
         IOperationResult<IGetImagesResponse> response = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
-           IGetImagesRequest.CreateObj(imageIds, ImageSource.Project)).Result.Message;
+          IGetImagesRequest.CreateObj(imageIds, ImageSource.Project)).Result.Message;
 
         if (response.IsSuccess && response.Body != null)
         {
@@ -120,9 +120,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         else
         {
           _logger.LogWarning(
-              logMessage,
-              string.Join(", ", imageIds),
-              string.Join('\n', response.Errors));
+            logMessage,
+            string.Join(", ", imageIds),
+            string.Join('\n', response.Errors));
         }
       }
       catch (Exception exc)
@@ -194,7 +194,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       try
       {
         var res = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
-            IGetUsersDataRequest.CreateObj(userIds));
+          IGetUsersDataRequest.CreateObj(userIds));
         usersDataResponse = res.Result.Message.Body.UsersData;
       }
       catch (Exception exc)

@@ -45,7 +45,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       try
       {
         var response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
-            IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
+          IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
 
         if (response.Message.IsSuccess)
         {
@@ -86,8 +86,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         }
 
         _logger.LogWarning(
-            logMessage,
-            string.Join('\n', response.Errors));
+          logMessage,
+          string.Join('\n', response.Errors));
       }
       catch (Exception exc)
       {
