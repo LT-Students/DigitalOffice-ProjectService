@@ -55,7 +55,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       try
       {
         var response = _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
-            ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value })).Result;
+          ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value })).Result;
         if (response.Message.IsSuccess)
         {
           if (!response.Message.Body.DepartmentIds.Any())
@@ -66,7 +66,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         }
 
         _logger.LogWarning("Can not find department with this Id: {departmentId}: " +
-            $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
+          $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
       }
       catch (Exception exc)
       {
@@ -90,14 +90,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       try
       {
         var response = _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUsersExistence>>(
-            ICheckUsersExistence.CreateObj(userIds)).Result;
+          ICheckUsersExistence.CreateObj(userIds)).Result;
         if (response.Message.IsSuccess)
         {
           return response.Message.Body.UserIds;
         }
 
         _logger.LogWarning("Can not find {userIds} with this Ids: {userIds}: " +
-            $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
+          $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
       }
       catch (Exception exc)
       {
@@ -121,7 +121,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         }
 
         var response = _rcCreateWorkspace.GetResponse<IOperationResult<bool>>(
-            ICreateWorkspaceRequest.CreateObj(projectName, creatorId, users), timeout: RequestTimeout.Default).Result;
+          ICreateWorkspaceRequest.CreateObj(projectName, creatorId, users), timeout: RequestTimeout.Default).Result;
 
         if (!(response.Message.IsSuccess && response.Message.Body))
         {
@@ -145,7 +145,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       try
       {
         var response = _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
-            ICreateWorkTimeRequest.CreateObj(projectId, userIds)).Result;
+          ICreateWorkTimeRequest.CreateObj(projectId, userIds)).Result;
 
         if (!(response.Message.IsSuccess && response.Message.Body))
         {
@@ -173,9 +173,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       try
       {
         IOperationResult<ICreateImagesResponse> response = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
-           ICreateImagesRequest.CreateObj(
-               projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).ToList(),
-               ImageSource.Project)).Result.Message;
+          ICreateImagesRequest.CreateObj(
+            projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).ToList(),
+            ImageSource.Project)).Result.Message;
 
         if (response.IsSuccess && response.Body.ImagesIds != null)
         {
@@ -183,8 +183,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         }
 
         _logger.LogWarning(
-            logMessage,
-            string.Join('\n', response.Errors));
+          logMessage,
+          string.Join('\n', response.Errors));
       }
       catch (Exception exc)
       {
@@ -197,17 +197,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     }
 
     public CreateProjectCommand(
-        IProjectRepository repository,
-        ICreateProjectValidator validator,
-        IAccessValidator accessValidator,
-        IDbProjectMapper dbProjectMapper,
-        ILogger<CreateProjectCommand> logger,
-        IHttpContextAccessor httpContextAccessor,
-        IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
-        IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
-        IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
-        IRequestClient<ICreateImagesRequest> rcImages,
-        IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence)
+      IProjectRepository repository,
+      ICreateProjectValidator validator,
+      IAccessValidator accessValidator,
+      IDbProjectMapper dbProjectMapper,
+      ILogger<CreateProjectCommand> logger,
+      IHttpContextAccessor httpContextAccessor,
+      IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
+      IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
+      IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
+      IRequestClient<ICreateImagesRequest> rcImages,
+      IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence)
     {
       _logger = logger;
       _validator = validator;
@@ -258,7 +258,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<Guid> existUsers = CheckUserExistence(request.Users.Select(u => u.UserId).ToList(), response.Errors);
       if (!response.Errors.Any()
-          && existUsers.Count() != request.Users.Count())
+        && existUsers.Count() != request.Users.Count())
       {
         response.Errors.Add("Not all users exist.");
       }

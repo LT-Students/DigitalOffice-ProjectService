@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Enums;
@@ -123,32 +123,35 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
     public OperationResultResponse<Guid> Execute(CreateTaskRequest request)
     {
-      var errors = new List<string>();
+      OperationResultResponse<Guid> response = new();
 
       Guid authorId = _httpContextAccessor.HttpContext.GetUserId();
 
       if (!_accessValidator.IsAdmin()
         && !_userRepository.AreUserProjectExist(authorId, request.ProjectId)
-        && GetDepartment(authorId, errors)?.DirectorUserId != authorId)
+        && GetDepartment(authorId, response.Errors)?.DirectorUserId != authorId)
       {
-        throw new ForbiddenException("Not enough rights.");
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+
+        response.Status = OperationResultStatusType.Failed;
+        response.Errors.Add("Not enough rights.");
+
+        return response;
       }
 
       _validator.ValidateAndThrowCustom(request);
 
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
-      List<Guid> imagesIds = CreateImage(request.TaskImages.ToList(), userId, errors);
+      List<Guid> imagesIds = CreateImage(request.TaskImages.ToList(), userId, response.Errors);
 
-      Guid taskId = _repository.Create(_mapperTask.Map(request, authorId, imagesIds));
+      response.Body = _repository.Create(_mapperTask.Map(request, authorId, imagesIds));
 
-      return new OperationResultResponse<Guid>
-      {
-        Body = taskId,
-        Status = !errors.Any() ?
-          OperationResultStatusType.FullSuccess : OperationResultStatusType.PartialSuccess,
-        Errors = errors
-      };
+      response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
+
+      _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
+
+      return response;
     }
   }
 }
