@@ -50,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
             if (filter.IncludeImages.HasValue && filter.IncludeImages.Value)
             {
-                dbProjectQueryable = dbProjectQueryable.Include(x => x.ProjectsImages);
+                dbProjectQueryable = dbProjectQueryable.Include(x => x.Images);
             }
 
             var dbProject = dbProjectQueryable.FirstOrDefault(x => x.Id == filter.ProjectId);
@@ -74,6 +74,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             _provider.Save();
 
             return dbProject.Id;
+
         }
 
         public bool Edit(DbProject dbProject, JsonPatchDocument<DbProject> request)

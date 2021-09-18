@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                 .NotNull().WithMessage("List must not be null")
                 .NotEmpty().WithMessage("List must not be empty");
 
-            RuleFor(images => images.ProjectOrTaskId)
+            RuleFor(images => images.EntityId)
                 .NotEmpty().WithMessage("Image's Id must not be empty");
 
             RuleForEach(images => images.Images)

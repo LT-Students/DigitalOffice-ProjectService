@@ -25,7 +25,6 @@ namespace LT.DigitalOffice.ProjectService.Broker
                             p.Name,
                             ((ProjectStatusType)p.Status).ToString(),
                             p.ShortName,
-                            p.Description,
                             p.ShortDescription,
                             p.Users?.Select(
                                 u => new ProjectUserData(

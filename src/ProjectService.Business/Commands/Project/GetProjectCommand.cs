@@ -1,9 +1,12 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Kernel.Enums;
+using LT.DigitalOffice.Models.Broker.Enums;
+using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
+using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
+using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.Models.Broker.Responses.User;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -19,9 +22,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LT.DigitalOffice.Models.Broker.Requests.Image;
-using LT.DigitalOffice.Models.Broker.Enums;
-using LT.DigitalOffice.Models.Broker.Responses.Image;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -35,25 +35,23 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IProjectFileInfoMapper _projectFileInfoMapper;
         private readonly IDepartmentInfoMapper _departmentInfoMapper;
         private readonly IImageInfoMapper _imageMapper;
-        private readonly IRequestClient<IGetDepartmentRequest> _departmentRequestClient;
+        private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartment;
         private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
-        private readonly IRequestClient<IGetUsersDepartmentsUsersPositionsRequest> _rcGetUsersDepartmentsUsersPositions;
+        private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployees;
         private readonly IRequestClient<IGetImagesRequest> _rcImages;
 
         private DepartmentInfo GetDepartment(Guid departmentId, List<string> errors)
         {
             try
             {
-                IOperationResult<IGetDepartmentResponse> departmentResponse =
-                    _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>
-                    (
-                        IGetDepartmentRequest.CreateObj(null, departmentId)
-                    )
+                IOperationResult<IGetDepartmentsResponse> departmentResponse =
+                    _rcGetDepartment.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
+                        IGetDepartmentsRequest.CreateObj(new() { departmentId }))
                     .Result.Message;
 
                 if (departmentResponse.IsSuccess)
                 {
-                    return _departmentInfoMapper.Map(departmentResponse.Body);
+                    return _departmentInfoMapper.Map(departmentResponse.Body.Departments.FirstOrDefault());
                 }
 
                 _logger.LogWarning(
@@ -166,8 +164,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
                 if (usersDataResponse.IsSuccess && usersDataResponse.Body.UsersData.Any())
                 {
-                    IGetUsersDepartmentsUsersPositionsResponse userPositionsAndDepartments =
-                        GetUserDepartmentsAndPositions(usersIds, errors);
+                    IGetCompanyEmployeesResponse userPositionsAndDepartments =
+                        GetCompanyEmployees(usersIds, errors);
 
                     var images = GetUserAvatars(
                         usersDataResponse
@@ -186,8 +184,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                             return _projectUserInfoMapper.Map(
                             mappedUser,
                             images.FirstOrDefault(i => i.Id == mappedUser.ImageId),
-                            userPositionsAndDepartments?.UsersPosition.FirstOrDefault(p => p.UserIds.Any(id => id == pu.UserId)),
-                            userPositionsAndDepartments?.UsersDepartment.FirstOrDefault(d => d.UserIds.Any(id => id == pu.UserId)),
+                            userPositionsAndDepartments?.Positions.FirstOrDefault(p => p.UsersIds.Any(id => id == pu.UserId)),
+                            userPositionsAndDepartments?.Departments.FirstOrDefault(d => d.UsersIds.Any(id => id == pu.UserId)),
                             pu,
                             projectUsersForCount.Where(u => u.UserId == pu.UserId).Count());
                         })
@@ -209,17 +207,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             return null;
         }
 
-        private IGetUsersDepartmentsUsersPositionsResponse GetUserDepartmentsAndPositions(
+        private IGetCompanyEmployeesResponse GetCompanyEmployees(
             List<Guid> userIds,
             List<string> errors)
         {
             try
             {
-                IOperationResult<IGetUsersDepartmentsUsersPositionsResponse> response =
-                    _rcGetUsersDepartmentsUsersPositions.GetResponse<IOperationResult<IGetUsersDepartmentsUsersPositionsResponse>>
-                    (
-                        IGetUsersDepartmentsUsersPositionsRequest.CreateObj(userIds, includeDepartments: true, includePositions: true)
-                    )
+                IOperationResult<IGetCompanyEmployeesResponse> response =
+                    _rcGetCompanyEmployees.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+                        IGetCompanyEmployeesRequest.CreateObj(userIds, includeDepartments: true, includePositions: true))
                     .Result.Message;
 
                 if (response.IsSuccess)
@@ -254,9 +250,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IProjectFileInfoMapper projectFileInfoMapper,
             IDepartmentInfoMapper departmentInfoMapper,
             IImageInfoMapper imageMapper,
-            IRequestClient<IGetDepartmentRequest> departmentRequestClient,
+            IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
             IRequestClient<IGetUsersDataRequest> usersDataRequestClient,
-            IRequestClient<IGetUsersDepartmentsUsersPositionsRequest> rcGetUsersDepartmentsUsersPositions,
+            IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployees,
             IRequestClient<IGetImagesRequest> rcImages)
         {
             _logger = logger;
@@ -267,9 +263,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _projectFileInfoMapper = projectFileInfoMapper;
             _departmentInfoMapper = departmentInfoMapper;
             _imageMapper = imageMapper;
-            _departmentRequestClient = departmentRequestClient;
+            _rcGetDepartment = rcGetDepartments;
             _usersDataRequestClient = usersDataRequestClient;
-            _rcGetUsersDepartmentsUsersPositions = rcGetUsersDepartmentsUsersPositions;
+            _rcGetCompanyEmployees = rcGetCompanyEmployees;
             _rcImages = rcImages;
         }
 
@@ -286,7 +282,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             List<ProjectUserInfo> usersInfo = GetProjectUsersInfo(dbProject.Users, response.Errors);
             List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
-            List<ImageInfo> imagesinfo = GetProjectImages(dbProject.ProjectsImages.Select(x => x.ImageId).ToList(), response.Errors);
+            List<ImageInfo> imagesinfo = GetProjectImages(dbProject.Images.Select(x => x.ImageId).ToList(), response.Errors);
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
             response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, imagesinfo, department);

@@ -1,4 +1,4 @@
-using LT.DigitalOffice.Kernel.Attributes.ParseEntity;
+﻿using LT.DigitalOffice.Kernel.Attributes.ParseEntity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -36,11 +36,11 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public ICollection<DbTask> Subtasks { get; set; }
 
         [IgnoreParse]
-        public ICollection<DbTaskImage> TasksImages { get; set; }
+        public ICollection<DbEntityImage> Images { get; set; }
 
         public DbTask()
         {
-            TasksImages = new HashSet<DbTaskImage>();
+            Images = new HashSet<DbEntityImage>();
         }
     }
 
@@ -88,9 +88,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .WithOne(tp => tp.ParentTask)
                 .HasForeignKey(t => t.ParentId);
 
-            builder
-                .HasMany(p => p.TasksImages)
-                .WithOne(tp => tp.Task);
-        }
+      builder
+          .HasMany(p => p.Images)
+          .WithOne(tp => tp.Task).HasForeignKey(o => o.EntityId);
+    }
     }
 }

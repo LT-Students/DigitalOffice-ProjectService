@@ -9,7 +9,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
 {
     public class ProjectInfoMapper : IProjectInfoMapper
     {
-        public ProjectInfo Map(DbProject value, string departmentName)
+        public ProjectInfo Map(DbProject value, DepartmentInfo department)
         {
             if (value == null)
             {
@@ -26,13 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
                 ShortName = value.ShortName,
                 Description = value.Description,
                 ShortDescription = value.ShortDescription,
-                Department = value.DepartmentId.HasValue ?
-                new DepartmentInfo
-                {
-                    Id = value.DepartmentId.Value,
-                    Name = departmentName
-                }
-                : null
+                Department = department
             };
         }
     }

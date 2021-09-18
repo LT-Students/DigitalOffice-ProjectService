@@ -5,20 +5,20 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
-    public class DbProjectImageMapper : IDbProjectImageMapper
+    public class DbImageMapper : IDbImageMapper
     {
-        public DbProjectImage Map(CreateImageRequest request, Guid imageId)
+        public DbEntityImage Map(CreateImageRequest request, Guid imageId)
         {
             if (request == null)
             {
                 throw new ArgumentNullException(nameof(request));
             }
 
-            return new DbProjectImage
+            return new DbEntityImage
             {
                 Id = Guid.NewGuid(),
                 ImageId = imageId,
-                ProjectId = request.ProjectOrTaskId
+                EntityId = request.EntityId
             };
         }
     }
