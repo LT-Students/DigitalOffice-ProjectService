@@ -1,4 +1,7 @@
-﻿using LT.DigitalOffice.ProjectService.Data.Provider;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Mappers.Db;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Helpers;
@@ -10,82 +13,82 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.AutoMock;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
 {
-    internal class DbTaskMapperTests
+  internal class DbTaskMapperTests
+  {
+    private IDbTaskMapper _dbTaskMapper;
+    private CreateTaskRequest _createTaskRequest;
+    private AutoMocker _mocker;
+    private Mock<IHttpContextAccessor> _accessorMock;
+    private List<Guid> _imagesIds;
+
+    private readonly Guid _authorId = Guid.NewGuid();
+
+    private static DbSet<T> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
     {
-        private IDbTaskMapper _dbTaskMapper;
-        private CreateTaskRequest _createTaskRequest;
-        private AutoMocker _mocker;
-        private Mock<IHttpContextAccessor> _accessorMock;
+      var queryable = sourceList.AsQueryable();
 
-        private readonly Guid _authorId = Guid.NewGuid();
+      var dbSet = new Mock<DbSet<T>>();
+      dbSet.As<IQueryable<T>>().Setup(m => m.Provider).Returns(queryable.Provider);
+      dbSet.As<IQueryable<T>>().Setup(m => m.Expression).Returns(queryable.Expression);
+      dbSet.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
+      dbSet.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
+      dbSet.Setup(d => d.Add(It.IsAny<T>())).Callback<T>((s) => sourceList.Add(s));
 
-        private static DbSet<T> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
-        {
-            var queryable = sourceList.AsQueryable();
+      return dbSet.Object;
 
-            var dbSet = new Mock<DbSet<T>>();
-            dbSet.As<IQueryable<T>>().Setup(m => m.Provider).Returns(queryable.Provider);
-            dbSet.As<IQueryable<T>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            dbSet.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            dbSet.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
-            dbSet.Setup(d => d.Add(It.IsAny<T>())).Callback<T>((s) => sourceList.Add(s));
+    }
 
-            return dbSet.Object;
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+      _accessorMock = new();
+      IDictionary<object, object> _items = new Dictionary<object, object>();
+      _items.Add("UserId", _authorId);
 
-        }
+      _accessorMock
+          .Setup(x => x.HttpContext.Items)
+          .Returns(_items);
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            _accessorMock = new();
-            IDictionary<object, object> _items = new Dictionary<object, object>();
-            _items.Add("UserId", _authorId);
+      _mocker = new AutoMocker();
 
-            _accessorMock
-                .Setup(x => x.HttpContext.Items)
-                .Returns(_items);
+      _imagesIds = new List<Guid>();
 
-            _mocker = new AutoMocker();
+      _dbTaskMapper = new DbTaskMapper(_accessorMock.Object);
 
-            _dbTaskMapper = new DbTaskMapper(_accessorMock.Object);
+      _createTaskRequest = new CreateTaskRequest
+      {
+        Name = "Create Smth",
+        Description = "Create smth in somewhere",
+        PlannedMinutes = 30,
+        AssignedTo = Guid.NewGuid(),
+        ProjectId = Guid.NewGuid(),
+        ParentId = Guid.NewGuid(),
+        PriorityId = Guid.NewGuid(),
+        StatusId = Guid.NewGuid(),
+        TypeId = Guid.NewGuid()
+      };
+    }
 
-            _createTaskRequest = new CreateTaskRequest
-            {
-                Name = "Create Smth",
-                Description = "Create smth in somewhere",
-                PlannedMinutes = 30,
-                AssignedTo = Guid.NewGuid(),
-                ProjectId = Guid.NewGuid(),
-                ParentId = Guid.NewGuid(),
-                PriorityId = Guid.NewGuid(),
-                StatusId = Guid.NewGuid(),
-                TypeId = Guid.NewGuid()
-            };
-        }
+    [Test]
+    public void ShouldThrowArgumentNullExceptionWhenCreateTaskRequestIsNull()
+    {
+      Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null, _authorId, _imagesIds));
+    }
 
-        [Test]
-        public void ShouldThrowArgumentNullExceptionWhenCreateTaskRequestIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null, _authorId));
-        }
-
-        [Test]
-        public void ShouldReturnDbTaskWhenCreateTaskRequestIsMapped()
-        {
-            var project = new List<DbProject>
+    [Test]
+    public void ShouldReturnDbTaskWhenCreateTaskRequestIsMapped()
+    {
+      var project = new List<DbProject>
             {
                 new DbProject { Id = _createTaskRequest.ProjectId}
             };
 
-            int maxNumber = 3;
+      int maxNumber = 3;
 
-            var tasks = new List<DbTask>
+      var tasks = new List<DbTask>
             {
                 new DbTask
                 {
@@ -95,34 +98,34 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
                 }
             };
 
-            _mocker
-                .Setup<IDataProvider, DbSet<DbProject>>(x => x.Projects)
-                .Returns(GetQueryableMockDbSet(project));
+      _mocker
+          .Setup<IDataProvider, DbSet<DbProject>>(x => x.Projects)
+          .Returns(GetQueryableMockDbSet(project));
 
-            _mocker
-                .Setup<IDataProvider, DbSet<DbTask>>(x => x.Tasks)
-                .Returns(GetQueryableMockDbSet(tasks));
+      _mocker
+          .Setup<IDataProvider, DbSet<DbTask>>(x => x.Tasks)
+          .Returns(GetQueryableMockDbSet(tasks));
 
-            TaskNumberHelper.LoadCache(_mocker.GetMock<IDataProvider>().Object);
-            var dbTask = _dbTaskMapper.Map(_createTaskRequest, _authorId);
-            var expectedDbTask = new DbTask
-            {
-                Id = dbTask.Id,
-                Name = _createTaskRequest.Name,
-                Description = _createTaskRequest.Description,
-                PlannedMinutes = _createTaskRequest.PlannedMinutes,
-                AssignedTo = _createTaskRequest.AssignedTo,
-                CreatedBy = _authorId,
-                ProjectId = _createTaskRequest.ProjectId,
-                CreatedAtUtc = dbTask.CreatedAtUtc,
-                ParentId = _createTaskRequest.ParentId,
-                Number = maxNumber + 1,
-                PriorityId = _createTaskRequest.PriorityId,
-                StatusId = _createTaskRequest.StatusId,
-                TypeId = _createTaskRequest.TypeId
-            };
+      TaskNumberHelper.LoadCache(_mocker.GetMock<IDataProvider>().Object);
+      var dbTask = _dbTaskMapper.Map(_createTaskRequest, _authorId, _imagesIds);
+      var expectedDbTask = new DbTask
+      {
+        Id = dbTask.Id,
+        Name = _createTaskRequest.Name,
+        Description = _createTaskRequest.Description,
+        PlannedMinutes = _createTaskRequest.PlannedMinutes,
+        AssignedTo = _createTaskRequest.AssignedTo,
+        CreatedBy = _authorId,
+        ProjectId = _createTaskRequest.ProjectId,
+        CreatedAtUtc = dbTask.CreatedAtUtc,
+        ParentId = _createTaskRequest.ParentId,
+        Number = maxNumber + 1,
+        PriorityId = _createTaskRequest.PriorityId,
+        StatusId = _createTaskRequest.StatusId,
+        TypeId = _createTaskRequest.TypeId
+      };
 
-            SerializerAssert.AreEqual(expectedDbTask, dbTask);
-        }
+      SerializerAssert.AreEqual(expectedDbTask, dbTask);
     }
+  }
 }
