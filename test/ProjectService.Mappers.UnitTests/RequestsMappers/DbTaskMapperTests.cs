@@ -22,6 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
     private CreateTaskRequest _createTaskRequest;
     private AutoMocker _mocker;
     private Mock<IHttpContextAccessor> _accessorMock;
+    private Mock<IDbEntityImageMapper> _imageMock;
     private List<Guid> _imagesIds;
 
     private readonly Guid _authorId = Guid.NewGuid();
@@ -56,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
 
       _imagesIds = new List<Guid>();
 
-      _dbTaskMapper = new DbTaskMapper(_accessorMock.Object);
+      _dbTaskMapper = new DbTaskMapper(_accessorMock.Object, _imageMock.Object);
 
       _createTaskRequest = new CreateTaskRequest
       {
