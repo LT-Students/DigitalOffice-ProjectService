@@ -45,6 +45,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+      _imageMock = new();
       _accessorMock = new();
       IDictionary<object, object> _items = new Dictionary<object, object>();
       _items.Add("UserId", _authorId);
@@ -76,7 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.RequestsMappers
     [Test]
     public void ShouldThrowArgumentNullExceptionWhenCreateTaskRequestIsNull()
     {
-      Assert.Throws<ArgumentNullException>(() => _dbTaskMapper.Map(null, _authorId, _imagesIds));
+      Assert.IsNull(_dbTaskMapper.Map(null, _authorId, _imagesIds));
     }
 
     [Test]
