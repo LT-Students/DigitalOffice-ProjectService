@@ -2,12 +2,18 @@
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-    public class CreateProjectValidator : AbstractValidator<ProjectRequest>, ICreateProjectValidator
+    public class CreateProjectValidator : AbstractValidator<CreateProjectRequest>, ICreateProjectValidator
     {
+        private readonly List<string> imageFormats = new()
+        {
+            ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tga"
+        };
+
         public CreateProjectValidator()
         {
             RuleFor(project => project.Name)
@@ -35,6 +41,29 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     user.RuleFor(user => user.Role)
                         .IsInEnum();
                 });
+            });
+
+            When(project => project.ProjectImages != null && project.ProjectImages.Any(), () =>
+            {
+                RuleForEach(project => project.ProjectImages)
+                    .Must(x => !string.IsNullOrEmpty(x.Content))
+                    .WithMessage("Content can't be empty")
+                    .Must(x => imageFormats.Contains(x.Extension))
+                    .WithMessage("Wrong extension")
+                    .Must(images => images.Name.Length < 150)
+                    .WithMessage("Name's length must be less than 150 letters")
+                    .Must(images =>
+                    {
+                        try
+                        {
+                            var byteString = new Span<byte>(new byte[images.Content.Length]);
+                            return Convert.TryFromBase64String(images.Content, byteString, out _);
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                    }).WithMessage("Wrong image content.");
             });
 
             When(project => !string.IsNullOrEmpty(project.ShortDescription?.Trim()), () =>

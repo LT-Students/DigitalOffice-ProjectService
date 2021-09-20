@@ -45,11 +45,11 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         [HttpPost("create")]
         public OperationResultResponse<Guid> Create(
             [FromServices] ICreateProjectCommand command,
-            [FromBody] ProjectRequest request)
+            [FromBody] CreateProjectRequest request)
         {
             var result = command.Execute(request);
 
-            if (result.Status == OperationResultStatusType.Conflict)
+            if (result.Status == OperationResultStatusType.Failed)
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
 
@@ -72,7 +72,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         {
             var result = command.Execute(projectId, request);
 
-            if (result.Status == OperationResultStatusType.Conflict)
+            if (result.Status == OperationResultStatusType.Failed)
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
             }

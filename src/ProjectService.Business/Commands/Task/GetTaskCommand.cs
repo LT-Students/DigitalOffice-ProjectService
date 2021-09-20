@@ -7,6 +7,7 @@ using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
@@ -33,27 +34,24 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         private readonly ITaskResponseMapper _taskResponseMapper;
         private readonly ITaskInfoMapper _taskInfoMapper;
         private readonly ILogger<GetTaskCommand> _logger;
-        private readonly IRequestClient<IGetDepartmentRequest> _departmentRequestClient;
+        private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployee;
         private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
 
-        private IGetDepartmentResponse GetDepartment(Guid userId, List<string> errors)
+        private DepartmentData GetDepartment(Guid authorId, List<string> errors)
         {
-            string errorMessage = "Cannot get user's department. Please try again later.";
+            string errorMessage = "Cannot get department. Please try again later.";
 
             try
             {
-                var response = _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(userId, null)).Result;
+                var response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+                    IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
 
                 if (response.Message.IsSuccess)
                 {
-                    return response.Message.Body;
+                    return response.Message.Body.Departments.FirstOrDefault();
                 }
 
-                errors.AddRange(response.Message.Errors);
-                _logger.LogWarning(
-                    "Can not find department for user with this id '{userId}': {NewLine}{errors}",
-                    userId, Environment.NewLine, string.Join('\n', response.Message.Errors));
+                _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", authorId);
             }
             catch (Exception exc)
             {
@@ -65,7 +63,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             return null;
         }
 
-        private void Authorization(Guid taskProjectId, List<string> errors, out IGetDepartmentResponse department)
+        private void Authorization(Guid taskProjectId, List<string> errors, out DepartmentData department)
         {
             List<DbProjectUser> projectUsers = _userRepository
                 .GetProjectUsers(taskProjectId, false)
@@ -104,7 +102,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             ITaskResponseMapper taskResponseMapper,
             ITaskInfoMapper taskInfoMapper,
             ILogger<GetTaskCommand> logger,
-            IRequestClient<IGetDepartmentRequest> departmentRequestClient,
+            IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployee,
             IRequestClient<IGetUsersDataRequest> userRequestClient)
         {
             _taskRepository = taskRepository;
@@ -114,7 +112,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
             _taskResponseMapper = taskResponseMapper;
             _taskInfoMapper = taskInfoMapper;
             _logger = logger;
-            _departmentRequestClient = departmentRequestClient;
+            _rcGetCompanyEmployee = rcGetCompanyEmployee;
             _usersDataRequestClient = userRequestClient;
         }
 
@@ -124,7 +122,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
             DbTask task = _taskRepository.Get(taskId, isFullModel);
 
-            Authorization(task.ProjectId, errors, out IGetDepartmentResponse department);
+            Authorization(task.ProjectId, errors, out DepartmentData department);
 
             List<Guid> userIds = new()
             {
@@ -179,7 +177,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
                 usersDataResponse.FirstOrDefault(x => x.Id == task.CreatedBy),
                 usersDataResponse.FirstOrDefault(x => parentTaskAssignedTo != null && x.Id == parentTaskAssignedTo),
                 usersDataResponse.FirstOrDefault(x => task.ParentTask != null && x.Id == task.ParentTask.CreatedBy),
-                department?.Name,
+                department,
                 usersDataResponse.FirstOrDefault(x => x.Id == task.AssignedTo),
                 subtasksInfo);
 

@@ -4,6 +4,7 @@ using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
@@ -28,22 +29,22 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IUserRepository _userRepository;
         private readonly IDbTaskMapper _mapperTask;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
+        private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployee;
         private readonly IAccessValidator _accessValidator;
         private readonly ILogger<CreateTaskCommand> _logger;
 
-        private IGetDepartmentResponse GetDepartment(Guid authorId, List<string> errors)
+        private DepartmentData GetDepartment(Guid authorId, List<string> errors)
         {
             string errorMessage = "Cannot create task. Please try again later.";
 
             try
             {
-                var response = _requestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(authorId, null)).Result;
+                var response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+                    IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
 
                 if (response.Message.IsSuccess)
                 {
-                    return response.Message.Body;
+                    return response.Message.Body.Departments.FirstOrDefault();
                 }
 
                 _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", authorId);
@@ -65,14 +66,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             IHttpContextAccessor httpContextAccessor,
             IAccessValidator accessValidator,
             IUserRepository userRepository,
-            IRequestClient<IGetDepartmentRequest> requestClient,
+            IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployees,
             ILogger<CreateTaskCommand> logger)
         {
             _repository = repository;
             _validator = validator;
             _mapperTask = mapperTask;
             _httpContextAccessor = httpContextAccessor;
-            _requestClient = requestClient;
+            _rcGetCompanyEmployee = rcGetCompanyEmployees;
             _accessValidator = accessValidator;
             _logger = logger;
             _userRepository = userRepository;

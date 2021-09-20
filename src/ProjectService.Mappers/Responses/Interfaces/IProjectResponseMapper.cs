@@ -10,6 +10,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces
     [AutoInject]
     public interface IProjectResponseMapper
     {
-        ProjectResponse Map(DbProject dbProject, IEnumerable<ProjectUserInfo> users, IEnumerable<ProjectFileInfo> files, DepartmentInfo department);
+        ProjectResponse Map(DbProject dbProject, IEnumerable<ProjectUserInfo> users, IEnumerable<ProjectFileInfo> files, IEnumerable<ImageInfo> images, DepartmentInfo department);
     }
 }

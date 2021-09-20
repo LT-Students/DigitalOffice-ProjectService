@@ -13,14 +13,14 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
     {
         private ICreateProjectValidator _validator;
 
-        private ProjectRequest _newProject;
+        private CreateProjectRequest _newProject;
 
         [SetUp]
         public void SetUp()
         {
             _validator = new CreateProjectValidator();
 
-            _newProject = new ProjectRequest
+            _newProject = new CreateProjectRequest
             {
                 Name = "Project for Lanit-Tercom",
                 ShortName = "Project",
@@ -88,7 +88,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [Test]
         public void ShouldErrorForWhenUserIdIsEmpty()
         {
-            var newProject = new ProjectRequest
+            var newProject = new CreateProjectRequest
             {
                 Name = "Project for Lanit-Tercom",
                 ShortName = "Project",
@@ -118,7 +118,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         [Test]
         public void ShouldErrorForWhenUserOutEnum()
         {
-            var newProject = new ProjectRequest
+            var newProject = new CreateProjectRequest
             {
                 Name = "Project for Lanit-Tercom",
                 ShortName = "Project",

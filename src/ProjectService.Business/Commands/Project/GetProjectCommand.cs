@@ -1,12 +1,12 @@
 ﻿using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
+using LT.DigitalOffice.Models.Broker.Enums;
+using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
-using LT.DigitalOffice.Models.Broker.Requests.File;
+using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
-using LT.DigitalOffice.Models.Broker.Responses.File;
+using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.Models.Broker.Responses.User;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -35,25 +35,23 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IProjectFileInfoMapper _projectFileInfoMapper;
         private readonly IDepartmentInfoMapper _departmentInfoMapper;
         private readonly IImageInfoMapper _imageMapper;
-        private readonly IRequestClient<IGetDepartmentRequest> _departmentRequestClient;
+        private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartment;
         private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
-        private readonly IRequestClient<IGetUsersDepartmentsUsersPositionsRequest> _rcGetUsersDepartmentsUsersPositions;
+        private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployees;
         private readonly IRequestClient<IGetImagesRequest> _rcImages;
 
         private DepartmentInfo GetDepartment(Guid departmentId, List<string> errors)
         {
             try
             {
-                IOperationResult<IGetDepartmentResponse> departmentResponse = 
-                    _departmentRequestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>
-                    (
-                        IGetDepartmentRequest.CreateObj(null, departmentId)
-                    )
+                IOperationResult<IGetDepartmentsResponse> departmentResponse =
+                    _rcGetDepartment.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
+                        IGetDepartmentsRequest.CreateObj(new() { departmentId }))
                     .Result.Message;
 
                 if (departmentResponse.IsSuccess)
                 {
-                    return _departmentInfoMapper.Map(departmentResponse.Body);
+                    return _departmentInfoMapper.Map(departmentResponse.Body.Departments.FirstOrDefault());
                 }
 
                 _logger.LogWarning(
@@ -69,30 +67,28 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             return null;
         }
 
-        private List<ImageInfo> GetImages(List<Guid> imageIds, List<string> errors)
+        private List<ImageInfo> GetUserAvatars(List<Guid> imageIds, List<string> errors)
         {
             if (imageIds == null || imageIds.Count == 0)
             {
-                return new();
+                return null;
             }
 
-            string errorMessage = "Can not get images. Please try again later.";
-            const string logMessage = "Errors while getting images with ids: {Ids}.";
+            string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
 
             try
             {
                 IOperationResult<IGetImagesResponse> response = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
-                    IGetImagesRequest.CreateObj(imageIds)).Result.Message;
+                    IGetImagesRequest.CreateObj(imageIds, ImageSource.User)).Result.Message;
 
-                if (response.IsSuccess)
+                if (response.IsSuccess && response.Body.ImagesData != null)
                 {
-                    return response.Body.Images.Select(_imageMapper.Map).ToList();
+                    return response.Body.ImagesData.Select(_imageMapper.Map).ToList();
                 }
                 else
                 {
-                    const string warningMessage = logMessage + "Errors: {Errors}";
                     _logger.LogWarning(
-                        warningMessage,
+                        logMessage,
                         string.Join(", ", imageIds),
                         string.Join('\n', response.Errors));
                 }
@@ -102,9 +98,45 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                 _logger.LogError(exc, logMessage, string.Join(", ", imageIds));
             }
 
-            errors.Add(errorMessage);
+            errors.Add("Can not get images. Please try again later.");
 
-            return new();
+            return null;
+        }
+
+        private List<ImageInfo> GetProjectImages(List<Guid> imageIds, List<string> errors)
+        {
+            if (imageIds == null || imageIds.Count == 0)
+            {
+                return null;
+            }
+
+            string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
+
+            try
+            {
+                IOperationResult<IGetImagesResponse> response = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
+                   IGetImagesRequest.CreateObj(imageIds, ImageSource.Project)).Result.Message;
+
+                if (response.IsSuccess && response.Body != null)
+                {
+                    return response.Body.ImagesData.Select(_imageMapper.Map).ToList();
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        logMessage,
+                        string.Join(", ", imageIds),
+                        string.Join('\n', response.Errors));
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, logMessage, string.Join(", ", imageIds));
+            }
+
+            errors.Add("Can not get images. Please try again later.");
+
+            return null;
         }
 
         private List<ProjectUserInfo> GetProjectUsersInfo(IEnumerable<DbProjectUser> projectUsers, List<string> errors)
@@ -132,10 +164,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
                 if (usersDataResponse.IsSuccess && usersDataResponse.Body.UsersData.Any())
                 {
-                    IGetUsersDepartmentsUsersPositionsResponse userPositionsAndDepartments =
-                        GetUserDepartmentsAndPositions(usersIds, errors);
+                    IGetCompanyEmployeesResponse userPositionsAndDepartments =
+                        GetCompanyEmployees(usersIds, errors);
 
-                    var images = GetImages(
+                    var images = GetUserAvatars(
                         usersDataResponse
                             .Body
                             .UsersData
@@ -152,8 +184,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
                             return _projectUserInfoMapper.Map(
                             mappedUser,
                             images.FirstOrDefault(i => i.Id == mappedUser.ImageId),
-                            userPositionsAndDepartments?.UsersPosition.FirstOrDefault(p => p.UserIds.Any(id => id == pu.UserId)),
-                            userPositionsAndDepartments?.UsersDepartment.FirstOrDefault(d => d.UserIds.Any(id => id == pu.UserId)),
+                            userPositionsAndDepartments?.Positions.FirstOrDefault(p => p.UsersIds.Any(id => id == pu.UserId)),
+                            userPositionsAndDepartments?.Departments.FirstOrDefault(d => d.UsersIds.Any(id => id == pu.UserId)),
                             pu,
                             projectUsersForCount.Where(u => u.UserId == pu.UserId).Count());
                         })
@@ -172,20 +204,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             errors.Add($"Can not get users info for UserIds {string.Join('\n', usersIds)}. Please try again later.");
 
-            return new();
+            return null;
         }
 
-        private IGetUsersDepartmentsUsersPositionsResponse GetUserDepartmentsAndPositions(
+        private IGetCompanyEmployeesResponse GetCompanyEmployees(
             List<Guid> userIds,
             List<string> errors)
         {
             try
             {
-                IOperationResult<IGetUsersDepartmentsUsersPositionsResponse> response = 
-                    _rcGetUsersDepartmentsUsersPositions.GetResponse<IOperationResult<IGetUsersDepartmentsUsersPositionsResponse>>
-                    (
-                        IGetUsersDepartmentsUsersPositionsRequest.CreateObj(userIds, includeDepartments: true, includePositions: true)
-                    )
+                IOperationResult<IGetCompanyEmployeesResponse> response =
+                    _rcGetCompanyEmployees.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+                        IGetCompanyEmployeesRequest.CreateObj(userIds, includeDepartments: true, includePositions: true))
                     .Result.Message;
 
                 if (response.IsSuccess)
@@ -201,8 +231,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             }
             catch (Exception exc)
             {
-                _logger.LogError(exc, 
-                    "Can not get user's departments and positions for users {UserIds}. Please try again later.", 
+                _logger.LogError(exc,
+                    "Can not get user's departments and positions for users {UserIds}. Please try again later.",
                     userIds);
             }
 
@@ -220,9 +250,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IProjectFileInfoMapper projectFileInfoMapper,
             IDepartmentInfoMapper departmentInfoMapper,
             IImageInfoMapper imageMapper,
-            IRequestClient<IGetDepartmentRequest> departmentRequestClient,
+            IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
             IRequestClient<IGetUsersDataRequest> usersDataRequestClient,
-            IRequestClient<IGetUsersDepartmentsUsersPositionsRequest> rcGetUsersDepartmentsUsersPositions,
+            IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployees,
             IRequestClient<IGetImagesRequest> rcImages)
         {
             _logger = logger;
@@ -233,9 +263,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _projectFileInfoMapper = projectFileInfoMapper;
             _departmentInfoMapper = departmentInfoMapper;
             _imageMapper = imageMapper;
-            _departmentRequestClient = departmentRequestClient;
+            _rcGetDepartment = rcGetDepartments;
             _usersDataRequestClient = usersDataRequestClient;
-            _rcGetUsersDepartmentsUsersPositions = rcGetUsersDepartmentsUsersPositions;
+            _rcGetCompanyEmployees = rcGetCompanyEmployees;
             _rcImages = rcImages;
         }
 
@@ -252,9 +282,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
             List<ProjectUserInfo> usersInfo = GetProjectUsersInfo(dbProject.Users, response.Errors);
             List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
+            List<ImageInfo> imagesinfo = GetProjectImages(dbProject.Images.Select(x => x.ImageId).ToList(), response.Errors);
 
             response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
-            response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, department);
+            response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, imagesinfo, department);
 
             return response;
         }

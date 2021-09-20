@@ -16,5 +16,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
 
         [FromQuery(Name = "includefiles")]
         public bool? IncludeFiles { get; set; }
+
+        [FromQuery(Name = "includeimages")]
+        public bool? IncludeImages { get; set; }
     }
 }
