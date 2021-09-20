@@ -30,14 +30,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
                 throw new ArgumentNullException(nameof(dbProjects));
             }
 
-            List<DepartmentInfo> departmentsInfos = departments.Select(_departmentInfoMapper.Map).ToList();
+            List<DepartmentInfo> departmentsInfos = departments?.Select(_departmentInfoMapper.Map).ToList();
 
             return new FindResponse<ProjectInfo>
             {
                 TotalCount = totalCount,
                 Body = dbProjects.Select(p =>
                 {
-                    return _mapper.Map(p, departmentsInfos.FirstOrDefault(d => p.DepartmentId == d.Id));
+                    return _mapper.Map(p, departmentsInfos?.FirstOrDefault(d => p.DepartmentId == d.Id));
                 }),
                 Errors = errors
             };
