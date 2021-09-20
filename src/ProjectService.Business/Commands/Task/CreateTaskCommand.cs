@@ -139,7 +139,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         return response;
       }
 
-      _validator.ValidateAndThrowCustom(request);
+      if (!_validator.ValidateCustom(request, out List<string> errors))
+      {
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+        response.Status = OperationResultStatusType.Failed;
+        response.Errors.AddRange(errors);
+
+        return response;
+      }
 
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 

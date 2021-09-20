@@ -5,7 +5,6 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,13 +14,6 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   [ApiController]
   public class ProjectController : ControllerBase
   {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public ProjectController(IHttpContextAccessor httpContextAccessor)
-    {
-      _httpContextAccessor = httpContextAccessor;
-    }
-
     [HttpGet("find")]
     public FindResponse<ProjectInfo> Find(
       [FromServices] IFindProjectsCommand command,

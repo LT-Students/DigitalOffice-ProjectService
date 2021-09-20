@@ -5,7 +5,6 @@ using System.Net;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
@@ -216,7 +215,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
       List<UserData> usersDataResponse = GetUsersInfo(userIds, response.Errors);
 
-      List<ImageInfo> imagesinfo = GetTaskImages(task.Images.Select(x => x.ImageId).ToList(), response.Errors);
+      List<ImageInfo> imagesInfo = GetTaskImages(task.Images.Select(x => x.ImageId).ToList(), response.Errors);
 
       List<TaskInfo> subtasksInfo = new();
       if (task.Subtasks != null)
@@ -239,7 +238,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         department,
         usersDataResponse.FirstOrDefault(x => x.Id == task.AssignedTo),
         subtasksInfo,
-        imagesinfo);
+        imagesInfo);
 
       response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
 
