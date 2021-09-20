@@ -108,10 +108,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       foreach (Operation item in request.Operations)
       {
         if (item.path == $"/{nameof(EditProjectRequest.Name)}" &&
-          _projectRepository.IsProjectNameExist(item.value.ToString()))
+          _projectRepository.DoesProjectNameExist(item.value.ToString()))
         {
           response.Status = OperationResultStatusType.Failed;
-          response.Errors.Add($"Project with name '{item.value}' already exist");
+          response.Errors.Add($"Project with name '{item.value}' already exists.");
           return response;
         }
 
@@ -125,7 +125,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
             response.Status = OperationResultStatusType.Failed;
-            response.Errors.Add("Project department not found");
+            response.Errors.Add("Project department does not found.");
 
             return response;
           }

@@ -55,6 +55,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
         bool IsExist(Guid id);
 
-        bool IsProjectNameExist(string name);
+        bool DoesProjectNameExist(string name);
     }
 }

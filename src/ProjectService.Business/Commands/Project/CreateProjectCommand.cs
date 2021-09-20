@@ -60,7 +60,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         {
           if (!response.Message.Body.DepartmentIds.Any())
           {
-            errors.Add($"Department Id: {departmentId} does not exist");
+            errors.Add($"Department Id: {departmentId} does not exist.");
           }
           return response.Message.Body.DepartmentIds;
         }
@@ -74,6 +74,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
 
       errors.Add(errorMessage);
+
       return null;
     }
 
@@ -105,6 +106,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
 
       errors.Add(errorMessage);
+
       return null;
     }
 
@@ -236,12 +238,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return response;
       }
 
-      if (_repository.IsProjectNameExist(request.Name))
+      if (_repository.DoesProjectNameExist(request.Name))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
 
         response.Status = OperationResultStatusType.Failed;
-        response.Errors.Add($"Project with name '{request.Name}' already exist");
+        response.Errors.Add($"Project with name '{request.Name}' already exists.");
 
         return response;
       }
@@ -257,17 +259,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
 
       List<Guid> existUsers = CheckUserExistence(request.Users.Select(u => u.UserId).ToList(), response.Errors);
-      if (!response.Errors.Any()
-        && existUsers.Count() != request.Users.Count())
-      {
-        response.Errors.Add("Not all users exist.");
-      }
-      else if (response.Errors.Any())
-      {
+
+      if (response.Errors.Any()) {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
         response.Status = OperationResultStatusType.Failed;
         return response;
+      }
+
+      if (existUsers.Count() != request.Users.Count())
+      {
+        response.Errors.Add("Not all users exist.");
       }
 
       List<Guid> existDepartments = CheckDepartmentExistence(request.DepartmentId, response.Errors);

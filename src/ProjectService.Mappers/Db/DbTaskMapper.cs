@@ -13,17 +13,21 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
   public class DbTaskMapper : IDbTaskMapper
   {
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IDbEntityImageMapper _dbEntityImageMapper;
 
-    public DbTaskMapper(IHttpContextAccessor httpContextAccessor)
+    public DbTaskMapper(
+      IHttpContextAccessor httpContextAccessor,
+      IDbEntityImageMapper dbEntityImageMapper)
     {
       _httpContextAccessor = httpContextAccessor;
+      _dbEntityImageMapper = dbEntityImageMapper;
     }
 
     public DbTask Map(CreateTaskRequest taskRequest, Guid authorId, List<Guid> imagesIds)
     {
       if (taskRequest == null)
       {
-        throw new ArgumentNullException(nameof(taskRequest));
+        return null;
       }
 
       var projectId = Guid.NewGuid();
@@ -43,12 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         StatusId = taskRequest.StatusId,
         TypeId = taskRequest.TypeId,
         Number = TaskNumberHelper.GetProjectTaskNumber(taskRequest.ProjectId),
-        Images = imagesIds.Select(imageId => new DbEntityImage
-        {
-          Id = Guid.NewGuid(),
-          ImageId = imageId,
-          EntityId = projectId
-        }).ToList()
+        Images = imagesIds.Select(imageId => _dbEntityImageMapper.Map(imageId, projectId)).ToList()
       };
     }
   }

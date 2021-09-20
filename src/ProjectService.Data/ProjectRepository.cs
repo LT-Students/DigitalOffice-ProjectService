@@ -160,7 +160,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             return _provider.Projects.FirstOrDefault(x => x.Id == id) != null;
         }
 
-        public bool IsProjectNameExist(string name)
+        public bool DoesProjectNameExist(string name)
         {
             return _provider.Projects.Any(p => p.Name.Contains(name));
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Enums;
@@ -42,13 +43,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
     private readonly IRequestClient<IGetImagesRequest> _rcImages;
     private readonly IImageInfoMapper _imageMapper;
 
-    private DepartmentData GetDepartment(Guid authorId, List<string> errors)
+    private DepartmentData GetDepartment(Guid authorId)
     {
-      string errorMessage = "Cannot get department. Please try again later.";
-
       try
       {
-        var response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+        Response<IOperationResult<IGetCompanyEmployeesResponse>> response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
           IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
 
         if (response.Message.IsSuccess)
@@ -60,15 +59,37 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       }
       catch (Exception exc)
       {
-        _logger.LogError(exc, errorMessage);
-
-        errors.Add(errorMessage);
+        _logger.LogError(exc, "Cannot get department. Please try again later.");
       }
 
       return null;
     }
 
-    private void Authorization(Guid taskProjectId, List<string> errors, out DepartmentData department)
+    private List<UserData> GetUsersInfo(List<Guid> userIds, List<string> errors)
+    {
+      try
+      {
+        IOperationResult<IGetUsersDataResponse> response = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
+          IGetUsersDataRequest.CreateObj(userIds)).Result.Message;
+
+        if (response.IsSuccess)
+        {
+          return response.Body.UsersData;
+        }
+
+        errors.Add($"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.");
+      }
+      catch (Exception exc)
+      {
+        errors.Add($"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.");
+
+        _logger.LogWarning(exc, "Exception on get user information.");
+      }
+
+      return null;
+    }
+
+    private bool Authorization(Guid taskProjectId, out DepartmentData department)
     {
       List<DbProjectUser> projectUsers = _userRepository
         .GetProjectUsers(taskProjectId, false)
@@ -76,27 +97,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
       Guid requestUserId = _httpContext.GetUserId();
 
-      department = GetDepartment(requestUserId, errors);
+      department = GetDepartment(requestUserId);
 
-      if (_accessValidator.IsAdmin(requestUserId))
+      if (_accessValidator.IsAdmin()
+        || projectUsers.FirstOrDefault(x => x.UserId == requestUserId) != null
+        || department != null && department.DirectorUserId == requestUserId)
       {
-        return;
+        return true;
       }
 
-      if (projectUsers.FirstOrDefault(x => x.UserId == requestUserId) != null)
-      {
-        return;
-      }
-
-      if (department != null)
-      {
-        if (department.DirectorUserId == requestUserId)
-        {
-          return;
-        }
-      }
-
-      throw new ForbiddenException("Not enough rights.");
+      return false;
     }
 
     private List<ImageInfo> GetTaskImages(List<Guid> imageIds, List<string> errors)
@@ -135,6 +145,31 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       return null;
     }
 
+    private List<Guid> GetUsersIds(DbTask task, Guid? parentTaskAssignedTo)
+    {
+      List<Guid> userIds = new()
+      {
+        task.CreatedBy,
+      };
+
+      if (task.AssignedTo.HasValue)
+      {
+        userIds.Add(task.AssignedTo.Value);
+      }
+
+      if (task.ParentTask != null)
+      {
+        userIds.Add(task.ParentTask.CreatedBy);
+      }
+
+      if (parentTaskAssignedTo != null && parentTaskAssignedTo != Guid.Empty)
+      {
+        userIds.Add(parentTaskAssignedTo.Value);
+      }
+
+      return userIds;
+    }
+
     public GetTaskCommand(
       ITaskRepository taskRepository,
       IUserRepository userRepository,
@@ -163,48 +198,25 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
     public OperationResultResponse<TaskResponse> Execute(Guid taskId, bool isFullModel = true)
     {
-      var errors = new List<string>();
-
+      OperationResultResponse<TaskResponse> response = new OperationResultResponse<TaskResponse>();
       DbTask task = _taskRepository.Get(taskId, isFullModel);
 
-      Authorization(task.ProjectId, errors, out DepartmentData department);
-
-      List<Guid> userIds = new()
+      if (!Authorization(task.ProjectId, out DepartmentData department))
       {
-        task.CreatedBy,
-      };
+        _httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
-      if (task.AssignedTo.HasValue)
-      {
-        userIds.Add(task.AssignedTo.Value);
-      }
+        response.Status = OperationResultStatusType.Failed;
+        response.Errors.Add("Not enough rights.");
 
-      if (task.ParentTask != null)
-      {
-        userIds.Add(task.ParentTask.CreatedBy);
+        return response;
       }
 
       Guid? parentTaskAssignedTo = task.ParentTask?.AssignedTo;
-      if (parentTaskAssignedTo != null && parentTaskAssignedTo != Guid.Empty)
-      {
-        userIds.Add(parentTaskAssignedTo.Value);
-      }
+      List<Guid> userIds = GetUsersIds(task, parentTaskAssignedTo);
 
-      List<UserData> usersDataResponse = new();
-      try
-      {
-        var res = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
-          IGetUsersDataRequest.CreateObj(userIds));
-        usersDataResponse = res.Result.Message.Body.UsersData;
-      }
-      catch (Exception exc)
-      {
-        errors.Add($"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.");
+      List<UserData> usersDataResponse = GetUsersInfo(userIds, response.Errors);
 
-        _logger.LogWarning(exc, "Exception on get user information.");
-      }
-
-      List<ImageInfo> imagesinfo = GetTaskImages(task.Images.Select(x => x.ImageId).ToList(), errors);
+      List<ImageInfo> imagesinfo = GetTaskImages(task.Images.Select(x => x.ImageId).ToList(), response.Errors);
 
       List<TaskInfo> subtasksInfo = new();
       if (task.Subtasks != null)
@@ -219,7 +231,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         }
       }
 
-      TaskResponse response = _taskResponseMapper.Map(
+      response.Body = _taskResponseMapper.Map(
         task,
         usersDataResponse.FirstOrDefault(x => x.Id == task.CreatedBy),
         usersDataResponse.FirstOrDefault(x => parentTaskAssignedTo != null && x.Id == parentTaskAssignedTo),
@@ -229,12 +241,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         subtasksInfo,
         imagesinfo);
 
-      return new OperationResultResponse<TaskResponse>()
-      {
-        Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
-        Body = response,
-        Errors = errors
-      };
+      response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
+
+      return response;
     }
   }
 }
