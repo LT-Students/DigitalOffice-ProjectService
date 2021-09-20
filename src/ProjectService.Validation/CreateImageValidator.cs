@@ -16,19 +16,19 @@ namespace LT.DigitalOffice.ProjectService.Validation
     public CreateImageValidator()
     {
       RuleFor(images => images)
-        .NotNull().WithMessage("List must not be null")
-        .NotEmpty().WithMessage("List must not be empty");
+        .NotNull().WithMessage("List must not be null.")
+        .NotEmpty().WithMessage("List must not be empty.");
 
       RuleFor(images => images.EntityId)
-        .NotEmpty().WithMessage("Image's Id must not be empty");
+        .NotEmpty().WithMessage("Image's Id must not be empty.");
 
       RuleForEach(images => images.Images)
         .Must(images => !string.IsNullOrEmpty(images.Content))
-        .WithMessage("Content can't be empty")
+        .WithMessage("Content can't be empty.")
         .Must(images => imageFormats.Contains(images.Extension))
-        .WithMessage("Wrong extension")
+        .WithMessage("Wrong extension.")
         .Must(images => images.Name.Length < 150)
-        .WithMessage("Name's length must be less than 150 letters")
+        .WithMessage("Name's length must be less than 150 letters.")
         .Must(images =>
         {
           try

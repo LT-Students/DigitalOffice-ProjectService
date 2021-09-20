@@ -56,11 +56,11 @@ namespace LT.DigitalOffice.ProjectService.Validation
       {
         RuleForEach(project => project.TaskImages)
           .Must(x => !string.IsNullOrEmpty(x.Content))
-          .WithMessage("Content can't be empty")
+          .WithMessage("Content can't be empty.")
           .Must(x => imageFormats.Contains(x.Extension))
-          .WithMessage("Wrong extension")
+          .WithMessage("Wrong extension.")
           .Must(images => images.Name.Length < 150)
-          .WithMessage("Name's length must be less than 150 letters")
+          .WithMessage("Name's length must be less than 150 letters.")
           .Must(images =>
           {
             try
