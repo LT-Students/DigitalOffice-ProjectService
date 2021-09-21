@@ -16,6 +16,7 @@ using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using MassTransit;
@@ -33,6 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDbImageMapper _dbProjectImageMapper;
     private readonly ICreateImageValidator _validator;
+    private readonly IUserRepository _userRepository;
 
     private List<Guid> CreateImage(List<ImageContent> context, Guid userId, List<string> errors)
     {
@@ -73,7 +75,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IDbImageMapper dbProjectImageMapper,
-      ICreateImageValidator validator)
+      ICreateImageValidator validator,
+      IUserRepository userRepository)
     {
       _repository = repository;
       _rcImages = rcImages;
@@ -82,13 +85,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       _httpContextAccessor = httpContextAccessor;
       _dbProjectImageMapper = dbProjectImageMapper;
       _validator = validator;
+      _userRepository = userRepository;
     }
 
     public OperationResultResponse<List<Guid>> Execute(CreateImageRequest request)
     {
       OperationResultResponse<List<Guid>> response = new();
 
-      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
+      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
+      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects)
+        && !(request.ImageType == ImageType.Task && _userRepository.AreUserProjectExist(request.EntityId, userId)))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 

@@ -37,78 +37,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly ILogger<CreateProjectCommand> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
-    private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IRequestClient<ICreateImagesRequest> _rcImages;
-    private readonly IRequestClient<ICheckDepartmentsExistence> _rcCheckDepartmentsExistence;
-
-    private List<Guid> CheckDepartmentExistence(Guid? departmentId, List<string> errors)
-    {
-      if (!departmentId.HasValue)
-      {
-        return null;
-      }
-
-      string errorMessage = "Failed to check the existing department.";
-      string logMessage = "Department with id: {id} not found.";
-
-      try
-      {
-        var response = _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
-          ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value })).Result;
-        if (response.Message.IsSuccess)
-        {
-          if (!response.Message.Body.DepartmentIds.Any())
-          {
-            errors.Add($"Department Id: {departmentId} does not exist.");
-          }
-          return response.Message.Body.DepartmentIds;
-        }
-
-        _logger.LogWarning("Can not find department with this Id: {departmentId}: " +
-          $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, logMessage);
-      }
-
-      errors.Add(errorMessage);
-
-      return null;
-    }
-
-    private List<Guid> CheckUserExistence(List<Guid> userIds, List<string> errors)
-    {
-      if (!userIds.Any())
-      {
-        return userIds;
-      }
-
-      string errorMessage = "Failed to check the existing users.";
-      string logMessage = "Cannot check existing users withs this ids {userIds}";
-
-      try
-      {
-        var response = _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUsersExistence>>(
-          ICheckUsersExistence.CreateObj(userIds)).Result;
-        if (response.Message.IsSuccess)
-        {
-          return response.Message.Body.UserIds;
-        }
-
-        _logger.LogWarning("Can not find {userIds} with this Ids: {userIds}: " +
-          $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, logMessage);
-      }
-
-      errors.Add(errorMessage);
-
-      return null;
-    }
 
     private void CreateWorkspace(string projectName, Guid creatorId, List<Guid> users, List<string> errors)
     {
@@ -206,10 +136,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       ILogger<CreateProjectCommand> logger,
       IHttpContextAccessor httpContextAccessor,
       IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
-      IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
-      IRequestClient<ICreateImagesRequest> rcImages,
-      IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence)
+      IRequestClient<ICreateImagesRequest> rcImages)
     {
       _logger = logger;
       _validator = validator;
@@ -218,10 +146,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _rcCreateWorkspace = rcCreateWorkspace;
-      _rcCheckUsersExistence = rcCheckUsersExistence;
       _rcCreateWorkTime = rcCreateWorkTime;
       _rcImages = rcImages;
-      _rcCheckDepartmentsExistence = rcCheckDepartmentsExistence;
     }
 
     public OperationResultResponse<Guid> Execute(CreateProjectRequest request)
@@ -238,16 +164,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return response;
       }
 
-      if (_repository.DoesProjectNameExist(request.Name))
-      {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
-
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.Add($"Project with name '{request.Name}' already exists.");
-
-        return response;
-      }
-
       if (!_validator.ValidateCustom(request, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -258,33 +174,24 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return response;
       }
 
-      List<Guid> existUsers = CheckUserExistence(request.Users.Select(u => u.UserId).ToList(), response.Errors);
-
-      if (response.Errors.Any()) {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        response.Status = OperationResultStatusType.Failed;
-        return response;
-      }
-
-      if (existUsers.Count() != request.Users.Count())
-      {
-        response.Errors.Add("Not all users exist.");
-      }
-
-      List<Guid> existDepartments = CheckDepartmentExistence(request.DepartmentId, response.Errors);
+      List<Guid> users = request.Users.Select(u => u.UserId).ToList();
 
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
       List<Guid> imagesIds = CreateImage(request.ProjectImages.ToList(), userId, response.Errors);
 
-      DbProject dbProject = _dbProjectMapper.Map(request, userId, existUsers, existDepartments, imagesIds);
+      DbProject dbProject = _dbProjectMapper.Map(
+        request,
+        userId,
+        users,
+        new List<Guid> { request.DepartmentId.Value },
+        imagesIds);
 
       response.Body = _repository.Create(dbProject);
 
-      CreateWorkTime(dbProject.Id, existUsers, response.Errors);
+      CreateWorkTime(dbProject.Id, users, response.Errors);
 
-      CreateWorkspace(request.Name, userId, existUsers, response.Errors);
+      CreateWorkspace(request.Name, userId, users, response.Errors);
 
       response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
 

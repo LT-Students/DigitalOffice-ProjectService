@@ -22,6 +22,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
     public TaskInfo ParentTask { get; set; }
 
     public IEnumerable<TaskInfo> Subtasks { get; set; }
-    public IEnumerable<ImageInfo> TasksImages { get; set; }
+    public IEnumerable<ImageInfo> TaskImages { get; set; }
   }
 }

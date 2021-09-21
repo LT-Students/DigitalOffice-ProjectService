@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
-using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
-using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
@@ -35,39 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartments;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<CreateProjectCommand> _logger;
-
-    private DepartmentData GetDepartment(Guid? departmentId, List<string> errors)
-    {
-      string errorMessage = "Cannot edit project. Please try again later.";
-
-      if (!departmentId.HasValue)
-      {
-        return null;
-      }
-
-      try
-      {
-        var response = _rcGetDepartments.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
-        IGetDepartmentsRequest.CreateObj(new() { departmentId.Value })).Result;
-
-        if (response.Message.IsSuccess)
-        {
-          return response.Message.Body.Departments.FirstOrDefault();
-        }
-
-        _logger.LogWarning(
-          "Can not find department with this id {departmentId}: " +
-          "{Environment.NewLine}{string.Join('\n', response.Message.Errors)}", departmentId);
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, errorMessage);
-
-        errors.Add(errorMessage);
-      }
-
-      return null;
-    }
+    private readonly IUserRepository _userRepository;
 
     public EditProjectCommand(
       IEditProjectValidator validator,
@@ -76,7 +42,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IProjectRepository projectRepository,
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
       IHttpContextAccessor httpContextAccessor,
-      ILogger<CreateProjectCommand> logger)
+      ILogger<CreateProjectCommand> logger,
+      IUserRepository userRepository)
     {
       _validator = validator;
       _accessValidator = accessValidator;
@@ -85,17 +52,27 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _rcGetDepartments = rcGetDepartments;
       _httpContextAccessor = httpContextAccessor;
       _logger = logger;
+      _userRepository = userRepository;
     }
 
     public OperationResultResponse<bool> Execute(Guid projectId, JsonPatchDocument<EditProjectRequest> request)
     {
-      _validator.ValidateAndThrowCustom(request);
-
-      DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId });
-
       OperationResultResponse<bool> response = new();
 
-      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
+      if (!_validator.ValidateCustom(request, out List<string> errors))
+      {
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+        response.Status = OperationResultStatusType.Failed;
+        response.Errors.AddRange(errors);
+
+        return response;
+      }
+
+      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
+
+      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects)
+        && !_userRepository.AreUserProjectExist(userId, projectId, true))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
@@ -105,41 +82,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return response;
       }
 
-      foreach (Operation item in request.Operations)
+      DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId });
+      response.Body = _projectRepository.Edit(dbProject, _mapper.Map(request));
+      if (!response.Body)
       {
-        if (item.path == $"/{nameof(EditProjectRequest.Name)}" &&
-          _projectRepository.DoesProjectNameExist(item.value.ToString()))
-        {
-          response.Status = OperationResultStatusType.Failed;
-          response.Errors.Add($"Project with name '{item.value}' already exists.");
-          return response;
-        }
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        if (item.path == $"/{nameof(EditProjectRequest.DepartmentId)}")
-        {
-          // TODO rework to department existence
-          var departmentData = GetDepartment(Guid.Parse(item.value.ToString()), response.Errors);
+        response.Status = OperationResultStatusType.Failed;
+        response.Errors.Add("Project can not be edit.");
 
-          if (!response.Errors.Any() && departmentData == null)
-          {
-            _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-            response.Status = OperationResultStatusType.Failed;
-            response.Errors.Add("Project department does not found.");
-
-            return response;
-          }
-          else if (response.Errors.Any())
-          {
-            _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-            response.Status = OperationResultStatusType.Failed;
-            return response;
-          }
-        };
+        return response;
       }
 
-      response.Body = _projectRepository.Edit(dbProject, _mapper.Map(request));
       response.Status = OperationResultStatusType.FullSuccess;
 
       return response;

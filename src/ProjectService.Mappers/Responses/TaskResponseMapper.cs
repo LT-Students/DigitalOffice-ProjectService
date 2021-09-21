@@ -76,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
         PlannedMinutes = dbTask.PlannedMinutes,
         CreatedAtUtc = dbTask.CreatedAtUtc,
         Subtasks = subtasksInfo,
-        TasksImages = imagesInfo
+        TaskImages = imagesInfo
       };
     }
   }
