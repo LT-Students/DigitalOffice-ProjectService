@@ -36,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
     private bool RemoveImage(List<Guid> ids, List<string> errors)
     {
-      if (ids == null || ids.Any())
+      if (ids == null || !ids.Any())
       {
         return false;
       }
