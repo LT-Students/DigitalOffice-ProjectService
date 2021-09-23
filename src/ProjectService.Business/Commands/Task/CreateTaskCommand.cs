@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
       try
       {
-        var response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+        Response<IOperationResult<IGetCompanyEmployeesResponse>> response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
           IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
 
         if (response.Message.IsSuccess)

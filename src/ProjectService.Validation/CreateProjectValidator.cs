@@ -82,8 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
             {
               try
               {
-                var byteString = new Span<byte>(new byte[images.Content.Length]);
-                return Convert.TryFromBase64String(images.Content, byteString, out _);
+                return Convert.TryFromBase64String(images.Content, new Span<byte>(new byte[images.Content.Length]), out _);
               }
               catch
               {

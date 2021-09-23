@@ -53,7 +53,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         dbProjectQueryable = dbProjectQueryable.Include(x => x.Images);
       }
 
-      var dbProject = dbProjectQueryable.FirstOrDefault(x => x.Id == filter.ProjectId);
+      DbProject dbProject = dbProjectQueryable.FirstOrDefault(x => x.Id == filter.ProjectId);
 
       if (dbProject == null)
       {
@@ -97,7 +97,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         throw new NotFoundException($"Project with Id {projectId} does not exist.");
       }
 
-      foreach (var userId in userIds)
+      foreach (Guid userId in userIds)
       {
         DbProjectUser dbProjectUser = dbProject.Users?.FirstOrDefault(w => w.UserId == userId);
 
@@ -121,7 +121,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         return null;
       }
 
-      var dbProjects = _provider.Projects
+      IQueryable<DbProject> dbProjects = _provider.Projects
         .AsQueryable();
 
       if (filter.DepartmentId.HasValue)
@@ -141,7 +141,7 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
       if (string.IsNullOrEmpty(text))
       {
-        throw new ArgumentNullException(nameof(text));
+        return null;
       }
 
       return _provider.Projects.Where(p => p.Name.Contains(text) || p.ShortName.Contains(text)).ToList();
@@ -171,15 +171,15 @@ namespace LT.DigitalOffice.ProjectService.Data
         if (request.IncludeUsers)
         {
           projects = _provider.Projects
-              .Include(pu => pu.Users)
-              .Where(p => p.Users.Any(u => u.UserId == request.UserId.Value));
+            .Include(pu => pu.Users)
+            .Where(p => p.Users.Any(u => u.UserId == request.UserId.Value));
         }
         else
         {
           projects = _provider.ProjectsUsers
-              .Where(pu => pu.UserId == request.UserId)
-              .Include(pu => pu.Project)
-              .Select(pu => pu.Project);
+            .Where(pu => pu.UserId == request.UserId)
+            .Include(pu => pu.Project)
+            .Select(pu => pu.Project);
         }
       }
 

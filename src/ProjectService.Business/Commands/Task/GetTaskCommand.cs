@@ -220,7 +220,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       List<TaskInfo> subtasksInfo = new();
       if (task.Subtasks != null)
       {
-        foreach (var dbSubtask in task.Subtasks)
+        foreach (DbTask dbSubtask in task.Subtasks)
         {
           subtasksInfo.Add(
             _taskInfoMapper.Map(

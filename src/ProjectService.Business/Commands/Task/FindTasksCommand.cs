@@ -6,7 +6,6 @@ using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
-using LT.DigitalOffice.Kernel.Validators;
 using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.User;
@@ -41,7 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
       try
       {
-        var response = _requestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
+        Response<IOperationResult<IGetUsersDataResponse>> response = _requestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
           IGetUsersDataRequest.CreateObj(userId)).Result;
 
         if (response.Message.IsSuccess)
