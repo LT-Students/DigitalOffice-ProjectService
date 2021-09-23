@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
         throw new ArgumentNullException(nameof(dbProjects));
       }
 
-      List<DepartmentInfo> departmentsInfos = departments.Select(_departmentInfoMapper.Map).ToList();
+            List<DepartmentInfo> departmentsInfos = departments?.Select(_departmentInfoMapper.Map).ToList();
 
       return new FindResultResponse<ProjectInfo>
       {
