@@ -66,7 +66,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
     private List<Guid> CreateImage(List<ImageContent> projectImages, Guid userId, List<string> errors)
     {
-      if (projectImages == null || projectImages.Count == 0)
+      if (projectImages == null || projectImages.Any())
       {
         return null;
       }

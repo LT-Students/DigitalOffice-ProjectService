@@ -110,7 +110,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
     private List<ImageInfo> GetTaskImages(List<Guid> imageIds, List<string> errors)
     {
-      if (imageIds == null || imageIds.Count == 0)
+      if (imageIds == null || imageIds.Any())
       {
         return null;
       }

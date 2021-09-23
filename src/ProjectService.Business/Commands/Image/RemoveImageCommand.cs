@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
@@ -35,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
     private bool RemoveImage(List<Guid> ids, List<string> errors)
     {
-      if (ids == null || ids.Count == 0)
+      if (ids == null || ids.Any())
       {
         return false;
       }
