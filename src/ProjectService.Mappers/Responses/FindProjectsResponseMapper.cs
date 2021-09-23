@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.Company;
@@ -27,10 +26,10 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
     {
       if (dbProjects == null)
       {
-        throw new ArgumentNullException(nameof(dbProjects));
+       return null;
       }
 
-            List<DepartmentInfo> departmentsInfos = departments?.Select(_departmentInfoMapper.Map).ToList();
+      List<DepartmentInfo> departmentsInfos = departments?.Select(_departmentInfoMapper.Map).ToList();
 
       return new FindResultResponse<ProjectInfo>
       {
