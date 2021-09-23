@@ -5,12 +5,16 @@ using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +30,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRemoveImageValidator _validator;
+    private readonly IUserRepository _userRepository;
+    private readonly ITaskRepository _taskRepository;
 
     private bool RemoveImage(List<Guid> ids, List<string> errors)
     {
@@ -67,7 +73,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       ILogger<RemoveImageCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
-      IRemoveImageValidator validator)
+      IRemoveImageValidator validator,
+      ITaskRepository taskRepository,
+      IUserRepository userRepository)
     {
       _repository = repository;
       _rcImages = rcImages;
@@ -75,13 +83,24 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _validator = validator;
+      _taskRepository = taskRepository;
+      _userRepository = userRepository;
     }
 
-    public OperationResultResponse<bool> Execute(List<Guid> request)
+    public OperationResultResponse<bool> Execute(RemoveImageRequest request)
     {
       OperationResultResponse<bool> response = new();
 
-      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
+      DbTask task = null;
+      if (request.ImageType == ImageType.Task)
+      {
+        task = _taskRepository.Get(request.EntityId, false);
+      }
+
+      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
+      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects)
+        && !(request.ImageType == ImageType.Task && _userRepository.AreUserProjectExist(task.ProjectId, userId))
+        && !(request.ImageType == ImageType.Project && _userRepository.AreUserProjectExist(request.EntityId, userId, true)))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
@@ -101,7 +120,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         return response;
       }
 
-      bool result = RemoveImage(request, response.Errors);
+      bool result = RemoveImage(request.ImagesIds, response.Errors);
 
       if (!result)
       {
@@ -111,7 +130,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         return response;
       }
 
-      response.Body = _repository.Remove(request);
+      response.Body = _repository.Remove(request.ImagesIds);
       response.Status = OperationResultStatusType.FullSuccess;
 
       return response;

@@ -59,16 +59,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     {
       OperationResultResponse<bool> response = new();
 
-      if (!_validator.ValidateCustom(request, out List<string> errors))
-      {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.AddRange(errors);
-
-        return response;
-      }
-
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
       if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects)
@@ -82,8 +72,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return response;
       }
 
-      DbProject dbProject = _projectRepository.Get(new GetProjectFilter { ProjectId = projectId });
-      response.Body = _projectRepository.Edit(dbProject, _mapper.Map(request));
+      if (!_validator.ValidateCustom(request, out List<string> errors))
+      {
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+        response.Status = OperationResultStatusType.Failed;
+        response.Errors.AddRange(errors);
+
+        return response;
+      }
+
+      response.Body = _projectRepository.Edit(projectId, _mapper.Map(request));
       if (!response.Body)
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;

@@ -16,6 +16,7 @@ using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
@@ -35,14 +36,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
     private readonly IDbImageMapper _dbProjectImageMapper;
     private readonly ICreateImageValidator _validator;
     private readonly IUserRepository _userRepository;
+    private readonly ITaskRepository _taskRepository;
 
-    private List<Guid> CreateImage(List<ImageContent> context, Guid userId, List<string> errors)
+    private List<Guid> CreateImages(List<ImageContent> context, Guid userId, Guid enityId, List<string> errors)
     {
       List<CreateImageData> images = context
         .Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId))
         .ToList();
 
-      string logMessage = $"Errors while creating images for user id {userId}.";
+      string logMessage = $"Errors while creating images for project id {enityId}.";
 
       try
       {
@@ -76,7 +78,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       IHttpContextAccessor httpContextAccessor,
       IDbImageMapper dbProjectImageMapper,
       ICreateImageValidator validator,
-      IUserRepository userRepository)
+      IUserRepository userRepository,
+      ITaskRepository taskRepository)
     {
       _repository = repository;
       _rcImages = rcImages;
@@ -86,15 +89,23 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       _dbProjectImageMapper = dbProjectImageMapper;
       _validator = validator;
       _userRepository = userRepository;
+      _taskRepository = taskRepository;
     }
 
     public OperationResultResponse<List<Guid>> Execute(CreateImageRequest request)
     {
       OperationResultResponse<List<Guid>> response = new();
 
+      DbTask task = null;
+      if (request.ImageType == ImageType.Task)
+      {
+        task = _taskRepository.Get(request.EntityId, false);
+      }
+
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects)
-        && !(request.ImageType == ImageType.Task && _userRepository.AreUserProjectExist(request.EntityId, userId)))
+        && !(request.ImageType == ImageType.Task && _userRepository.AreUserProjectExist(task.ProjectId, userId))
+        && !(request.ImageType == ImageType.Project && _userRepository.AreUserProjectExist(request.EntityId, userId, true)))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
@@ -114,9 +125,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         return response;
       }
 
-      List<Guid> imagesIds = CreateImage(
+      List<Guid> imagesIds = CreateImages(
         request.Images,
-        _httpContextAccessor.HttpContext.GetUserId(),
+        userId,
+        request.EntityId,
         response.Errors);
 
       if (response.Errors.Any())

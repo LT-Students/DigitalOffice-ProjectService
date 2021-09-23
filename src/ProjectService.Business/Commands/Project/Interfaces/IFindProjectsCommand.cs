@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
     [AutoInject]
     public interface IFindProjectsCommand
     {
-        FindResponse<ProjectInfo> Execute(FindProjectsFilter filter, int skipCount, int takeCount);
+        FindResponse<ProjectInfo> Execute(FindProjectsFilter filter);
     }
 }

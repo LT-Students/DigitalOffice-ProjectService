@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
     {
       if (dbTask == null)
       {
-        throw new ArgumentNullException(nameof(dbTask));
+        return null;
       }
 
       return new TaskResponse()

@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         return null;
       }
 
-      var projectId = Guid.NewGuid();
+      Guid projectId = Guid.NewGuid();
 
       return new DbTask
       {

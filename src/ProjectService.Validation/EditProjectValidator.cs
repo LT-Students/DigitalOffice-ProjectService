@@ -123,8 +123,6 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
     private bool GetDepartment(Guid? departmentId)
     {
-      string errorMessage = "Cannot edit project. Please try again later.";
-
       if (!departmentId.HasValue)
       {
         return true;
@@ -132,7 +130,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
       try
       {
-        var response = _rcGetDepartments.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
+        Response<IOperationResult<IGetDepartmentsResponse>> response = _rcGetDepartments.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
         IGetDepartmentsRequest.CreateObj(new() { departmentId.Value })).Result;
 
         if (response.Message.IsSuccess && response.Message.Body.Departments.FirstOrDefault() != null)
@@ -141,12 +139,13 @@ namespace LT.DigitalOffice.ProjectService.Validation
         }
 
         _logger.LogWarning(
-          "Can not find department with this id {departmentId}: " +
-          "{Environment.NewLine}{string.Join('\n', response.Message.Errors)}", departmentId);
+          "Can not find department with this id {departmentId}: Errors: { Errors}",
+          departmentId,
+          string.Join('\n', response.Message.Errors));
       }
       catch (Exception exc)
       {
-        _logger.LogError(exc, errorMessage);
+        _logger.LogError(exc, "Cannot edit project. Please try again later.");
       }
 
       return false;

@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         return null;
       }
 
-      var projectId = Guid.NewGuid();
+      Guid projectId = Guid.NewGuid();
       string shortName = request.ShortName?.Trim();
       string description = request.Description?.Trim();
       string shortDescription = request.ShortDescription?.Trim();

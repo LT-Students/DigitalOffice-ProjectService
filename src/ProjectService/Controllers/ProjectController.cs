@@ -17,11 +17,9 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [HttpGet("find")]
     public FindResponse<ProjectInfo> Find(
       [FromServices] IFindProjectsCommand command,
-      [FromQuery] FindProjectsFilter filter,
-      [FromQuery] int skipCount,
-      [FromQuery] int takeCount)
+      [FromQuery] FindProjectsFilter filter)
     {
-      return command.Execute(filter, skipCount, takeCount);
+      return command.Execute(filter);
     }
 
     [HttpGet("get")]
@@ -37,9 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
       [FromServices] ICreateProjectCommand command,
       [FromBody] CreateProjectRequest request)
     {
-      var result = command.Execute(request);
-
-      return result;
+      return command.Execute(request);
     }
 
     [HttpPatch("edit")]
@@ -48,9 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
       [FromQuery] Guid projectId,
       [FromBody] JsonPatchDocument<EditProjectRequest> request)
     {
-      var result = command.Execute(projectId, request);
-
-      return result;
+      return command.Execute(projectId, request);
     }
   }
 }

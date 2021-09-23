@@ -125,19 +125,14 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
       try
       {
-        var response = _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
+        Response<IOperationResult<ICheckDepartmentsExistence>> response = _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
           ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value })).Result;
-        if (response.Message.IsSuccess)
+        if (response.Message.IsSuccess && !response.Message.Body.DepartmentIds.Any())
         {
-          if (!response.Message.Body.DepartmentIds.Any())
-          {
-            return false;
-          }
           return true;
         }
 
-        _logger.LogWarning("Can not find department with this Id: {departmentId}: " +
-          $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
+        return false;
       }
       catch (Exception exc)
       {
@@ -149,24 +144,18 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
     private bool CheckUserExistence(List<Guid> userIds)
     {
-      if (!userIds.Any())
-      {
-        return true;
-      }
-
       string logMessage = "Cannot check existing users withs this ids {userIds}";
 
       try
       {
-        var response = _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUsersExistence>>(
+        Response<IOperationResult<ICheckUsersExistence>> response = _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUsersExistence>>(
           ICheckUsersExistence.CreateObj(userIds)).Result;
         if (response.Message.IsSuccess)
         {
           return true;
         }
 
-        _logger.LogWarning("Can not find {userIds} with this Ids: {userIds}: " +
-          $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
+        _logger.LogWarning($"Can not find with this Ids: {userIds}: {Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
       }
       catch (Exception exc)
       {

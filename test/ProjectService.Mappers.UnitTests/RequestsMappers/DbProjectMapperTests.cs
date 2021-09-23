@@ -20,6 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+      _imageMock = new();
       _projectRequestMapper = new DbProjectMapper(_imageMock.Object);
 
       _newProject = new CreateProjectRequest

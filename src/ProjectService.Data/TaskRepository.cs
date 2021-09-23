@@ -86,21 +86,17 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
       if (isFullModel)
       {
-        DbTask dbTask = _provider.Tasks
+        return _provider.Tasks
           .Include(t => t.Project)
           .Include(t => t.Status)
           .Include(t => t.Priority)
           .Include(t => t.Type)
           .Include(t => t.Subtasks)
           .Include(t => t.Images)
-          .FirstOrDefault(x => x.Id == taskId) ??
-            throw new NotFoundException($"Task id '{taskId}' was not found.");
-
-        return dbTask;
+          .FirstOrDefault(x => x.Id == taskId);
       }
 
-      return _provider.Tasks.FirstOrDefault(x => x.Id == taskId) ??
-        throw new NotFoundException($"Task id '{taskId}' was not found.");
+      return _provider.Tasks.FirstOrDefault(x => x.Id == taskId);
     }
 
     public IEnumerable<DbTask> Find(
@@ -110,19 +106,10 @@ namespace LT.DigitalOffice.ProjectService.Data
       int takeCount,
       out int totalCount)
     {
-      if (skipCount < 0)
-      {
-        throw new BadRequestException("Skip count can't be less than 0.");
-      }
-
-      if (takeCount < 1)
-      {
-        throw new BadRequestException("Take count can't be less than 1.");
-      }
-
       if (filter == null)
       {
-        throw new ArgumentNullException(nameof(filter));
+        totalCount = 0;
+        return null;
       }
 
       IQueryable<DbTask> dbTasks = _provider.Tasks

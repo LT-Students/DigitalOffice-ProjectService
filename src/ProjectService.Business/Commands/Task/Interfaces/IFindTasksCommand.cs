@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     [AutoInject]
     public interface IFindTasksCommand
     {
-        FindResponse<TaskInfo> Execute(FindTasksFilter filter, int skipCount, int takeCount);
+        FindResponse<TaskInfo> Execute(FindTasksFilter filter);
     }
 }

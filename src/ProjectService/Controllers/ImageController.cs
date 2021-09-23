@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [HttpDelete("remove")]
     public OperationResultResponse<bool> Remove(
       [FromServices] IRemoveImageCommand command,
-      [FromBody] List<Guid> request)
+      [FromBody] RemoveImageRequest request)
     {
       return command.Execute(request);
     }

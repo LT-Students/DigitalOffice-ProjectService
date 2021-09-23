@@ -18,11 +18,9 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         [HttpGet("find")]
         public FindResponse<TaskInfo> Find(
             [FromServices] IFindTasksCommand command,
-            [FromQuery] FindTasksFilter filter,
-            [FromQuery] int skipCount,
-            [FromQuery] int takeCount)
+            [FromQuery] FindTasksFilter filter)
         {
-            return command.Execute(filter, skipCount, takeCount);
+            return command.Execute(filter);
         }
 
         [HttpGet("get")]
