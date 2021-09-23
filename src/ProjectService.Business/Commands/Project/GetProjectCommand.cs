@@ -18,10 +18,12 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using MassTransit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -39,6 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
         private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployees;
         private readonly IRequestClient<IGetImagesRequest> _rcImages;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         private DepartmentInfo GetDepartment(Guid departmentId, List<string> errors)
         {
@@ -253,7 +256,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
             IRequestClient<IGetUsersDataRequest> usersDataRequestClient,
             IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployees,
-            IRequestClient<IGetImagesRequest> rcImages)
+            IRequestClient<IGetImagesRequest> rcImages,
+            IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _repository = repository;
@@ -267,6 +271,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             _usersDataRequestClient = usersDataRequestClient;
             _rcGetCompanyEmployees = rcGetCompanyEmployees;
             _rcImages = rcImages;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public OperationResultResponse<ProjectResponse> Execute(GetProjectFilter filter)
@@ -274,6 +279,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             OperationResultResponse<ProjectResponse> response = new();
             DepartmentInfo department = null;
             DbProject dbProject = _repository.Get(filter);
+
+            if (dbProject == null)
+            {
+                _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+                response.Status = OperationResultStatusType.Failed;
+                response.Errors.Add($"Project with Id {filter.ProjectId} was not found.");
+
+                return response;
+            }
 
             if (dbProject.DepartmentId.HasValue)
             {

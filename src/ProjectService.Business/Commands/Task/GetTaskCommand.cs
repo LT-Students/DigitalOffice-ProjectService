@@ -200,6 +200,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       OperationResultResponse<TaskResponse> response = new OperationResultResponse<TaskResponse>();
       DbTask task = _taskRepository.Get(taskId, isFullModel);
 
+      if (task == null)
+      {
+        _httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+        response.Status = OperationResultStatusType.Failed;
+        response.Errors.Add($"Task with Id {taskId} was not found.");
+
+        return response;
+      }
+
       if (!Authorization(task.ProjectId, out DepartmentData department))
       {
         _httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
