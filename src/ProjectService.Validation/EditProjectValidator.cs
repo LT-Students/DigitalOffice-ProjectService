@@ -115,13 +115,13 @@ namespace LT.DigitalOffice.ProjectService.Validation
               RuleFor(x => GetOperationByPath(x, DepartmentId).value)
                 .Must(x => Guid.TryParse(x.ToString(), out Guid _))
                 .WithMessage("Wrong department id value.")
-                .Must(x => GetDepartment(Guid.Parse(DepartmentId)))
+                .Must(x => CheckValidityDepartmentId(Guid.Parse(DepartmentId)))
                 .WithMessage("Project department does not found.");
             });
         });
     }
 
-    private bool GetDepartment(Guid? departmentId)
+    private bool CheckValidityDepartmentId(Guid? departmentId)
     {
       if (!departmentId.HasValue)
       {

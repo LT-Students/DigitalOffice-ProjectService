@@ -37,9 +37,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
         .NotEmpty()
         .Must(project => !projectRepository.DoesProjectNameExist(project.Name))
         .WithMessage(project => $"Project with name '{project.Name}' already exists.")
-        .Must(project => CheckDepartmentExistence(project.DepartmentId))
+        .Must(project => CheckValidityDepartmentId(project.DepartmentId))
         .WithMessage("Some departments does not exist.")
-        .Must(project => CheckUserExistence(project.Users.Select(u => u.UserId).ToList()))
+        .Must(project => CheckValidityUsersIds(project.Users.Select(u => u.UserId).ToList()))
         .WithMessage("Some users does not exist.");
 
       RuleFor(project => project.Name)
@@ -113,7 +113,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
             .WithMessage("Wrong type of department Id."));
     }
 
-    private bool CheckDepartmentExistence(Guid? departmentId)
+    private bool CheckValidityDepartmentId(Guid? departmentId)
     {
       if (!departmentId.HasValue)
       {
@@ -144,7 +144,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
       return false;
     }
 
-    private bool CheckUserExistence(List<Guid> userIds)
+    private bool CheckValidityUsersIds(List<Guid> userIds)
     {
       if (!userIds.Any())
       {
