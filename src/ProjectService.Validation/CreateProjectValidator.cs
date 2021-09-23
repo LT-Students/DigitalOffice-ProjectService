@@ -35,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
       RuleFor(project => project)
         .NotEmpty()
-        .Must(project => projectRepository.DoesProjectNameExist(project.Name))
+        .Must(project => !projectRepository.DoesProjectNameExist(project.Name))
         .WithMessage(project => $"Project with name '{project.Name}' already exists.")
         .Must(project => CheckDepartmentExistence(project.DepartmentId))
         .WithMessage("Some departments does not exist.")
@@ -132,7 +132,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
           return true;
         }
 
-        _logger.LogWarning("Can not add certificate image to certificate. Reason: '{Errors}'",
+        _logger.LogWarning("Can not find department. Reason: '{Errors}'",
           string.Join(',', response.Message.Errors));
 
         return false;

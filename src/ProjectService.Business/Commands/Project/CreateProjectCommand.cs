@@ -184,7 +184,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         request,
         userId,
         users,
-        new List<Guid> { request.DepartmentId.Value },
+        new List<Guid> { request.DepartmentId.GetValueOrDefault() },
         imagesIds);
 
       response.Body = _repository.Create(dbProject);
