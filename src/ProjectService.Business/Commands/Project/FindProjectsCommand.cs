@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
-using LT.DigitalOffice.Kernel.Validators;
+using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
@@ -15,7 +16,6 @@ using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -86,27 +86,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _findRequestValidator = findRequestValidator;
     }
 
-    public FindResponse<ProjectInfo> Execute(FindProjectsFilter filter)
+    public FindResultResponse<ProjectInfo> Execute(FindProjectsFilter filter)
     {
-      FindResponse<ProjectInfo> response = new();
-      if (filter == null)
-      {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        response.Errors.Concat(new List<string> { "Filter is null." });
-        return response;
-      }
+      FindResultResponse<ProjectInfo> response = new();
 
       if (_findRequestValidator.ValidateCustom(filter, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
+        response.Status = OperationResultStatusType.Failed;
         response.Errors.Concat(errors);
 
         return response;
       }
 
-      List<DbProject> dbProject = _repository.Find(filter, filter.skipCount, filter.takeCount, out int totalCount);
+      List<DbProject> dbProject = _repository.Find(filter, out int totalCount);
 
       List<DepartmentData> departments = GetDepartments(dbProject, response.Errors.ToList());
 

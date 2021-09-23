@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds);
 
-    List<DbProject> Find(FindProjectsFilter filter, int skipCount, int takeCount, out int totalCount);
+    List<DbProject> Find(FindProjectsFilter filter, out int totalCount);
 
     List<DbProject> Search(string text);
 

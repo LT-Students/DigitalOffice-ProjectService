@@ -4,8 +4,10 @@ using System.Linq;
 using System.Net;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.User;
@@ -16,7 +18,6 @@ using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -83,26 +84,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       _findRequestValidator = findRequestValidator;
     }
 
-    public FindResponse<TaskInfo> Execute(FindTasksFilter filter)
+    public FindResultResponse<TaskInfo> Execute(FindTasksFilter filter)
     {
-      FindResponse<TaskInfo> response = new();
+      FindResultResponse<TaskInfo> response = new();
 
-      if (filter == null)
-      {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        response.Errors.Concat(new List<string> { "Filter is null." });
-        return response;
-      }
-
-      var userId = _httpContextAccessor.HttpContext.GetUserId();
-      var projectUsers = _userRepository.Find(userId).ToList();
+      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
+      List<DbProjectUser> projectUsers = _userRepository.Find(userId).ToList();
 
       if (!(projectUsers.Any() || _accessValidator.IsAdmin()))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
+        response.Status = OperationResultStatusType.Failed;
         response.Errors.Concat(new List<string> { "Not enough rights." });
+
         return response;
       }
 
@@ -116,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       }
 
       IEnumerable<Guid> projectIds = projectUsers.Select(x => x.ProjectId);
-      List<DbTask> dbTasks = _taskRepository.Find(filter, projectIds, filter.skipCount, filter.takeCount, out int totalCount).ToList();
+      List<DbTask> dbTasks = _taskRepository.Find(filter, projectIds, out int totalCount).ToList();
 
       List<Guid> users = dbTasks.Where(x => x.AssignedTo.HasValue).Select(x => x.AssignedTo.Value).ToList();
       users.AddRange(dbTasks.Select(x => x.CreatedBy).ToList());
@@ -124,7 +119,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       IGetUsersDataResponse usersData = GetUsersData(users, response.Errors.ToList());
 
       List<TaskInfo> tasks = new();
-      foreach (var dbTask in dbTasks)
+      foreach (DbTask dbTask in dbTasks)
       {
         UserData assignedUser = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AssignedTo);
         UserData author = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.CreatedBy);

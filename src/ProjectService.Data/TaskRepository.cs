@@ -102,8 +102,6 @@ namespace LT.DigitalOffice.ProjectService.Data
     public IEnumerable<DbTask> Find(
       FindTasksFilter filter,
       IEnumerable<Guid> projectIds,
-      int skipCount,
-      int takeCount,
       out int totalCount)
     {
       if (filter == null)
@@ -123,7 +121,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       IQueryable<DbTask> tasks = CreateFindPredicates(filter, dbTasks, projectIds);
       totalCount = tasks.Count();
 
-      return tasks.Skip(skipCount).Take(takeCount).ToList();
+      return tasks.Skip(filter.skipCount).Take(filter.takeCount).ToList();
     }
   }
 }

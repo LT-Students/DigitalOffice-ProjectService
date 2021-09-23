@@ -113,7 +113,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       _provider.Save();
     }
 
-    public List<DbProject> Find(FindProjectsFilter filter, int skipCount, int takeCount, out int totalCount)
+    public List<DbProject> Find(FindProjectsFilter filter, out int totalCount)
     {
       if (filter == null)
       {
@@ -134,7 +134,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         totalCount = dbProjects.Count();
       }
 
-      return dbProjects.Skip(skipCount).Take(takeCount).ToList();
+      return dbProjects.Skip(filter.skipCount).Take(filter.takeCount).ToList();
     }
 
     public List<DbProject> Search(string text)

@@ -1,10 +1,10 @@
 ﻿using System;
+using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   public class ProjectController : ControllerBase
   {
     [HttpGet("find")]
-    public FindResponse<ProjectInfo> Find(
+    public FindResultResponse<ProjectInfo> Find(
       [FromServices] IFindProjectsCommand command,
       [FromQuery] FindProjectsFilter filter)
     {

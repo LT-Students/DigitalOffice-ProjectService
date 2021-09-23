@@ -5,9 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
+using LT.DigitalOffice.Kernel.Responses;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
@@ -16,7 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     public class TaskController : ControllerBase
     {
         [HttpGet("find")]
-        public FindResponse<TaskInfo> Find(
+        public FindResultResponse<TaskInfo> Find(
             [FromServices] IFindTasksCommand command,
             [FromQuery] FindTasksFilter filter)
         {
