@@ -132,6 +132,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
           return true;
         }
 
+        _logger.LogWarning("Can not add certificate image to certificate. Reason: '{Errors}'",
+          string.Join(',', response.Message.Errors));
+
         return false;
       }
       catch (Exception exc)
@@ -144,6 +147,11 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
     private bool CheckUserExistence(List<Guid> userIds)
     {
+      if (!userIds.Any())
+      {
+        return true;
+      }
+
       string logMessage = "Cannot check existing users withs this ids {userIds}";
 
       try
