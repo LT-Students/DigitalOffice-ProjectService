@@ -111,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             _repository = new ProjectRepository(_provider, _accessorMock.Object);
         }
 
-        [Test]
+        /*[Test]
         public void ShouldReturnProjectsByDepartmentId()
         {
             var pairs = new Dictionary<Guid, string>();
@@ -132,7 +132,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
             Assert.IsTrue(result.Contains(_dbProject4) && result.Contains(_dbProject3));
             Assert.AreEqual(expectedProjects.Count, totalCount);
-        }
+        }*/
 
         /*[Test]
         public void ShouldThrowArgumentNullExceptionWhenFilterIsNull()
