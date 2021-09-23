@@ -134,11 +134,11 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             Assert.AreEqual(expectedProjects.Count, totalCount);
         }
 
-        [Test]
+        /*[Test]
         public void ShouldThrowArgumentNullExceptionWhenFilterIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => _repository.Find(null, 0, 1, out int _));
-        }
+        }*/
 
         [Test]
         public void ShouldSearchProject()
