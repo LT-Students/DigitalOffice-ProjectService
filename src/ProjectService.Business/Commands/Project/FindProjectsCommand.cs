@@ -95,16 +95,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
         response.Status = OperationResultStatusType.Failed;
-        response.Errors.Concat(errors);
+        response.Errors = errors;
 
         return response;
       }
 
       List<DbProject> dbProject = _repository.Find(filter, out int totalCount);
 
-      List<DepartmentData> departments = GetDepartments(dbProject, response.Errors.ToList());
+      List<DepartmentData> departments = GetDepartments(dbProject, response.Errors);
 
-      response = _responseMapper.Map(dbProject, totalCount, departments, response.Errors.ToList());
+      response = _responseMapper.Map(dbProject, totalCount, departments, response.Errors);
 
       return response;
     }

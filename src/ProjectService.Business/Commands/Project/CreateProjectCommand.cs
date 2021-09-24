@@ -168,7 +168,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
         response.Status = OperationResultStatusType.Failed;
-        response.Errors.AddRange(errors);
+        response.Errors = errors;
 
         return response;
       }
