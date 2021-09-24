@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
@@ -123,30 +124,26 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       List<DbProjectUser> projectUsers = _userRepository.Find(userId).ToList();
 
       if (!_accessValidator.IsAdmin()
-        && !projectUsers.Any()
+        && !_accessValidator.HasRights(Rights.AddEditRemoveProjects)
         && GetDepartment(userId, response.Errors)?.DirectorUserId != userId)
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        return new FindResultResponse<TaskInfo>
-        {
-          Status = OperationResultStatusType.Failed,
-          Errors = new List<string> { "Not enough rights." }
-        };
+        response.Status = OperationResultStatusType.Failed;
+        response.Errors.Add("Not enough rights.");
+
+        return response;
       }
 
       if (_findRequestValidator.ValidateCustom(filter, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        return new FindResultResponse<TaskInfo>
-        {
-          Status = OperationResultStatusType.Failed,
-          Errors = errors
-        };
-      }
+        response.Status = OperationResultStatusType.Failed;
+        response.Errors.AddRange(errors);
 
-    //  FindResultResponse<TaskInfo> response = new();
+        return response;
+      }
 
       IEnumerable<Guid> projectIds = projectUsers.Select(x => x.ProjectId);
       List<DbTask> dbTasks = _taskRepository.Find(filter, projectIds, out int totalCount).ToList();
