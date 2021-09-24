@@ -54,7 +54,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
       When(project => project.TaskImages != null && project.TaskImages.Any(), () =>
       {
         RuleForEach(project => project.TaskImages)
-        .SetValidator(imageContentValidator)
+        .SetValidator(imageContentValidator);
       });
 
       //When(task => task.AssignedTo.HasValue, () =>
