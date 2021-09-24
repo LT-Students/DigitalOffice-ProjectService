@@ -10,7 +10,10 @@ using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Models.Company;
+using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.User;
+using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.Models.Broker.Responses.User;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -34,6 +37,33 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     private readonly ILogger<FindTasksCommand> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRequestClient<IGetUsersDataRequest> _requestClient;
+    private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployee;
+
+    private DepartmentData GetDepartment(Guid authorId, List<string> errors)
+    {
+      string errorMessage = "Cannot create task. Please try again later.";
+
+      try
+      {
+        Response<IOperationResult<IGetCompanyEmployeesResponse>> response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+          IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
+
+        if (response.Message.IsSuccess)
+        {
+          return response.Message.Body.Departments.FirstOrDefault();
+        }
+
+        _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", authorId);
+      }
+      catch (Exception exc)
+      {
+        _logger.LogError(exc, errorMessage);
+
+        errors.Add(errorMessage);
+      }
+
+      return null;
+    }
 
     private IGetUsersDataResponse GetUsersData(List<Guid> userId, List<string> errors)
     {
@@ -72,7 +102,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IRequestClient<IGetUsersDataRequest> requestClient,
-      IBaseFindRequestValidator findRequestValidator)
+      IBaseFindRequestValidator findRequestValidator,
+      IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployee)
     {
       _mapper = mapper;
       _logger = logger;
@@ -82,14 +113,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _findRequestValidator = findRequestValidator;
+      _rcGetCompanyEmployee = rcGetCompanyEmployee;
     }
 
     public FindResultResponse<TaskInfo> Execute(FindTasksFilter filter)
     {
+      FindResultResponse<TaskInfo> response = new();
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       List<DbProjectUser> projectUsers = _userRepository.Find(userId).ToList();
 
-      if (!(projectUsers.Any() || _accessValidator.IsAdmin()))
+      if (!_accessValidator.IsAdmin()
+        && !projectUsers.Any()
+        && GetDepartment(userId, response.Errors)?.DirectorUserId != userId)
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
@@ -111,7 +146,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         };
       }
 
-      FindResultResponse<TaskInfo> response = new();
+    //  FindResultResponse<TaskInfo> response = new();
 
       IEnumerable<Guid> projectIds = projectUsers.Select(x => x.ProjectId);
       List<DbTask> dbTasks = _taskRepository.Find(filter, projectIds, out int totalCount).ToList();

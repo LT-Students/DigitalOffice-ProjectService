@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
+using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
@@ -11,17 +12,15 @@ namespace LT.DigitalOffice.ProjectService.Validation
 {
   public class CreateTaskRequestValidator : AbstractValidator<CreateTaskRequest>, ICreateTaskValidator
   {
-    private readonly List<string> imageFormats = new()
-    {
-      ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tga"
-    };
-
     public CreateTaskRequestValidator(
       ITaskRepository tasksRepository,
       IUserRepository userRepository,
       IProjectRepository projectRepository,
-      ITaskPropertyRepository taskPropertyRepository)
+      ITaskPropertyRepository taskPropertyRepository,
+      IImageContentValidator imageContentValidator)
     {
+      List<string> errors = new();
+
       RuleFor(task => task.Name)
         .NotEmpty()
         .MaximumLength(150)
@@ -55,24 +54,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
       When(project => project.TaskImages != null && project.TaskImages.Any(), () =>
       {
         RuleForEach(project => project.TaskImages)
-          .Must(x => !string.IsNullOrEmpty(x.Content))
-          .WithMessage("Content can't be empty.")
-          .Must(x => imageFormats.Contains(x.Extension))
-          .WithMessage("Wrong extension.")
-          .Must(images => images.Name.Length < 150)
-          .WithMessage("Name's length must be less than 150 letters.")
-          .Must(images =>
-          {
-            try
-            {
-              Span<byte> byteString = new Span<byte>(new byte[images.Content.Length]);
-              return Convert.TryFromBase64String(images.Content, byteString, out _);
-            }
-            catch
-            {
-              return false;
-            }
-          }).WithMessage("Wrong image content.");
+          .Must(image => imageContentValidator.ValidateCustom(image, out errors))
+          .WithMessage(errors[0]);
       });
 
       //When(task => task.AssignedTo.HasValue, () =>

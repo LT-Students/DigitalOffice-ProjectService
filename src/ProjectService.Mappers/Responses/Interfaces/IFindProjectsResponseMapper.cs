@@ -10,6 +10,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces
   [AutoInject]
   public interface IFindProjectsResponseMapper
   {
-    public FindResultResponse<ProjectInfo> Map(List<DbProject> dbProject, int totalCount, List<DepartmentData> departments, List<string> errors);
+    FindResultResponse<ProjectInfo> Map(List<DbProject> dbProject, int totalCount, List<DepartmentData> departments, List<string> errors);
   }
 }

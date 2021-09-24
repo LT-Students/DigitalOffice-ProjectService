@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentValidation;
+using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 
@@ -8,13 +9,11 @@ namespace LT.DigitalOffice.ProjectService.Validation
 {
   public class CreateImageValidator : AbstractValidator<CreateImageRequest>, ICreateImageValidator
   {
-    private readonly List<string> imageFormats = new()
+    public CreateImageValidator(
+      IImageContentValidator imageContentValidator)
     {
-      ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tga"
-    };
+      List<string> errors = new();
 
-    public CreateImageValidator()
-    {
       RuleFor(images => images)
         .NotNull().WithMessage("List must not be null.")
         .NotEmpty().WithMessage("List must not be empty.");
@@ -23,23 +22,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
         .NotEmpty().WithMessage("Image's Id must not be empty.");
 
       RuleForEach(images => images.Images)
-        .Must(images => !string.IsNullOrEmpty(images.Content))
-        .WithMessage("Content can't be empty.")
-        .Must(images => imageFormats.Contains(images.Extension))
-        .WithMessage("Wrong extension.")
-        .Must(images => images.Name.Length < 150)
-        .WithMessage("Name's length must be less than 150 letters.")
-        .Must(images =>
-        {
-          try
-          {
-            return Convert.TryFromBase64String(images.Content, new Span<byte>(new byte[images.Content.Length]), out _);
-          }
-          catch
-          {
-            return false;
-          }
-        }).WithMessage("Wrong image content.");
+        .Must(image => imageContentValidator.ValidateCustom(image, out errors))
+        .WithMessage(errors[0]);
     }
   }
 }

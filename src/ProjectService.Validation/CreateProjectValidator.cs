@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
@@ -18,20 +19,18 @@ namespace LT.DigitalOffice.ProjectService.Validation
     private readonly IRequestClient<ICheckDepartmentsExistence> _rcCheckDepartmentsExistence;
     private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
 
-    private readonly List<string> imageFormats = new()
-    {
-      ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tga"
-    };
-
     public CreateProjectValidator(
       IProjectRepository projectRepository,
       ILogger<CreateProjectValidator> logger,
       IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence,
-      IRequestClient<ICheckUsersExistence> rcCheckUsersExistence)
+      IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
+      IImageContentValidator imageContentValidator)
     {
       _logger = logger;
       _rcCheckDepartmentsExistence = rcCheckDepartmentsExistence;
       _rcCheckUsersExistence = rcCheckUsersExistence;
+
+      List<string> errors = new();
 
       RuleFor(project => project)
         .NotEmpty()
@@ -72,23 +71,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
       When(project => project.ProjectImages != null && project.ProjectImages.Any(), () =>
       {
         RuleForEach(project => project.ProjectImages)
-          .Must(x => !string.IsNullOrEmpty(x.Content))
-          .WithMessage("Content can't be empty")
-          .Must(x => imageFormats.Contains(x.Extension))
-          .WithMessage("Wrong extension")
-          .Must(images => images.Name.Length < 150)
-          .WithMessage("Name's length must be less than 150 letters")
-          .Must(images =>
-            {
-              try
-              {
-                return Convert.TryFromBase64String(images.Content, new Span<byte>(new byte[images.Content.Length]), out _);
-              }
-              catch
-              {
-                return false;
-              }
-            }).WithMessage("Wrong image content.");
+          .Must(image => imageContentValidator.ValidateCustom(image, out errors))
+          .WithMessage(errors[0]);
       });
 
       When(project => !string.IsNullOrEmpty(project.ShortDescription?.Trim()), () =>

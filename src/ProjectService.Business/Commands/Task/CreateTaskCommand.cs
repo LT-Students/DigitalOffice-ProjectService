@@ -19,7 +19,6 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;

@@ -73,17 +73,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
 
       response.Body = _projectRepository.Edit(projectId, _mapper.Map(request));
+
+      response.Status = OperationResultStatusType.FullSuccess;
       if (!response.Body)
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
         response.Status = OperationResultStatusType.Failed;
         response.Errors.Add("Project can not be edit.");
-
-        return response;
       }
-
-      response.Status = OperationResultStatusType.FullSuccess;
 
       return response;
     }
