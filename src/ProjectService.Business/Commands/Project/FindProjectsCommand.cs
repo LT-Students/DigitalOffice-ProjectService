@@ -88,23 +88,24 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
     public FindResultResponse<ProjectInfo> Execute(FindProjectsFilter filter)
     {
-      FindResultResponse<ProjectInfo> response = new();
-
       if (_findRequestValidator.ValidateCustom(filter, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors = errors;
-
-        return response;
+        return new FindResultResponse<ProjectInfo>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = errors
+        };
       }
 
-      List<DbProject> dbProject = _repository.Find(filter, out int totalCount);
+      FindResultResponse<ProjectInfo> response = new();
 
-      List<DepartmentData> departments = GetDepartments(dbProject, response.Errors);
+      List<DbProject> dbProjects = _repository.Find(filter, out int totalCount);
 
-      response = _responseMapper.Map(dbProject, totalCount, departments, response.Errors);
+      List<DepartmentData> departments = GetDepartments(dbProjects, response.Errors);
+
+      response = _responseMapper.Map(dbProjects, totalCount, departments, response.Errors);
 
       return response;
     }

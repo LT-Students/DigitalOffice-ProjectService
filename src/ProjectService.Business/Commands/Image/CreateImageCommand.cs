@@ -94,8 +94,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
     public OperationResultResponse<List<Guid>> Execute(CreateImageRequest request)
     {
-      OperationResultResponse<List<Guid>> response = new();
-
       DbTask task = null;
       if (request.ImageType == ImageType.Task)
       {
@@ -109,21 +107,25 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.Add("Not enough rights.");
-
-        return response;
+        return new OperationResultResponse<List<Guid>>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = new List<string> { "Not enough rights." }
+        };
       }
 
       if (!_validator.ValidateCustom(request, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.AddRange(errors);
-
-        return response;
+        return new OperationResultResponse<List<Guid>>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = errors
+        };
       }
+
+      OperationResultResponse<List<Guid>> response = new();
 
       List<Guid> imagesIds = CreateImages(
         request.Images,

@@ -145,12 +145,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
         response.Status = OperationResultStatusType.Failed;
-        response.Errors = errors;
+        response.Errors.AddRange(errors);
 
         return response;
       }
 
-      List<Guid> imagesIds = CreateImage(request.TaskImages.ToList(), authorId, response.Errors);
+      List<Guid> imagesIds = CreateImage(request.TaskImages, authorId, response.Errors);
 
       response.Body = _repository.Create(_mapperTask.Map(request, authorId, imagesIds));
 

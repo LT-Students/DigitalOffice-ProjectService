@@ -86,8 +86,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
     public FindResultResponse<TaskInfo> Execute(FindTasksFilter filter)
     {
-      FindResultResponse<TaskInfo> response = new();
-
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       List<DbProjectUser> projectUsers = _userRepository.Find(userId).ToList();
 
@@ -95,20 +93,25 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.Concat(new List<string> { "Not enough rights." });
-
-        return response;
+        return new FindResultResponse<TaskInfo>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = new List<string> { "Not enough rights." }
+        };
       }
 
       if (_findRequestValidator.ValidateCustom(filter, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        response.Errors.Concat(errors);
-
-        return response;
+        return new FindResultResponse<TaskInfo>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = errors
+        };
       }
+
+      FindResultResponse<TaskInfo> response = new();
 
       IEnumerable<Guid> projectIds = projectUsers.Select(x => x.ProjectId);
       List<DbTask> dbTasks = _taskRepository.Find(filter, projectIds, out int totalCount).ToList();
@@ -116,7 +119,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       List<Guid> users = dbTasks.Where(x => x.AssignedTo.HasValue).Select(x => x.AssignedTo.Value).ToList();
       users.AddRange(dbTasks.Select(x => x.CreatedBy).ToList());
 
-      IGetUsersDataResponse usersData = GetUsersData(users, response.Errors.ToList());
+      IGetUsersDataResponse usersData = GetUsersData(users, response.Errors);
 
       List<TaskInfo> tasks = new();
       foreach (DbTask dbTask in dbTasks)

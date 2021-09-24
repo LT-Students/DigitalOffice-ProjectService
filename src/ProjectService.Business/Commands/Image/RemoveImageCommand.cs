@@ -90,8 +90,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
     public OperationResultResponse<bool> Execute(RemoveImageRequest request)
     {
-      OperationResultResponse<bool> response = new();
-
       DbTask task = null;
       if (request.ImageType == ImageType.Task)
       {
@@ -105,21 +103,25 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.Add("Not enough rights.");
-
-        return response;
+        return new OperationResultResponse<bool>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = new List<string> { "Not enough rights." }
+        };
       }
 
       if (!_validator.ValidateCustom(request, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.AddRange(errors);
-
-        return response;
+        return new OperationResultResponse<bool>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = errors
+        };
       }
+
+      OperationResultResponse<bool> response = new();
 
       bool result = RemoveImage(request.ImagesIds, response.Errors);
 

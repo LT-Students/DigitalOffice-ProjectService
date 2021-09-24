@@ -151,27 +151,29 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
     public OperationResultResponse<Guid> Execute(CreateProjectRequest request)
     {
-      OperationResultResponse<Guid> response = new();
-
       if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.Add("Not enough rights.");
-
-        return response;
+        return new OperationResultResponse<Guid>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = new List<string> { "Not enough rights." }
+        };
       }
 
       if (!_validator.ValidateCustom(request, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors = errors;
-
-        return response;
+        return new OperationResultResponse<Guid>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = errors
+        };
       }
+
+      OperationResultResponse<Guid> response = new();
 
       List<Guid> users = request.Users.Select(u => u.UserId).ToList();
 
