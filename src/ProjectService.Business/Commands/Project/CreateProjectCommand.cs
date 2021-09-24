@@ -9,7 +9,6 @@ using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
@@ -21,7 +20,6 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
@@ -179,7 +177,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
-      List<Guid> imagesIds = CreateImage(request.ProjectImages.ToList(), userId, response.Errors);
+      List<Guid> imagesIds = CreateImage(request.ProjectImages, userId, response.Errors);
 
       DbProject dbProject = _dbProjectMapper.Map(
         request,
