@@ -71,8 +71,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
       When(project => project.ProjectImages != null && project.ProjectImages.Any(), () =>
       {
         RuleForEach(project => project.ProjectImages)
-          .Must(image => imageContentValidator.ValidateCustom(image, out errors))
-          .WithMessage(errors[0]);
+          .SetValidator(imageContentValidator);
       });
 
       When(project => !string.IsNullOrEmpty(project.ShortDescription?.Trim()), () =>

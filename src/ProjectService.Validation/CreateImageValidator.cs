@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentValidation;
-using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 
@@ -22,8 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         .NotEmpty().WithMessage("Image's Id must not be empty.");
 
       RuleForEach(images => images.Images)
-        .Must(image => imageContentValidator.ValidateCustom(image, out errors))
-        .WithMessage(errors[0]);
+        .SetValidator(imageContentValidator);
     }
   }
 }
