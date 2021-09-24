@@ -125,6 +125,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
       if (!_accessValidator.IsAdmin()
         && !_accessValidator.HasRights(Rights.AddEditRemoveProjects)
+        && !projectUsers.Any()
         && GetDepartment(userId, response.Errors)?.DirectorUserId != userId)
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
