@@ -127,12 +127,9 @@ namespace LT.DigitalOffice.ProjectService.Data
       if (filter.DepartmentId.HasValue)
       {
         dbProjects = dbProjects.Where(p => p.DepartmentId == filter.DepartmentId.Value);
-        totalCount = dbProjects.Count(p => p.DepartmentId == filter.DepartmentId.Value);
       }
-      else
-      {
-        totalCount = dbProjects.Count();
-      }
+
+      totalCount = dbProjects.Count();
 
       return dbProjects.Skip(filter.skipCount).Take(filter.takeCount).ToList();
     }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
