@@ -26,10 +26,11 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
       _autoMock = new();
 
       _validator = new CreateProjectValidator(
-        _autoMock.CreateInstance<IProjectRepository>(),
-        _autoMock.CreateInstance<ILogger<CreateProjectValidator>>(),
-        _autoMock.CreateInstance<IRequestClient<ICheckDepartmentsExistence>>(),
-        _autoMock.CreateInstance<IRequestClient<ICheckUsersExistence>>());
+      _autoMock.CreateInstance<IProjectRepository>(),
+      _autoMock.CreateInstance<ILogger<CreateProjectValidator>>(),
+      _autoMock.CreateInstance<IRequestClient<ICheckDepartmentsExistence>>(),
+      _autoMock.CreateInstance<IRequestClient<ICheckUsersExistence>>(),
+      _autoMock.CreateInstance<IImageContentValidator>());
 
       _newProject = new CreateProjectRequest
       {
