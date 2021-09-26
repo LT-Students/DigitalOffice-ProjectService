@@ -124,7 +124,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             _provider.Projects.Add(_dbProjectBefore);
             _provider.Save();
 
-            SerializerAssert.AreEqual(true, _repository.Edit(_dbProjectBefore, _patchProject));
+            SerializerAssert.AreEqual(true, _repository.Edit(_dbProjectBefore.Id, _patchProject));
 
             var patchedProject = _provider.Projects.FirstOrDefault(p => p.Id == _dbProjectBefore.Id);
             _dbProjectAfter.ModifiedAtUtc = patchedProject.ModifiedAtUtc;

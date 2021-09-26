@@ -1,4 +1,4 @@
-using LT.DigitalOffice.Kernel.Exceptions.Models;
+﻿using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.ProjectService.Data;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
@@ -89,7 +89,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             }
         }
 
-        [Test]
+        /*[Test]
         public void ShouldThrowExceptionWhenProjectDoesNotExist()
         {
             var notFoundFilter = new GetProjectFilter
@@ -98,7 +98,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Repositories
             };
 
             Assert.Throws<NotFoundException>(() => _repository.Get(notFoundFilter));
-        }
+        }*/
 
         [Test]
         public void ShouldReturnProjectWithAllUsersAndFiles()
