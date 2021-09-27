@@ -16,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public DbProjectUser Map(ProjectUserRequest request)
+    public DbProjectUser Map(ProjectUserRequest request, Guid projectId)
     {
       if (request == null)
       {
@@ -26,6 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       return new DbProjectUser
       {
         Id = Guid.NewGuid(),
+        ProjectId = projectId,
         UserId = request.UserId,
         Role = (int)request.Role,
         CreatedAtUtc = DateTime.UtcNow,

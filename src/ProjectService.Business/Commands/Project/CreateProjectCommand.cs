@@ -40,7 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IRequestClient<ICreateImagesRequest> _rcImages;
 
-    private async void CreateWorkspace(string projectName, List<Guid> usersIds, List<string> errors)
+    private async System.Threading.Tasks.Task CreateWorkspace(string projectName, List<Guid> usersIds, List<string> errors)
     {
       string errorMessage = $"Failed to create a workspace for the project {projectName}";
       string logMessage = "Cannot create workspace for project {name}";
@@ -54,11 +54,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
           usersIds.Add(creatorId);
         }
 
-        var response = await _rcCreateWorkspace.GetResponse<IOperationResult<bool>>(
-          ICreateWorkspaceRequest.CreateObj(
-            projectName,
-            creatorId,
-            usersIds));
+        Response<IOperationResult<bool>> response =
+          await _rcCreateWorkspace.GetResponse<IOperationResult<bool>>(
+            ICreateWorkspaceRequest.CreateObj(
+              projectName,
+              creatorId,
+              usersIds));
 
         if (!(response.Message.IsSuccess && response.Message.Body))
         {
@@ -74,15 +75,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
     }
 
-    private async void CreateWorkTime(Guid projectId, List<Guid> userIds, List<string> errors)
+    private async System.Threading.Tasks.Task CreateWorkTime(Guid projectId, List<Guid> userIds, List<string> errors)
     {
       string errorMessage = $"Failed to create a work time for project {projectId} with users: {string.Join(", ", userIds)}.";
       const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
 
       try
       {
-        var response = await _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
-          ICreateWorkTimeRequest.CreateObj(projectId, userIds));
+        Response<IOperationResult<bool>> response =
+          await _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
+            ICreateWorkTimeRequest.CreateObj(projectId, userIds));
 
         if (!(response.Message.IsSuccess && response.Message.Body))
         {
@@ -109,15 +111,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       try
       {
-        var response = await _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
-          ICreateImagesRequest.CreateObj(
-            projectImages.Select(x => new CreateImageData(
-              x.Name,
-              x.Content,
-              x.Extension,
-              _httpContextAccessor.HttpContext.GetUserId()))
-            .ToList(),
-            ImageSource.Project));
+        Response<IOperationResult<ICreateImagesResponse>> response =
+          await _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
+            ICreateImagesRequest.CreateObj(
+              projectImages.Select(x => new CreateImageData(
+                x.Name,
+                x.Content,
+                x.Extension,
+                _httpContextAccessor.HttpContext.GetUserId()))
+              .ToList(),
+              ImageSource.Project));
 
         if (response.Message.IsSuccess && response.Message.Body.ImagesIds != null)
         {
@@ -204,9 +207,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<Guid> usersIds = request.Users.Select(u => u.UserId).ToList();
 
-      CreateWorkTime(dbProject.Id, usersIds, response.Errors);
+      await CreateWorkTime(dbProject.Id, usersIds, response.Errors);
 
-      CreateWorkspace(request.Name, usersIds, response.Errors);
+      await CreateWorkspace(request.Name, usersIds, response.Errors);
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 

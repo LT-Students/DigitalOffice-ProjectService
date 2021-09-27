@@ -40,7 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       return new DbProject
       {
         Id = projectId,
-        Name = request.Name,
+        Name = request.Name.Trim(),
         Status = (int)request.Status,
         ShortName = shortName == null || !shortName.Any() ? null : shortName,
         Description = description == null || !description.Any() ? null : description,
@@ -49,7 +49,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         CreatedAtUtc = DateTime.UtcNow,
         CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
         Users = request.Users?
-          .Select(_projectUserMapper.Map)
+          .Select(pu => _projectUserMapper.Map(pu, projectId))
           .ToList(),
         Images = imagesIds?
           .Select(imageId => _dbEntityImageMapper.Map(imageId, projectId))
