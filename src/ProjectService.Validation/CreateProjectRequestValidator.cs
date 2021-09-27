@@ -108,9 +108,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
       {
         var response = await _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
           ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value }));
-        if (response.Message.IsSuccess && !response.Message.Body.DepartmentIds.Any())
+        if (response.Message.IsSuccess)
         {
-          return true;
+          return response.Message.Body.DepartmentIds.Any();
         }
 
         _logger.LogWarning("Can not find department. Reason: '{Errors}'",
@@ -141,7 +141,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
           ICheckUsersExistence.CreateObj(usersIds));
         if (response.Message.IsSuccess)
         {
-          return true;
+          return response.Message.Body.UserIds.Count() == usersIds.Count();
         }
 
         _logger.LogWarning($"Can not find with this Ids: {usersIds}: {Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
