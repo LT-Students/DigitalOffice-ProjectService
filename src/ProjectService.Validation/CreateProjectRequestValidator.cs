@@ -84,6 +84,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
           });
 
         RuleFor(project => project.Users)
+          .Cascade(CascadeMode.Stop)
+          .Must(p => p.Select(pu => pu.UserId).Distinct().Count() == p.Count())
+          .WithMessage("User cannot be added to the project twice.")
           .MustAsync(async (pu, cancellation) => await CheckValidityUsersIds(pu.Select(u => u.UserId).ToList()))
           .WithMessage("Some users does not exist.");
       });
