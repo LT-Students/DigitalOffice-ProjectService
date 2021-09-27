@@ -41,14 +41,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         }
 
         [Test]
-        public void ShouldThrowArgumentNullExceptionWhenProjectUserRequestIsNull()
-        {
-            ProjectUserRequest projectRequest = null;
-
-            Assert.Throws<ArgumentNullException>(() => _projectUserRequestMapper.Map(projectRequest));
-        }
-
-        [Test]
         public void ShouldReturnDbProjectWhenProjectUserRequestIsMapped()
         {
             var dbProjectUser = _projectUserRequestMapper.Map(_projectUser);
