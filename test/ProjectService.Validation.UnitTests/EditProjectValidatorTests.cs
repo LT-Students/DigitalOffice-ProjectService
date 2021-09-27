@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using FluentValidation;
-using FluentValidation.TestHelper;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
@@ -34,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 
       _validator = new EditProjectValidator(
         _autoMock.CreateInstance<IProjectRepository>(),
-        _autoMock.CreateInstance<ILogger<CreateProjectValidator>>(),
+        _autoMock.CreateInstance<ILogger<EditProjectValidator>>(),
         _autoMock.CreateInstance<IRequestClient<IGetDepartmentsRequest>>());
     }
 

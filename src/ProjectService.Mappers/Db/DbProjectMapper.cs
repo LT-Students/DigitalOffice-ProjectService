@@ -1,22 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
   public class DbProjectMapper : IDbProjectMapper
   {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IDbProjectUserMapper _projectUserMapper;
     private readonly IDbEntityImageMapper _dbEntityImageMapper;
 
-    public DbProjectMapper(IDbEntityImageMapper dbEntityImageMapper)
+    public DbProjectMapper(
+      IHttpContextAccessor httpContextAccessor,
+      IDbProjectUserMapper projectUserMapper,
+      IDbEntityImageMapper dbEntityImageMapper)
     {
+      _httpContextAccessor = httpContextAccessor;
+      _projectUserMapper = projectUserMapper;
       _dbEntityImageMapper = dbEntityImageMapper;
     }
 
-    public DbProject Map(CreateProjectRequest request, Guid authorId, List<Guid> users, List<Guid> departmentIds, List<Guid> imagesIds)
+    public DbProject Map(CreateProjectRequest request, List<Guid> imagesIds)
     {
       if (request == null)
       {
@@ -38,20 +47,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         ShortDescription = shortDescription == null || !shortDescription.Any() ? null : shortDescription,
         DepartmentId = request.DepartmentId,
         CreatedAtUtc = DateTime.UtcNow,
-        CreatedBy = authorId,
-        Users = users
-          .Select(userId => new DbProjectUser
-          {
-            Id = Guid.NewGuid(),
-            ProjectId = projectId,
-            UserId = userId,
-            Role = (int)request.Users.FirstOrDefault(u => u.UserId == userId).Role,
-            CreatedAtUtc = DateTime.UtcNow,
-            CreatedBy = authorId,
-            IsActive = true
-          })
+        CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
+        Users = request.Users?
+          .Select(_projectUserMapper.Map)
           .ToList(),
-        Images = imagesIds.Select(imageId => _dbEntityImageMapper.Map(imageId, projectId)).ToList()
+        Images = imagesIds?
+          .Select(imageId => _dbEntityImageMapper.Map(imageId, projectId))
+          .ToList()
       };
     }
   }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentValidation;
 using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
@@ -13,15 +13,15 @@ using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-  public class CreateProjectValidator : AbstractValidator<CreateProjectRequest>, ICreateProjectValidator
+  public class CreateProjectRequestValidator : AbstractValidator<CreateProjectRequest>, ICreateProjectRequestValidator
   {
-    private readonly ILogger<CreateProjectValidator> _logger;
+    private readonly ILogger<CreateProjectRequestValidator> _logger;
     private readonly IRequestClient<ICheckDepartmentsExistence> _rcCheckDepartmentsExistence;
     private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
 
-    public CreateProjectValidator(
+    public CreateProjectRequestValidator(
       IProjectRepository projectRepository,
-      ILogger<CreateProjectValidator> logger,
+      ILogger<CreateProjectRequestValidator> logger,
       IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence,
       IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
       IImageContentValidator imageContentValidator)
@@ -30,21 +30,12 @@ namespace LT.DigitalOffice.ProjectService.Validation
       _rcCheckDepartmentsExistence = rcCheckDepartmentsExistence;
       _rcCheckUsersExistence = rcCheckUsersExistence;
 
-      List<string> errors = new();
-
-      RuleFor(project => project)
-        .NotEmpty()
-        .Must(project => !projectRepository.DoesProjectNameExist(project.Name))
-        .WithMessage(project => $"Project with name '{project.Name}' already exists.")
-        .Must(project => CheckValidityDepartmentId(project.DepartmentId))
-        .WithMessage("Some departments does not exist.")
-        .Must(project => CheckValidityUsersIds(project.Users.Select(u => u.UserId).ToList()))
-        .WithMessage("Some users does not exist.");
-
-      RuleFor(project => project.Name)
-        .NotEmpty()
-        .MaximumLength(150)
-        .WithMessage("Project name is too long.");
+      RuleFor(project => project.Name.Trim())
+        .Cascade(CascadeMode.Stop)
+        .NotEmpty().WithMessage("Project name must not be empty.")
+        .MaximumLength(150).WithMessage("Project name is too long.")
+        .Must(name => !projectRepository.DoesProjectNameExist(name))
+        .WithMessage(project => $"Project with name '{project.Name}' already exists.");
 
       RuleFor(project => project.Status)
         .IsInEnum();
@@ -56,22 +47,11 @@ namespace LT.DigitalOffice.ProjectService.Validation
           .WithMessage("Project short name is too long.");
       });
 
-      When(project => project.Users != null && project.Users.Any(), () =>
+      When(project => !string.IsNullOrEmpty(project.Description?.Trim()), () =>
       {
-        RuleForEach(project => project.Users).ChildRules(user =>
-          {
-            user.RuleFor(user => user.UserId)
-              .NotEmpty();
-
-            user.RuleFor(user => user.Role)
-              .IsInEnum();
-          });
-      });
-
-      When(project => project.ProjectImages != null && project.ProjectImages.Any(), () =>
-      {
-        RuleForEach(project => project.ProjectImages)
-          .SetValidator(imageContentValidator);
+        RuleFor(project => project.Description)
+          .MaximumLength(300)
+          .WithMessage("Project description is too long.");
       });
 
       When(project => !string.IsNullOrEmpty(project.ShortDescription?.Trim()), () =>
@@ -81,22 +61,41 @@ namespace LT.DigitalOffice.ProjectService.Validation
           .WithMessage("Project short description is too long.");
       });
 
-      When(project => !string.IsNullOrEmpty(project.Description?.Trim()), () =>
+      When(project => project.DepartmentId.HasValue, () =>
       {
-        RuleFor(project => project.Description)
-          .MaximumLength(300)
-          .WithMessage("Project description is too long.");
+        RuleFor(project => project.DepartmentId)
+          .Cascade(CascadeMode.Stop)
+          .Must(departmentId => departmentId != Guid.Empty)
+          .WithMessage("Wrong type of department Id.")
+          .MustAsync(async (id, cancellation) => await CheckValidityDepartmentId(id))
+          .WithMessage("Some departments does not exist.");
       });
 
-      When(
-        news => news.DepartmentId.HasValue,
-        () =>
-          RuleFor(news => news.DepartmentId)
-            .Must(DepartmentId => DepartmentId != Guid.Empty)
-            .WithMessage("Wrong type of department Id."));
+      When(project => project.Users != null && project.Users.Any(), () =>
+      {
+        RuleForEach(project => project.Users)
+          .ChildRules(user =>
+          {
+            user.RuleFor(user => user.UserId)
+              .NotEmpty().WithMessage("Wrong type of user Id.");
+
+            user.RuleFor(user => user.Role)
+              .IsInEnum();
+          });
+
+        RuleFor(project => project.Users)
+          .MustAsync(async (pu, cancellation) => await CheckValidityUsersIds(pu.Select(u => u.UserId).ToList()))
+          .WithMessage("Some users does not exist.");
+      });
+
+      When(project => project.ProjectImages != null && project.ProjectImages.Any(), () =>
+      {
+        RuleForEach(project => project.ProjectImages)
+          .SetValidator(imageContentValidator);
+      });
     }
 
-    private bool CheckValidityDepartmentId(Guid? departmentId)
+    private async Task<bool> CheckValidityDepartmentId(Guid? departmentId)
     {
       if (!departmentId.HasValue)
       {
@@ -107,8 +106,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
       try
       {
-        Response<IOperationResult<ICheckDepartmentsExistence>> response = _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
-          ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value })).Result;
+        var response = await _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
+          ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value }));
         if (response.Message.IsSuccess && !response.Message.Body.DepartmentIds.Any())
         {
           return true;
@@ -127,9 +126,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
       return false;
     }
 
-    private bool CheckValidityUsersIds(List<Guid> userIds)
+    private async Task<bool> CheckValidityUsersIds(List<Guid> usersIds)
     {
-      if (!userIds.Any())
+      if (!usersIds.Any())
       {
         return true;
       }
@@ -138,14 +137,14 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
       try
       {
-        Response<IOperationResult<ICheckUsersExistence>> response = _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUsersExistence>>(
-          ICheckUsersExistence.CreateObj(userIds)).Result;
+        var response = await _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUsersExistence>>(
+          ICheckUsersExistence.CreateObj(usersIds));
         if (response.Message.IsSuccess)
         {
           return true;
         }
 
-        _logger.LogWarning($"Can not find with this Ids: {userIds}: {Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
+        _logger.LogWarning($"Can not find with this Ids: {usersIds}: {Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
       }
       catch (Exception exc)
       {

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {

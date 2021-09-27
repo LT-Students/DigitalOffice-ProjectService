@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
+using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
-using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
@@ -30,29 +31,34 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
   public class CreateProjectCommand : ICreateProjectCommand
   {
     private readonly IProjectRepository _repository;
-    private readonly IDbProjectMapper _dbProjectMapper;
+    private readonly IDbProjectMapper _mapper;
     private readonly IAccessValidator _accessValidator;
-    private readonly ICreateProjectValidator _validator;
+    private readonly ICreateProjectRequestValidator _validator;
     private readonly ILogger<CreateProjectCommand> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IRequestClient<ICreateImagesRequest> _rcImages;
 
-    private void CreateWorkspace(string projectName, Guid creatorId, List<Guid> users, List<string> errors)
+    private async void CreateWorkspace(string projectName, List<Guid> usersIds, List<string> errors)
     {
       string errorMessage = $"Failed to create a workspace for the project {projectName}";
       string logMessage = "Cannot create workspace for project {name}";
 
+      Guid creatorId = _httpContextAccessor.HttpContext.GetUserId();
+
       try
       {
-        if (!users.Contains(creatorId))
+        if (!usersIds.Contains(creatorId))
         {
-          users.Add(creatorId);
+          usersIds.Add(creatorId);
         }
 
-        var response = _rcCreateWorkspace.GetResponse<IOperationResult<bool>>(
-          ICreateWorkspaceRequest.CreateObj(projectName, creatorId, users), timeout: RequestTimeout.Default).Result;
+        var response = await _rcCreateWorkspace.GetResponse<IOperationResult<bool>>(
+          ICreateWorkspaceRequest.CreateObj(
+            projectName,
+            creatorId,
+            usersIds));
 
         if (!(response.Message.IsSuccess && response.Message.Body))
         {
@@ -68,15 +74,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
     }
 
-    private void CreateWorkTime(Guid projectId, List<Guid> userIds, List<string> errors)
+    private async void CreateWorkTime(Guid projectId, List<Guid> userIds, List<string> errors)
     {
       string errorMessage = $"Failed to create a work time for project {projectId} with users: {string.Join(", ", userIds)}.";
       const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
 
       try
       {
-        var response = _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
-          ICreateWorkTimeRequest.CreateObj(projectId, userIds)).Result;
+        var response = await _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
+          ICreateWorkTimeRequest.CreateObj(projectId, userIds));
 
         if (!(response.Message.IsSuccess && response.Message.Body))
         {
@@ -92,9 +98,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
     }
 
-    private List<Guid> CreateImage(List<ImageContent> projectImages, Guid userId, List<string> errors)
+    private async Task<List<Guid>> CreateImage(List<ImageContent> projectImages, List<string> errors)
     {
-      if (projectImages == null || projectImages.Count == 0)
+      if (projectImages == null || !projectImages.Any())
       {
         return null;
       }
@@ -103,19 +109,24 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       try
       {
-        IOperationResult<ICreateImagesResponse> response = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
+        var response = await _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
           ICreateImagesRequest.CreateObj(
-            projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId)).ToList(),
-            ImageSource.Project)).Result.Message;
+            projectImages.Select(x => new CreateImageData(
+              x.Name,
+              x.Content,
+              x.Extension,
+              _httpContextAccessor.HttpContext.GetUserId()))
+            .ToList(),
+            ImageSource.Project));
 
-        if (response.IsSuccess && response.Body.ImagesIds != null)
+        if (response.Message.IsSuccess && response.Message.Body.ImagesIds != null)
         {
-          return response.Body.ImagesIds;
+          return response.Message.Body.ImagesIds;
         }
 
         _logger.LogWarning(
           logMessage,
-          string.Join('\n', response.Errors));
+          string.Join('\n', response.Message.Errors));
       }
       catch (Exception exc)
       {
@@ -129,9 +140,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
     public CreateProjectCommand(
       IProjectRepository repository,
-      ICreateProjectValidator validator,
+      ICreateProjectRequestValidator validator,
       IAccessValidator accessValidator,
-      IDbProjectMapper dbProjectMapper,
+      IDbProjectMapper mapper,
       ILogger<CreateProjectCommand> logger,
       IHttpContextAccessor httpContextAccessor,
       IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
@@ -141,7 +152,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _logger = logger;
       _validator = validator;
       _repository = repository;
-      _dbProjectMapper = dbProjectMapper;
+      _mapper = mapper;
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _rcCreateWorkspace = rcCreateWorkspace;
@@ -149,54 +160,58 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _rcImages = rcImages;
     }
 
-    public OperationResultResponse<Guid> Execute(CreateProjectRequest request)
+    public async Task<OperationResultResponse<Guid?>> Execute(CreateProjectRequest request)
     {
       if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
-        return new OperationResultResponse<Guid>
+        return new OperationResultResponse<Guid?>
         {
           Status = OperationResultStatusType.Failed,
           Errors = new List<string> { "Not enough rights." }
         };
       }
 
-      if (!_validator.ValidateCustom(request, out List<string> errors))
+      ValidationResult validationResult = await _validator.ValidateAsync(request);
+
+      if (!validationResult.IsValid)
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        return new OperationResultResponse<Guid>
+        return new OperationResultResponse<Guid?>
         {
           Status = OperationResultStatusType.Failed,
-          Errors = errors
+          Errors = validationResult.Errors.Select(vf => vf.ErrorMessage).ToList()
         };
       }
 
-      OperationResultResponse<Guid> response = new();
+      OperationResultResponse<Guid?> response = new();
 
-      List<Guid> users = request.Users.Select(u => u.UserId).ToList();
+      List<Guid> imagesIds = await CreateImage(request.ProjectImages, response.Errors);
 
-      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
-
-      List<Guid> imagesIds = CreateImage(request.ProjectImages, userId, response.Errors);
-
-      DbProject dbProject = _dbProjectMapper.Map(
-        request,
-        userId,
-        users,
-        new List<Guid> { request.DepartmentId.GetValueOrDefault() },
-        imagesIds);
+      DbProject dbProject = _mapper.Map(request, imagesIds);
 
       response.Body = _repository.Create(dbProject);
 
-      CreateWorkTime(dbProject.Id, users, response.Errors);
+      if (response.Body == null)
+      {
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-      CreateWorkspace(request.Name, userId, users, response.Errors);
+        response.Status = OperationResultStatusType.Failed;
+        return response;
+      }
 
-      response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
+      List<Guid> usersIds = request.Users.Select(u => u.UserId).ToList();
+
+      CreateWorkTime(dbProject.Id, usersIds, response.Errors);
+
+      CreateWorkspace(request.Name, usersIds, response.Errors);
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
+
+      response.Status = response.Errors.Any() ?
+        OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
 
       return response;
     }

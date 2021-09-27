@@ -17,7 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
 
     private CreateProjectRequest _newProject;
 
-    [OneTimeSetUp]
+    /*[OneTimeSetUp]
     public void OneTimeSetUp()
     {
       _imageMock = new();
@@ -31,9 +31,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.UnitTests
         ShortDescription = "Short description",
         DepartmentId = Guid.NewGuid(),
         Status = ProjectStatusType.Active,
-        Users = new List<ProjectUserRequest>
+        Users = new List<AddProjectUserRequest>
           {
-            new ProjectUserRequest
+            new AddProjectUserRequest
             {
               UserId = Guid.NewGuid(),
               Role = ProjectUserRoleType.Manager

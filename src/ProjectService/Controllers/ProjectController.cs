@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
@@ -31,11 +32,11 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     }
 
     [HttpPost("create")]
-    public OperationResultResponse<Guid> Create(
+    public async Task<OperationResultResponse<Guid?>> Create(
       [FromServices] ICreateProjectCommand command,
       [FromBody] CreateProjectRequest request)
     {
-      return command.Execute(request);
+      return await command.Execute(request);
     }
 
     [HttpPatch("edit")]
