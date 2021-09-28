@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
@@ -14,7 +15,6 @@ using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -93,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _cache = cache;
     }
 
-    public async Task<FindResponse<ProjectInfo>> Execute(FindProjectsFilter filter, int skipCount, int takeCount)
+    public async Task<FindResultResponse<ProjectInfo>> Execute(FindProjectsFilter filter)
     {
       if (filter == null)
       {
@@ -102,12 +102,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<string> errors = new();
 
-      List<DbProject> dbProject = _repository.Find(filter, skipCount, takeCount, out int totalCount);
+      List<DbProject> dbProject = _repository.Find(filter, out int totalCount);
 
       List<DepartmentData> departments = await GetDepartments(
         dbProject.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList(), errors);
 
-      FindResponse<ProjectInfo> response = _responseMapper.Map(dbProject, totalCount, departments, errors);
+      FindResultResponse<ProjectInfo> response = _responseMapper.Map(dbProject, totalCount, departments, errors);
 
       return response;
     }

@@ -6,8 +6,14 @@ using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Models.Company;
+using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.User;
+using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.Models.Broker.Responses.User;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -15,7 +21,6 @@ using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -101,7 +106,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       _cache = cache;
     }
 
-    public async Task<FindResponse<TaskInfo>> Execute(FindTasksFilter filter, int skipCount, int takeCount)
+    public async Task<FindResultResponse<TaskInfo>> Execute(FindTasksFilter filter)
     {
       if (filter == null)
       {
@@ -115,11 +120,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
       if (!(projectUsers.Any() || _accessValidator.IsAdmin()))
       {
-        return new FindResponse<TaskInfo>();
+        return new FindResultResponse<TaskInfo>();
       }
 
       IEnumerable<Guid> projectIds = projectUsers.Select(x => x.ProjectId);
-      List<DbTask> dbTasks = _taskRepository.Find(filter, projectIds, skipCount, takeCount, out int totalCount).ToList();
+      List<DbTask> dbTasks = _taskRepository.Find(filter, projectIds, out int totalCount).ToList();
 
       List<Guid> users = dbTasks.Where(x => x.AssignedTo.HasValue).Select(x => x.AssignedTo.Value).ToList();
       users.AddRange(dbTasks.Select(x => x.CreatedBy).ToList());
@@ -135,7 +140,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         tasks.Add(_mapper.Map(dbTask, assignedUser, author));
       }
 
-      return new FindResponse<TaskInfo>
+      return new FindResultResponse<TaskInfo>
       {
         TotalCount = totalCount,
         Body = tasks,

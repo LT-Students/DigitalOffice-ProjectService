@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 {
-    class FindTaskPropertyCommandTests
+  class FindTaskPropertyCommandTests
     {
         private Guid _projectId;
         private List<DbTaskProperty> _dbTaskProperties;

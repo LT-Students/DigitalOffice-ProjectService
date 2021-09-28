@@ -8,11 +8,15 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
+using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
+using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.Models.Broker.Responses.User;
 using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -41,6 +45,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
     private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployee;
     private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
     private readonly IConnectionMultiplexer _cache;
+    private readonly IRequestClient<IGetImagesRequest> _rcImages;
+    private readonly IImageInfoMapper _imageMapper;
 
     private async Task<DepartmentData> GetDepartment(Guid authorId, List<string> errors)
     {
@@ -76,6 +82,66 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
         errors.Add(errorMessage);
       }
+
+      return null;
+    }
+
+    private List<UserData> GetUsersInfo(List<Guid> userIds, List<string> errors)
+    {
+      try
+      {
+        IOperationResult<IGetUsersDataResponse> response = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
+          IGetUsersDataRequest.CreateObj(userIds)).Result.Message;
+
+        if (response.IsSuccess)
+        {
+          return response.Body.UsersData;
+        }
+
+        errors.Add($"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.");
+      }
+      catch (Exception exc)
+      {
+        errors.Add($"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.");
+
+        _logger.LogWarning(exc, "Exception on get user information.");
+      }
+
+      return null;
+    }
+
+    private List<ImageInfo> GetTaskImages(List<Guid> imageIds, List<string> errors)
+    {
+      if (imageIds == null || !imageIds.Any())
+      {
+        return null;
+      }
+
+      string logMessage = "Errors while getting images with ids: {Ids}. Errors: {Errors}";
+
+      try
+      {
+        IOperationResult<IGetImagesResponse> response = _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
+          IGetImagesRequest.CreateObj(imageIds, ImageSource.Project)).Result.Message;
+
+        if (response.IsSuccess && response.Body != null)
+        {
+          return response.Body.ImagesData.Select(_imageMapper.Map).ToList();
+        }
+        else
+        {
+          _logger.LogWarning(
+            logMessage,
+            string.Join(", ", imageIds),
+            string.Join('\n', response.Errors));
+        }
+      }
+      catch (Exception exc)
+      {
+        _logger.LogError(exc, logMessage, string.Join(", ", imageIds));
+      }
+
+      errors.Add("Can not get images. Please try again later.");
 
       return null;
     }
@@ -171,19 +237,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         userIds.Add(parentTaskAssignedTo.Value);
       }
 
-      List<UserData> usersDataResponse = new();
-      try
-      {
-        var res = _usersDataRequestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
-          IGetUsersDataRequest.CreateObj(userIds));
-        usersDataResponse = res.Result.Message.Body.UsersData;
-      }
-      catch (Exception exc)
-      {
-        errors.Add($"Can not get users info for UserIds {string.Join('\n', userIds)}. Please try again later.");
+      List<UserData> usersDataResponse = GetUsersInfo(userIds, errors);
 
-        _logger.LogWarning(exc, "Exception on get user information.");
-      }
+      List<ImageInfo> imagesInfo = GetTaskImages(task.Images.Select(x => x.ImageId).ToList(), errors);
 
       List<TaskInfo> subtasksInfo = new();
       if (task.Subtasks != null)
@@ -205,7 +261,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         usersDataResponse.FirstOrDefault(x => task.ParentTask != null && x.Id == task.ParentTask.CreatedBy),
         department,
         usersDataResponse.FirstOrDefault(x => x.Id == task.AssignedTo),
-        subtasksInfo);
+        subtasksInfo,
+        imagesInfo);
 
       return new OperationResultResponse<TaskResponse>()
       {

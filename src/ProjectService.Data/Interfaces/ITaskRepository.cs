@@ -1,4 +1,4 @@
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.JsonPatch;
  using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
         bool Edit(DbTask task, JsonPatchDocument<DbTask> taskPatch);
 
-        IEnumerable<DbTask> Find(FindTasksFilter filter, IEnumerable<Guid> projectIds, int skipCount, int takeCount, out int totalCount);
+        IEnumerable<DbTask> Find(FindTasksFilter filter, IEnumerable<Guid> projectIds, out int totalCount);
 
         Guid Create(DbTask item);
 
