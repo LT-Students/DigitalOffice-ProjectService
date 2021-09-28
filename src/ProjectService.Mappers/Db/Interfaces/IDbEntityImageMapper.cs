@@ -1,13 +1,12 @@
 ﻿using System;
 using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces
 {
   [AutoInject]
-  public interface IDbProjectUserMapper
+  public interface IDbEntityImageMapper
   {
-    DbProjectUser Map(ProjectUserRequest request, Guid projectId);
+    DbEntityImage Map(Guid imageId, Guid projectId);
   }
 }

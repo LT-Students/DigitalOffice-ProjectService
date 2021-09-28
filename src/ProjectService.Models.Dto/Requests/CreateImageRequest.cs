@@ -1,13 +1,13 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
-    public record CreateImageRequest
-    {
-        public Guid ProjectOrTaskId { get; set; }
-        public List<ImageContent> Images { get; set; }
-        public ImageType ImageType { get; set; }
-    }
+  public record CreateImageRequest
+  {
+    public Guid EntityId { get; set; }
+    public List<ImageContent> Images { get; set; }
+    public ImageType ImageType { get; set; }
+  }
 }
