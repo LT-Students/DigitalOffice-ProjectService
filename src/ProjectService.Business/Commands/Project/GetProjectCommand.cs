@@ -329,7 +329,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<UserData> usersDatas = await GetUsersDatas(dbProject.Users, response.Errors);
       List<ProjectUserInfo> usersInfo = null;
-      List<Guid> usersIds = dbProject.Users.Select(u => u.Id).Distinct().ToList();
+      List<Guid> usersIds = dbProject.Users.Select(u => u.UserId).Distinct().ToList();
 
       if (usersDatas != null && usersDatas.Any())
       {
