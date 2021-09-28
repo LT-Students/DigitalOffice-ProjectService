@@ -88,7 +88,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
             }
         }
 
-        [Test]
+        /*[Test]
         public void ShouldReturnUsersByNameSuccessful()
         {
             int skipCount = 0;
@@ -121,6 +121,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 x.Find(filter, out totalCount), Times.Once);
             _mocker.Verify<ITaskPropertyInfoMapper, TaskPropertyInfo>(x =>
                 x.Map(It.IsAny<DbTaskProperty>()), Times.Exactly(_taskPropertiesInfo.Count));
-        }
+        }*/
     }
 }
