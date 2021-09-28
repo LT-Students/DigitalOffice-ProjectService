@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 {
   public class EditProjectValidator : AbstractValidator<JsonPatchDocument<EditProjectRequest>>, IEditProjectValidator
   {
-    private readonly ILogger<CreateProjectValidator> _logger;
+    private readonly ILogger<EditProjectValidator> _logger;
     private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartments;
 
     public static List<string> Paths =>
@@ -46,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
     public EditProjectValidator(
       IProjectRepository projectRepository,
-      ILogger<CreateProjectValidator> logger,
+      ILogger<EditProjectValidator> logger,
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments)
     {
       _logger = logger;
