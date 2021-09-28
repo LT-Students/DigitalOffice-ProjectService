@@ -7,7 +7,6 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.Kernel.Responses;
 
 namespace LT.DigitalOffice.ProjectService.Controllers

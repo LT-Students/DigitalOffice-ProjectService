@@ -9,7 +9,6 @@ using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.UnitTestKernel;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
