@@ -66,8 +66,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       try
       {
         Response<IOperationResult<IGetDepartmentsResponse>> response = await _rcGetDepartments
-            .GetResponse<IOperationResult<IGetDepartmentsResponse>>(
-                IGetDepartmentsRequest.CreateObj(departmentsIds));
+          .GetResponse<IOperationResult<IGetDepartmentsResponse>>(
+            IGetDepartmentsRequest.CreateObj(departmentsIds));
 
         if (response.Message.IsSuccess)
         {

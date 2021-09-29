@@ -67,8 +67,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       try
       {
         Response<IOperationResult<IGetDepartmentsResponse>> departmentResponse =
-            await _rcGetDepartment.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
-                IGetDepartmentsRequest.CreateObj(new() { departmentId }));
+          await _rcGetDepartment.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
+            IGetDepartmentsRequest.CreateObj(new() { departmentId }));
 
         if (departmentResponse.Message.IsSuccess)
         {
@@ -76,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         }
 
         _logger.LogWarning(
-            $"Can not get department. Reason:{Environment.NewLine}{string.Join('\n', departmentResponse.Message.Errors)}.");
+          $"Can not get department. Reason:{Environment.NewLine}{string.Join('\n', departmentResponse.Message.Errors)}.");
       }
       catch (Exception exc)
       {
@@ -90,7 +90,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
     private async Task<List<ImageInfo>> GetUserAvatars(List<Guid> imageIds, List<string> errors)
     {
-      if (imageIds == null || imageIds.Count == 0)
+      if (imageIds == null || !imageIds.Any())
       {
         return null;
       }
@@ -100,7 +100,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       try
       {
         Response<IOperationResult<IGetImagesResponse>> response = await _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
-            IGetImagesRequest.CreateObj(imageIds, ImageSource.User));
+          IGetImagesRequest.CreateObj(imageIds, ImageSource.User));
 
         if (response.Message.IsSuccess && response.Message.Body.ImagesData != null)
         {
@@ -109,9 +109,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         else
         {
           _logger.LogWarning(
-              logMessage,
-              string.Join(", ", imageIds),
-              string.Join('\n', response.Message.Errors));
+            logMessage,
+            string.Join(", ", imageIds),
+            string.Join('\n', response.Message.Errors));
         }
       }
       catch (Exception exc)
@@ -126,7 +126,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
     private async Task<List<ImageInfo>> GetProjectImages(List<Guid> imageIds, List<string> errors)
     {
-      if (imageIds == null || imageIds.Count == 0)
+      if (imageIds == null || !imageIds.Any())
       {
         return null;
       }
@@ -136,7 +136,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       try
       {
         Response<IOperationResult<IGetImagesResponse>> response = await _rcImages.GetResponse<IOperationResult<IGetImagesResponse>>(
-           IGetImagesRequest.CreateObj(imageIds, ImageSource.Project));
+          IGetImagesRequest.CreateObj(imageIds, ImageSource.Project));
 
         if (response.Message.IsSuccess && response.Message.Body != null)
         {
@@ -193,7 +193,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         }
         
         _logger.LogWarning(
-            $"Can not get users. Reason:{Environment.NewLine}{string.Join('\n', usersDataResponse.Message.Errors)}.");
+          $"Can not get users. Reason:{Environment.NewLine}{string.Join('\n', usersDataResponse.Message.Errors)}.");
       }
       catch (Exception exc)
       {
@@ -271,15 +271,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         else
         {
           _logger.LogWarning("Errors while getting users departments and positions for users {UserIds}. Reason: {Errors}",
-              string.Join(", ", usersIds),
-              string.Join('\n', response.Message.Errors));
+            string.Join(", ", usersIds),
+            string.Join('\n', response.Message.Errors));
         }
       }
       catch (Exception exc)
       {
         _logger.LogError(exc,
-            "Can not get user's departments and positions for users {UserIds}. Please try again later.",
-            usersIds);
+          "Can not get user's departments and positions for users {UserIds}. Please try again later.",
+          usersIds);
       }
 
       errors.Add("Can not get user's departments and positions. Please try again later.");

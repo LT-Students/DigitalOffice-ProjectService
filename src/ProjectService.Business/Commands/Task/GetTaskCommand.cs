@@ -174,6 +174,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       ILogger<GetTaskCommand> logger,
       IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployee,
       IRequestClient<IGetUsersDataRequest> userRequestClient,
+      IRequestClient<IGetImagesRequest> rcImages,
+      IImageInfoMapper imageMapper,
       IConnectionMultiplexer cache)
     {
       _taskRepository = taskRepository;
@@ -185,6 +187,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       _logger = logger;
       _rcGetCompanyEmployee = rcGetCompanyEmployee;
       _usersDataRequestClient = userRequestClient;
+      _rcImages = rcImages;
+      _imageMapper = imageMapper;
       _cache = cache;
     }
 
