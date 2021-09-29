@@ -44,8 +44,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
     public OperationResultResponse<IEnumerable<Guid>> Execute(CreateTaskPropertyRequest request)
     {
-      if (!(_accessValidator.IsAdmin()
-        || _userRepository.AreUserProjectExist(_httpContextAccessor.HttpContext.GetUserId(), request.ProjectId)))
+      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
+
+      if (!(_accessValidator.IsAdmin() || _userRepository.AreUserProjectExist(userId, request.ProjectId)))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
