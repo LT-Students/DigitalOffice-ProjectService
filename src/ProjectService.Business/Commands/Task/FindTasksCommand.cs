@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
+using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Responses;
@@ -35,10 +37,38 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     private readonly ITaskRepository _taskRepository;
     private readonly IUserRepository _userRepository;
     private readonly IAccessValidator _accessValidator;
+    private readonly IBaseFindFilterValidator _findFilterValidator;
     private readonly ILogger<FindTasksCommand> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IRequestClient<IGetUsersDataRequest> _requestClient;
+    private readonly IRequestClient<IGetUsersDataRequest> _rcGetUsers;
+    private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployee;
     private readonly IConnectionMultiplexer _cache;
+
+    private async Task<DepartmentData> GetDepartment(Guid authorId, List<string> errors)
+    {
+      string errorMessage = "Cannot create task. Please try again later.";
+
+      try
+      {
+        Response<IOperationResult<IGetCompanyEmployeesResponse>> response = await _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+          IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true));
+
+        if (response.Message.IsSuccess)
+        {
+          return response.Message.Body.Departments.FirstOrDefault();
+        }
+
+        _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", authorId);
+      }
+      catch (Exception exc)
+      {
+        _logger.LogError(exc, errorMessage);
+
+        errors.Add(errorMessage);
+      }
+
+      return null;
+    }
 
     private async Task<List<UserData>> GetUsersDatas(List<Guid> usersIds, List<string> errors)
     {
@@ -63,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
       try
       {
-        var response = await _requestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
+        Response<IOperationResult<IGetUsersDataResponse>> response = await _rcGetUsers.GetResponse<IOperationResult<IGetUsersDataResponse>>(
           IGetUsersDataRequest.CreateObj(usersIds));
 
         if (response.Message.IsSuccess)
@@ -92,35 +122,51 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       IUserRepository userRepository,
       ILogger<FindTasksCommand> logger,
       IAccessValidator accessValidator,
+      IBaseFindFilterValidator findFilterValidator,
       IHttpContextAccessor httpContextAccessor,
-      IRequestClient<IGetUsersDataRequest> requestClient,
+      IRequestClient<IGetUsersDataRequest> rcGetUsers,
+      IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployee,
       IConnectionMultiplexer cache)
     {
       _mapper = mapper;
       _logger = logger;
-      _requestClient = requestClient;
+      _rcGetUsers = rcGetUsers;
+      _rcGetCompanyEmployee = rcGetCompanyEmployee;
       _taskRepository = taskRepository;
       _userRepository = userRepository;
       _accessValidator = accessValidator;
+      _findFilterValidator = findFilterValidator;
       _httpContextAccessor = httpContextAccessor;
       _cache = cache;
     }
 
     public async Task<FindResultResponse<TaskInfo>> Execute(FindTasksFilter filter)
     {
-      if (filter == null)
+      FindResultResponse<TaskInfo> response = new();
+      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
+      List<DbProjectUser> projectUsers = _userRepository.Find(userId).ToList();
+
+      if (!_accessValidator.IsAdmin()
+        && !_accessValidator.HasRights(Rights.AddEditRemoveProjects)
+        && !projectUsers.Any()
+        && (await GetDepartment(userId, response.Errors))?.DirectorUserId != userId)
       {
-        throw new ArgumentNullException(nameof(filter));
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+        response.Status = OperationResultStatusType.Failed;
+        response.Errors.Add("Not enough rights.");
+
+        return response;
       }
 
-      List<string> errors = new();
-
-      var userId = _httpContextAccessor.HttpContext.GetUserId();
-      var projectUsers = _userRepository.Find(userId).ToList();
-
-      if (!(projectUsers.Any() || _accessValidator.IsAdmin()))
+      if (!_findFilterValidator.ValidateCustom(filter, out List<string> errors))
       {
-        return new FindResultResponse<TaskInfo>();
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+        response.Status = OperationResultStatusType.Failed;
+        response.Errors.AddRange(errors);
+
+        return response;
       }
 
       IEnumerable<Guid> projectIds = projectUsers.Select(x => x.ProjectId);
@@ -129,10 +175,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       List<Guid> users = dbTasks.Where(x => x.AssignedTo.HasValue).Select(x => x.AssignedTo.Value).ToList();
       users.AddRange(dbTasks.Select(x => x.CreatedBy).ToList());
 
-      List<UserData> usersData = await GetUsersDatas(users, errors);
+      List<UserData> usersData = await GetUsersDatas(users, response.Errors);
 
       List<TaskInfo> tasks = new();
-      foreach (var dbTask in dbTasks)
+      foreach (DbTask dbTask in dbTasks)
       {
         UserData assignedUser = usersData?.FirstOrDefault(x => x.Id == dbTask.AssignedTo);
         UserData author = usersData?.FirstOrDefault(x => x.Id == dbTask.CreatedBy);
@@ -140,12 +186,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         tasks.Add(_mapper.Map(dbTask, assignedUser, author));
       }
 
-      return new FindResultResponse<TaskInfo>
-      {
-        TotalCount = totalCount,
-        Body = tasks,
-        Errors = errors
-      };
+      response.TotalCount = totalCount;
+      response.Body = tasks;
+
+      return response;
     }
   }
 }

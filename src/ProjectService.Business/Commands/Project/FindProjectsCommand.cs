@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
+using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
@@ -16,6 +20,7 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using MassTransit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StackExchange.Redis;
@@ -26,8 +31,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
   {
     private readonly ILogger<FindProjectsCommand> _logger;
     private readonly IProjectRepository _repository;
+    private readonly IBaseFindFilterValidator _findFilterValidator;
     private readonly IFindProjectsResponseMapper _responseMapper;
     private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartments;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IConnectionMultiplexer _cache;
 
     private async Task<List<DepartmentData>> GetDepartments(List<Guid> departmentsIds, List<string> errors)
@@ -82,25 +89,33 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     public FindProjectsCommand(
       ILogger<FindProjectsCommand> logger,
       IProjectRepository repository,
+      IBaseFindFilterValidator findFilterValidator,
       IFindProjectsResponseMapper responseMapper,
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
+      IHttpContextAccessor httpContextAccessor,
       IConnectionMultiplexer cache)
     {
       _logger = logger;
       _repository = repository;
+      _findFilterValidator = findFilterValidator;
       _responseMapper = responseMapper;
       _rcGetDepartments = rcGetDepartments;
+      _httpContextAccessor = httpContextAccessor;
       _cache = cache;
     }
 
     public async Task<FindResultResponse<ProjectInfo>> Execute(FindProjectsFilter filter)
     {
-      if (filter == null)
+      if (!_findFilterValidator.ValidateCustom(filter, out List<string> errors))
       {
-        throw new ArgumentNullException(nameof(filter));
-      }
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-      List<string> errors = new();
+        return new FindResultResponse<ProjectInfo>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = errors
+        };
+      }
 
       List<DbProject> dbProject = _repository.Find(filter, out int totalCount);
 

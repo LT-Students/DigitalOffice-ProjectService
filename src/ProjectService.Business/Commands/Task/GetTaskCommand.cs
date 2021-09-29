@@ -66,8 +66,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
       try
       {
-        var response = await _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
-          IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true));
+        Response<IOperationResult<IGetCompanyEmployeesResponse>> response = 
+          await _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+            IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true));
 
         if (response.Message.IsSuccess)
         {
@@ -157,20 +158,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
       DepartmentData department = await GetDepartment(requestUserId, errors);
 
-      if (department != null)
-      {
-        if (department.DirectorUserId == requestUserId)
-        {
-          return (true, department);
-        }
-      }
-
-      if (_accessValidator.IsAdmin(requestUserId))
-      {
-        return (true, department);
-      }
-
-      return (projectUsers.FirstOrDefault(x => x.UserId == requestUserId) != null, department);
+      return (department != null && department.DirectorUserId == requestUserId
+          || _accessValidator.IsAdmin(requestUserId)
+          || projectUsers.FirstOrDefault(x => x.UserId == requestUserId) != null, 
+        department);
     }
 
     public GetTaskCommand(
@@ -199,7 +190,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
     public async Task<OperationResultResponse<TaskResponse>> Execute(Guid taskId, bool isFullModel = true)
     {
-      var errors = new List<string>();
+      List<string> errors = new();
 
       DbTask task = _taskRepository.Get(taskId, isFullModel);
 
@@ -209,17 +200,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       {
         _httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
+        errors.Add("Not enough rights.");
+
         return new OperationResultResponse<TaskResponse>
         {
           Status = OperationResultStatusType.Failed,
-          Errors = new() { "Not enough rights." }
+          Errors = errors
         };
       }
 
-      List<Guid> userIds = new()
-      {
-        task.CreatedBy,
-      };
+      List<Guid> userIds = new() { task.CreatedBy };
 
       if (task.AssignedTo.HasValue)
       {
@@ -244,7 +234,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       List<TaskInfo> subtasksInfo = new();
       if (task.Subtasks != null)
       {
-        foreach (var dbSubtask in task.Subtasks)
+        foreach (DbTask dbSubtask in task.Subtasks)
         {
           subtasksInfo.Add(
             _taskInfoMapper.Map(
