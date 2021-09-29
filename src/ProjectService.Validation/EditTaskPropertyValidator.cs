@@ -43,11 +43,11 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
       AddFailureForPropertyIf(
           nameof(TaskProperty.Name),
-          x => x == OperationType.Replace || x == OperationType.Add,
+          x => x == OperationType.Replace,
           new()
           {
-            { x => !string.IsNullOrEmpty(x.value.ToString()), "Name is empty." },
-            { x => x.value.ToString().Length < 150, "Name is too long" }
+            { x => !string.IsNullOrEmpty(x.value.ToString()), "Name must not be empty." },
+            { x => x.value.ToString().Trim().Length < 150, "Name is too long" }
           });
 
       #endregion
@@ -56,7 +56,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
       AddFailureForPropertyIf(
           nameof(TaskProperty.Description),
-          x => x == OperationType.Replace || x == OperationType.Add,
+          x => x == OperationType.Replace,
           new()
           {
             {
@@ -67,9 +67,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
                   return true;
                 }
 
-                return x.value.ToString().Length < 150;
+                return x.value.ToString().Trim().Length < 150;
               },
-              "Name is too long"
+              "Description is too long"
             }
           });
 
@@ -79,7 +79,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
       AddFailureForPropertyIf(
           nameof(TaskProperty.PropertyType),
-          x => x == OperationType.Replace || x == OperationType.Add,
+          x => x == OperationType.Replace,
           new()
           {
             { x => Enum.IsDefined(typeof(TaskPropertyType), Convert.ToInt32(x.value)), "This PropertyType does not exist." }

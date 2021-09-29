@@ -43,7 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public OperationResultResponse<IEnumerable<Guid>> Execute(CreateTaskPropertyRequest request)
+    public OperationResultResponse<List<Guid>> Execute(CreateTaskPropertyRequest request)
     {
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
@@ -52,7 +52,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
-        return new OperationResultResponse<IEnumerable<Guid>>
+        return new OperationResultResponse<List<Guid>>
         {
           Status = OperationResultStatusType.Failed,
           Errors = new List<string> { "Not enough rights." }
@@ -63,7 +63,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        return new OperationResultResponse<IEnumerable<Guid>>
+        return new OperationResultResponse<List<Guid>>
         {
           Status = OperationResultStatusType.Failed,
           Errors = errors
@@ -76,9 +76,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
-      return new OperationResultResponse<IEnumerable<Guid>>
+      return new OperationResultResponse<List<Guid>>
       {
-        Body = dbTaskProperties.Select(x => x.Id),
+        Body = dbTaskProperties.Select(x => x.Id).ToList(),
         Status = OperationResultStatusType.FullSuccess
       };
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
@@ -47,7 +48,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       DbTaskProperty taskProperty = _taskPropertyRepository.Get(taskPropertyId);
 
       if (taskProperty.ProjectId == null
-        || !(_accessValidator.IsAdmin() || _userRepository.AreUserProjectExist(_httpContextAccessor.HttpContext.GetUserId(), (Guid)taskProperty.ProjectId)))
+        || !_userRepository.AreUserProjectExist(_httpContextAccessor.HttpContext.GetUserId(), (Guid)taskProperty.ProjectId)
+        || !_accessValidator.HasRights(Rights.AddEditRemoveProjects))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
@@ -75,8 +77,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
       if (response.Body)
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.OK;
-
         response.Status = OperationResultStatusType.FullSuccess;
       }
       else

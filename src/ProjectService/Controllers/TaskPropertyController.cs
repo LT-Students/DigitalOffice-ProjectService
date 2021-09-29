@@ -24,7 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     }
 
     [HttpPost("create")]
-    public OperationResultResponse<IEnumerable<Guid>> Create(
+    public OperationResultResponse<List<Guid>> Create(
         [FromServices] ICreateTaskPropertyCommand command,
         [FromBody] CreateTaskPropertyRequest request)
     {
