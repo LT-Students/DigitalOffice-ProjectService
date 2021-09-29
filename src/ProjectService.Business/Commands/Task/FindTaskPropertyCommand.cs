@@ -8,6 +8,7 @@ using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.Http;
@@ -35,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
     public FindResultResponse<TaskPropertyInfo> Execute(FindTaskPropertiesFilter filter)
     {
-      var dbTaskProperties = _repository.Find(filter, out int totalCount);
+      IEnumerable<DbTaskProperty> dbTaskProperties = _repository.Find(filter, out int totalCount);
 
       FindResultResponse<TaskPropertyInfo> response = new();
 

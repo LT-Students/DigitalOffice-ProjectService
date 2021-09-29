@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
     public OperationResultResponse<bool> Execute(Guid taskPropertyId, JsonPatchDocument<TaskProperty> patch)
     {
-      var userId = _httpContextAccessor.HttpContext.GetUserId();
+      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
       DbTaskProperty taskProperty = _taskPropertyRepository.Get(taskPropertyId);
 

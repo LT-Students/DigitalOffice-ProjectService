@@ -16,9 +16,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         return null;
       }
 
-      var result = new JsonPatchDocument<DbTaskProperty>();
+      JsonPatchDocument<DbTaskProperty> result = new JsonPatchDocument<DbTaskProperty>();
 
-      foreach (var item in request.Operations)
+      foreach (Operation<TaskProperty> item in request.Operations)
       {
         result.Operations.Add(new Operation<DbTaskProperty>(item.op, item.path, item.from, item.value));
       }

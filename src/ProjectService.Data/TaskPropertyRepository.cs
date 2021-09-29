@@ -34,14 +34,14 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public bool AreExist(params Guid[] ids)
     {
-      var dbIds = _provider.TaskProperties.Select(x => x.Id);
+      IQueryable<Guid> dbIds = _provider.TaskProperties.Select(x => x.Id);
 
       return ids.All(x => dbIds.Contains(x));
     }
 
     public bool AreExistForProject(Guid projectId, params string[] propertyNames)
     {
-      var dbPropertyNames = _provider.TaskProperties
+      IQueryable<string> dbPropertyNames = _provider.TaskProperties
         .Where(tp => tp.ProjectId == projectId || tp.ProjectId == null)
         .Select(x => x.Name);
 
@@ -65,7 +65,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public IEnumerable<DbTaskProperty> Find(FindTaskPropertiesFilter filter, out int totalCount)
     {
-      var dbTaskProperties = _provider.TaskProperties.AsQueryable();
+      IQueryable<DbTaskProperty> dbTaskProperties = _provider.TaskProperties.AsQueryable();
 
       if (filter.ProjectId.HasValue)
       {

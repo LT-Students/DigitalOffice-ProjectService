@@ -62,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
           return;
         }
 
-        foreach (var validateDelegate in predicates)
+        foreach (KeyValuePair<Func<Operation<TaskProperty>, bool>, string> validateDelegate in predicates)
         {
           if (!validateDelegate.Key(requestedOperation))
           {

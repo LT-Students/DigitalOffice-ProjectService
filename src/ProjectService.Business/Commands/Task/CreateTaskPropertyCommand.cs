@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
     public OperationResultResponse<IEnumerable<Guid>> Execute(CreateTaskPropertyRequest request)
     {
-      var userId = _httpContextAccessor.HttpContext.GetUserId();
+      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
       if (!(_accessValidator.IsAdmin() || _userRepository.AreUserProjectExist(userId, request.ProjectId)))
       {
