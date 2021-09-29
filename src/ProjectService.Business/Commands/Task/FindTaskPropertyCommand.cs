@@ -8,7 +8,6 @@ using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.Http;
@@ -36,23 +35,24 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
     public FindResultResponse<TaskPropertyInfo> Execute(FindTaskPropertiesFilter filter)
     {
-      IEnumerable<DbTaskProperty> dbTaskProperties = _repository.Find(filter, out int totalCount);
-
-      FindResultResponse<TaskPropertyInfo> response = new();
-
       if (_findRequestValidator.ValidateCustom(filter, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.AddRange(errors);
-
-        return response;
+        return new FindResultResponse<TaskPropertyInfo>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = errors
+        };
       }
 
       return new FindResultResponse<TaskPropertyInfo>
       {
-        Body = dbTaskProperties.Select(tp => _mapper.Map(tp)).ToList(),
+        Body = _repository
+          .Find(filter, out int totalCount)
+          .Select(tp => _mapper.Map(tp))
+          .ToList(),
+        Status = OperationResultStatusType.FullSuccess,
         TotalCount = totalCount
       };
     }

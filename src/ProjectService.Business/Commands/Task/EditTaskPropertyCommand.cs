@@ -44,12 +44,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
     public OperationResultResponse<bool> Execute(Guid taskPropertyId, JsonPatchDocument<TaskProperty> patch)
     {
-      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
-
       DbTaskProperty taskProperty = _taskPropertyRepository.Get(taskPropertyId);
 
       if (taskProperty.ProjectId == null
-        || !(_accessValidator.IsAdmin() || _userRepository.AreUserProjectExist(userId, (Guid)taskProperty.ProjectId)))
+        || !(_accessValidator.IsAdmin() || _userRepository.AreUserProjectExist(_httpContextAccessor.HttpContext.GetUserId(), (Guid)taskProperty.ProjectId)))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
@@ -73,12 +71,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
       OperationResultResponse<bool> response = new();
 
-      if (_taskPropertyRepository.Edit(taskProperty, _mapper.Map(patch)))
+      response.Body = _taskPropertyRepository.Edit(taskProperty, _mapper.Map(patch));
+
+      if (response.Body)
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.OK;
 
         response.Status = OperationResultStatusType.FullSuccess;
-        response.Body = true;
       }
       else
       {
@@ -86,7 +85,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
         response.Status = OperationResultStatusType.Failed;
         response.Errors.Add($"Can not edit taskProperty with Id: {taskPropertyId}");
-        response.Body = false;
       }
 
       return response;
