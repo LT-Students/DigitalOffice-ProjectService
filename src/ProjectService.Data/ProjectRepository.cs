@@ -131,7 +131,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
       totalCount = dbProjects.Count();
 
-      return dbProjects.Skip(filter.skipCount).Take(filter.takeCount).ToList();
+      return dbProjects.Skip(filter.SkipCount).Take(filter.TakeCount).ToList();
     }
 
     public List<DbProject> Search(string text)

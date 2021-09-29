@@ -18,13 +18,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
   {
     private readonly ITaskPropertyInfoMapper _mapper;
     private readonly ITaskPropertyRepository _repository;
-    private readonly IBaseFindRequestValidator _findRequestValidator;
+    private readonly IBaseFindFilterValidator _findRequestValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public FindTaskPropertyCommand(
       ITaskPropertyRepository repository,
       ITaskPropertyInfoMapper mapper,
-      IBaseFindRequestValidator findRequestValidator,
+      IBaseFindFilterValidator findRequestValidator,
       IHttpContextAccessor httpContextAccessor)
     {
       _mapper = mapper;

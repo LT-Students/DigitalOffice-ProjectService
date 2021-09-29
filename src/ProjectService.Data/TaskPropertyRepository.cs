@@ -84,7 +84,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
       totalCount = dbTaskProperties.Count();
 
-      return dbTaskProperties.Skip(filter.skipCount).Take(filter.takeCount).ToList();
+      return dbTaskProperties.Skip(filter.SkipCount).Take(filter.TakeCount).ToList();
     }
 
     public bool AreExist(Guid id, TaskPropertyType type)

@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     private readonly ITaskRepository _taskRepository;
     private readonly IUserRepository _userRepository;
     private readonly IAccessValidator _accessValidator;
-    private readonly IBaseFindRequestValidator _findRequestValidator;
+    private readonly IBaseFindFilterValidator _findRequestValidator;
     private readonly ILogger<FindTasksCommand> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRequestClient<IGetUsersDataRequest> _requestClient;
@@ -103,7 +103,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IRequestClient<IGetUsersDataRequest> requestClient,
-      IBaseFindRequestValidator findRequestValidator,
+      IBaseFindFilterValidator findRequestValidator,
       IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployee)
     {
       _mapper = mapper;

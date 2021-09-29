@@ -120,7 +120,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       IQueryable<DbTask> tasks = CreateFindPredicates(filter, dbTasks, projectIds);
       totalCount = tasks.Count();
 
-      return tasks.Skip(filter.skipCount).Take(filter.takeCount).ToList();
+      return tasks.Skip(filter.SkipCount).Take(filter.TakeCount).ToList();
     }
   }
 }

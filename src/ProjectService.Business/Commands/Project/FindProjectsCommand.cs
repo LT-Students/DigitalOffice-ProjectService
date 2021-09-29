@@ -6,6 +6,7 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.Kernel.Validators;
 using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
@@ -29,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IFindProjectsResponseMapper _responseMapper;
     private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartments;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IBaseFindRequestValidator _findRequestValidator;
+    private readonly IBaseFindFilterValidator _findRequestValidator;
 
     private List<DepartmentData> GetDepartments(List<DbProject> dbProjects, List<string> errors)
     {
@@ -76,7 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IFindProjectsResponseMapper responseMapper,
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
       IHttpContextAccessor httpContextAccessor,
-      IBaseFindRequestValidator findRequestValidator)
+      IBaseFindFilterValidator findRequestValidator)
     {
       _logger = logger;
       _repository = repository;

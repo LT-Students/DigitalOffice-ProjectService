@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
@@ -46,7 +47,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     {
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
-      if (!(_accessValidator.IsAdmin() || _userRepository.AreUserProjectExist(userId, request.ProjectId)))
+      if (!_userRepository.AreUserProjectExist(userId, request.ProjectId)
+        && !_accessValidator.HasRights(Rights.AddEditRemoveProjects))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
