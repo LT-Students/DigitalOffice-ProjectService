@@ -10,6 +10,7 @@ using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -67,7 +68,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         };
       }
 
-      var dbTaskProperties = request.TaskProperties.Select(x => _mapper.Map(x, userId, request.ProjectId)).ToList();
+      List<DbTaskProperty> dbTaskProperties = request.TaskProperties.Select(x => _mapper.Map(x, userId, request.ProjectId)).ToList();
 
       _taskPropertyRepository.Create(dbTaskProperties);
 

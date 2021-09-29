@@ -46,8 +46,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
     {
       var userId = _httpContextAccessor.HttpContext.GetUserId();
 
-      string s = patch.Operations[0].value.ToString();
-
       DbTaskProperty taskProperty = _taskPropertyRepository.Get(taskPropertyId);
 
       if (taskProperty.ProjectId == null
