@@ -55,8 +55,8 @@ namespace LT.DigitalOffice.ProjectService.Validation
           x => x == OperationType.Replace,
           new()
           {
-            { x => !string.IsNullOrEmpty(x.value.ToString()), "Name must not be empty." },
-            { x => x.value.ToString().Trim().Length < 150, "Name is too long." }
+            { x => !string.IsNullOrEmpty(x.value?.ToString()), "Name must not be empty." },
+            { x => x.value?.ToString().Trim().Length < 150, "Name is too long." }
           });
 
       #endregion
@@ -71,7 +71,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
             {
               x =>
               {
-                if (string.IsNullOrEmpty(x.ToString()))
+                if (string.IsNullOrEmpty(x.value?.ToString()))
                 {
                   return true;
                 }
@@ -91,7 +91,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
           x => x == OperationType.Replace,
           new()
           {
-            { x => Enum.IsDefined(typeof(TaskPropertyType), x.value.ToString()), "This PropertyType does not exist." }
+            { x => Enum.IsDefined(typeof(TaskPropertyType), x.value?.ToString()), "This PropertyType does not exist." }
           });
 
       #endregion
@@ -104,7 +104,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
           new()
           {
             { x => Guid.TryParse(x.value.ToString(), out Guid result), "Project id has incorrect format." },
-            { x => _projectRepository.IsExist(Guid.Parse(x.value.ToString())), "Project id does not exist." }
+            { x => _projectRepository.IsExist(Guid.Parse(x.value?.ToString())), "Project id does not exist." }
           });
 
       #endregion
