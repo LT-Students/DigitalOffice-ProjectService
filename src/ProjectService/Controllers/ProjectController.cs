@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
@@ -15,27 +16,27 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   public class ProjectController : ControllerBase
   {
     [HttpGet("find")]
-    public FindResultResponse<ProjectInfo> Find(
+    public async Task<FindResultResponse<ProjectInfo>> Find(
       [FromServices] IFindProjectsCommand command,
       [FromQuery] FindProjectsFilter filter)
     {
-      return command.Execute(filter);
+      return await command.Execute(filter);
     }
 
     [HttpGet("get")]
-    public OperationResultResponse<ProjectResponse> Get(
+    public async Task<OperationResultResponse<ProjectResponse>> Get(
       [FromServices] IGetProjectCommand command,
       [FromQuery] GetProjectFilter filter)
     {
-      return command.Execute(filter);
+      return await command.Execute(filter);
     }
 
     [HttpPost("create")]
-    public OperationResultResponse<Guid> Create(
+    public async Task<OperationResultResponse<Guid?>> Create(
       [FromServices] ICreateProjectCommand command,
       [FromBody] CreateProjectRequest request)
     {
-      return command.Execute(request);
+      return await command.Execute(request);
     }
 
     [HttpPatch("edit")]

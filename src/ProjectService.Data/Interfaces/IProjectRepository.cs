@@ -17,7 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     List<DbProject> Find(List<Guid> projectIds);
 
-    Guid Create(DbProject dbProject);
+    Guid? Create(DbProject dbProject);
 
     bool Edit(Guid projectId, JsonPatchDocument<DbProject> request);
 

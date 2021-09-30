@@ -16,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
   class CreateProjectValidatorTests
   {
-    private ICreateProjectValidator _validator;
+    private ICreateProjectRequestValidator _validator;
     private CreateProjectRequest _newProject;
     private AutoMocker _autoMock;
 
@@ -25,9 +25,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
     {
       _autoMock = new();
 
-      _validator = new CreateProjectValidator(
+      _validator = new CreateProjectRequestValidator(
       _autoMock.CreateInstance<IProjectRepository>(),
-      _autoMock.CreateInstance<ILogger<CreateProjectValidator>>(),
+      _autoMock.CreateInstance<ILogger<CreateProjectRequestValidator>>(),
       _autoMock.CreateInstance<IRequestClient<ICheckDepartmentsExistence>>(),
       _autoMock.CreateInstance<IRequestClient<ICheckUsersExistence>>(),
       _autoMock.CreateInstance<IImageContentValidator>());

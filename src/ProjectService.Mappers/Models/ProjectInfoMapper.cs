@@ -13,7 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
         {
             if (value == null)
             {
-                throw new ArgumentNullException(nameof(value));
+                return null;
             }
 
             return new ProjectInfo

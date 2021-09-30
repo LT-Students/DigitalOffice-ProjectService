@@ -48,7 +48,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
       #endregion
 
-      #region firstname
+      #region name
 
       AddFailureForPropertyIf(
           nameof(EditTaskPropertyRequest.Name),

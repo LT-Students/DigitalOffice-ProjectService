@@ -6,7 +6,7 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
 {
-    [AutoInject]
+  [AutoInject]
     public interface IFindTaskPropertyCommand
     {
         FindResultResponse<TaskPropertyInfo> Execute(FindTaskPropertiesFilter filter);

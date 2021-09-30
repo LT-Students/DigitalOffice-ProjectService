@@ -68,8 +68,13 @@ namespace LT.DigitalOffice.ProjectService.Data
       return _provider.Projects.Where(p => p.DepartmentId == departmentId);
     }
 
-    public Guid Create(DbProject dbProject)
+    public Guid? Create(DbProject dbProject)
     {
+      if (dbProject == null)
+      {
+        return null;
+      }
+
       _provider.Projects.Add(dbProject);
       _provider.Save();
 

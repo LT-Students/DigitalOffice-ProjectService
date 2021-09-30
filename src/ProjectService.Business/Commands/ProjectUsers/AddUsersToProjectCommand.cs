@@ -90,7 +90,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
         private DbProjectUser GetDbProjectUsers(ProjectUserRequest projectUser, Guid projectId)
         {
-            DbProjectUser dbProjectUser = _mapper.Map(projectUser);
+            DbProjectUser dbProjectUser = _mapper.Map(projectUser, projectId);
 
             dbProjectUser.ProjectId = projectId;
 
