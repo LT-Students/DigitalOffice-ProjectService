@@ -9,6 +9,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Interfaces
     [AutoInject]
     public interface ICreateTaskPropertyCommand
     {
-        OperationResultResponse<IEnumerable<Guid>> Execute(CreateTaskPropertyRequest request);
+        OperationResultResponse<List<Guid>> Execute(CreateTaskPropertyRequest request);
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -8,7 +8,9 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.UnitTestKernel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
@@ -22,11 +24,13 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         private readonly string _name = "Name";
         private readonly string _description = "Description";
         private readonly int _type = (int)TaskPropertyType.Status;
+        private Mock<IHttpContextAccessor> _accessorMock;
 
-        private List<DbTaskProperty> _dbTaskProperties;
+    private List<DbTaskProperty> _dbTaskProperties;
 
         private void CreateInMemoryDb()
         {
+            _accessorMock = new();
             var dbOptions = new DbContextOptionsBuilder<ProjectServiceDbContext>()
                 .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
                 .Options;
@@ -36,7 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             _provider.TaskProperties.AddRange(_dbTaskProperties);
 
             _provider.Save();
-            _repository = new TaskPropertyRepository(_provider);
+            _repository = new TaskPropertyRepository(_provider, _accessorMock.Object);
         }
 
         [SetUp]

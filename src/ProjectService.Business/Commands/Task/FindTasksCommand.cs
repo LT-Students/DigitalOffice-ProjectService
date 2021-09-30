@@ -124,8 +124,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       IAccessValidator accessValidator,
       IBaseFindFilterValidator findFilterValidator,
       IHttpContextAccessor httpContextAccessor,
-      IRequestClient<IGetUsersDataRequest> rcGetUsers,
+      IRequestClient<IGetUsersDataRequest> requestClient,
+      IBaseFindFilterValidator findRequestValidator,
       IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployee,
+      IRequestClient<IGetUsersDataRequest> rcGetUsers,
       IConnectionMultiplexer cache)
     {
       _mapper = mapper;
