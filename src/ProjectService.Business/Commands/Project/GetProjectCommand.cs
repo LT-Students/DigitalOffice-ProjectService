@@ -142,13 +142,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         {
           return response.Message.Body.ImagesData.Select(_imageMapper.Map).ToList();
         }
-        else
-        {
-          _logger.LogWarning(
-            logMessage,
-            string.Join(", ", imageIds),
-            string.Join('\n', response.Message.Errors));
-        }
+
+        _logger.LogWarning(
+          logMessage,
+          string.Join(", ", imageIds),
+          string.Join('\n', response.Message.Errors));
       }
       catch (Exception exc)
       {

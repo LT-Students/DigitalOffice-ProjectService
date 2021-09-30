@@ -146,8 +146,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       List<DbProjectUser> projectUsers = _userRepository.Find(userId).ToList();
 
-      if (!_accessValidator.IsAdmin()
-        && !_accessValidator.HasRights(Rights.AddEditRemoveProjects)
+      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects)
         && !projectUsers.Any()
         && (await GetDepartment(userId, response.Errors))?.DirectorUserId != userId)
       {

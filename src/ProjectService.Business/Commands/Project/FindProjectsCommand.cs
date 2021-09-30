@@ -117,12 +117,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         };
       }
 
-      List<DbProject> dbProject = _repository.Find(filter, out int totalCount);
+      List<DbProject> dbProjects = _repository.Find(filter, out int totalCount);
 
       List<DepartmentData> departments = await GetDepartments(
-        dbProject.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList(), errors);
+        dbProjects.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList(), errors);
 
-      FindResultResponse<ProjectInfo> response = _responseMapper.Map(dbProject, totalCount, departments, errors);
+      FindResultResponse<ProjectInfo> response = _responseMapper.Map(dbProjects, totalCount, departments, errors);
 
       return response;
     }
