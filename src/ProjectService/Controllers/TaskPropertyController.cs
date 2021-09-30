@@ -3,7 +3,6 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -12,7 +11,7 @@ using System.Net;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
 {
-    [Route("[controller]")]
+  [Route("[controller]")]
     [ApiController]
     public class TaskPropertyController : ControllerBase
     {
@@ -34,7 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
         }
 
         [HttpGet("find")]
-        public FindResponse<TaskPropertyInfo> Find(
+        public FindResultResponse<TaskPropertyInfo> Find(
             [FromServices] IFindTaskPropertyCommand command,
             [FromQuery] FindTaskPropertiesFilter filter,
             [FromQuery] int skipCount,

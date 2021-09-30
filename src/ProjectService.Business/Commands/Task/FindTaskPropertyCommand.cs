@@ -1,15 +1,14 @@
-﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+﻿using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
-using System;
 using System.Linq;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
-    public class FindTaskPropertyCommand : IFindTaskPropertyCommand
+  public class FindTaskPropertyCommand : IFindTaskPropertyCommand
     {
         private readonly ITaskPropertyInfoMapper _mapper;
         private readonly ITaskPropertyRepository _repository;
@@ -22,13 +21,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             _repository = repository;
         }
 
-        public FindResponse<TaskPropertyInfo> Execute(FindTaskPropertiesFilter filter, int skipCount, int tackeCount)
+        public FindResultResponse<TaskPropertyInfo> Execute(FindTaskPropertiesFilter filter, int skipCount, int tackeCount)
         {
             var dbTaskProperties = _repository.Find(filter, skipCount, tackeCount, out int totalCount);
 
-            return new FindResponse<TaskPropertyInfo>
+            return new FindResultResponse<TaskPropertyInfo>
             {
-                Body = dbTaskProperties.Select(tp => _mapper.Map(tp)),
+                Body = dbTaskProperties.Select(tp => _mapper.Map(tp)).ToList(),
                 TotalCount = totalCount
             };
         }

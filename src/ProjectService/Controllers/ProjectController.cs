@@ -16,19 +16,19 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   public class ProjectController : ControllerBase
   {
     [HttpGet("find")]
-    public FindResultResponse<ProjectInfo> Find(
+    public async Task<FindResultResponse<ProjectInfo>> Find(
       [FromServices] IFindProjectsCommand command,
       [FromQuery] FindProjectsFilter filter)
     {
-      return command.Execute(filter);
+      return await command.Execute(filter);
     }
 
     [HttpGet("get")]
-    public OperationResultResponse<ProjectResponse> Get(
+    public async Task<OperationResultResponse<ProjectResponse>> Get(
       [FromServices] IGetProjectCommand command,
       [FromQuery] GetProjectFilter filter)
     {
-      return command.Execute(filter);
+      return await command.Execute(filter);
     }
 
     [HttpPost("create")]

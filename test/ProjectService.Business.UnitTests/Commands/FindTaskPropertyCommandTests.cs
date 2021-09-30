@@ -1,11 +1,11 @@
-﻿using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
+﻿using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
 using LT.DigitalOffice.UnitTestKernel;
 using Moq;
 using Moq.AutoMock;
@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 {
-    class FindTaskPropertyCommandTests
+  class FindTaskPropertyCommandTests
     {
         private Guid _projectId;
         private List<DbTaskProperty> _dbTaskProperties;
@@ -100,7 +100,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
                 Name = "Feature"
             };
 
-            var result = new FindResponse<TaskPropertyInfo>
+            var result = new FindResultResponse<TaskPropertyInfo>
             {
                 Body = _taskPropertiesInfo,
                 TotalCount = totalCount
