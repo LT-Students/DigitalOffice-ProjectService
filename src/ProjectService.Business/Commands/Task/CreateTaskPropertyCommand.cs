@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     {
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
-      if (!_userRepository.AreUserProjectExist(userId, request.ProjectId)
+      if (!_userRepository.AreUserProjectExist(userId, request.ProjectId, true)
         && !_accessValidator.HasRights(Rights.AddEditRemoveProjects))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;

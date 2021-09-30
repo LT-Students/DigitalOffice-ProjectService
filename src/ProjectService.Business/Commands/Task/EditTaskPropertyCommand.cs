@@ -48,7 +48,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       DbTaskProperty taskProperty = _taskPropertyRepository.Get(taskPropertyId);
 
       if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects)
-        && (taskProperty.ProjectId == null || !_userRepository.AreUserProjectExist(_httpContextAccessor.HttpContext.GetUserId(), (Guid)taskProperty.ProjectId)))
+        && (taskProperty.ProjectId == null
+        || !_userRepository.AreUserProjectExist(_httpContextAccessor.HttpContext.GetUserId(), (Guid)taskProperty.ProjectId, true)))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
