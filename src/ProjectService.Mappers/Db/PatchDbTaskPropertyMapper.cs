@@ -2,7 +2,7 @@
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 
@@ -10,7 +10,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
   public class PatchDbTaskPropertyMapper : IPatchDbTaskPropertyMapper
   {
-    public JsonPatchDocument<DbTaskProperty> Map(JsonPatchDocument<TaskProperty> request)
+    public JsonPatchDocument<DbTaskProperty> Map(JsonPatchDocument<EditTaskPropertyRequest> request)
     {
       if (request == null)
       {
@@ -19,11 +19,23 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
 
       JsonPatchDocument<DbTaskProperty> result = new JsonPatchDocument<DbTaskProperty>();
 
-      foreach (Operation<TaskProperty> item in request.Operations)
+      foreach (Operation<EditTaskPropertyRequest> item in request.Operations)
       {
-        if (item.path.EndsWith(nameof(TaskProperty.PropertyType), StringComparison.OrdinalIgnoreCase))
+        if (item.path.EndsWith(nameof(EditTaskPropertyRequest.PropertyType), StringComparison.OrdinalIgnoreCase))
         {
           result.Operations.Add(new Operation<DbTaskProperty>(item.op, item.path, item.from, (int)Enum.Parse(typeof(TaskPropertyType), item.value.ToString())));
+          continue;
+        }
+
+        if (item.path.EndsWith(nameof(EditTaskPropertyRequest.ProjectId), StringComparison.OrdinalIgnoreCase))
+        {
+          result.Operations.Add(new Operation<DbTaskProperty>(item.op, item.path, item.from, Guid.Parse(item.value.ToString())));
+          continue;
+        }
+
+        if (item.path.EndsWith(nameof(EditTaskPropertyRequest.IsActive), StringComparison.OrdinalIgnoreCase))
+        {
+          result.Operations.Add(new Operation<DbTaskProperty>(item.op, item.path, item.from, bool.Parse(item.value.ToString())));
           continue;
         }
 

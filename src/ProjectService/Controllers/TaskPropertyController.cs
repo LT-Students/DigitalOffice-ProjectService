@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [HttpPatch("edit")]
     public OperationResultResponse<bool> Edit(
       [FromQuery] Guid taskPropertyId,
-      [FromBody] JsonPatchDocument<TaskProperty> request,
+      [FromBody] JsonPatchDocument<EditTaskPropertyRequest> request,
       [FromServices] IEditTaskPropertyCommand command)
     {
       return command.Execute(taskPropertyId, request);

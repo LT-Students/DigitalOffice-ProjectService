@@ -3,22 +3,27 @@ using System.Collections.Generic;
 using FluentValidation;
 using FluentValidation.Validators;
 using LT.DigitalOffice.Kernel.Validators;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 
 namespace LT.DigitalOffice.ProjectService.Validation
 {
-  public class EditTaskPropertyValidator : BaseEditRequestValidator<TaskProperty>, IEditTaskPropertyValidator
+  public class EditTaskPropertyValidator : BaseEditRequestValidator<EditTaskPropertyRequest>, IEditTaskPropertyValidator
   {
-    public EditTaskPropertyValidator()
+    private readonly IProjectRepository _projectRepository;
+    public EditTaskPropertyValidator(
+      IProjectRepository projectRepository)
     {
+      _projectRepository = projectRepository;
+
       RuleForEach(x => x.Operations)
         .Custom(HandleInternalPropertyValidation);
     }
 
-    private void HandleInternalPropertyValidation(Operation<TaskProperty> requestedOperation, CustomContext context)
+    private void HandleInternalPropertyValidation(Operation<EditTaskPropertyRequest> requestedOperation, CustomContext context)
     {
       Context = context;
       RequestedOperation = requestedOperation;
@@ -28,26 +33,30 @@ namespace LT.DigitalOffice.ProjectService.Validation
       AddСorrectPaths(
         new List<string>
         {
-          nameof(TaskProperty.Name),
-          nameof(TaskProperty.PropertyType),
-          nameof(TaskProperty.Description),
+          nameof(EditTaskPropertyRequest.Name),
+          nameof(EditTaskPropertyRequest.PropertyType),
+          nameof(EditTaskPropertyRequest.Description),
+          nameof(EditTaskPropertyRequest.ProjectId),
+          nameof(EditTaskPropertyRequest.IsActive)
         });
 
-      AddСorrectOperations(nameof(TaskProperty.Name), new List<OperationType> { OperationType.Replace });
-      AddСorrectOperations(nameof(TaskProperty.PropertyType), new List<OperationType> { OperationType.Replace });
-      AddСorrectOperations(nameof(TaskProperty.Description), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditTaskPropertyRequest.Name), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditTaskPropertyRequest.PropertyType), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditTaskPropertyRequest.Description), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditTaskPropertyRequest.ProjectId), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditTaskPropertyRequest.IsActive), new List<OperationType> { OperationType.Replace });
 
       #endregion
 
       #region firstname
 
       AddFailureForPropertyIf(
-          nameof(TaskProperty.Name),
+          nameof(EditTaskPropertyRequest.Name),
           x => x == OperationType.Replace,
           new()
           {
             { x => !string.IsNullOrEmpty(x.value.ToString()), "Name must not be empty." },
-            { x => x.value.ToString().Trim().Length < 150, "Name is too long" }
+            { x => x.value.ToString().Trim().Length < 150, "Name is too long." }
           });
 
       #endregion
@@ -55,7 +64,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
       #region description
 
       AddFailureForPropertyIf(
-          nameof(TaskProperty.Description),
+          nameof(EditTaskPropertyRequest.Description),
           x => x == OperationType.Replace,
           new()
           {
@@ -69,7 +78,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
                 return x.value.ToString().Trim().Length < 150;
               },
-              "Description is too long"
+              "Description is too long."
             }
           });
 
@@ -78,11 +87,36 @@ namespace LT.DigitalOffice.ProjectService.Validation
       #region PropertyType
 
       AddFailureForPropertyIf(
-          nameof(TaskProperty.PropertyType),
+          nameof(EditTaskPropertyRequest.PropertyType),
           x => x == OperationType.Replace,
           new()
           {
-            { x => Enum.IsDefined(typeof(TaskPropertyType), Convert.ToInt32(x.value)), "This PropertyType does not exist." }
+            { x => Enum.IsDefined(typeof(TaskPropertyType), x.value.ToString()), "This PropertyType does not exist." }
+          });
+
+      #endregion
+
+      #region ProjectId
+
+      AddFailureForPropertyIf(
+          nameof(EditTaskPropertyRequest.ProjectId),
+          x => x == OperationType.Replace,
+          new()
+          {
+            { x => Guid.TryParse(x.value.ToString(), out Guid result), "Project id has incorrect format." },
+            { x => _projectRepository.IsExist(Guid.Parse(x.value.ToString())), "Project id does not exist." }
+          });
+
+      #endregion
+
+      #region IsActive
+
+      AddFailureForPropertyIf(
+          nameof(EditTaskPropertyRequest.IsActive),
+          x => x == OperationType.Replace,
+          new()
+          {
+            { x => bool.TryParse(x.value?.ToString(), out bool result), "Incorrect taskProperty is active format." }
           });
 
       #endregion

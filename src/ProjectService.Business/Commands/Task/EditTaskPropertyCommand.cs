@@ -11,7 +11,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -43,13 +43,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       _validator = validator;
     }
 
-    public OperationResultResponse<bool> Execute(Guid taskPropertyId, JsonPatchDocument<TaskProperty> patch)
+    public OperationResultResponse<bool> Execute(Guid taskPropertyId, JsonPatchDocument<EditTaskPropertyRequest> patch)
     {
       DbTaskProperty taskProperty = _taskPropertyRepository.Get(taskPropertyId);
 
       if (taskProperty.ProjectId == null
-        || !_userRepository.AreUserProjectExist(_httpContextAccessor.HttpContext.GetUserId(), (Guid)taskProperty.ProjectId)
-        || !_accessValidator.HasRights(Rights.AddEditRemoveProjects))
+        && !_userRepository.AreUserProjectExist(_httpContextAccessor.HttpContext.GetUserId(), (Guid)taskProperty.ProjectId)
+        && !_accessValidator.HasRights(Rights.AddEditRemoveProjects))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
