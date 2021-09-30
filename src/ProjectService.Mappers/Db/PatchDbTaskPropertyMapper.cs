@@ -27,19 +27,10 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
           continue;
         }
 
-        if (item.path.EndsWith(nameof(EditTaskPropertyRequest.ProjectId), StringComparison.OrdinalIgnoreCase))
+        else
         {
-          result.Operations.Add(new Operation<DbTaskProperty>(item.op, item.path, item.from, Guid.Parse(item.value.ToString())));
-          continue;
+          result.Operations.Add(new Operation<DbTaskProperty>(item.op, item.path, item.from, item.value));
         }
-
-        if (item.path.EndsWith(nameof(EditTaskPropertyRequest.IsActive), StringComparison.OrdinalIgnoreCase))
-        {
-          result.Operations.Add(new Operation<DbTaskProperty>(item.op, item.path, item.from, bool.Parse(item.value.ToString())));
-          continue;
-        }
-
-        result.Operations.Add(new Operation<DbTaskProperty>(item.op, item.path, item.from, item.value));
       }
 
       return result;
