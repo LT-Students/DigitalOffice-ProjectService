@@ -88,7 +88,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
     public FindResultResponse<ProjectInfo> Execute(FindProjectsFilter filter)
     {
-      if (_findRequestValidator.ValidateCustom(filter, out List<string> errors))
+      if (!_findRequestValidator.ValidateCustom(filter, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
