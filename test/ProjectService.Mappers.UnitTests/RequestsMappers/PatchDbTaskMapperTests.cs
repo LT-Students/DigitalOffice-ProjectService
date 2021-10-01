@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Db;
+using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.UnitTestKernel;

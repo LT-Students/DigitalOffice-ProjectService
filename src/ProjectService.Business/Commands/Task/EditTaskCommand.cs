@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
@@ -7,11 +7,13 @@ using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
@@ -29,27 +31,26 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         private readonly IUserRepository _userRepository;
         private readonly IEditTaskValidator _validator;
         private readonly IAccessValidator _accessValidator;
-        private readonly HttpContext _httpContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPatchDbTaskMapper _mapper;
         private readonly ILogger<EditTaskCommand> _logger;
-        private readonly IRequestClient<IGetDepartmentRequest> _requestClient;
+        private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployee;
 
-        private IGetDepartmentResponse GetDepartment(Guid userId, List<string> errors)
+        private DepartmentData GetDepartment(Guid authorId, List<string> errors)
         {
-            string errorMessage = "Cannot edit task. Please try again later.";
+            string errorMessage = "Cannot create task. Please try again later.";
 
             try
             {
-                var response = _requestClient.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-                    IGetDepartmentRequest.CreateObj(userId, null)).Result;
+                var response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+                    IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
 
                 if (response.Message.IsSuccess)
                 {
-                    return response.Message.Body;
+                    return response.Message.Body.Departments.FirstOrDefault();
                 }
 
-                _logger.LogWarning($"Can not find department with this id '{userId}': " +
-                                   $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
+                _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", authorId);
             }
             catch (Exception exc)
             {
@@ -70,50 +71,36 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
             IHttpContextAccessor httpContextAccessor,
             IPatchDbTaskMapper mapper,
             ILogger<EditTaskCommand> logger,
-            IRequestClient<IGetDepartmentRequest> requestClient)
+            IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployee)
         {
             _taskRepository = taskRepository;
             _userRepository = userRepository;
             _validator = validator;
             _accessValidator = accessValidator;
-            _httpContext = httpContextAccessor.HttpContext;
+            _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
             _logger = logger;
-            _requestClient = requestClient;
+            _rcGetCompanyEmployee = rcGetCompanyEmployee;
         }
 
         public OperationResultResponse<bool> Execute(Guid taskId, JsonPatchDocument<EditTaskRequest> patch)
         {
-            _validator.ValidateAndThrowCustom(patch);
-
             var errors = new List<string>();
 
             DbTask task = _taskRepository.Get(taskId, false);
-            List<DbProjectUser> projectUsers =
-                _userRepository.GetProjectUsers(task.ProjectId, false).ToList();
 
-            Guid requestUserId = _httpContext.GetUserId();
-            IGetDepartmentResponse department = GetDepartment(requestUserId, errors);
+            Guid requestUserId = _httpContextAccessor.HttpContext.GetUserId();
 
-            bool isAdmin = _accessValidator.IsAdmin();
-
-            bool isProjectParticipant = projectUsers.FirstOrDefault(x =>
-                x.UserId == requestUserId) != null;
-
-            bool isDepartmentDirector = false;
-            if (department != null)
-            {
-                 isDepartmentDirector = department.DirectorUserId == requestUserId;
-            }
-
-            if (!isAdmin && !isProjectParticipant && !isDepartmentDirector)
+            if (!_accessValidator.IsAdmin()
+                && !(_userRepository.AreUserProjectExist(requestUserId, task.ProjectId))
+                && !(GetDepartment(requestUserId, errors)?.DirectorUserId == requestUserId))
             {
                 throw new ForbiddenException("Not enough rights.");
             }
 
-            var dbTaskPatch = _mapper.Map(patch);
+            _validator.ValidateAndThrowCustom(patch);
 
-            _taskRepository.Edit(task, dbTaskPatch);
+            _taskRepository.Edit(task, _mapper.Map(patch));
 
             return new OperationResultResponse<bool>
             {

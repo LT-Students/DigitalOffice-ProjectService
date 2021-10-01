@@ -39,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = _projectId,
                     UserId = Guid.NewGuid(),
-                    Role = (int) UserRoleType.ProjectAdmin,
+                    Role = (int) ProjectUserRoleType.Manager,
                     IsActive = true
                 },
                 new DbProjectUser
@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                     Id = Guid.NewGuid(),
                     ProjectId = _projectId,
                     UserId = Guid.NewGuid(),
-                    Role = (int) UserRoleType.ProjectAdmin,
+                    Role = (int) ProjectUserRoleType.Manager,
                     IsActive = true
                 }
             };
@@ -56,12 +56,12 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
             {
                 new ProjectUserRequest
                 {
-                    Role = (int) UserRoleType.ProjectAdmin,
+                    Role = (int) ProjectUserRoleType.Manager,
                     UserId = Guid.NewGuid()
                 },
                 new ProjectUserRequest
                 {
-                    Role = (int) UserRoleType.ProjectAdmin,
+                    Role = (int) ProjectUserRoleType.Manager,
                     UserId = Guid.NewGuid()
                 }
             };
@@ -104,7 +104,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                         new ProjectUserRequest()
                         {
                             UserId = Guid.NewGuid(),
-                            Role = UserRoleType.ProjectAdmin
+                            Role = ProjectUserRoleType.Manager
                         }
                     }
                 })
@@ -155,7 +155,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
                 {
                     new ProjectUserRequest
                     {
-                        Role = (int) UserRoleType.ProjectAdmin,
+                        Role = (int) ProjectUserRoleType.Manager,
                         UserId = _dbProjectUsers.ElementAt(0).UserId
                     }
                 }

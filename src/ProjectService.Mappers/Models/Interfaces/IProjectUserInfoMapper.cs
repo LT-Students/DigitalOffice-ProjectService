@@ -1,6 +1,8 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces
@@ -8,6 +10,12 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces
     [AutoInject]
     public interface IProjectUserInfoMapper
     {
-        ProjectUserInfo Map(UserData userData, DbProjectUser dbProjectUser);
+        ProjectUserInfo Map(
+            UserData userData,
+            ImageInfo image,
+            PositionData userPosition,
+            DepartmentData userDepartment,
+            DbProjectUser dbProjectUser,
+            int projectCount);
     }
 }

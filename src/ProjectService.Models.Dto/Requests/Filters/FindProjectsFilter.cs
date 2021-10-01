@@ -1,16 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using LT.DigitalOffice.Kernel.Requests;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
 {
-    public class FindProjectsFilter
-    {
-        [FromQuery(Name = "name")]
-        public string Name { get; set; }
-
-        [FromQuery(Name = "shortname")]
-        public string ShortName { get; set; }
-
-        [FromQuery(Name = "departmentname")]
-        public string DepartmentName { get; set; }
-    }
+  public record FindProjectsFilter : BaseFindFilter
+  {
+    [FromQuery(Name = "departmentid")]
+    public Guid? DepartmentId { get; set; }
+  }
 }

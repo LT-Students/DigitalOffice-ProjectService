@@ -9,6 +9,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Responses
         public ProjectInfo Project { get; set; }
         public IEnumerable<ProjectUserInfo> Users { get; set; }
         public IEnumerable<ProjectFileInfo> Files { get; set; }
-        public List<string> Errors { get; set; } = new();
+        public IEnumerable<ImageInfo> Images { get; set; }
     }
 }

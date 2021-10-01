@@ -1,4 +1,4 @@
-using LT.DigitalOffice.Kernel.Attributes;
+﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Kernel.Database;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -14,5 +14,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider
         DbSet<DbProject> Projects { get; set; }
         DbSet<DbProjectFile> ProjectsFiles { get; set; }
         DbSet<DbProjectUser> ProjectsUsers { get; set; }
+        DbSet<DbEntityImage> Images { get; set; }
     }
 }

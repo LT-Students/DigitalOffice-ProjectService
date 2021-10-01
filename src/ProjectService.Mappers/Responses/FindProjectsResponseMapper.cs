@@ -1,42 +1,45 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
+﻿using System.Collections.Generic;
+using System.Linq;
+using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.Models.Broker.Models.Company;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
-using System;
-using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Responses
 {
-    public class FindProjectsResponseMapper : IFindProjectsResponseMapper
+  public class FindProjectsResponseMapper : IFindProjectsResponseMapper
+  {
+    private readonly IProjectInfoMapper _mapper;
+    private readonly IDepartmentInfoMapper _departmentInfoMapper;
+
+    public FindProjectsResponseMapper(
+      IProjectInfoMapper mapper,
+      IDepartmentInfoMapper departmentInfoMapper)
     {
-        private readonly IProjectInfoMapper _mapper;
-        public FindProjectsResponseMapper(
-            IProjectInfoMapper mapper)
-        {
-            _mapper = mapper;
-        }
-
-        public FindResponse<ProjectInfo> Map(List<DbProject> dbProjects, int totalCount, IDictionary<Guid, string> departmentsNames, List<string> errors)
-        {
-            if (dbProjects == null)
-            {
-                throw new ArgumentNullException(nameof(dbProjects));
-            }
-
-            var projectInfos = new List<ProjectInfo>();
-            foreach(var dbProject in dbProjects)
-            {
-                departmentsNames.TryGetValue(dbProject.DepartmentId, out string departmentName);
-                projectInfos.Add(_mapper.Map(dbProject, departmentName));
-            }
-
-            return new FindResponse<ProjectInfo>
-            {
-                TotalCount = totalCount,
-                Body = projectInfos,
-                Errors = errors
-            };
-        }
+      _mapper = mapper;
+      _departmentInfoMapper = departmentInfoMapper;
     }
+
+    public FindResultResponse<ProjectInfo> Map(List<DbProject> dbProjects, int totalCount, List<DepartmentData> departments, List<string> errors)
+    {
+      if (dbProjects == null)
+      {
+       return null;
+      }
+
+      List<DepartmentInfo> departmentsInfos = departments?.Select(_departmentInfoMapper.Map).ToList();
+
+      return new FindResultResponse<ProjectInfo>
+      {
+        TotalCount = totalCount,
+        Body = dbProjects.Select(p =>
+        {
+          return _mapper.Map(p, departmentsInfos?.FirstOrDefault(d => p.DepartmentId == d.Id));
+        }).ToList(),
+        Errors = errors
+      };
+    }
+  }
 }

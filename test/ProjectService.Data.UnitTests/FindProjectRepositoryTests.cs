@@ -4,7 +4,9 @@ using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.UnitTestKernel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -13,10 +15,12 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
     class FindProjectRepositoryTests
     {
-        private FindDbProjectsFilter _filter;
+        private FindProjectsFilter _filter;
         private IDataProvider _provider;
         private IProjectRepository _repository;
+        private Mock<IHttpContextAccessor> _accessorMock;
 
+        private Guid _authorId = Guid.NewGuid();
         private List<DbProject> _dbProjectsInDb;
         private DbProject _dbProject1;
         private DbProject _dbProject2;
@@ -33,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 ShortName = "N1",
                 Description = "description",
                 DepartmentId = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow,
             };
 
             _dbProject2 = new DbProject
@@ -43,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 ShortName = "N2",
                 Description = "description",
                 DepartmentId = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow,
             };
 
             _dbProject3 = new DbProject
@@ -53,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 ShortName = "NWR1",
                 Description = "description",
                 DepartmentId = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow,
             };
 
             _dbProject4 = new DbProject
@@ -62,8 +66,8 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = "NameWithRegular2",
                 ShortName = "NWR2",
                 Description = "description",
-                DepartmentId = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
+                DepartmentId = _dbProject3.DepartmentId,
+                CreatedAtUtc = DateTime.UtcNow,
             };
 
             _dbProjectsInDb = new List<DbProject>
@@ -91,64 +95,31 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
         public void CreateMemoryDb()
         {
+            _accessorMock = new();
+            IDictionary<object, object> _items = new Dictionary<object, object>();
+            _items.Add("UserId", _authorId);
+
+            _accessorMock
+                .Setup(x => x.HttpContext.Items)
+                .Returns(_items);
+
             var dbOptions = new DbContextOptionsBuilder<ProjectServiceDbContext>()
                    .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
                    .Options;
             _provider = new ProjectServiceDbContext(dbOptions);
 
-            _repository = new ProjectRepository(_provider);
+            _repository = new ProjectRepository(_provider, _accessorMock.Object);
         }
 
-        [Test]
-        public void ShouldReturnProjectsByName()
-        {
-            _filter = new FindDbProjectsFilter
-            {
-                Name = "WithRegular"
-            };
-
-            var expectedProjects = new List<DbProject>
-            {
-                _dbProject3,
-                _dbProject4
-            };
-
-            var result = _repository.FindProjects(_filter, 0, 3, out int totalCount);
-
-            Assert.IsTrue(result.Contains(_dbProject4) && result.Contains(_dbProject3));
-            Assert.AreEqual(expectedProjects.Count, totalCount);
-        }
-
-        [Test]
-        public void ShouldReturnProjectsByShortName()
-        {
-            _filter = new FindDbProjectsFilter
-            {
-                ShortName = "WR"
-            };
-
-            var expectedProjects = new List<DbProject>
-            {
-                _dbProject3,
-                _dbProject4
-            };
-
-            var result = _repository.FindProjects(_filter, 0, 3, out int totalCount);
-
-            Assert.IsTrue(result.Contains(_dbProject4) && result.Contains(_dbProject3));
-            Assert.AreEqual(expectedProjects.Count, totalCount);
-        }
-
-        [Test]
-        public void ShouldReturnProjectsByDepartmentName()
+        /*[Test]
+        public void ShouldReturnProjectsByDepartmentId()
         {
             var pairs = new Dictionary<Guid, string>();
-            pairs.Add(_dbProject3.DepartmentId, "");
-            pairs.Add(_dbProject4.DepartmentId, "");
+            pairs.Add(_dbProject3.DepartmentId.Value, "");
 
-            _filter = new FindDbProjectsFilter
+            _filter = new FindProjectsFilter
             {
-                IdNameDepartments = pairs
+                DepartmentId = _dbProject3.DepartmentId
             };
 
             var expectedProjects = new List<DbProject>
@@ -157,17 +128,17 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 _dbProject4
             };
 
-            var result = _repository.FindProjects(_filter, 0, 3, out int totalCount);
+            var result = _repository.Find(_filter, 0, 3, out int totalCount);
 
             Assert.IsTrue(result.Contains(_dbProject4) && result.Contains(_dbProject3));
             Assert.AreEqual(expectedProjects.Count, totalCount);
-        }
+        }*/
 
-        [Test]
+        /*[Test]
         public void ShouldThrowArgumentNullExceptionWhenFilterIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _repository.FindProjects(null, 0, 0, out int _));
-        }
+            Assert.Throws<ArgumentNullException>(() => _repository.Find(null, 0, 1, out int _));
+        }*/
 
         [Test]
         public void ShouldSearchProject()
@@ -181,11 +152,11 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             SerializerAssert.AreEqual(projects, _repository.Search("Regular"));
         }
 
-        [Test]
+/*        [Test]
         public void ShouldThrowNullArgumentExceptionWhenSearchTextIsNullOrEmpty()
         {
             Assert.Throws<ArgumentNullException>(() => _repository.Search(""));
             Assert.Throws<ArgumentNullException>(() => _repository.Search(null));
-        }
+        }*/
     }
 }

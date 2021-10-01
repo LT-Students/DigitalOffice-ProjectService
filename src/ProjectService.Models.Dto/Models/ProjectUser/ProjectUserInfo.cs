@@ -9,9 +9,15 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
         public string LastName { get; set; }
-        public DateTime AddedOn { get; set; }
-        public DateTime? RemovedOn { get; set; }
+        public string Status { get; set; }
+        public double Rate { get; set; }
+        public int ProjectCount { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
+        public DateTime? ModifiedAtUtc { get; set; }
         public bool IsActive { get; set; }
-        public UserRoleType Role { get; set; }
+        public ProjectUserRoleType Role { get; set; }
+        public ImageInfo AvatarImage { get; set; }
+        public DepartmentInfo Department { get; set; }
+        public PositionInfo Position { get; set; }
     }
 }

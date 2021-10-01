@@ -4,6 +4,7 @@ using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.UnitTestKernel;
+using Moq;
 using NUnit.Framework;
 using System;
 
@@ -12,13 +13,16 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
     class TaskInfoMapperTests
     {
         private ITaskInfoMapper _mapper;
+        private Mock<IUserTaskInfoMapper> _userMapperMock;
         private TaskInfo _taskInfo;
         public DbTask _dbTask;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _mapper = new TaskInfoMapper();
+            _userMapperMock = new Mock<IUserTaskInfoMapper>();
+
+            _mapper = new TaskInfoMapper(_userMapperMock.Object);
 
             var projectId = Guid.NewGuid();
 
@@ -29,9 +33,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 Description = "Create smth in somewhere",
                 PlannedMinutes = 30,
                 AssignedTo = Guid.NewGuid(),
-                AuthorId = Guid.NewGuid(),
+                CreatedBy = Guid.NewGuid(),
                 ProjectId = projectId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow,
                 ParentId = Guid.NewGuid(),
                 Number = 2,
                 StatusId = Guid.NewGuid(),
@@ -74,9 +78,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                     FirstName = "Ivan",
                     LastName = "Ivanov"
                 },
-                Author = new UserTaskInfo
+                CreatedBy = new UserTaskInfo
                 {
-                    Id = _dbTask.AuthorId,
+                    Id = _dbTask.CreatedBy,
                     FirstName = "Semen",
                     LastName = "Semenov"
                 },
@@ -85,7 +89,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                     Id = _dbTask.ProjectId,
                     ShortName = "DO"
                 },
-                CreatedAt = _dbTask.CreatedAt,
+                CreatedAtUtc = _dbTask.CreatedAtUtc,
                 Number = 2,
                 PriorityName = "First",
                 StatusName = "New",
@@ -126,7 +130,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                     middleName: "Ivanovich",
                     isActive: true,
                     imageId: null,
-                    rate: null);
+                    rate: 0,
+                    status: null);
 
             UserData authorData = new UserData(
                     id: Guid.NewGuid(),
@@ -135,7 +140,16 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                     middleName: "Semenovich",
                     isActive: true,
                     imageId: null,
-                    rate: null);
+                    rate: 0,
+                    status: null);
+
+            _userMapperMock
+                .Setup(x => x.Map(assignedUserData))
+                .Returns(_taskInfo.AssignedTo);
+
+            _userMapperMock
+                .Setup(x => x.Map(authorData))
+                .Returns(_taskInfo.CreatedBy);
 
             SerializerAssert.AreEqual(_taskInfo, _mapper.Map(_dbTask, assignedUserData, authorData));
         }

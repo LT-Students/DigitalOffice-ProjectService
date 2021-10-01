@@ -4,7 +4,9 @@ using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.UnitTestKernel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -16,19 +18,29 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     {
         private IDataProvider _provider;
         private IProjectRepository _repository;
+        private Mock<IHttpContextAccessor> _accessorMock;
 
         private DbProject _newProject;
+        private Guid _creatorId = Guid.NewGuid();
 
         [SetUp]
         public void SetUp()
         {
+            _accessorMock = new();
+            IDictionary<object, object> _items = new Dictionary<object, object>();
+            _items.Add("UserId", _creatorId);
+
+            _accessorMock
+                .Setup(x => x.HttpContext.Items)
+                .Returns(_items);
+
             var dbOptionsProjectService = new DbContextOptionsBuilder<ProjectServiceDbContext>()
                 .UseInMemoryDatabase("ProjectServiceTest")
                 .Options;
 
             _provider = new ProjectServiceDbContext(dbOptionsProjectService);
 
-            _repository = new ProjectRepository(_provider);
+            _repository = new ProjectRepository(_provider, _accessorMock.Object);
 
             _newProject = new DbProject
             {
@@ -39,12 +51,14 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 ShortDescription = "Short description",
                 DepartmentId = Guid.NewGuid(),
                 Status = (int)ProjectStatusType.Active,
+                CreatedBy = _creatorId,
                 Users = new List<DbProjectUser>
                 {
                     new DbProjectUser
                     {
                         Id = Guid.NewGuid(),
-                        Role = (int)UserRoleType.ProjectAdmin
+                        Role = (int)ProjectUserRoleType.Manager,
+                        CreatedBy = _creatorId
                     }
                 }
             };

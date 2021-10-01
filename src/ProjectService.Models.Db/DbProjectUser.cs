@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
-using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Models.Db
 {
@@ -13,23 +12,13 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         public Guid ProjectId { get; set; }
         public Guid UserId { get; set; }
         public int Role { get; set; }
-        public DateTime AddedOn { get; set; }
-        public DateTime? RemovedOn { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
+        public Guid CreatedBy { get; set; }
+        public DateTime? ModifiedAtUtc { get; set; }
+        public Guid? ModifiedBy { get; set; }
         public bool IsActive { get; set; }
 
         public DbProject Project { get; set; }
-        public ICollection<DbTask> AuthorTasks { get; set; }
-        public ICollection<DbTask> AssignedUserTasks { get; set; }
-        public ICollection<DbTaskProperty> TaskProperties { get; set; }
-
-        public DbProjectUser ()
-        {
-            AuthorTasks = new HashSet<DbTask>();
-
-            AssignedUserTasks = new HashSet<DbTask>();
-
-            TaskProperties = new HashSet<DbTaskProperty>();
-        }
     }
 
     public class DbProjectUserConfiguration : IEntityTypeConfiguration<DbProjectUser>
@@ -46,24 +35,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
                 .HasOne(pu => pu.Project)
                 .WithMany(p => p.Users)
                 .HasForeignKey(pu => pu.ProjectId);
-
-            builder
-                .HasMany(pu => pu.TaskProperties)
-                .WithOne(t => t.User);
-
-            builder
-                .HasMany(pu => pu.AssignedUserTasks)
-                .WithOne(t => t.AssignedUser)
-                .HasForeignKey(t => t.AssignedTo);
-
-            builder
-                .HasMany(pu => pu.AuthorTasks)
-                .WithOne(t => t.Author)
-                .HasForeignKey(t => t.AuthorId);
-
-            builder
-                .HasMany(pu => pu.TaskProperties)
-                .WithOne(tp => tp.User);
         }
     }
 }

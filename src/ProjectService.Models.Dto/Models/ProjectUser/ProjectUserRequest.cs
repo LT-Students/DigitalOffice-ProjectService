@@ -6,6 +6,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser
     public class ProjectUserRequest
     {
         public Guid UserId { get; set; }
-        public UserRoleType Role { get; set; }
+        public ProjectUserRoleType Role { get; set; }
     }
 }

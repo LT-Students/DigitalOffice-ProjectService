@@ -29,10 +29,10 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models.UnitTests
                 Id = Guid.NewGuid(),
                 Name = "Feature",
                 ProjectId = Guid.NewGuid(),
-                AuthorId = Guid.NewGuid(),
+                CreatedBy = Guid.NewGuid(),
                 PropertyType = (int)TaskPropertyType.Type,
                 Description = "Description",
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow,
                 IsActive = true
             };
 
@@ -41,10 +41,10 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models.UnitTests
                 Id = _dbTaskProperty.Id,
                 Name = _dbTaskProperty.Name,
                 ProjectId = _dbTaskProperty.ProjectId,
-                AuthorId = _dbTaskProperty.AuthorId,
+                CreatedBy = _dbTaskProperty.CreatedBy,
                 PropertyType = (TaskPropertyType)_dbTaskProperty.PropertyType,
                 Description = _dbTaskProperty.Description,
-                CreatedAt = _dbTaskProperty.CreatedAt,
+                CreatedAtUtc = _dbTaskProperty.CreatedAtUtc,
                 IsActive = _dbTaskProperty.IsActive
             };
         }
