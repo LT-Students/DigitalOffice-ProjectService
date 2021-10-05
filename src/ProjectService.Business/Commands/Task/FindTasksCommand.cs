@@ -81,7 +81,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
       if (usersFromCache.HasValue)
       {
-        _logger.LogInformation("UsersDatas were taken from the cache. UsersDatas ids: {usersIds}", string.Join(", ", usersIds));
+        _logger.LogInformation("UsersDatas were taken from the cache. Users ids: {usersIds}", string.Join(", ", usersIds));
 
         return JsonConvert.DeserializeObject<List<UserData>>(usersFromCache);
       }
@@ -100,7 +100,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         if (response.Message.IsSuccess)
         {
-          _logger.LogInformation("UsersDatas were taken from the service. UsersDatas ids: {usersIds}", string.Join(", ", usersIds));
+          _logger.LogInformation("UsersDatas were taken from the service. Users ids: {usersIds}", string.Join(", ", usersIds));
 
           return response.Message.Body.UsersData;
         }
