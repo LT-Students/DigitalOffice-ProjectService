@@ -54,6 +54,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
       if (departmentFromCache.HasValue)
       {
+        _logger.LogInformation("Department was taken from the cache.");
+
         return JsonConvert.DeserializeObject<List<DepartmentData>>(departmentFromCache).FirstOrDefault();
       }
 
@@ -66,12 +68,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
       try
       {
-        Response<IOperationResult<IGetCompanyEmployeesResponse>> response = 
+        Response<IOperationResult<IGetCompanyEmployeesResponse>> response =
           await _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
             IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true));
 
         if (response.Message.IsSuccess)
         {
+          _logger.LogInformation("Department was taken from the service.");
+
           return response.Message.Body.Departments.FirstOrDefault();
         }
 
@@ -160,7 +164,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
       return (department != null && department.DirectorUserId == requestUserId
           || _accessValidator.IsAdmin(requestUserId)
-          || projectUsers.FirstOrDefault(x => x.UserId == requestUserId) != null, 
+          || projectUsers.FirstOrDefault(x => x.UserId == requestUserId) != null,
         department);
     }
 

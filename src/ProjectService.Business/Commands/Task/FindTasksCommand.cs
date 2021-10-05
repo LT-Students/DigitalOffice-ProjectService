@@ -81,6 +81,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
       if (usersFromCache.HasValue)
       {
+        _logger.LogInformation("UsersDatas were taken from the cache.");
+
         return JsonConvert.DeserializeObject<List<UserData>>(usersFromCache);
       }
 
@@ -98,6 +100,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
 
         if (response.Message.IsSuccess)
         {
+          _logger.LogInformation("UsersDatas were taken from the service.");
+
           return response.Message.Body.UsersData;
         }
 
