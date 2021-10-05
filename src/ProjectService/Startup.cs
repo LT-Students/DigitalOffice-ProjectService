@@ -193,19 +193,17 @@ namespace LT.DigitalOffice.ProjectService
 
     private string HidePassord(string line)
     {
-      string password = "Password=";
+      string password = "Password";
 
       int index = line.IndexOf(password, 0);
-
       if (index != -1)
       {
         string[] words = line.Split(';', '=');
-
         for (int i = 0; i < words.Length; i++)
         {
-          if (words[i].Equals("Password"))
+          if (password.Equals(words[i]))
           {
-            line.Replace(words[i + 1], "****");
+            line = line.Replace(words[i + 1], "****");
             break;
           }
         }
