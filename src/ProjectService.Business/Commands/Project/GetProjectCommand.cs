@@ -56,7 +56,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       if (departmentFromCache.HasValue)
       {
-        _logger.LogInformation("Department was taken from the cache.");
+        _logger.LogInformation("Department was taken from the cache. Department's id: {departmentId}", string.Join(", ", departmentId));
 
         return JsonConvert.DeserializeObject<List<DepartmentData>>(departmentFromCache).FirstOrDefault();
       }
@@ -74,7 +74,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         if (departmentResponse.Message.IsSuccess)
         {
-          _logger.LogInformation("Department was taken from the service.");
+          _logger.LogInformation("Department was taken from the service. Department's id: {departmentId}", string.Join(", ", departmentId));
 
           return departmentResponse.Message.Body.Departments.FirstOrDefault();
         }
@@ -175,7 +175,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       if (usersFromCache.HasValue)
       {
-        _logger.LogInformation("UsersDatas were taken from the cache.");
+        _logger.LogInformation("UsersDatas were taken from the cache. UsersDatas ids: {usersIds}", string.Join(", ", usersIds));
 
         return JsonConvert.DeserializeObject<List<UserData>>(usersFromCache);
       }
@@ -193,7 +193,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         if (usersDataResponse.Message.IsSuccess)
         {
-          _logger.LogInformation("UsersDatas were taken from the service.");
+          _logger.LogInformation("UsersDatas were taken from the service. UsersDatas ids: {usersIds}", string.Join(", ", usersIds));
 
           return usersDataResponse.Message.Body.UsersData;
         }

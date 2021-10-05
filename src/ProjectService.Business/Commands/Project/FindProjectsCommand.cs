@@ -48,7 +48,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       if (departmentFromCache.HasValue)
       {
-        _logger.LogInformation("Departments were taken from the cache.");
+        _logger.LogInformation("Departments were taken from the cache. Departments ids: {departmentsIds}", string.Join(", ", departmentsIds));
 
         return JsonConvert.DeserializeObject<List<DepartmentData>>(departmentFromCache);
       }
@@ -73,7 +73,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         if (response.Message.IsSuccess)
         {
-          _logger.LogInformation("Departments were taken from the service.");
+          _logger.LogInformation("Departments were taken from the service. Departments ids: {departmentsIds}", string.Join(", ", departmentsIds));
 
           return response.Message.Body.Departments;
         }
