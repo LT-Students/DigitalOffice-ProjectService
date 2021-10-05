@@ -196,9 +196,11 @@ namespace LT.DigitalOffice.ProjectService
       string password = "Password";
 
       int index = line.IndexOf(password, 0);
+
       if (index != -1)
       {
         string[] words = line.Split(';', '=');
+
         for (int i = 0; i < words.Length; i++)
         {
           if (password.Equals(words[i]))
