@@ -118,11 +118,11 @@ namespace LT.DigitalOffice.ProjectService
       {
         redisConnStr = Configuration.GetConnectionString("Redis");
 
-        logger.LogInformation(message: $"Redis connection string from appsettings.json was used. Value '{HidePassord(connStr)}'");
+        logger.LogInformation(message: $"Redis connection string from appsettings.json was used. Value '{HidePassord(redisConnStr)}'");
       }
       else
       {
-        logger.LogInformation(message: $"Redis connection string from environment was used. Value '{HidePassord(connStr)}'");
+        logger.LogInformation(message: $"Redis connection string from environment was used. Value '{HidePassord(redisConnStr)}'");
       }
 
       services.AddSingleton<IConnectionMultiplexer>(
