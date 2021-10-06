@@ -56,6 +56,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       if (departmentFromCache.HasValue)
       {
+        _logger.LogInformation($"Department was taken from the cache. Department id: {departmentId}");
+
         return JsonConvert.DeserializeObject<List<DepartmentData>>(departmentFromCache).FirstOrDefault();
       }
 
@@ -72,6 +74,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         if (departmentResponse.Message.IsSuccess)
         {
+          _logger.LogInformation($"Department was taken from the service. Department id: {departmentId}");
+
           return departmentResponse.Message.Body.Departments.FirstOrDefault();
         }
 
@@ -171,6 +175,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       if (usersFromCache.HasValue)
       {
+        _logger.LogInformation("UsersDatas were taken from the cache. Users ids: {usersIds}", string.Join(", ", usersIds));
+
         return JsonConvert.DeserializeObject<List<UserData>>(usersFromCache);
       }
 
@@ -187,9 +193,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         if (usersDataResponse.Message.IsSuccess)
         {
+          _logger.LogInformation("UsersDatas were taken from the service. Users ids: {usersIds}", string.Join(", ", usersIds));
+
           return usersDataResponse.Message.Body.UsersData;
         }
-        
+
         _logger.LogWarning(
           $"Can not get users. Reason:{Environment.NewLine}{string.Join('\n', usersDataResponse.Message.Errors)}.");
       }
