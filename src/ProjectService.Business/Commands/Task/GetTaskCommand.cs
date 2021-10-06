@@ -79,7 +79,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
           return response.Message.Body.Departments.FirstOrDefault();
         }
 
-        _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", userId);
+        _logger.LogWarning("Can not find department contain user with Id: '{userId}'", userId);
       }
       catch (Exception exc)
       {
