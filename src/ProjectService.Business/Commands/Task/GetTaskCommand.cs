@@ -48,21 +48,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
     private readonly IRequestClient<IGetImagesRequest> _rcImages;
     private readonly IImageInfoMapper _imageMapper;
 
-    private async Task<DepartmentData> GetDepartment(Guid authorId, List<string> errors)
+    private async Task<DepartmentData> GetDepartment(Guid userId, List<string> errors)
     {
-      RedisValue departmentFromCache = await _cache.GetDatabase(Cache.Departments).StringGetAsync(authorId.GetRedisCacheHashCode());
+      RedisValue departmentFromCache = await _cache.GetDatabase(Cache.Departments).StringGetAsync(userId.GetRedisCacheHashCode());
 
       if (departmentFromCache.HasValue)
       {
-        _logger.LogInformation($"Department was taken from the cache. Department id: {authorId}");
+        _logger.LogInformation($"Department was taken from the cache. User id: {userId}");
 
         return JsonConvert.DeserializeObject<List<DepartmentData>>(departmentFromCache).FirstOrDefault();
       }
 
-      return await GetDepartmentThroughBroker(authorId, errors);
+      return await GetDepartmentThroughBroker(userId, errors);
     }
 
-    private async Task<DepartmentData> GetDepartmentThroughBroker(Guid authorId, List<string> errors)
+    private async Task<DepartmentData> GetDepartmentThroughBroker(Guid userId, List<string> errors)
     {
       string errorMessage = "Cannot get department. Please try again later.";
 
@@ -70,16 +70,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       {
         Response<IOperationResult<IGetCompanyEmployeesResponse>> response =
           await _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
-            IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true));
+            IGetCompanyEmployeesRequest.CreateObj(new() { userId }, includeDepartments: true));
 
         if (response.Message.IsSuccess)
         {
-          _logger.LogInformation($"Department was taken from the service. Department id: {authorId}");
+          _logger.LogInformation($"Department was taken from the service. User id: {userId}");
 
           return response.Message.Body.Departments.FirstOrDefault();
         }
 
-        _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", authorId);
+        _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", userId);
       }
       catch (Exception exc)
       {
