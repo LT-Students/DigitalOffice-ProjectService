@@ -20,6 +20,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using StackExchange.Redis;
 
 namespace LT.DigitalOffice.ProjectService
@@ -55,14 +56,6 @@ namespace LT.DigitalOffice.ProjectService
 
     public void ConfigureServices(IServiceCollection services)
     {
-      using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-      {
-        builder.SetMinimumLevel(LogLevel.Information);
-        builder.AddConsole();
-        builder.AddEventSourceLogger();
-      });
-      ILogger logger = loggerFactory.CreateLogger("Startup");
-
       services.AddCors(options =>
       {
         options.AddPolicy(
@@ -101,11 +94,11 @@ namespace LT.DigitalOffice.ProjectService
       {
         connStr = Configuration.GetConnectionString("SQLConnectionString");
 
-        logger.LogInformation(message: $"SQL connection string from appsettings.json was used. Value '{HidePassord(connStr)}'.");
+        Log.Information($"SQL connection string from appsettings.json was used. Value '{HidePassord(connStr)}'.");
       }
       else
       {
-        logger.LogInformation(message: $"SQL connection string from environment was used. Value '{HidePassord(connStr)}'.");
+        Log.Information( $"SQL connection string from environment was used. Value '{HidePassord(connStr)}'.");
       }
 
       services.AddDbContext<ProjectServiceDbContext>(options =>
@@ -118,11 +111,11 @@ namespace LT.DigitalOffice.ProjectService
       {
         redisConnStr = Configuration.GetConnectionString("Redis");
 
-        logger.LogInformation(message: $"Redis connection string from appsettings.json was used. Value '{HidePassord(redisConnStr)}'");
+        Log.Information( $"Redis connection string from appsettings.json was used. Value '{HidePassord(redisConnStr)}'");
       }
       else
       {
-        logger.LogInformation(message: $"Redis connection string from environment was used. Value '{HidePassord(redisConnStr)}'");
+        Log.Information( $"Redis connection string from environment was used. Value '{HidePassord(redisConnStr)}'");
       }
 
       services.AddSingleton<IConnectionMultiplexer>(
