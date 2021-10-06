@@ -36,8 +36,7 @@ namespace LT.DigitalOffice.ProjectService
 
     #region public methods
 
-    public Startup(
-      IConfiguration configuration)
+    public Startup(IConfiguration configuration)
     {
       Configuration = configuration;
 
