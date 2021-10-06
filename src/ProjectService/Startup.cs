@@ -188,7 +188,7 @@ namespace LT.DigitalOffice.ProjectService
     {
       string password = "Password";
 
-      int index = line.IndexOf(password, 0);
+      int index = line.IndexOf(password, 0, StringComparison.OrdinalIgnoreCase);
 
       if (index != -1)
       {
@@ -196,7 +196,7 @@ namespace LT.DigitalOffice.ProjectService
 
         for (int i = 0; i < words.Length; i++)
         {
-          if (password.Equals(words[i]))
+          if (string.Equals(password, words[i], StringComparison.OrdinalIgnoreCase))
           {
             line = line.Replace(words[i + 1], "****");
             break;
