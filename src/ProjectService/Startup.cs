@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using HealthChecks.UI.Client;
 using LT.DigitalOffice.Kernel.Broker.Consumer;
 using LT.DigitalOffice.Kernel.Configurations;
@@ -192,7 +193,7 @@ namespace LT.DigitalOffice.ProjectService
 
       if (index != -1)
       {
-        string[] words = line.Split(';', '=');
+        string[] words = Regex.Split(line, @"[=,; ]");
 
         for (int i = 0; i < words.Length; i++)
         {
