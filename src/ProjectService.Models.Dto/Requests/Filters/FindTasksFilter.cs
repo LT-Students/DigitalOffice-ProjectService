@@ -1,10 +1,10 @@
 ﻿using System;
-using LT.DigitalOffice.Kernel.Validators.Models;
+using LT.DigitalOffice.Kernel.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
 {
-  public record FindTasksFilter : BaseFindRequest
+  public record FindTasksFilter : BaseFindFilter
   {
     [FromQuery(Name = "number")]
     public int? Number { get; set; }

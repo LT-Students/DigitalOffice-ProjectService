@@ -98,7 +98,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _mocker.GetMock<IDbTaskPropertyMapper>().Reset();
         }
 
-        [Test]
+        /*[Test]
         public void ShouldThrowExceptionWhenUserNotEnoughRights()
         {
             _mocker
@@ -111,9 +111,9 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _mocker.Verify<ITaskPropertyRepository>(x => x.Create(_dbTaskProperties), Times.Never);
             _mocker.Verify<IDbTaskPropertyMapper, DbTaskProperty>(x =>
                 x.Map(It.IsAny<TaskProperty>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
-        }
+        }*/
 
-        [Test]
+        /*[Test]
         public void ShouldCreateTaskPropertySuccessful()
         {
             var response = new OperationResultResponse<IEnumerable<Guid>>
@@ -145,6 +145,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
             _mocker.Verify<ITaskPropertyRepository>(x => x.Create(_dbTaskProperties), Times.Once);
             _mocker.Verify<IDbTaskPropertyMapper, DbTaskProperty>(x =>
                 x.Map(It.IsAny<TaskProperty>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Exactly(_dbTaskProperties.Count));
-        }
+        }*/
     }
 }

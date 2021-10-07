@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
@@ -25,6 +26,8 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands
 {
@@ -34,20 +37,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
     private readonly ITaskRepository _taskRepository;
     private readonly IUserRepository _userRepository;
     private readonly IAccessValidator _accessValidator;
-    private readonly IBaseFindRequestValidator _findRequestValidator;
+    private readonly IBaseFindFilterValidator _findFilterValidator;
     private readonly ILogger<FindTasksCommand> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IRequestClient<IGetUsersDataRequest> _requestClient;
+    private readonly IRequestClient<IGetUsersDataRequest> _rcGetUsers;
     private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployee;
+    private readonly IConnectionMultiplexer _cache;
 
-    private DepartmentData GetDepartment(Guid authorId, List<string> errors)
+    private async Task<DepartmentData> GetDepartment(Guid authorId, List<string> errors)
     {
       string errorMessage = "Cannot create task. Please try again later.";
 
       try
       {
-        Response<IOperationResult<IGetCompanyEmployeesResponse>> response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
-          IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
+        Response<IOperationResult<IGetCompanyEmployeesResponse>> response = await _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+          IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true));
 
         if (response.Message.IsSuccess)
         {
@@ -66,24 +70,45 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       return null;
     }
 
-    private IGetUsersDataResponse GetUsersData(List<Guid> userId, List<string> errors)
+    private async Task<List<UserData>> GetUsersDatas(List<Guid> usersIds, List<string> errors)
+    {
+      if (usersIds == null && !usersIds.Any())
+      {
+        return null;
+      }
+
+      RedisValue usersFromCache = await _cache.GetDatabase(Cache.Users).StringGetAsync(usersIds.GetRedisCacheHashCode());
+
+      if (usersFromCache.HasValue)
+      {
+        _logger.LogInformation("UsersDatas were taken from the cache. Users ids: {usersIds}", string.Join(", ", usersIds));
+
+        return JsonConvert.DeserializeObject<List<UserData>>(usersFromCache);
+      }
+
+      return await GetUsersDatasThroughBroker(usersIds, errors);
+    }
+
+    private async Task<List<UserData>> GetUsersDatasThroughBroker(List<Guid> usersIds, List<string> errors)
     {
       string errorMessage = "Can not find user data. Please try again later.";
 
       try
       {
-        Response<IOperationResult<IGetUsersDataResponse>> response = _requestClient.GetResponse<IOperationResult<IGetUsersDataResponse>>(
-          IGetUsersDataRequest.CreateObj(userId)).Result;
+        Response<IOperationResult<IGetUsersDataResponse>> response = await _rcGetUsers.GetResponse<IOperationResult<IGetUsersDataResponse>>(
+          IGetUsersDataRequest.CreateObj(usersIds));
 
         if (response.Message.IsSuccess)
         {
-          return response.Message.Body;
+          _logger.LogInformation("UsersDatas were taken from the service. Users ids: {usersIds}", string.Join(", ", usersIds));
+
+          return response.Message.Body.UsersData;
         }
 
         errors.AddRange(response.Message.Errors);
 
         _logger.LogWarning("Can not find user data with this id {UserId}: " +
-          $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}", userId);
+          $"{Environment.NewLine}{string.Join('\n', response.Message.Errors)}", usersIds);
       }
       catch (Exception exc)
       {
@@ -101,32 +126,35 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       IUserRepository userRepository,
       ILogger<FindTasksCommand> logger,
       IAccessValidator accessValidator,
+      IBaseFindFilterValidator findFilterValidator,
       IHttpContextAccessor httpContextAccessor,
       IRequestClient<IGetUsersDataRequest> requestClient,
-      IBaseFindRequestValidator findRequestValidator,
-      IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployee)
+      IBaseFindFilterValidator findRequestValidator,
+      IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployee,
+      IRequestClient<IGetUsersDataRequest> rcGetUsers,
+      IConnectionMultiplexer cache)
     {
       _mapper = mapper;
       _logger = logger;
-      _requestClient = requestClient;
+      _rcGetUsers = rcGetUsers;
+      _rcGetCompanyEmployee = rcGetCompanyEmployee;
       _taskRepository = taskRepository;
       _userRepository = userRepository;
       _accessValidator = accessValidator;
+      _findFilterValidator = findFilterValidator;
       _httpContextAccessor = httpContextAccessor;
-      _findRequestValidator = findRequestValidator;
-      _rcGetCompanyEmployee = rcGetCompanyEmployee;
+      _cache = cache;
     }
 
-    public FindResultResponse<TaskInfo> Execute(FindTasksFilter filter)
+    public async Task<FindResultResponse<TaskInfo>> Execute(FindTasksFilter filter)
     {
       FindResultResponse<TaskInfo> response = new();
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       List<DbProjectUser> projectUsers = _userRepository.Find(userId).ToList();
 
-      if (!_accessValidator.IsAdmin()
-        && !_accessValidator.HasRights(Rights.AddEditRemoveProjects)
+      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects)
         && !projectUsers.Any()
-        && GetDepartment(userId, response.Errors)?.DirectorUserId != userId)
+        && (await GetDepartment(userId, response.Errors))?.DirectorUserId != userId)
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
@@ -136,7 +164,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
         return response;
       }
 
-      if (_findRequestValidator.ValidateCustom(filter, out List<string> errors))
+      if (!_findFilterValidator.ValidateCustom(filter, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
@@ -152,13 +180,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands
       List<Guid> users = dbTasks.Where(x => x.AssignedTo.HasValue).Select(x => x.AssignedTo.Value).ToList();
       users.AddRange(dbTasks.Select(x => x.CreatedBy).ToList());
 
-      IGetUsersDataResponse usersData = GetUsersData(users, response.Errors);
+      List<UserData> usersData = await GetUsersDatas(users, response.Errors);
 
       List<TaskInfo> tasks = new();
       foreach (DbTask dbTask in dbTasks)
       {
-        UserData assignedUser = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.AssignedTo);
-        UserData author = usersData?.UsersData.FirstOrDefault(x => x.Id == dbTask.CreatedBy);
+        UserData assignedUser = usersData?.FirstOrDefault(x => x.Id == dbTask.AssignedTo);
+        UserData author = usersData?.FirstOrDefault(x => x.Id == dbTask.CreatedBy);
 
         tasks.Add(_mapper.Map(dbTask, assignedUser, author));
       }

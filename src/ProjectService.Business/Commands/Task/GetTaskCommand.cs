@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Responses;
@@ -26,6 +28,8 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 {
@@ -40,26 +44,48 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
     private readonly ILogger<GetTaskCommand> _logger;
     private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployee;
     private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
+    private readonly IConnectionMultiplexer _cache;
     private readonly IRequestClient<IGetImagesRequest> _rcImages;
     private readonly IImageInfoMapper _imageMapper;
 
-    private DepartmentData GetDepartment(Guid authorId)
+    private async Task<DepartmentData> GetDepartment(Guid userId, List<string> errors)
     {
+      RedisValue departmentFromCache = await _cache.GetDatabase(Cache.Departments).StringGetAsync(userId.GetRedisCacheHashCode());
+
+      if (departmentFromCache.HasValue)
+      {
+        _logger.LogInformation($"Department was taken from the cache. User id: {userId}");
+
+        return JsonConvert.DeserializeObject<List<DepartmentData>>(departmentFromCache).FirstOrDefault();
+      }
+
+      return await GetDepartmentThroughBroker(userId, errors);
+    }
+
+    private async Task<DepartmentData> GetDepartmentThroughBroker(Guid userId, List<string> errors)
+    {
+      string errorMessage = "Cannot get department. Please try again later.";
+
       try
       {
-        Response<IOperationResult<IGetCompanyEmployeesResponse>> response = _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
-          IGetCompanyEmployeesRequest.CreateObj(new() { authorId }, includeDepartments: true)).Result;
+        Response<IOperationResult<IGetCompanyEmployeesResponse>> response =
+          await _rcGetCompanyEmployee.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
+            IGetCompanyEmployeesRequest.CreateObj(new() { userId }, includeDepartments: true));
 
         if (response.Message.IsSuccess)
         {
+          _logger.LogInformation($"Department was taken from the service. User id: {userId}");
+
           return response.Message.Body.Departments.FirstOrDefault();
         }
 
-        _logger.LogWarning("Can not find department contain user with Id: '{authorId}'", authorId);
+        _logger.LogWarning("Can not find department contain user with Id: '{userId}'", userId);
       }
       catch (Exception exc)
       {
-        _logger.LogError(exc, "Cannot get department. Please try again later.");
+        _logger.LogError(exc, errorMessage);
+
+        errors.Add(errorMessage);
       }
 
       return null;
@@ -87,26 +113,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       }
 
       return null;
-    }
-
-    private bool Authorization(Guid taskProjectId, out DepartmentData department)
-    {
-      List<DbProjectUser> projectUsers = _userRepository
-        .GetProjectUsers(taskProjectId, false)
-        .ToList();
-
-      Guid requestUserId = _httpContext.GetUserId();
-
-      department = GetDepartment(requestUserId);
-
-      if (_accessValidator.IsAdmin()
-        || projectUsers.FirstOrDefault(x => x.UserId == requestUserId) != null
-        || department != null && department.DirectorUserId == requestUserId)
-      {
-        return true;
-      }
-
-      return false;
     }
 
     private List<ImageInfo> GetTaskImages(List<Guid> imageIds, List<string> errors)
@@ -145,29 +151,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       return null;
     }
 
-    private List<Guid> GetUsersIds(DbTask task, Guid? parentTaskAssignedTo)
+    //TODO rework
+    private async Task<(bool hasRights, DepartmentData department)> Authorization(Guid taskProjectId, List<string> errors)
     {
-      List<Guid> userIds = new()
-      {
-        task.CreatedBy,
-      };
+      List<DbProjectUser> projectUsers = _userRepository
+        .GetProjectUsers(taskProjectId, false)
+        .ToList();
 
-      if (task.AssignedTo.HasValue)
-      {
-        userIds.Add(task.AssignedTo.Value);
-      }
+      Guid requestUserId = _httpContext.GetUserId();
 
-      if (task.ParentTask != null)
-      {
-        userIds.Add(task.ParentTask.CreatedBy);
-      }
+      DepartmentData department = await GetDepartment(requestUserId, errors);
 
-      if (parentTaskAssignedTo != null && parentTaskAssignedTo != Guid.Empty)
-      {
-        userIds.Add(parentTaskAssignedTo.Value);
-      }
-
-      return userIds;
+      return (department != null && department.DirectorUserId == requestUserId
+          || _accessValidator.IsAdmin(requestUserId)
+          || projectUsers.FirstOrDefault(x => x.UserId == requestUserId) != null,
+        department);
     }
 
     public GetTaskCommand(
@@ -181,7 +179,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployee,
       IRequestClient<IGetUsersDataRequest> userRequestClient,
       IRequestClient<IGetImagesRequest> rcImages,
-      IImageInfoMapper imageMapper)
+      IImageInfoMapper imageMapper,
+      IConnectionMultiplexer cache)
     {
       _taskRepository = taskRepository;
       _userRepository = userRepository;
@@ -194,39 +193,51 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       _usersDataRequestClient = userRequestClient;
       _rcImages = rcImages;
       _imageMapper = imageMapper;
+      _cache = cache;
     }
 
-    public OperationResultResponse<TaskResponse> Execute(Guid taskId, bool isFullModel = true)
+    public async Task<OperationResultResponse<TaskResponse>> Execute(Guid taskId, bool isFullModel = true)
     {
-      OperationResultResponse<TaskResponse> response = new OperationResultResponse<TaskResponse>();
+      List<string> errors = new();
+
       DbTask task = _taskRepository.Get(taskId, isFullModel);
 
-      if (task == null)
-      {
-        _httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+      (bool hasRights, DepartmentData department) = await Authorization(task.ProjectId, errors);
 
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.Add($"Task with Id {taskId} was not found.");
-
-        return response;
-      }
-
-      if (!Authorization(task.ProjectId, out DepartmentData department))
+      if (!hasRights)
       {
         _httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.Add("Not enough rights.");
+        errors.Add("Not enough rights.");
 
-        return response;
+        return new OperationResultResponse<TaskResponse>
+        {
+          Status = OperationResultStatusType.Failed,
+          Errors = errors
+        };
+      }
+
+      List<Guid> userIds = new() { task.CreatedBy };
+
+      if (task.AssignedTo.HasValue)
+      {
+        userIds.Add(task.AssignedTo.Value);
+      }
+
+      if (task.ParentTask != null)
+      {
+        userIds.Add(task.ParentTask.CreatedBy);
       }
 
       Guid? parentTaskAssignedTo = task.ParentTask?.AssignedTo;
-      List<Guid> userIds = GetUsersIds(task, parentTaskAssignedTo);
+      if (parentTaskAssignedTo != null && parentTaskAssignedTo != Guid.Empty)
+      {
+        userIds.Add(parentTaskAssignedTo.Value);
+      }
 
-      List<UserData> usersDataResponse = GetUsersInfo(userIds, response.Errors);
+      List<UserData> usersDataResponse = GetUsersInfo(userIds, errors);
 
-      List<ImageInfo> imagesInfo = GetTaskImages(task.Images.Select(x => x.ImageId).ToList(), response.Errors);
+      List<ImageInfo> imagesInfo = GetTaskImages(task.Images.Select(x => x.ImageId).ToList(), errors);
 
       List<TaskInfo> subtasksInfo = new();
       if (task.Subtasks != null)
@@ -241,7 +252,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         }
       }
 
-      response.Body = _taskResponseMapper.Map(
+      TaskResponse response = _taskResponseMapper.Map(
         task,
         usersDataResponse.FirstOrDefault(x => x.Id == task.CreatedBy),
         usersDataResponse.FirstOrDefault(x => parentTaskAssignedTo != null && x.Id == parentTaskAssignedTo),
@@ -251,9 +262,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         subtasksInfo,
         imagesInfo);
 
-      response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
-
-      return response;
+      return new OperationResultResponse<TaskResponse>()
+      {
+        Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
+        Body = response,
+        Errors = errors
+      };
     }
   }
 }
