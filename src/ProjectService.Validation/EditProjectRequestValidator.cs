@@ -67,7 +67,9 @@ namespace LT.DigitalOffice.ProjectService.Validation
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => x.value == null || CheckValidityDepartmentId(Guid.Parse(x.value.ToString())), "Incorrect department id value."},
+          { x => x.value == null ||
+            (Guid.TryParse(x.value.ToString(), out Guid departmentId) && CheckValidityDepartmentId(departmentId)),
+            "Incorrect department id value." },
         });
 
       #endregion
@@ -81,7 +83,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         {
           { x => !string.IsNullOrEmpty(x.value?.ToString().Trim()), "Name must not be empty." },
           { x => x.value.ToString().Trim().Length < 150, "Name it too long." },
-          { x => _projectRepository.DoesProjectNameExist(x.value.ToString().Trim()), "The project name already exist." }
+          { x => !_projectRepository.DoesProjectNameExist(x.value.ToString().Trim()), "The project name already exist." }
         }, CascadeMode.Stop);
 
       #endregion
