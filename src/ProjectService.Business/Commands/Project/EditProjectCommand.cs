@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
   public class EditProjectCommand : IEditProjectCommand
   {
-    private readonly IEditProjectValidator _validator;
+    private readonly IEditProjectRequestValidator _validator;
     private readonly IAccessValidator _accessValidator;
     private readonly IPatchDbProjectMapper _mapper;
     private readonly IProjectRepository _projectRepository;
@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IUserRepository _userRepository;
 
     public EditProjectCommand(
-      IEditProjectValidator validator,
+      IEditProjectRequestValidator validator,
       IAccessValidator accessValidator,
       IPatchDbProjectMapper mapper,
       IProjectRepository projectRepository,

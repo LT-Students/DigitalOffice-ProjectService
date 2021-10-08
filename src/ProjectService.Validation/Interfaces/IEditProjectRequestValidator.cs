@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.JsonPatch;
 
 namespace LT.DigitalOffice.ProjectService.Validation.Interfaces
 {
-    [AutoInject]
-    public interface IEditProjectValidator : IValidator<JsonPatchDocument<EditProjectRequest>>
-    {
-    }
+  [AutoInject]
+  public interface IEditProjectRequestValidator : IValidator<JsonPatchDocument<EditProjectRequest>>
+  {
+  }
 }
