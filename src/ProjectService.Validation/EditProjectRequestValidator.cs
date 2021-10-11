@@ -82,7 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
           { x => !string.IsNullOrEmpty(x.value?.ToString().Trim()), "Name must not be empty." },
-          { x => x.value.ToString().Trim().Length < 150, "Name it too long." },
+          { x => x.value.ToString().Trim().Length < 150, "Name is too long." },
           { x => !_projectRepository.DoesProjectNameExist(x.value.ToString().Trim()), "The project name already exist." }
         }, CascadeMode.Stop);
 
@@ -95,7 +95,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => x.value == null || x.value.ToString().Trim().Length < 30, "Short name it too long." },
+          { x => x.value == null || x.value.ToString().Trim().Length < 30, "Short name is too long." },
         });
 
       #endregion
@@ -107,7 +107,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => x.value == null || x.value.ToString().Trim().Length < 300, "Short description it too long." },
+          { x => x.value == null || x.value.ToString().Trim().Length < 300, "Short description is too long." },
         });
 
       #endregion
