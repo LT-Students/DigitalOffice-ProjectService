@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentValidation;
+using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
@@ -30,10 +31,10 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
     {
       _autoMock = new();
 
-      _validator = new EditProjectValidator(
+      _validator = new EditProjectRequestValidator(
         _autoMock.CreateInstance<IProjectRepository>(),
-        _autoMock.CreateInstance<ILogger<EditProjectValidator>>(),
-        _autoMock.CreateInstance<IRequestClient<IGetDepartmentsRequest>>());
+        _autoMock.CreateInstance<ILogger<EditProjectRequestValidator>>(),
+        _autoMock.CreateInstance<IRequestClient<ICheckDepartmentsExistence>>());
     }
 
     [SetUp]
