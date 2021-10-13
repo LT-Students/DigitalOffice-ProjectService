@@ -22,14 +22,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
             this.accessValidator = accessValidator;
         }
 
-        public void Execute(Guid projectId, IEnumerable<Guid> userIds)
+        public async System.Threading.Tasks.Task Execute(Guid projectId, IEnumerable<Guid> userIds)
         {
             if (userIds == null || userIds.Count() == 0)
             {
                 throw new BadRequestException("Users not specified.");
             }
 
-            if (!(accessValidator.IsAdmin() || accessValidator.HasRights(Rights.AddEditRemoveProjects)))
+            if (!await accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
             {
                 throw new ForbiddenException("Not enough rights.");
             }

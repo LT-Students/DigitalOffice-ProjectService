@@ -5,11 +5,12 @@ using HealthChecks.UI.Client;
 using LT.DigitalOffice.Kernel.Broker.Consumer;
 using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.Helpers;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
 using LT.DigitalOffice.Kernel.Middlewares.Token;
 using LT.DigitalOffice.ProjectService.Broker;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Mappers.Helpers;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
@@ -89,6 +90,7 @@ namespace LT.DigitalOffice.ProjectService
       services.AddHttpContextAccessor();
 
       services.AddBusinessObjects();
+      services.AddTransient<IRedisHelper, RedisHelper>();
 
       string connStr = Environment.GetEnvironmentVariable("ConnectionString");
       if (string.IsNullOrEmpty(connStr))
@@ -182,7 +184,6 @@ namespace LT.DigitalOffice.ProjectService
       using var context = serviceScope.ServiceProvider.GetService<ProjectServiceDbContext>();
 
       context.Database.Migrate();
-      TaskNumberHelper.LoadCache(context);
     }
 
     private string HidePassord(string line)
@@ -240,6 +241,8 @@ namespace LT.DigitalOffice.ProjectService
       x.AddConsumer<GetProjectsUsersConsumer>();
       x.AddConsumer<DisactivateUserConsumer>();
       x.AddConsumer<GetProjectsConsumer>();
+      x.AddConsumer<CheckProjectsExistenceConsumer>();
+      x.AddConsumer<CheckProjectUsersExistenceConsumer>();
     }
 
     private void ConfigureEndpoints(
@@ -270,6 +273,16 @@ namespace LT.DigitalOffice.ProjectService
       cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectsEndpoint, ep =>
       {
         ep.ConfigureConsumer<GetProjectsConsumer>(context);
+      });
+
+      cfg.ReceiveEndpoint(rabbitMqConfig.CheckProjectsExistenceEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<CheckProjectsExistenceConsumer>(context);
+      });
+
+      cfg.ReceiveEndpoint(rabbitMqConfig.CheckProjectUsersExistenceEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<CheckProjectUsersExistenceConsumer>(context);
       });
     }
 

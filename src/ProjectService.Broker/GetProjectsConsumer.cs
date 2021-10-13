@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
     private string CreateKey(IGetProjectsRequest request)
     {
       List<Guid> ids = new();
-      
+
       if (request.ProjectsIds != null && request.ProjectsIds.Any())
       {
         ids.AddRange(request.ProjectsIds);
@@ -63,7 +63,19 @@ namespace LT.DigitalOffice.ProjectService.Broker
         ids.Add(request.DepartmentId.Value);
       }
 
-      return ids.GetRedisCacheHashCode(request.IncludeUsers);
+      List<object> additionalArguments = new() { request.IncludeUsers };
+
+      if (request.SkipCount.HasValue)
+      {
+        additionalArguments.Add(request.SkipCount.Value);
+      }
+
+      if (request.TakeCount.HasValue)
+      {
+        additionalArguments.Add(request.TakeCount.Value);
+      }
+
+      return ids.GetRedisCacheHashCode(additionalArguments);
     }
 
     public GetProjectsConsumer(
@@ -84,7 +96,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
       await context.RespondAsync<IOperationResult<IGetProjectsResponse>>(response);
 
-      await _cache.GetDatabase(Cache.Projects).StringSetAsync(CreateKey(context.Message), 
+      await _cache.GetDatabase(Cache.Projects).StringSetAsync(CreateKey(context.Message),
         JsonConvert.SerializeObject((projects, totalCount)),
         TimeSpan.FromMinutes(_redisConfig.Value.CacheLiveInMinutes));
     }

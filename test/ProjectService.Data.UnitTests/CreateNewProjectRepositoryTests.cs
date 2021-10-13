@@ -81,7 +81,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         {
             var dbProject = _provider.Projects.FirstOrDefault(project => project.Id == _newProject.Id);
             dbProject.Users.ElementAt(0).Project = null;
-            Assert.IsTrue(_repository.IsExist(_newProject.Id));
+            Assert.IsTrue(_repository.DoesExist(_newProject.Id));
             SerializerAssert.AreEqual(_newProject, dbProject);
         }
     }

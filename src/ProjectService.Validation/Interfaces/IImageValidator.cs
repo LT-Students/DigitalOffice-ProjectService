@@ -5,7 +5,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 namespace LT.DigitalOffice.ProjectService.Validation.Interfaces
 {
   [AutoInject]
-  public interface IImageContentValidator : IValidator<ImageContent>
+  public interface IImageValidator : IValidator<ImageContent>
   {
   }
 }

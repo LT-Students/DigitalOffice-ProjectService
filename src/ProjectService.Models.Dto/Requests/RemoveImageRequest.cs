@@ -6,7 +6,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
   public class RemoveImageRequest
   {
-    public Guid EntityId { get; set; }
+    public Guid ProjectId { get; set; }
     public ImageType ImageType { get; set; }
     public List<Guid> ImagesIds { get; set; }
   }

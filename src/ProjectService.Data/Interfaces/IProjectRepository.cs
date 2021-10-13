@@ -29,7 +29,9 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     List<DbProject> Get(IGetProjectsRequest request, out int totalCount);
 
-    bool IsExist(Guid id);
+    bool DoesExist(Guid id);
+
+    List<Guid> DoExist(List<Guid> ids);
 
     bool DoesProjectNameExist(string name);
   }

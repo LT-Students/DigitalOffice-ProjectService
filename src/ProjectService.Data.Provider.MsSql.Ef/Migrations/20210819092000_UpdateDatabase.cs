@@ -76,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         private void AddTasksTable(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: DbTask.TableName,
+                name: "Tasks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -104,7 +104,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         private void AddTaskPropertiesTable(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: DbTaskProperty.TableName,
+                name: "TaskProperties",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -127,17 +127,17 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         private void AddDefaultTypes(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.InsertData(
-                table: DbTaskProperty.TableName,
+                table: "TaskProperties",
                 columns: new[]
                 {
-                    nameof(DbTaskProperty.Id),
-                    nameof(DbTaskProperty.Name),
-                    nameof(DbTaskProperty.ProjectId),
-                    nameof(DbTaskProperty.CreatedBy),
-                    nameof(DbTaskProperty.PropertyType),
-                    nameof(DbTaskProperty.Description),
-                    nameof(DbTaskProperty.CreatedAtUtc),
-                    nameof(DbTaskProperty.IsActive)
+                    "Id",
+                    "Name",
+                    "ProjectId",
+                    "CreatedBy",
+                    "PropertyType",
+                    "Description",
+                    "CreatedAtUtc",
+                    "IsActive"
                 },
                 columnTypes: new[]
                 {
@@ -163,17 +163,17 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: DbTaskProperty.TableName,
+                table: "TasksProperties",
                 columns: new[]
                 {
-                    nameof(DbTaskProperty.Id),
-                    nameof(DbTaskProperty.Name),
-                    nameof(DbTaskProperty.ProjectId),
-                    nameof(DbTaskProperty.CreatedBy),
-                    nameof(DbTaskProperty.PropertyType),
-                    nameof(DbTaskProperty.Description),
-                    nameof(DbTaskProperty.CreatedAtUtc),
-                    nameof(DbTaskProperty.IsActive)
+                    "Id",
+                    "Name",
+                    "ProjectId",
+                    "CreatedBy",
+                    "PropertyType",
+                    "Description",
+                    "CreatedAtUtc",
+                    "IsActive"
                 },
                 columnTypes: new[]
                 {
@@ -199,17 +199,17 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: DbTaskProperty.TableName,
+                table: "TasksProperties",
                 columns: new[]
                 {
-                    nameof(DbTaskProperty.Id),
-                    nameof(DbTaskProperty.Name),
-                    nameof(DbTaskProperty.ProjectId),
-                    nameof(DbTaskProperty.CreatedBy),
-                    nameof(DbTaskProperty.PropertyType),
-                    nameof(DbTaskProperty.Description),
-                    nameof(DbTaskProperty.CreatedAtUtc),
-                    nameof(DbTaskProperty.IsActive)
+                    "Id",
+                    "Name",
+                    "ProjectId",
+                    "CreatedBy",
+                    "PropertyType",
+                    "Description",
+                    "CreatedAtUtc",
+                    "IsActive"
                 },
                 columnTypes: new[]
                 {
@@ -238,17 +238,17 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         private void AddDefaultPriorities(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.InsertData(
-                table: DbTaskProperty.TableName,
+                table: "TasksProperties",
                 columns: new[]
                 {
-                    nameof(DbTaskProperty.Id),
-                    nameof(DbTaskProperty.Name),
-                    nameof(DbTaskProperty.ProjectId),
-                    nameof(DbTaskProperty.CreatedBy),
-                    nameof(DbTaskProperty.PropertyType),
-                    nameof(DbTaskProperty.Description),
-                    nameof(DbTaskProperty.CreatedAtUtc),
-                    nameof(DbTaskProperty.IsActive)
+                    "Id",
+                    "Name",
+                    "ProjectId",
+                    "CreatedBy",
+                    "PropertyType",
+                    "Description",
+                    "CreatedAtUtc",
+                    "IsActive"
                 },
                 columnTypes: new[]
                 {
@@ -274,17 +274,17 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: DbTaskProperty.TableName,
+                table: "TasksProperties",
                 columns: new[]
                 {
-                    nameof(DbTaskProperty.Id),
-                    nameof(DbTaskProperty.Name),
-                    nameof(DbTaskProperty.ProjectId),
-                    nameof(DbTaskProperty.CreatedBy),
-                    nameof(DbTaskProperty.PropertyType),
-                    nameof(DbTaskProperty.Description),
-                    nameof(DbTaskProperty.CreatedAtUtc),
-                    nameof(DbTaskProperty.IsActive)
+                    "Id",
+                    "Name",
+                    "ProjectId",
+                    "CreatedBy",
+                    "PropertyType",
+                    "Description",
+                    "CreatedAtUtc",
+                    "IsActive"
                 },
                 columnTypes: new[]
                 {
@@ -310,17 +310,17 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: DbTaskProperty.TableName,
+                table: "TasksProperties",
                 columns: new[]
                 {
-                    nameof(DbTaskProperty.Id),
-                    nameof(DbTaskProperty.Name),
-                    nameof(DbTaskProperty.ProjectId),
-                    nameof(DbTaskProperty.CreatedBy),
-                    nameof(DbTaskProperty.PropertyType),
-                    nameof(DbTaskProperty.Description),
-                    nameof(DbTaskProperty.CreatedAtUtc),
-                    nameof(DbTaskProperty.IsActive)
+                    "Id",
+                    "Name",
+                    "ProjectId",
+                    "CreatedBy",
+                    "PropertyType",
+                    "Description",
+                    "CreatedAtUtc",
+                    "IsActive"
                 },
                 columnTypes: new[]
                 {
@@ -349,17 +349,17 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         private void AddDefaultStatuses(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.InsertData(
-            table: DbTaskProperty.TableName,
+            table: "TasksProperties",
                 columns: new[]
                 {
-                    nameof(DbTaskProperty.Id),
-                    nameof(DbTaskProperty.Name),
-                    nameof(DbTaskProperty.ProjectId),
-                    nameof(DbTaskProperty.CreatedBy),
-                    nameof(DbTaskProperty.PropertyType),
-                    nameof(DbTaskProperty.Description),
-                    nameof(DbTaskProperty.CreatedAtUtc),
-                    nameof(DbTaskProperty.IsActive)
+                    "Id",
+                    "Name",
+                    "ProjectId",
+                    "CreatedBy",
+                    "PropertyType",
+                    "Description",
+                    "CreatedAtUtc",
+                    "IsActive"
                 },
                 columnTypes: new[]
                 {
@@ -385,17 +385,17 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 });
 
             migrationBuilder.InsertData(
-            table: DbTaskProperty.TableName,
+            table: "TasksProperties",
                 columns: new[]
                 {
-                    nameof(DbTaskProperty.Id),
-                    nameof(DbTaskProperty.Name),
-                    nameof(DbTaskProperty.ProjectId),
-                    nameof(DbTaskProperty.CreatedBy),
-                    nameof(DbTaskProperty.PropertyType),
-                    nameof(DbTaskProperty.Description),
-                    nameof(DbTaskProperty.CreatedAtUtc),
-                    nameof(DbTaskProperty.IsActive)
+                    "Id",
+                    "Name",
+                    "ProjectId",
+                    "CreatedBy",
+                    "PropertyType",
+                    "Description",
+                    "CreatedAtUtc",
+                    "IsActive"
                 },
                 columnTypes: new[]
                 {
@@ -421,17 +421,17 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
                 });
 
             migrationBuilder.InsertData(
-            table: DbTaskProperty.TableName,
+            table: "TasksProperties",
                 columns: new[]
                 {
-                    nameof(DbTaskProperty.Id),
-                    nameof(DbTaskProperty.Name),
-                    nameof(DbTaskProperty.ProjectId),
-                    nameof(DbTaskProperty.CreatedBy),
-                    nameof(DbTaskProperty.PropertyType),
-                    nameof(DbTaskProperty.Description),
-                    nameof(DbTaskProperty.CreatedAtUtc),
-                    nameof(DbTaskProperty.IsActive)
+                    "Id",
+                    "Name",
+                    "ProjectId",
+                    "CreatedBy",
+                    "PropertyType",
+                    "Description",
+                    "CreatedAtUtc",
+                    "IsActive"
                 },
                 columnTypes: new[]
                 {
@@ -481,8 +481,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
             migrationBuilder.DropTable(DbProject.TableName);
             migrationBuilder.DropTable(DbProjectFile.TableName);
             migrationBuilder.DropTable(DbProjectUser.TableName);
-            migrationBuilder.DropTable(DbTask.TableName);
-            migrationBuilder.DropTable(DbTaskProperty.TableName);
+            migrationBuilder.DropTable("Tasks");
+            migrationBuilder.DropTable("TasksProperties");
         }
     }
 }

@@ -8,7 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
   public class CreateImageValidator : AbstractValidator<CreateImageRequest>, ICreateImageValidator
   {
     public CreateImageValidator(
-      IImageContentValidator imageContentValidator)
+      IImageValidator imageValidator)
     {
       List<string> errors = new();
 
@@ -16,11 +16,12 @@ namespace LT.DigitalOffice.ProjectService.Validation
         .NotNull().WithMessage("List must not be null.")
         .NotEmpty().WithMessage("List must not be empty.");
 
-      RuleFor(images => images.EntityId)
+      RuleFor(images => images.ProjectId)
         .NotEmpty().WithMessage("Image's Id must not be empty.");
 
       RuleForEach(images => images.Images)
-        .SetValidator(imageContentValidator);
+        .SetValidator(imageValidator)
+        .WithMessage("Incorrect image.");
     }
   }
 }

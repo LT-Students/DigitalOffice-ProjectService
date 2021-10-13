@@ -4,6 +4,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
 {
@@ -20,6 +21,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
         /// <param name="projectId">Project id to update the project.</param>
         /// <param name="request">Data to update the project.</param>
         /// <returns></returns>
-        OperationResultResponse<bool> Execute(Guid projectId, JsonPatchDocument<EditProjectRequest> request);
+        Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, JsonPatchDocument<EditProjectRequest> request);
     }
 }

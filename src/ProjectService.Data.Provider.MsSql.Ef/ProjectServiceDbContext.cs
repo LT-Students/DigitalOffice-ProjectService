@@ -1,6 +1,7 @@
 ﻿using LT.DigitalOffice.ProjectService.Models.Db;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
 {
@@ -9,8 +10,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
     /// </summary>
     public class ProjectServiceDbContext : DbContext, IDataProvider
     {
-        public DbSet<DbTask> Tasks { get; set; }
-        public DbSet<DbTaskProperty> TaskProperties { get; set; }
         public DbSet<DbProject> Projects { get; set; }
         public DbSet<DbProjectFile> ProjectsFiles { get; set; }
         public DbSet<DbProjectUser> ProjectsUsers { get; set; }
@@ -48,5 +47,10 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
         {
             return Database.IsInMemory();
         }
+
+    public async Task SaveAsync()
+    {
+      await SaveChangesAsync();
     }
+  }
 }

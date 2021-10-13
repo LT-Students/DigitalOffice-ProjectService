@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
@@ -42,13 +43,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _userRepository = userRepository;
     }
 
-    public OperationResultResponse<bool> Execute(Guid projectId, JsonPatchDocument<EditProjectRequest> request)
+    public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, JsonPatchDocument<EditProjectRequest> request)
     {
       OperationResultResponse<bool> response = new();
 
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
-      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects)
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
         && !_userRepository.AreUserProjectExist(userId, projectId, true))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;

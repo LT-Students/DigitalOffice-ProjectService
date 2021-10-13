@@ -149,7 +149,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       return _provider.Projects.Where(p => p.Name.Contains(text) || p.ShortName.Contains(text)).ToList();
     }
 
-    public bool IsExist(Guid id)
+    public bool DoesExist(Guid id)
     {
       return _provider.Projects.FirstOrDefault(x => x.Id == id) != null;
     }
@@ -213,6 +213,11 @@ namespace LT.DigitalOffice.ProjectService.Data
       }
 
       return projects.ToList();
+    }
+
+    public List<Guid> DoExist(List<Guid> ids)
+    {
+      return _provider.Projects.Where(p => ids.Contains(p.Id)).Select(p => p.Id).ToList();
     }
   }
 }

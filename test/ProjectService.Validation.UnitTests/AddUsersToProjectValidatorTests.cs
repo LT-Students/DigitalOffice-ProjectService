@@ -169,7 +169,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         {
             DbProject project = new DbProject {Id = _projectId};
 
-            _projectRepository.Setup(p => p.IsExist(_projectId)).Returns(true);
+            _projectRepository.Setup(p => p.DoesExist(_projectId)).Returns(true);
 
             validator.TestValidate(_request).ShouldNotHaveAnyValidationErrors();
         }

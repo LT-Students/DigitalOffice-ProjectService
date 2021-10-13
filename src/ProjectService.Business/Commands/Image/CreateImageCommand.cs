@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
@@ -13,10 +14,9 @@ using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Responses.Image;
-using LT.DigitalOffice.ProjectService.Business.Commands.Task.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Interfaces;
@@ -24,7 +24,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
+namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 {
   public class CreateImageCommand : ICreateImageCommand
   {
@@ -36,19 +36,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
     private readonly IDbImageMapper _dbProjectImageMapper;
     private readonly ICreateImageValidator _validator;
     private readonly IUserRepository _userRepository;
-    private readonly ITaskRepository _taskRepository;
 
     private List<Guid> CreateImages(List<ImageContent> context, Guid userId, Guid enityId, List<string> errors)
     {
-      List<CreateImageData> images = context
+      var images = context
         .Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId))
         .ToList();
 
-      string logMessage = $"Errors while creating images for project id {enityId}.";
+      var logMessage = $"Errors while creating images for project id {enityId}.";
 
       try
       {
-        IOperationResult<ICreateImagesResponse> response = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
+        var response = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
           ICreateImagesRequest.CreateObj(images, ImageSource.Project)).Result.Message;
 
         if (response.IsSuccess && response.Body.ImagesIds != null)
@@ -78,8 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       IHttpContextAccessor httpContextAccessor,
       IDbImageMapper dbProjectImageMapper,
       ICreateImageValidator validator,
-      IUserRepository userRepository,
-      ITaskRepository taskRepository)
+      IUserRepository userRepository)
     {
       _repository = repository;
       _rcImages = rcImages;
@@ -89,21 +87,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
       _dbProjectImageMapper = dbProjectImageMapper;
       _validator = validator;
       _userRepository = userRepository;
-      _taskRepository = taskRepository;
     }
 
-    public OperationResultResponse<List<Guid>> Execute(CreateImageRequest request)
+    public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateImageRequest request)
     {
-      DbTask task = null;
-      if (request.ImageType == ImageType.Task)
-      {
-        task = _taskRepository.Get(request.EntityId, false);
-      }
-
-      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
-      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects)
-        && !(request.ImageType == ImageType.Task && _userRepository.AreUserProjectExist(task.ProjectId, userId))
-        && !(request.ImageType == ImageType.Project && _userRepository.AreUserProjectExist(request.EntityId, userId, true)))
+      var userId = _httpContextAccessor.HttpContext.GetUserId();
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
+        && !(request.ImageType == ImageType.Project && _userRepository.AreUserProjectExist(request.ProjectId, userId, true)))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
@@ -114,7 +104,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
         };
       }
 
-      if (!_validator.ValidateCustom(request, out List<string> errors))
+      if (!_validator.ValidateCustom(request, out var errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
@@ -127,10 +117,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Task
 
       OperationResultResponse<List<Guid>> response = new();
 
-      List<Guid> imagesIds = CreateImages(
+      var imagesIds = CreateImages(
         request.Images,
         userId,
-        request.EntityId,
+        request.ProjectId,
         response.Errors);
 
       if (response.Errors.Any())

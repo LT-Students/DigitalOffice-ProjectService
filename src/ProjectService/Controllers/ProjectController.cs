@@ -40,12 +40,12 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     }
 
     [HttpPatch("edit")]
-    public OperationResultResponse<bool> Edit(
+    public async Task<OperationResultResponse<bool>> Edit(
       [FromServices] IEditProjectCommand command,
       [FromQuery] Guid projectId,
       [FromBody] JsonPatchDocument<EditProjectRequest> request)
     {
-      return command.Execute(projectId, request);
+      return await command.ExecuteAsync(projectId, request);
     }
   }
 }

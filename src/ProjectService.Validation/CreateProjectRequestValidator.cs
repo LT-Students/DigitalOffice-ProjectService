@@ -24,7 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
       ILogger<CreateProjectRequestValidator> logger,
       IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence,
       IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
-      IImageContentValidator imageContentValidator)
+      IImageValidator imageValidator)
     {
       _logger = logger;
       _rcCheckDepartmentsExistence = rcCheckDepartmentsExistence;
@@ -87,7 +87,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
       When(project => project.ProjectImages != null && project.ProjectImages.Any(), () =>
       {
         RuleForEach(project => project.ProjectImages)
-          .SetValidator(imageContentValidator);
+          .SetValidator(imageValidator);
       });
     }
 

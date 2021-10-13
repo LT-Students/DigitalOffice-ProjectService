@@ -165,7 +165,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
     public async Task<OperationResultResponse<Guid?>> Execute(CreateProjectRequest request)
     {
-      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects))
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 

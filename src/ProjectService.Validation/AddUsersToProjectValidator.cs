@@ -20,13 +20,13 @@ namespace LT.DigitalOffice.ProjectService.Validation
         )
         {
             CascadeMode = CascadeMode.Stop;
-            
+
             _userRepository = userRepository;
 
             RuleFor(projectUser => projectUser.ProjectId)
                 .NotEmpty()
                 .WithMessage("Request must have a project Id")
-                .Must(projectRepository.IsExist)
+                .Must(projectRepository.DoesExist)
                 .WithMessage("This project id does not exist")
                 .DependentRules(() =>
                 {
@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
                     RuleForEach(projectUser => projectUser.Users)
                         .SetValidator(new ProjectUserValidator());
                 });
-            
+
             RuleFor(pu => pu)
                 .NotEmpty()
                 .Must(pu => !AreUsersInProject(pu.Users, pu.ProjectId, out _existingUsers))

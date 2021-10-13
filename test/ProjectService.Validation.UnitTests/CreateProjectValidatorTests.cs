@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
       _autoMock.CreateInstance<ILogger<CreateProjectRequestValidator>>(),
       _autoMock.CreateInstance<IRequestClient<ICheckDepartmentsExistence>>(),
       _autoMock.CreateInstance<IRequestClient<ICheckUsersExistence>>(),
-      _autoMock.CreateInstance<IImageContentValidator>());
+      _autoMock.CreateInstance<IImageValidator>());
 
       _newProject = new CreateProjectRequest
       {
