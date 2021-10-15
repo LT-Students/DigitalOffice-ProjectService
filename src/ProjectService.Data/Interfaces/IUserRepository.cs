@@ -15,8 +15,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
   [AutoInject]
   public interface IUserRepository
   {
-    Task<List<DbProjectUser>> GetAsync(Guid projectId, bool showNotActiveUsers);
-
     Task<(List<DbProjectUser>, int totalCount)> GetAsync(IGetProjectsUsersRequest request);
 
     Task<List<Guid>> GetExistAsync(Guid projectId, IEnumerable<Guid> userIds);

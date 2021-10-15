@@ -175,11 +175,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       return (await dbProjects.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(), totalCount);
     }
 
-    public async Task<List<DbProject>> FindAsync(List<Guid> projectIds)
-    {
-      return await _provider.Projects.Where(p => projectIds.Contains(p.Id)).ToListAsync();
-    }
-
     public async Task<List<DbProject>> SearchAsync(string text)
     {
       if (string.IsNullOrEmpty(text))

@@ -18,8 +18,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request);
 
-    Task<List<DbProject>> FindAsync(List<Guid> projectIds);
-
     Task<(List<DbProject>, int totalCount)> FindAsync(FindProjectsFilter filter);
 
     Task<Guid?> CreateAsync(DbProject dbProject);

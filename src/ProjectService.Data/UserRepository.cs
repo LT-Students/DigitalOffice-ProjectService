@@ -124,11 +124,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       return true;
     }
 
-    public async Task<List<DbProjectUser>> FindAsync(Guid userId)
-    {
-      return await _provider.ProjectsUsers.Where(pu => pu.UserId == userId && pu.IsActive).ToListAsync();
-    }
-
     public async Task<List<DbProjectUser>> FindAsync(FindDbProjectsUserFilter filter)
     {
       if (filter == null)
