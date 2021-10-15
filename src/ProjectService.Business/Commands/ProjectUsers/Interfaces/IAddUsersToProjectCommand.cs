@@ -1,4 +1,6 @@
-﻿using LT.DigitalOffice.Kernel.Attributes;
+﻿using System.Threading.Tasks;
+using LT.DigitalOffice.Kernel.Attributes;
+using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces
@@ -14,6 +16,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfa
     /// Added new users id to specific project.
     /// </summary>
     /// <param name="request">List of users for a specific project.</param>
-    System.Threading.Tasks.Task Execute(AddUsersToProjectRequest request);
+    Task<OperationResultResponse<bool>> ExecuteAsync(AddUsersToProjectRequest request);
   }
 }

@@ -7,11 +7,12 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace LT.DigitalOffice.ProjectService.Validation
+namespace LT.DigitalOffice.ProjectService.Validation.Project
 {
   public class CreateProjectRequestValidator : AbstractValidator<CreateProjectRequest>, ICreateProjectRequestValidator
   {
@@ -34,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         .Cascade(CascadeMode.Stop)
         .NotEmpty().WithMessage("Project name must not be empty.")
         .MaximumLength(150).WithMessage("Project name is too long.")
-        .Must(name => !projectRepository.DoesProjectNameExist(name))
+        .MustAsync(async (name, _) => !await projectRepository.DoesProjectNameExistAsync(name))
         .WithMessage(project => $"Project with name '{project.Name}' already exists.");
 
       RuleFor(project => project.Status)
@@ -98,7 +99,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         return true;
       }
 
-      string logMessage = "Department with id: {id} not found.";
+      var logMessage = "Department with id: {id} not found.";
 
       try
       {
@@ -129,7 +130,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         return true;
       }
 
-      string logMessage = "Cannot check existing users withs this ids {userIds}";
+      var logMessage = "Cannot check existing users withs this ids {userIds}";
 
       try
       {

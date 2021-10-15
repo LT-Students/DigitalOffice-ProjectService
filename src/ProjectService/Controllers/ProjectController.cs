@@ -28,7 +28,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
       [FromServices] IGetProjectCommand command,
       [FromQuery] GetProjectFilter filter)
     {
-      return await command.Execute(filter);
+      return await command.ExecuteAsync(filter);
     }
 
     [HttpPost("create")]

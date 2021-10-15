@@ -9,6 +9,7 @@ using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.Models.Broker.Responses.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using MassTransit;
@@ -24,24 +25,25 @@ namespace LT.DigitalOffice.ProjectService.Broker
     private readonly IConnectionMultiplexer _cache;
     private readonly IOptions<RedisConfig> _redisConfig;
 
-    private (List<ProjectData> projects, int totalCount) GetProjects(IGetProjectsRequest request)
+    private async Task<(List<ProjectData> projects, int totalCount)> GetProjectsAsync(IGetProjectsRequest request)
     {
-      return (_projectRepository.Get(request, out int totalCount)
-        .Select(
-          p => new ProjectData(
-            p.Id,
-            p.DepartmentId,
-            p.Name,
-            ((ProjectStatusType)p.Status).ToString(),
-            p.ShortName,
-            p.ShortDescription,
-            p.Users?.Select(
-              u => new ProjectUserData(
-                u.UserId,
-                u.ProjectId,
-                u.CreatedAtUtc))
-              .ToList()))
-            .ToList(), totalCount);
+      (List<DbProject> projects, int totalCount) = (await _projectRepository.GetAsync(request));
+
+      return (projects.Select(
+        p => new ProjectData(
+          p.Id,
+          p.DepartmentId,
+          p.Name,
+          ((ProjectStatusType)p.Status).ToString(),
+          p.ShortName,
+          p.ShortDescription,
+          p.Users?.Select(
+            u => new ProjectUserData(
+              u.UserId,
+              u.ProjectId,
+              u.CreatedAtUtc))
+            .ToList()))
+          .ToList(), totalCount);
     }
 
     private string CreateKey(IGetProjectsRequest request)
@@ -90,7 +92,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
     public async Task Consume(ConsumeContext<IGetProjectsRequest> context)
     {
-      (List<ProjectData> projects, int totalCount) = GetProjects(context.Message);
+      (List<ProjectData> projects, int totalCount) = await GetProjectsAsync(context.Message);
 
       object response = OperationResultWrapper.CreateResponse((_) => IGetProjectsResponse.CreateObj(projects, totalCount), context.Message);
 

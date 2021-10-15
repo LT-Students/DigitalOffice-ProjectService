@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
-using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+using LT.DigitalOffice.Kernel.Enums;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -27,37 +29,42 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IAddUsersToProjectValidator _validator;
     private readonly ILogger<AddUsersToProjectCommand> _logger;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
+    private readonly IResponseCreater _responseCreater;
 
-    private void CreateWorkTime(Guid projectId, List<Guid> userIds, List<string> errors)
+    private async Task CreateWorkTimeAsync(Guid projectId, List<Guid> userIds, List<string> errors)
     {
       string errorMessage = $"Failed to create a work time for project {projectId} with users: {string.Join(", ", userIds)}.";
       const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
 
       try
       {
-        var response = _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
-            ICreateWorkTimeRequest.CreateObj(projectId, userIds)).Result;
+        Response<IOperationResult<bool>> response =
+          await _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
+            ICreateWorkTimeRequest.CreateObj(projectId, userIds));
 
-        if (!(response.Message.IsSuccess && response.Message.Body))
+        if (response.Message.IsSuccess && response.Message.Body)
         {
-          _logger.LogWarning(logMessage, projectId, string.Join(", ", userIds));
-          errors.Add(errorMessage);
+          return;
         }
+
+        _logger.LogWarning(logMessage, projectId, string.Join(", ", userIds));
       }
       catch (Exception exc)
       {
         _logger.LogError(exc, logMessage, projectId, string.Join(", ", userIds));
-
-        errors.Add(errorMessage);
       }
+
+      errors.Add(errorMessage);
     }
+
     public AddUsersToProjectCommand(
-        IUserRepository repository,
-        IDbProjectUserMapper mapper,
-        IAccessValidator accessValidator,
-        IAddUsersToProjectValidator validator,
-        ILogger<AddUsersToProjectCommand> logger,
-        IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime)
+      IUserRepository repository,
+      IDbProjectUserMapper mapper,
+      IAccessValidator accessValidator,
+      IAddUsersToProjectValidator validator,
+      ILogger<AddUsersToProjectCommand> logger,
+      IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
+      IResponseCreater responseCreater)
     {
       _mapper = mapper;
       _validator = validator;
@@ -65,36 +72,53 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _accessValidator = accessValidator;
       _logger = logger;
       _rcCreateWorkTime = rcCreateWorkTime;
+      _responseCreater = responseCreater;
     }
 
-    //Todo rework this
-    public async System.Threading.Tasks.Task Execute(AddUsersToProjectRequest request)
+    public async Task<OperationResultResponse<bool>> ExecuteAsync(AddUsersToProjectRequest request)
     {
       List<string> errors = new();
 
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
       {
-        throw new ForbiddenException("Not enough rights");
+        return _responseCreater.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
-      _validator.ValidateAndThrowCustom(request);
+      ValidationResult validationResult = await _validator.ValidateAsync(request);
 
-      List<DbProjectUser> dbProjectUsers = request.Users.Select(user =>
-          GetDbProjectUsers(user, request.ProjectId)
-      ).ToList();
+      errors.AddRange(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
 
-      _repository.AddUsersToProject(dbProjectUsers, request.ProjectId);
+      if (!validationResult.IsValid)
+      {
+        return _responseCreater.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
+      }
 
-      CreateWorkTime(request.ProjectId, request.Users.Select(u => u.UserId).ToList(), errors);
-    }
+      List<Guid> existUsers = await _repository.GetExistAsync(request.ProjectId, request.Users.Select(u => u.UserId).ToList());
 
-    private DbProjectUser GetDbProjectUsers(ProjectUserRequest projectUser, Guid projectId)
-    {
-      DbProjectUser dbProjectUser = _mapper.Map(projectUser, projectId);
+      request.Users = request.Users.GroupBy(u => u.UserId).Select(g => g.First()).Where(u => !existUsers.Contains(u.UserId)).ToList();
 
-      dbProjectUser.ProjectId = projectId;
+      if (!request.Users.Any())
+      {
+        errors.Add("Request doesn't contains users who still are not emloyees of this project.");
 
-      return dbProjectUser;
+        return _responseCreater.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
+      }
+
+      bool result = await _repository.CreateAsync(_mapper.Map(request));
+
+      await CreateWorkTimeAsync(request.ProjectId, request.Users.Select(u => u.UserId).ToList(), errors);
+
+      if (existUsers.Any())
+      {
+        errors.Add("Exist user were not added again.");
+      }
+
+      return new()
+      {
+        Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
+        Body = result,
+        Errors = errors
+      };
     }
   }
 }

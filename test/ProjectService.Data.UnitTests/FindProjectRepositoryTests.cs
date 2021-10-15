@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
@@ -141,7 +142,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }*/
 
         [Test]
-        public void ShouldSearchProject()
+        public async Task ShouldSearchProject()
         {
             List<DbProject> projects = new()
             {
@@ -149,7 +150,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 _dbProject4
             };
 
-            SerializerAssert.AreEqual(projects, _repository.Search("Regular"));
+            SerializerAssert.AreEqual(projects, await _repository.SearchAsync("Regular"));
         }
 
 /*        [Test]

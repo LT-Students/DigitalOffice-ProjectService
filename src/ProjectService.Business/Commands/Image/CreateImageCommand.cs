@@ -19,7 +19,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -93,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     {
       var userId = _httpContextAccessor.HttpContext.GetUserId();
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(request.ImageType == ImageType.Project && _userRepository.AreUserProjectExist(request.ProjectId, userId, true)))
+        && !(request.ImageType == ImageType.Project && await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
@@ -131,7 +131,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         return response;
       }
 
-      response.Body = _repository.Create(imagesIds.Select(imageId =>
+      response.Body = await _repository.CreateAsync(imagesIds.Select(imageId =>
         _dbProjectImageMapper.Map(request, imageId))
         .ToList());
 

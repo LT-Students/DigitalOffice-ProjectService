@@ -1,5 +1,4 @@
-﻿using System;
-using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
+﻿using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 
@@ -11,7 +10,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
     {
       if (dbProjectFile == null)
       {
-        throw new ArgumentNullException(nameof(dbProjectFile));
+        return null;
       }
 
       return new ProjectFileInfo

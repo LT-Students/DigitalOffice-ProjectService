@@ -9,12 +9,12 @@ using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.Extensions.Logging;
 
-namespace LT.DigitalOffice.ProjectService.Validation
+namespace LT.DigitalOffice.ProjectService.Validation.Project
 {
   public class EditProjectRequestValidator : BaseEditRequestValidator<EditProjectRequest>, IEditProjectRequestValidator
   {
@@ -69,7 +69,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
           { x => x.value == null ||
-            (Guid.TryParse(x.value.ToString(), out Guid departmentId) && CheckValidityDepartmentId(departmentId)),
+            Guid.TryParse(x.value.ToString(), out var departmentId) && CheckValidityDepartmentId(departmentId),
             "Incorrect department id value." },
         });
 
@@ -80,11 +80,18 @@ namespace LT.DigitalOffice.ProjectService.Validation
       AddFailureForPropertyIf(
         nameof(EditProjectRequest.Name),
         x => x == OperationType.Replace,
-        new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
+        new()
         {
           { x => !string.IsNullOrEmpty(x.value?.ToString().Trim()), "Name must not be empty." },
           { x => x.value.ToString().Trim().Length < 150, "Name is too long." },
-          { x => !_projectRepository.DoesProjectNameExist(x.value.ToString().Trim()), "The project name already exist." }
+        }, CascadeMode.Stop);
+
+      AddFailureForPropertyIfAsync(
+        nameof(EditProjectRequest.Name),
+        x => x == OperationType.Replace,
+        new()
+        {
+          { async x => !await _projectRepository.DoesProjectNameExistAsync(x.value?.ToString()?.Trim()), "The project name already exist." }
         }, CascadeMode.Stop);
 
       #endregion
@@ -136,7 +143,7 @@ namespace LT.DigitalOffice.ProjectService.Validation
 
       try
       {
-        Response<IOperationResult<ICheckDepartmentsExistence>> response =
+        var response =
           _rcDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
             ICheckDepartmentsExistence.CreateObj(new() { departmentId })).Result;
 

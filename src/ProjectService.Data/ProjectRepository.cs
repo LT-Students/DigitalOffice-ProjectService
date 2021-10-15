@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -19,152 +19,40 @@ namespace LT.DigitalOffice.ProjectService.Data
     private readonly IDataProvider _provider;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ProjectRepository(
-      IDataProvider provider,
-      IHttpContextAccessor httpContextAccessor)
-    {
-      _provider = provider;
-      _httpContextAccessor = httpContextAccessor;
-    }
+    #region private
 
-    public DbProject Get(GetProjectFilter filter)
+    private IQueryable<DbProject> CreateGetPredicate(
+      GetProjectFilter filter)
     {
-      IQueryable<DbProject> dbProjectQueryable = _provider.Projects.AsQueryable();
+      IQueryable<DbProject> projects = _provider.Projects.AsQueryable();
 
       if (filter.IncludeUsers.HasValue && filter.IncludeUsers.Value)
       {
         if (filter.ShowNotActiveUsers.HasValue && filter.ShowNotActiveUsers.Value)
         {
-          dbProjectQueryable = dbProjectQueryable.Include(x => x.Users);
+          projects = projects.Include(x => x.Users);
         }
         else
         {
-          dbProjectQueryable = dbProjectQueryable.Include(x => x.Users.Where(x => x.IsActive));
+          projects = projects.Include(x => x.Users.Where(x => x.IsActive));
         }
       }
 
       if (filter.IncludeFiles.HasValue && filter.IncludeFiles.Value)
       {
-        dbProjectQueryable = dbProjectQueryable.Include(x => x.Files);
+        projects = projects.Include(x => x.Files);
       }
 
       if (filter.IncludeImages.HasValue && filter.IncludeImages.Value)
       {
-        dbProjectQueryable = dbProjectQueryable.Include(x => x.Images);
+        projects = projects.Include(x => x.Images);
       }
 
-      DbProject dbProject = dbProjectQueryable.FirstOrDefault(x => x.Id == filter.ProjectId);
-
-      if (dbProject == null)
-      {
-        return null;
-      }
-
-      return dbProject;
+      return projects;
     }
 
-    public IEnumerable<DbProject> Get(Guid departmentId)
-    {
-      return _provider.Projects.Where(p => p.DepartmentId == departmentId);
-    }
-
-    public Guid? Create(DbProject dbProject)
-    {
-      if (dbProject == null)
-      {
-        return null;
-      }
-
-      _provider.Projects.Add(dbProject);
-      _provider.Save();
-
-      return dbProject.Id;
-    }
-
-    public bool Edit(Guid projectId, JsonPatchDocument<DbProject> request)
-    {
-      DbProject dbProject = Get(new GetProjectFilter { ProjectId = projectId });
-      request.ApplyTo(dbProject);
-      dbProject.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
-      dbProject.ModifiedAtUtc = DateTime.UtcNow;
-      _provider.Save();
-
-      return true;
-    }
-
-    public void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds)
-    {
-      DbProject dbProject = _provider.Projects
-        .FirstOrDefault(p => p.Id == projectId);
-
-      if (dbProject == null)
-      {
-        throw new NotFoundException($"Project with Id {projectId} does not exist.");
-      }
-
-      foreach (Guid userId in userIds)
-      {
-        DbProjectUser dbProjectUser = dbProject.Users?.FirstOrDefault(w => w.UserId == userId);
-
-        if (dbProjectUser == null)
-        {
-          throw new NotFoundException($"Worker with Id {userId} does not exist.");
-        }
-
-        dbProjectUser.IsActive = false;
-      }
-
-      _provider.Projects.Update(dbProject);
-      _provider.Save();
-    }
-
-    public List<DbProject> Find(FindProjectsFilter filter, out int totalCount)
-    {
-      if (filter == null)
-      {
-        totalCount = 0;
-        return null;
-      }
-
-      IQueryable<DbProject> dbProjects = _provider.Projects
-        .AsQueryable();
-
-      if (filter.DepartmentId.HasValue)
-      {
-        dbProjects = dbProjects.Where(p => p.DepartmentId == filter.DepartmentId.Value);
-      }
-
-      totalCount = dbProjects.Count();
-
-      return dbProjects.Skip(filter.SkipCount).Take(filter.TakeCount).ToList();
-    }
-
-    public List<DbProject> Search(string text)
-    {
-      if (string.IsNullOrEmpty(text))
-      {
-        return null;
-      }
-
-      return _provider.Projects.Where(p => p.Name.Contains(text) || p.ShortName.Contains(text)).ToList();
-    }
-
-    public bool DoesExist(Guid id)
-    {
-      return _provider.Projects.FirstOrDefault(x => x.Id == id) != null;
-    }
-
-    public bool DoesProjectNameExist(string name)
-    {
-      return _provider.Projects.Any(p => p.Name.Contains(name));
-    }
-
-    public List<DbProject> Find(List<Guid> projectIds)
-    {
-      return _provider.Projects.Where(p => projectIds.Contains(p.Id)).ToList();
-    }
-
-    public List<DbProject> Get(IGetProjectsRequest request, out int totalCount)
+    private IQueryable<DbProject> CreateGetPredicate(
+      IGetProjectsRequest request)
     {
       IQueryable<DbProject> projects = _provider.Projects.AsQueryable();
 
@@ -195,7 +83,34 @@ namespace LT.DigitalOffice.ProjectService.Data
         projects = projects.Where(p => p.DepartmentId == request.DepartmentId.Value);
       }
 
-      totalCount = projects.Count();
+      return projects;
+    }
+
+    #endregion
+
+    public ProjectRepository(
+      IDataProvider provider,
+      IHttpContextAccessor httpContextAccessor)
+    {
+      _provider = provider;
+      _httpContextAccessor = httpContextAccessor;
+    }
+
+    public async Task<DbProject> GetAsync(GetProjectFilter filter)
+    {
+      return await CreateGetPredicate(filter).FirstOrDefaultAsync();
+    }
+
+    public async Task<List<DbProject>> GetAsync(Guid departmentId)
+    {
+      return await _provider.Projects.Where(p => p.DepartmentId == departmentId).ToListAsync();
+    }
+
+    public async Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request)
+    {
+      IQueryable<DbProject> projects = CreateGetPredicate(request);
+
+      int totalCount = await projects.CountAsync();
 
       if (request.SkipCount.HasValue)
       {
@@ -212,12 +127,82 @@ namespace LT.DigitalOffice.ProjectService.Data
         projects = projects.Include(p => p.Users);
       }
 
-      return projects.ToList();
+      return (await projects.ToListAsync(), totalCount);
     }
 
-    public List<Guid> DoExist(List<Guid> ids)
+    public async Task<Guid?> CreateAsync(DbProject dbProject)
     {
-      return _provider.Projects.Where(p => ids.Contains(p.Id)).Select(p => p.Id).ToList();
+      if (dbProject == null)
+      {
+        return null;
+      }
+
+      _provider.Projects.Add(dbProject);
+      await _provider.SaveAsync();
+
+      return dbProject.Id;
+    }
+
+    public async Task<bool> EditAsync(Guid projectId, JsonPatchDocument<DbProject> request)
+    {
+      DbProject dbProject = await _provider.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
+      request.ApplyTo(dbProject);
+      dbProject.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
+      dbProject.ModifiedAtUtc = DateTime.UtcNow;
+
+      await _provider.SaveAsync();
+
+      return true;
+    }
+
+    public async Task<(List<DbProject>, int totalCount)> FindAsync(FindProjectsFilter filter)
+    {
+      if (filter == null)
+      {
+        return (null, 0);
+      }
+
+      IQueryable<DbProject> dbProjects = _provider.Projects
+        .AsQueryable();
+
+      if (filter.DepartmentId.HasValue)
+      {
+        dbProjects = dbProjects.Where(p => p.DepartmentId == filter.DepartmentId.Value);
+      }
+
+      int totalCount = await dbProjects.CountAsync();
+
+      return (await dbProjects.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(), totalCount);
+    }
+
+    public async Task<List<DbProject>> FindAsync(List<Guid> projectIds)
+    {
+      return await _provider.Projects.Where(p => projectIds.Contains(p.Id)).ToListAsync();
+    }
+
+    public async Task<List<DbProject>> SearchAsync(string text)
+    {
+      if (string.IsNullOrEmpty(text))
+      {
+        return null;
+      }
+
+      return await _provider.Projects.Where(p => p.Name.Contains(text) || p.ShortName.Contains(text)).ToListAsync();
+    }
+
+    public async Task<bool> DoesExistAsync(Guid projectId)
+    {
+      return await _provider.Projects.AnyAsync(x => x.Id == projectId);
+    }
+
+    public async Task<bool> DoesProjectNameExistAsync(string name)
+    {
+      return await _provider.Projects.AnyAsync(p => p.Name.Contains(name));
+    }
+
+    public async Task<List<Guid>> DoExistAsync(List<Guid> projectsIds)
+    {
+      return await _provider.Projects.Where(p => projectsIds.Contains(p.Id)).Select(p => p.Id).ToListAsync();
     }
   }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
@@ -27,7 +26,6 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using MassTransit;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StackExchange.Redis;
@@ -323,11 +321,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _cache = cache;
     }
 
-    public async Task<OperationResultResponse<ProjectResponse>> Execute(GetProjectFilter filter)
+    public async Task<OperationResultResponse<ProjectResponse>> ExecuteAsync(GetProjectFilter filter)
     {
       OperationResultResponse<ProjectResponse> response = new();
       DepartmentData department = null;
-      DbProject dbProject = _repository.Get(filter);
+      DbProject dbProject = await _repository.GetAsync(filter);
 
       if (dbProject.DepartmentId.HasValue)
       {
@@ -344,7 +342,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         List<ImageInfo> imagesInfos = await GetUserAvatars(usersDatas.Where(u => u.ImageId.HasValue).Select(u => u.ImageId.Value).ToList(), response.Errors);
 
         //rework
-        List<DbProjectUser> projectUsersForCount = _userRepository.Find(usersIds);
+        List<DbProjectUser> projectUsersForCount = await _userRepository.GetAsync(usersIds);
 
         usersInfo = dbProject.Users
           .Select(pu =>

@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 
-namespace LT.DigitalOffice.ProjectService.Validation
+namespace LT.DigitalOffice.ProjectService.Validation.Image
 {
   public class ImageContentValidator : AbstractValidator<ImageContent>, IImageValidator
   {

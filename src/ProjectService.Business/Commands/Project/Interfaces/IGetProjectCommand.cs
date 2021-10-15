@@ -9,6 +9,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
     [AutoInject]
     public interface IGetProjectCommand
     {
-        Task<OperationResultResponse<ProjectResponse>> Execute(GetProjectFilter filter);
+        Task<OperationResultResponse<ProjectResponse>> ExecuteAsync(GetProjectFilter filter);
     }
 }

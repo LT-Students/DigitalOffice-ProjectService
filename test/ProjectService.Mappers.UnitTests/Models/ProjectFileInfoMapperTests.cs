@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
         [Test]
         public void ShouldThrowExceptionWhenDbProjectFileIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _mapper.Map(null));
+            Assert.IsNull(_mapper.Map(null));
         }
 
         [Test]

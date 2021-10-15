@@ -9,6 +9,7 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
@@ -21,7 +22,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -39,8 +40,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IRequestClient<ICreateImagesRequest> _rcImages;
+    private readonly IResponseCreater _responseCreater;
 
-    private async System.Threading.Tasks.Task CreateWorkspace(string projectName, List<Guid> usersIds, List<string> errors)
+    private async Task CreateWorkspace(string projectName, List<Guid> usersIds, List<string> errors)
     {
       string errorMessage = $"Failed to create a workspace for the project {projectName}";
       string logMessage = "Cannot create workspace for project {name}";
@@ -75,7 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
     }
 
-    private async System.Threading.Tasks.Task CreateWorkTime(Guid projectId, List<Guid> userIds, List<string> errors)
+    private async Task CreateWorkTime(Guid projectId, List<Guid> userIds, List<string> errors)
     {
       string errorMessage = $"Failed to create a work time for project {projectId} with users: {string.Join(", ", userIds)}.";
       const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
@@ -150,7 +152,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IHttpContextAccessor httpContextAccessor,
       IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
-      IRequestClient<ICreateImagesRequest> rcImages)
+      IRequestClient<ICreateImagesRequest> rcImages,
+      IResponseCreater responseCreater)
     {
       _logger = logger;
       _validator = validator;
@@ -161,32 +164,22 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _rcCreateWorkspace = rcCreateWorkspace;
       _rcCreateWorkTime = rcCreateWorkTime;
       _rcImages = rcImages;
+      _responseCreater = responseCreater;
     }
 
     public async Task<OperationResultResponse<Guid?>> Execute(CreateProjectRequest request)
     {
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-
-        return new OperationResultResponse<Guid?>
-        {
-          Status = OperationResultStatusType.Failed,
-          Errors = new List<string> { "Not enough rights." }
-        };
+        return _responseCreater.CreateFailureResponse<Guid?>(HttpStatusCode.Forbidden);
       }
 
       ValidationResult validationResult = await _validator.ValidateAsync(request);
 
       if (!validationResult.IsValid)
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        return new OperationResultResponse<Guid?>
-        {
-          Status = OperationResultStatusType.Failed,
-          Errors = validationResult.Errors.Select(vf => vf.ErrorMessage).ToList()
-        };
+        return _responseCreater.CreateFailureResponse<Guid?>(HttpStatusCode.BadRequest,
+          validationResult.Errors.Select(vf => vf.ErrorMessage).ToList());
       }
 
       OperationResultResponse<Guid?> response = new();
@@ -195,14 +188,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       DbProject dbProject = _mapper.Map(request, imagesIds);
 
-      response.Body = _repository.Create(dbProject);
+      response.Body = await _repository.CreateAsync(dbProject);
 
       if (response.Body == null)
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        response.Status = OperationResultStatusType.Failed;
-        return response;
+        return _responseCreater.CreateFailureResponse<Guid?>(HttpStatusCode.BadRequest);
       }
 
       List<Guid> usersIds = request.Users.Select(u => u.UserId).ToList();

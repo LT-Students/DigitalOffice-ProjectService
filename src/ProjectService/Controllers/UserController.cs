@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
@@ -10,20 +13,20 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   public class UserController : ControllerBase
   {
     [HttpPost("addUsersToProject")]
-    public void AddUsersToProject(
+    public async Task<OperationResultResponse<bool>> AddUsersToProject(
       [FromServices] IAddUsersToProjectCommand command,
       [FromBody] AddUsersToProjectRequest request)
     {
-      command.Execute(request);
+      return await command.ExecuteAsync(request);
     }
 
     [HttpDelete("removeUsersFromProject")]
-    public void RemoveUsersFromProject(
-      [FromServices] IDisableWorkersInProjectCommand command,
+    public async Task<OperationResultResponse<bool>> RemoveUsersFromProject(
+      [FromServices] IRemoveUsersFromProjectCommand command,
       [FromQuery] Guid projectId,
-      [FromQuery] Guid[] userIds)
+      [FromBody] List<Guid> userIds)
     {
-      command.Execute(projectId, userIds);
+      return await command.ExecuteAsync(projectId, userIds);
     }
   }
 }

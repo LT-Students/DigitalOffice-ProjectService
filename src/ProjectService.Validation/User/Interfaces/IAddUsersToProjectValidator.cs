@@ -2,10 +2,10 @@
 using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 
-namespace LT.DigitalOffice.ProjectService.Validation.Interfaces
+namespace LT.DigitalOffice.ProjectService.Validation.User.Interfaces
 {
   [AutoInject]
-  public interface IImageValidator : IValidator<ImageContent>
+  public interface IAddUsersToProjectValidator : IValidator<AddUsersToProjectRequest>
   {
   }
 }

@@ -17,7 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
         public Task Consume(ConsumeContext<IDisactivateUserRequest> context)
         {
-            _repository.Remove(context.Message.UserId, context.Message.ModifiedBy);
+            _repository.RemoveAsync(context.Message.UserId, context.Message.ModifiedBy);
 
             return Task.FromResult(0);
         }

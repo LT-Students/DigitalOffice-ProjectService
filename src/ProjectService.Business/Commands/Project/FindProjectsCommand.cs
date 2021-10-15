@@ -5,9 +5,9 @@ using System.Net;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
-using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models.Company;
@@ -20,10 +20,7 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using MassTransit;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using StackExchange.Redis;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -34,8 +31,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IBaseFindFilterValidator _findFilterValidator;
     private readonly IFindProjectsResponseMapper _responseMapper;
     private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartments;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IConnectionMultiplexer _cache;
+    private readonly IRedisHelper _redisHelper;
+    private readonly IResponseCreater _responseCreater;
 
     private async Task<List<DepartmentData>> GetDepartments(List<Guid> departmentsIds, List<string> errors)
     {
@@ -44,13 +41,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return null;
       }
 
-      RedisValue departmentFromCache = await _cache.GetDatabase(Cache.Departments).StringGetAsync(departmentsIds.GetRedisCacheHashCode());
+      List<DepartmentData> departmentDatas = await _redisHelper.GetAsync<List<DepartmentData>>(Cache.Departments, departmentsIds.GetRedisCacheHashCode());
 
-      if (departmentFromCache.HasValue)
+      if (departmentDatas != null)
       {
         _logger.LogInformation("Departments were taken from the cache. Departments ids: {departmentsIds}", string.Join(", ", departmentsIds));
 
-        return JsonConvert.DeserializeObject<List<DepartmentData>>(departmentFromCache);
+        return departmentDatas;
       }
 
       return await GetDepartmentsThroughBroker(departmentsIds, errors);
@@ -96,32 +93,26 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IBaseFindFilterValidator findFilterValidator,
       IFindProjectsResponseMapper responseMapper,
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
-      IHttpContextAccessor httpContextAccessor,
-      IConnectionMultiplexer cache)
+      IRedisHelper redisHelper,
+      IResponseCreater responseCreater)
     {
       _logger = logger;
       _repository = repository;
       _findFilterValidator = findFilterValidator;
       _responseMapper = responseMapper;
       _rcGetDepartments = rcGetDepartments;
-      _httpContextAccessor = httpContextAccessor;
-      _cache = cache;
+      _redisHelper = redisHelper;
+      _responseCreater = responseCreater;
     }
 
     public async Task<FindResultResponse<ProjectInfo>> Execute(FindProjectsFilter filter)
     {
       if (!_findFilterValidator.ValidateCustom(filter, out List<string> errors))
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        return new FindResultResponse<ProjectInfo>
-        {
-          Status = OperationResultStatusType.Failed,
-          Errors = errors
-        };
+        return _responseCreater.CreateFailureFindResponse<ProjectInfo>(HttpStatusCode.BadRequest, errors);
       }
 
-      List<DbProject> dbProjects = _repository.Find(filter, out int totalCount);
+      (List<DbProject> dbProjects, int totalCount) = await _repository.FindAsync(filter);
 
       List<DepartmentData> departments = await GetDepartments(
         dbProjects.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList(), errors);
