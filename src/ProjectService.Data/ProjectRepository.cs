@@ -92,32 +92,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       return true;
     }
 
-    public void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds)
-    {
-      DbProject dbProject = _provider.Projects
-        .FirstOrDefault(p => p.Id == projectId);
-
-      if (dbProject == null)
-      {
-        throw new NotFoundException($"Project with Id {projectId} does not exist.");
-      }
-
-      foreach (Guid userId in userIds)
-      {
-        DbProjectUser dbProjectUser = dbProject.Users?.FirstOrDefault(w => w.UserId == userId);
-
-        if (dbProjectUser == null)
-        {
-          throw new NotFoundException($"Worker with Id {userId} does not exist.");
-        }
-
-        dbProjectUser.IsActive = false;
-      }
-
-      _provider.Projects.Update(dbProject);
-      _provider.Save();
-    }
-
     public List<DbProject> Find(FindProjectsFilter filter, out int totalCount)
     {
       if (filter == null)

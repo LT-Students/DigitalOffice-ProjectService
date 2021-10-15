@@ -21,8 +21,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     bool Edit(Guid projectId, JsonPatchDocument<DbProject> request);
 
-    void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds);
-
     List<DbProject> Find(FindProjectsFilter filter, out int totalCount);
 
     List<DbProject> Search(string text);
