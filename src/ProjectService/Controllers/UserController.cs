@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
@@ -10,20 +12,20 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   public class UserController : ControllerBase
   {
     [HttpPost("addUsersToProject")]
-    public void AddUsersToProject(
+    public OperationResultResponse<bool> AddUsersToProject(
       [FromServices] IAddUsersToProjectCommand command,
       [FromBody] AddUsersToProjectRequest request)
     {
-      command.Execute(request);
+      return command.Execute(request);
     }
 
     [HttpDelete("removeUsersFromProject")]
-    public void RemoveUsersFromProject(
-      [FromServices] IDisableWorkersInProjectCommand command,
+    public OperationResultResponse<bool> RemoveUsersFromProject(
+      [FromServices] IRemoveUsersFromProjectCommand command,
       [FromQuery] Guid projectId,
-      [FromQuery] Guid[] userIds)
+      [FromBody] List<Guid> userIds)
     {
-      command.Execute(projectId, userIds);
+      return command.Execute(projectId, userIds);
     }
   }
 }
