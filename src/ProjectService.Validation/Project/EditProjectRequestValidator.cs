@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Validators;
 using LT.DigitalOffice.Kernel.Broker;
@@ -22,7 +23,41 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
     private readonly ILogger<EditProjectRequestValidator> _logger;
     private readonly IRequestClient<ICheckDepartmentsExistence> _rcDepartmentsExistence;
 
-    private void HandleInternalPropertyValidation(Operation<EditProjectRequest> requestedOperation, CustomContext context)
+    private async Task<bool> CheckValidityDepartmentIdAsync(Guid departmentId)
+    {
+      if (departmentId == Guid.Empty)
+      {
+        return false;
+      }
+
+      try
+      {
+        var response =
+          await _rcDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
+            ICheckDepartmentsExistence.CreateObj(new() { departmentId }));
+
+        if (response.Message.IsSuccess)
+        {
+          return response.Message.Body.DepartmentIds.Any();
+        }
+
+        _logger.LogWarning(
+          "Error while checking department existence with id {departmentId}.\n Errors: {Errors}",
+          departmentId,
+          string.Join('\n', response.Message.Errors));
+      }
+      catch (Exception exc)
+      {
+        _logger.LogError(
+          exc,
+          "Cannot check department existence with id {departmentId}.",
+          departmentId);
+      }
+
+      return false;
+    }
+
+    private async Task HandleInternalPropertyValidationAsync(Operation<EditProjectRequest> requestedOperation, CustomContext context)
     {
       Context = context;
       RequestedOperation = requestedOperation;
@@ -63,13 +98,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
 
       #region DepartmentId
 
-      AddFailureForPropertyIf(
+      await AddFailureForPropertyIfAsync(
         nameof(EditProjectRequest.DepartmentId),
         x => x == OperationType.Replace,
-        new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
+        new()
         {
-          { x => x.value == null ||
-            Guid.TryParse(x.value.ToString(), out var departmentId) && CheckValidityDepartmentId(departmentId),
+          { async x => x.value == null ||
+            Guid.TryParse(x.value.ToString(), out var departmentId) && await CheckValidityDepartmentIdAsync(departmentId),
             "Incorrect department id value." },
         });
 
@@ -86,7 +121,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
           { x => x.value.ToString().Trim().Length < 150, "Name is too long." },
         }, CascadeMode.Stop);
 
-      AddFailureForPropertyIfAsync(
+      await AddFailureForPropertyIfAsync(
         nameof(EditProjectRequest.Name),
         x => x == OperationType.Replace,
         new()
@@ -131,41 +166,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       _rcDepartmentsExistence = rcDepartmentsExistence;
 
       RuleForEach(x => x.Operations)
-        .Custom(HandleInternalPropertyValidation);
-    }
-
-    private bool CheckValidityDepartmentId(Guid departmentId)
-    {
-      if (departmentId == Guid.Empty)
-      {
-        return false;
-      }
-
-      try
-      {
-        var response =
-          _rcDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
-            ICheckDepartmentsExistence.CreateObj(new() { departmentId })).Result;
-
-        if (response.Message.IsSuccess)
-        {
-          return response.Message.Body.DepartmentIds.Any();
-        }
-
-        _logger.LogWarning(
-          "Error while checking department existence with id {departmentId}.\n Errors: {Errors}",
-          departmentId,
-          string.Join('\n', response.Message.Errors));
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(
-          exc,
-          "Cannot check department existence with id {departmentId}.",
-          departmentId);
-      }
-
-      return false;
+        .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
     }
   }
 }

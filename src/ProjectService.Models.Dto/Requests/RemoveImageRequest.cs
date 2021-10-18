@@ -4,7 +4,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
-  public class RemoveImageRequest
+  public record RemoveImageRequest
   {
     public Guid ProjectId { get; set; }
     public ImageType ImageType { get; set; }

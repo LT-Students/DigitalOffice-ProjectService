@@ -2,14 +2,13 @@
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using System;
 using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Responses
 {
-    public class ProjectResponseMapper : IProjectResponseMapper
+  public class ProjectResponseMapper : IProjectResponseMapper
     {
         private readonly IProjectInfoMapper _projectInfoMapper;
 
@@ -20,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
 
         public ProjectResponse Map(
             DbProject dbProject,
-            IEnumerable<ProjectUserInfo> users,
+            IEnumerable<UserInfo> users,
             IEnumerable<ProjectFileInfo> files,
             IEnumerable<ImageInfo> images,
             DepartmentInfo department)

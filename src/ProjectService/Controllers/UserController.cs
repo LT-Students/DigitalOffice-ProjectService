@@ -12,16 +12,16 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   [ApiController]
   public class UserController : ControllerBase
   {
-    [HttpPost("addUsersToProject")]
-    public async Task<OperationResultResponse<bool>> AddUsersToProject(
+    [HttpPost("create")]
+    public async Task<OperationResultResponse<bool>> Create(
       [FromServices] IAddUsersToProjectCommand command,
       [FromBody] AddUsersToProjectRequest request)
     {
       return await command.ExecuteAsync(request);
     }
 
-    [HttpDelete("removeUsersFromProject")]
-    public async Task<OperationResultResponse<bool>> RemoveUsersFromProject(
+    [HttpDelete("remove")]
+    public async Task<OperationResultResponse<bool>> Remove(
       [FromServices] IRemoveUsersFromProjectCommand command,
       [FromQuery] Guid projectId,
       [FromBody] List<Guid> userIds)

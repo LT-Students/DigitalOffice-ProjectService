@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
-  public class AddUsersToProjectRequest
+  public record AddUsersToProjectRequest
   {
     public Guid ProjectId { get; set; }
-    public List<ProjectUserRequest> Users { get; set; }
+    public List<AddUserRequest> Users { get; set; }
   }
 }

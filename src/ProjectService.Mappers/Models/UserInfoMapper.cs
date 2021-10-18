@@ -4,13 +4,12 @@ using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
 {
-  public class ProjectUserInfoMapper : IProjectUserInfoMapper
+  public class UserInfoMapper : IUserInfoMapper
   {
-    public ProjectUserInfo Map(
+    public UserInfo Map(
       UserData userData,
       ImageInfo image,
       PositionData userPosition,
@@ -28,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
         return null;
       }
 
-      return new ProjectUserInfo
+      return new UserInfo
       {
         Id = userData.Id,
         FirstName = userData.FirstName,

@@ -1,6 +1,5 @@
 ﻿using System;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -156,7 +155,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           "Feature",
           null,
           null,
-          (int)TaskPropertyType.Type,
+          0,
           null,
           DateTime.UtcNow,
           true
@@ -192,7 +191,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           "Bug",
           null,
           null,
-          (int)TaskPropertyType.Type,
+          0,
           null,
           DateTime.UtcNow,
           true
@@ -228,7 +227,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           "Task",
           null,
           null,
-          (int)TaskPropertyType.Type,
+          0,
           null,
           DateTime.UtcNow,
           true
@@ -267,7 +266,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           "Normal",
           null,
           null,
-          (int)TaskPropertyType.Priority,
+          2,
           null,
           DateTime.UtcNow,
           true
@@ -303,7 +302,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           "High",
           null,
           null,
-          (int)TaskPropertyType.Priority,
+          2,
           null,
           DateTime.UtcNow,
           true
@@ -339,7 +338,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           "Low",
           null,
           null,
-          (int)TaskPropertyType.Priority,
+          2,
           null,
           DateTime.UtcNow,
           true
@@ -378,7 +377,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           "New",
           null,
           null,
-          (int)TaskPropertyType.Status,
+          1,
           null,
           DateTime.UtcNow,
           true
@@ -414,7 +413,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           "In Progress",
           null,
           null,
-          (int)TaskPropertyType.Status,
+          1,
           null,
           DateTime.UtcNow,
           true
@@ -450,7 +449,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           "Done",
           null,
           null,
-          (int)TaskPropertyType.Status,
+          1,
           null,
           DateTime.UtcNow,
           true

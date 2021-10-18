@@ -4,7 +4,6 @@ using FluentValidation.TestHelper;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Validation.Project;
@@ -42,9 +41,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         ShortDescription = "Short description",
         DepartmentId = Guid.NewGuid(),
         Status = ProjectStatusType.Active,
-        Users = new List<ProjectUserRequest>
+        Users = new List<AddUserRequest>
                 {
-                    new ProjectUserRequest
+                    new AddUserRequest
                     {
                         UserId = Guid.NewGuid(),
                         Role = ProjectUserRoleType.Manager

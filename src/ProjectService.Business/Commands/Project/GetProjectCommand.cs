@@ -22,7 +22,6 @@ using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using MassTransit;
@@ -38,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IProjectRepository _repository;
     private readonly IUserRepository _userRepository;
     private readonly IProjectResponseMapper _projectResponseMapper;
-    private readonly IProjectUserInfoMapper _projectUserInfoMapper;
+    private readonly IUserInfoMapper _projectUserInfoMapper;
     private readonly IProjectFileInfoMapper _projectFileInfoMapper;
     private readonly IDepartmentInfoMapper _departmentInfoMapper;
     private readonly IImageInfoMapper _imageMapper;
@@ -296,7 +295,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IProjectRepository repository,
       IUserRepository userRepository,
       IProjectResponseMapper projectResponsMapper,
-      IProjectUserInfoMapper projectUserInfoMapper,
+      IUserInfoMapper projectUserInfoMapper,
       IProjectFileInfoMapper projectFileInfoMapper,
       IDepartmentInfoMapper departmentInfoMapper,
       IImageInfoMapper imageMapper,
@@ -333,7 +332,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
 
       List<UserData> usersDatas = await GetUsersDatas(dbProject.Users, response.Errors);
-      List<ProjectUserInfo> usersInfo = null;
+      List<UserInfo> usersInfo = null;
       List<Guid> usersIds = dbProject.Users.Select(u => u.UserId).Distinct().ToList();
 
       if (usersDatas != null && usersDatas.Any())

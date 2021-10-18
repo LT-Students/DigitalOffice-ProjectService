@@ -3,7 +3,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
-  public class EditProjectRequest
+  public record EditProjectRequest
   {
     public string Name { get; set; }
     public string ShortName { get; set; }
