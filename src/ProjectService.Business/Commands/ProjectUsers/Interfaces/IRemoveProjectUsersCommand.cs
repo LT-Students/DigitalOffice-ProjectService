@@ -7,7 +7,7 @@ using LT.DigitalOffice.Kernel.Responses;
 namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces
 {
   [AutoInject]
-  public interface IRemoveUsersFromProjectCommand
+  public interface IRemoveProjectUsersCommand
   {
     Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, List<Guid> userIds);
   }

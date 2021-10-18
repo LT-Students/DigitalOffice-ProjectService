@@ -37,13 +37,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     private readonly ICreateImageValidator _validator;
     private readonly IUserRepository _userRepository;
 
-    private List<Guid> CreateImages(List<ImageContent> context, Guid userId, Guid enityId, List<string> errors)
+    private List<Guid> CreateImagesAsync(List<ImageContent> context, Guid userId, Guid enityId, List<string> errors)
     {
       List<CreateImageData> images = context
         .Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId))
         .ToList();
 
-      var logMessage = $"Errors while creating images for project id {enityId}.";
+      string logMessage = $"Errors while creating images for project id {enityId}.";
 
       try
       {
@@ -92,9 +92,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
     public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateImageRequest request)
     {
-      var userId = _httpContextAccessor.HttpContext.GetUserId();
+      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(request.ImageType == ImageType.Project && await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
+        && !(await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
@@ -105,7 +105,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         };
       }
 
-      if (!_validator.ValidateCustom(request, out var errors))
+      if (!_validator.ValidateCustom(request, out List<string> errors))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
@@ -118,7 +118,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
       OperationResultResponse<List<Guid>> response = new();
 
-      var imagesIds = CreateImages(
+      List<Guid> imagesIds = CreateImagesAsync(
         request.Images,
         userId,
         request.ProjectId,

@@ -12,6 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public const string TableName = "Projects";
 
     public Guid Id { get; set; }
+    // TODO remove
     public Guid? DepartmentId { get; set; }
     public int Status { get; set; }
     public string Name { get; set; }

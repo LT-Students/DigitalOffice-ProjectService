@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   {
     [HttpPost("create")]
     public async Task<OperationResultResponse<bool>> Create(
-      [FromServices] IAddUsersToProjectCommand command,
+      [FromServices] ICreateProjectUsersCommand command,
       [FromBody] AddUsersToProjectRequest request)
     {
       return await command.ExecuteAsync(request);
@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
 
     [HttpDelete("remove")]
     public async Task<OperationResultResponse<bool>> Remove(
-      [FromServices] IRemoveUsersFromProjectCommand command,
+      [FromServices] IRemoveProjectUsersCommand command,
       [FromQuery] Guid projectId,
       [FromBody] List<Guid> userIds)
     {

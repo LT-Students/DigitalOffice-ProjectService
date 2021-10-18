@@ -13,13 +13,13 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 {
-  public class RemoveUsersFromProjectCommand : IRemoveUsersFromProjectCommand
+  public class RemoveProjectUsersCommand : IRemoveProjectUsersCommand
   {
     private readonly IUserRepository _repository;
     private readonly IAccessValidator _accessValidator;
     private readonly IResponseCreater _responseCreater;
 
-    public RemoveUsersFromProjectCommand(
+    public RemoveProjectUsersCommand(
       IUserRepository repository,
       IAccessValidator accessValidator,
       IResponseCreater responseCreater)

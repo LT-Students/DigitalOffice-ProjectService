@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRequestClient<ICreateImagesRequest> _rcImages;
     private readonly IResponseCreater _responseCreater;
 
-    private async Task CreateWorkspace(string projectName, List<Guid> usersIds, List<string> errors)
+    private async Task CreateWorkspaceAsync(string projectName, List<Guid> usersIds, List<string> errors)
     {
       string errorMessage = $"Failed to create a workspace for the project {projectName}";
       string logMessage = "Cannot create workspace for project {name}";
@@ -77,7 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
     }
 
-    private async Task CreateWorkTime(Guid projectId, List<Guid> userIds, List<string> errors)
+    private async Task CreateWorkTimeAsync(Guid projectId, List<Guid> userIds, List<string> errors)
     {
       string errorMessage = $"Failed to create a work time for project {projectId} with users: {string.Join(", ", userIds)}.";
       const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
@@ -102,7 +102,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
     }
 
-    private async Task<List<Guid>> CreateImage(List<ImageContent> projectImages, List<string> errors)
+    private async Task<List<Guid>> CreateImageAsync(List<ImageContent> projectImages, List<string> errors)
     {
       if (projectImages == null || !projectImages.Any())
       {
@@ -167,7 +167,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _responseCreater = responseCreater;
     }
 
-    public async Task<OperationResultResponse<Guid?>> Execute(CreateProjectRequest request)
+    public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateProjectRequest request)
     {
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
       {
@@ -184,7 +184,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       OperationResultResponse<Guid?> response = new();
 
-      List<Guid> imagesIds = await CreateImage(request.ProjectImages, response.Errors);
+      List<Guid> imagesIds = await CreateImageAsync(request.ProjectImages, response.Errors);
 
       DbProject dbProject = _mapper.Map(request, imagesIds);
 
@@ -197,9 +197,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<Guid> usersIds = request.Users.Select(u => u.UserId).ToList();
 
-      await CreateWorkTime(dbProject.Id, usersIds, response.Errors);
+      await CreateWorkTimeAsync(dbProject.Id, usersIds, response.Errors);
 
-      await CreateWorkspace(request.Name, usersIds, response.Errors);
+      await CreateWorkspaceAsync(request.Name, usersIds, response.Errors);
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 

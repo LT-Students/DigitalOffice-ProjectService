@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
@@ -8,6 +7,5 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
   {
     public Guid ProjectId { get; set; }
     public List<ImageContent> Images { get; set; }
-    public ImageType ImageType { get; set; }
   }
 }

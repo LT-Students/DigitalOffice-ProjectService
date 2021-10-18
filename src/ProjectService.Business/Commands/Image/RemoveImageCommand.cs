@@ -33,7 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     private readonly IRemoveImageValidator _validator;
     private readonly IUserRepository _userRepository;
 
-    private bool RemoveImage(List<Guid> ids, List<string> errors)
+    private async Task<bool> RemoveImageAsync(List<Guid> ids, List<string> errors)
     {
       if (ids == null || !ids.Any())
       {
@@ -44,10 +44,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
       try
       {
-        IOperationResult<bool> response = _rcImages.GetResponse<IOperationResult<bool>>(
-          IRemoveImagesRequest.CreateObj(ids, ImageSource.Project)).Result.Message;
+        Response<IOperationResult<bool>> response =
+          await _rcImages.GetResponse<IOperationResult<bool>>(
+            IRemoveImagesRequest.CreateObj(ids, ImageSource.Project));
 
-        if (response.IsSuccess)
+        if (response.Message.IsSuccess)
         {
           return true;
         }
@@ -55,7 +56,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         _logger.LogWarning(
           logMessage,
           string.Join('\n', ids),
-          string.Join('\n', response.Errors));
+          string.Join('\n', response.Message.Errors));
       }
       catch (Exception exc)
       {
@@ -85,11 +86,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       _userRepository = userRepository;
     }
 
-    public async Task<OperationResultResponse<bool>> Execute(RemoveImageRequest request)
+    public async Task<OperationResultResponse<bool>> ExecuteAsync(RemoveImageRequest request)
     {
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(request.ImageType == ImageType.Project && await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
+        && !(await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
@@ -113,7 +114,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
       OperationResultResponse<bool> response = new();
 
-      bool result = RemoveImage(request.ImagesIds, response.Errors);
+      bool result = await RemoveImageAsync(request.ImagesIds, response.Errors);
 
       if (!result)
       {

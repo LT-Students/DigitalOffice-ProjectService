@@ -9,6 +9,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
   [AutoInject]
   public interface ICreateProjectCommand
   {
-    Task<OperationResultResponse<Guid?>> Execute(CreateProjectRequest request);
+    Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateProjectRequest request);
   }
 }

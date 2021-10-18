@@ -21,48 +21,47 @@ using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 {
-  public class AddUsersToProjectCommand : IAddUsersToProjectCommand
+  public class CreateProjectUsersCommand : ICreateProjectUsersCommand
   {
     private readonly IUserRepository _repository;
     private readonly IDbProjectUserMapper _mapper;
     private readonly IAccessValidator _accessValidator;
     private readonly IAddUsersToProjectValidator _validator;
-    private readonly ILogger<AddUsersToProjectCommand> _logger;
+    private readonly ILogger<CreateProjectUsersCommand> _logger;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IResponseCreater _responseCreater;
 
-    private async Task CreateWorkTimeAsync(Guid projectId, List<Guid> userIds, List<string> errors)
+    private async Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds, List<string> errors)
     {
-      string errorMessage = $"Failed to create a work time for project {projectId} with users: {string.Join(", ", userIds)}.";
       const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
 
       try
       {
         Response<IOperationResult<bool>> response =
           await _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
-            ICreateWorkTimeRequest.CreateObj(projectId, userIds));
+            ICreateWorkTimeRequest.CreateObj(projectId, usersIds));
 
         if (response.Message.IsSuccess && response.Message.Body)
         {
           return;
         }
 
-        _logger.LogWarning(logMessage, projectId, string.Join(", ", userIds));
+        _logger.LogWarning(logMessage, projectId, string.Join(", ", usersIds));
       }
       catch (Exception exc)
       {
-        _logger.LogError(exc, logMessage, projectId, string.Join(", ", userIds));
+        _logger.LogError(exc, logMessage, projectId, string.Join(", ", usersIds));
       }
 
-      errors.Add(errorMessage);
+      errors.Add($"Failed to create a work time for project {projectId} with users: {string.Join(", ", usersIds)}.");
     }
 
-    public AddUsersToProjectCommand(
+    public CreateProjectUsersCommand(
       IUserRepository repository,
       IDbProjectUserMapper mapper,
       IAccessValidator accessValidator,
       IAddUsersToProjectValidator validator,
-      ILogger<AddUsersToProjectCommand> logger,
+      ILogger<CreateProjectUsersCommand> logger,
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
       IResponseCreater responseCreater)
     {

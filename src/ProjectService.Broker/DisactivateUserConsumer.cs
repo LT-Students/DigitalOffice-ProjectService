@@ -1,25 +1,23 @@
-﻿using LT.DigitalOffice.Models.Broker.Common;
+﻿using System.Threading.Tasks;
+using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using MassTransit;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Broker
 {
-    public class DisactivateUserConsumer : IConsumer<IDisactivateUserRequest>
+  public class DisactivateUserConsumer : IConsumer<IDisactivateUserRequest>
+  {
+    private readonly IUserRepository _repository;
+
+    public DisactivateUserConsumer(
+      IUserRepository repository)
     {
-        private readonly IUserRepository _repository;
-
-        public DisactivateUserConsumer(
-            IUserRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public Task Consume(ConsumeContext<IDisactivateUserRequest> context)
-        {
-            _repository.RemoveAsync(context.Message.UserId, context.Message.ModifiedBy);
-
-            return Task.FromResult(0);
-        }
+      _repository = repository;
     }
+
+    public async Task Consume(ConsumeContext<IDisactivateUserRequest> context)
+    {
+      await _repository.RemoveAsync(context.Message.UserId, context.Message.ModifiedBy);
+    }
+  }
 }

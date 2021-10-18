@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces
   [AutoInject]
   public interface IRemoveImageCommand
   {
-    Task<OperationResultResponse<bool>> Execute(RemoveImageRequest request);
+    Task<OperationResultResponse<bool>> ExecuteAsync(RemoveImageRequest request);
   }
 }

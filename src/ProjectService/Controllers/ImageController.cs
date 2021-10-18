@@ -25,7 +25,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
       [FromServices] IRemoveImageCommand command,
       [FromBody] RemoveImageRequest request)
     {
-      return await command.Execute(request);
+      return await command.ExecuteAsync(request);
     }
   }
 }

@@ -20,7 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
       [FromServices] IFindProjectsCommand command,
       [FromQuery] FindProjectsFilter filter)
     {
-      return await command.Execute(filter);
+      return await command.ExecuteAsync(filter);
     }
 
     [HttpGet("get")]
@@ -36,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
       [FromServices] ICreateProjectCommand command,
       [FromBody] CreateProjectRequest request)
     {
-      return await command.Execute(request);
+      return await command.ExecuteAsync(request);
     }
 
     [HttpPatch("edit")]

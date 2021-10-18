@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRedisHelper _redisHelper;
     private readonly IResponseCreater _responseCreater;
 
-    private async Task<List<DepartmentData>> GetDepartments(List<Guid> departmentsIds, List<string> errors)
+    private async Task<List<DepartmentData>> GetDepartmentsAsync(List<Guid> departmentsIds, List<string> errors)
     {
       if (departmentsIds == null || !departmentsIds.Any())
       {
@@ -50,10 +50,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return departmentDatas;
       }
 
-      return await GetDepartmentsThroughBroker(departmentsIds, errors);
+      return await GetDepartmentsThroughBrokerAsync(departmentsIds, errors);
     }
 
-    private async Task<List<DepartmentData>> GetDepartmentsThroughBroker(List<Guid> departmentsIds, List<string> errors)
+    private async Task<List<DepartmentData>> GetDepartmentsThroughBrokerAsync(List<Guid> departmentsIds, List<string> errors)
     {
       if (departmentsIds == null || !departmentsIds.Any())
       {
@@ -105,7 +105,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _responseCreater = responseCreater;
     }
 
-    public async Task<FindResultResponse<ProjectInfo>> Execute(FindProjectsFilter filter)
+    public async Task<FindResultResponse<ProjectInfo>> ExecuteAsync(FindProjectsFilter filter)
     {
       if (!_findFilterValidator.ValidateCustom(filter, out List<string> errors))
       {
@@ -114,7 +114,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       (List<DbProject> dbProjects, int totalCount) = await _repository.FindAsync(filter);
 
-      List<DepartmentData> departments = await GetDepartments(
+      // TODO cut departments
+      List<DepartmentData> departments = await GetDepartmentsAsync(
         dbProjects.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList(), errors);
 
       FindResultResponse<ProjectInfo> response = _responseMapper.Map(dbProjects, totalCount, departments, errors);

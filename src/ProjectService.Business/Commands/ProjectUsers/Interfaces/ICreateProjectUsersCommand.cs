@@ -10,7 +10,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfa
   /// Provides method for adding a new users to project.
   /// </summary>
   [AutoInject]
-  public interface IAddUsersToProjectCommand
+  public interface ICreateProjectUsersCommand
   {
     /// <summary>
     /// Added new users id to specific project.
