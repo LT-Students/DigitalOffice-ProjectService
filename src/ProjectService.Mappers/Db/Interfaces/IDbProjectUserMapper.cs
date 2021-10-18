@@ -9,8 +9,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces
   [AutoInject]
   public interface IDbProjectUserMapper
   {
-    DbProjectUser Map(AddUserRequest request, Guid projectId);
+    DbProjectUser Map(CreateUserRequest request, Guid projectId);
 
-    List<DbProjectUser> Map(AddUsersToProjectRequest request);
+    List<DbProjectUser> Map(CreateProjectUsersRequest request);
   }
 }

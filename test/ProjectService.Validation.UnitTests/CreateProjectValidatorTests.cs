@@ -41,9 +41,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         ShortDescription = "Short description",
         DepartmentId = Guid.NewGuid(),
         Status = ProjectStatusType.Active,
-        Users = new List<AddUserRequest>
+        Users = new List<CreateUserRequest>
                 {
-                    new AddUserRequest
+                    new CreateUserRequest
                     {
                         UserId = Guid.NewGuid(),
                         Role = ProjectUserRoleType.Manager

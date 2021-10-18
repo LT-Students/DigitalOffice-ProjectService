@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [HttpPost("create")]
     public async Task<OperationResultResponse<bool>> Create(
       [FromServices] ICreateProjectUsersCommand command,
-      [FromBody] AddUsersToProjectRequest request)
+      [FromBody] CreateProjectUsersRequest request)
     {
       return await command.ExecuteAsync(request);
     }

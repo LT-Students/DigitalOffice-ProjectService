@@ -74,7 +74,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _responseCreater = responseCreater;
     }
 
-    public async Task<OperationResultResponse<bool>> ExecuteAsync(AddUsersToProjectRequest request)
+    public async Task<OperationResultResponse<bool>> ExecuteAsync(CreateProjectUsersRequest request)
     {
       List<string> errors = new();
 

@@ -18,7 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public DbProjectUser Map(AddUserRequest request, Guid projectId)
+    public DbProjectUser Map(CreateUserRequest request, Guid projectId)
     {
       if (request == null)
       {
@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       };
     }
 
-    public List<DbProjectUser> Map(AddUsersToProjectRequest request)
+    public List<DbProjectUser> Map(CreateProjectUsersRequest request)
     {
       if (request == null)
       {

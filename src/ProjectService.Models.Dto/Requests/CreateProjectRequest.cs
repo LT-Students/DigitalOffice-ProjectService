@@ -12,7 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
     public string ShortDescription { get; set; }
     public Guid? DepartmentId { get; set; }
     public ProjectStatusType Status { get; set; }
-    public List<AddUserRequest> Users { get; set; }
+    public List<CreateUserRequest> Users { get; set; }
     public List<ImageContent> ProjectImages { get; set; }
   }
 }
