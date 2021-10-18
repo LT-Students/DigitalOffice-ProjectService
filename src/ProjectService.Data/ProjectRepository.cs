@@ -101,11 +101,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       return await CreateGetPredicate(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<List<DbProject>> GetAsync(Guid departmentId)
-    {
-      return await _provider.Projects.Where(p => p.DepartmentId == departmentId).ToListAsync();
-    }
-
     public async Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request)
     {
       IQueryable<DbProject> projects = CreateGetPredicate(request);
@@ -146,6 +141,12 @@ namespace LT.DigitalOffice.ProjectService.Data
     public async Task<bool> EditAsync(Guid projectId, JsonPatchDocument<DbProject> request)
     {
       DbProject dbProject = await _provider.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
+
+      if (dbProject == null)
+      {
+        return false;
+      }
+
       request.ApplyTo(dbProject);
       dbProject.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
       dbProject.ModifiedAtUtc = DateTime.UtcNow;

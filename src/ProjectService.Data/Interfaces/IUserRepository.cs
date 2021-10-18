@@ -17,13 +17,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
   {
     Task<(List<DbProjectUser>, int totalCount)> GetAsync(IGetProjectsUsersRequest request);
 
-    Task<List<Guid>> GetExistAsync(Guid projectId, IEnumerable<Guid> userIds);
+    Task<List<Guid>> GetExistAsync(Guid projectId, IEnumerable<Guid> usersIds);
+
+    Task<List<DbProjectUser>> GetAsync(List<Guid> usersIds);
 
     Task<bool> CreateAsync(List<DbProjectUser> dbProjectUsers);
-
-    Task<List<DbProjectUser>> FindAsync(FindDbProjectsUserFilter filter);
-
-    Task<List<DbProjectUser>> GetAsync(List<Guid> userIds);
 
     Task<bool> DoesExistAsync(Guid userId, Guid projectId, bool? isManager = null);
 
@@ -31,6 +29,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<bool> RemoveAsync(Guid userId, Guid removedBy);
 
-    Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> userIds);
+    Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> usersIds);
+
+    Task<bool> IsProjectAdminAsync(Guid projectId, Guid userId);
   }
 }

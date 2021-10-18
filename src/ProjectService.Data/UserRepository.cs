@@ -18,23 +18,6 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     #region private methods
 
-    private IQueryable<DbProjectUser> CreateGetPredicates(
-      FindDbProjectsUserFilter filter,
-      IQueryable<DbProjectUser> dbProjectUser)
-    {
-      if (filter.UserId.HasValue)
-      {
-        dbProjectUser = dbProjectUser.Where(x => x.UserId == filter.UserId);
-      }
-
-      if (filter.IncludeProject.HasValue && filter.IncludeProject.Value)
-      {
-        dbProjectUser = dbProjectUser.Include(x => x.Project);
-      }
-
-      return dbProjectUser;
-    }
-
     private IQueryable<DbProjectUser> CreateGetPredicate(IGetProjectsUsersRequest request)
     {
       IQueryable<DbProjectUser> projectUsers = _provider.ProjectsUsers.AsQueryable();
@@ -80,15 +63,15 @@ namespace LT.DigitalOffice.ProjectService.Data
       return await dbProjectQueryable.ToListAsync();
     }
 
-    public async Task<List<DbProjectUser>> GetAsync(List<Guid> userIds)
+    public async Task<List<DbProjectUser>> GetAsync(List<Guid> usersIds)
     {
-      return await _provider.ProjectsUsers.Where(u => userIds.Contains(u.UserId) && u.IsActive).ToListAsync();
+      return await _provider.ProjectsUsers.Where(u => usersIds.Contains(u.UserId) && u.IsActive).ToListAsync();
     }
 
-    public async Task<List<Guid>> GetExistAsync(Guid projectId, IEnumerable<Guid> userIds)
+    public async Task<List<Guid>> GetExistAsync(Guid projectId, IEnumerable<Guid> usersIds)
     {
       return await _provider.ProjectsUsers
-        .Where(pu => pu.IsActive && pu.ProjectId == projectId && userIds.Contains(pu.UserId)).Select(pu => pu.UserId).ToListAsync();
+        .Where(pu => pu.IsActive && pu.ProjectId == projectId && usersIds.Contains(pu.UserId)).Select(pu => pu.UserId).ToListAsync();
     }
 
     public async Task<(List<DbProjectUser>, int totalCount)> GetAsync(IGetProjectsUsersRequest request)
@@ -122,37 +105,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       await _provider.SaveAsync();
 
       return true;
-    }
-
-    public async Task<List<DbProjectUser>> FindAsync(FindDbProjectsUserFilter filter)
-    {
-      if (filter == null)
-      {
-        return null;
-      }
-
-      var dbProjectsUser = _provider.ProjectsUsers.AsQueryable();
-
-      return await CreateGetPredicates(filter, dbProjectsUser).ToListAsync();
-    }
-
-    public async Task<(List<DbProjectUser>, int totalCount)> FindAsync(Guid projectId, int? skipCount, int? takeCount)
-    {
-      IQueryable<DbProjectUser> users = _provider.ProjectsUsers.Where(pu => pu.ProjectId == projectId && pu.IsActive).AsQueryable();
-
-      int totalCount = await users.CountAsync();
-
-      if (skipCount.HasValue)
-      {
-        users = users.Skip(skipCount.Value);
-      }
-
-      if (takeCount.HasValue)
-      {
-        users = users.Take(takeCount.Value);
-      }
-
-      return (await users.ToListAsync(), totalCount);
     }
 
     public async Task<bool> DoesExistAsync(Guid userId, Guid projectId, bool? isManager)
@@ -193,10 +145,10 @@ namespace LT.DigitalOffice.ProjectService.Data
         .ToListAsync();
     }
 
-    public async Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> userIds)
+    public async Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> usersIds)
     {
       List<DbProjectUser> users = await _provider.ProjectsUsers
-        .Where(pu => pu.IsActive && pu.ProjectId == projectId && userIds.Contains(pu.UserId)).ToListAsync();
+        .Where(pu => pu.IsActive && pu.ProjectId == projectId && usersIds.Contains(pu.UserId)).ToListAsync();
 
       if (!users.Any())
       {
@@ -212,6 +164,11 @@ namespace LT.DigitalOffice.ProjectService.Data
       await _provider.SaveAsync();
 
       return true;
+    }
+
+    public async Task<bool> IsProjectAdminAsync(Guid projectId, Guid userId)
+    {
+      return await _provider.ProjectsUsers.AnyAsync(pu => pu.IsActive && pu.ProjectId == projectId && pu.UserId == userId);
     }
   }
 }

@@ -8,15 +8,18 @@ using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 using MassTransit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
@@ -30,6 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly ILogger<CreateProjectUsersCommand> _logger;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IResponseCreater _responseCreater;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     private async Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds, List<string> errors)
     {
@@ -63,7 +67,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       IAddUsersToProjectValidator validator,
       ILogger<CreateProjectUsersCommand> logger,
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
-      IResponseCreater responseCreater)
+      IResponseCreater responseCreater,
+      IHttpContextAccessor httpContextAccessor)
     {
       _mapper = mapper;
       _validator = validator;
@@ -72,13 +77,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _logger = logger;
       _rcCreateWorkTime = rcCreateWorkTime;
       _responseCreater = responseCreater;
+      _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(CreateProjectUsersRequest request)
     {
       List<string> errors = new();
 
-      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
+        && !await _repository.IsProjectAdminAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId()))
       {
         return _responseCreater.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
