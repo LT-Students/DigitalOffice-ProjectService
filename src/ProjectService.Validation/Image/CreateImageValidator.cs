@@ -17,7 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Image
         .NotEmpty().WithMessage("List must not be empty.");
 
       RuleFor(images => images.ProjectId)
-        .NotEmpty().WithMessage("Image's Id must not be empty.");
+        .NotEmpty().WithMessage("Project id must not be empty.");
 
       RuleForEach(images => images.Images)
         .SetValidator(imageValidator)

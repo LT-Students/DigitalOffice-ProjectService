@@ -22,7 +22,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
       _departmentInfoMapper = departmentInfoMapper;
     }
 
-    public FindResultResponse<ProjectInfo> Map(List<DbProject> dbProjects, int totalCount, List<DepartmentData> departments, List<string> errors)
+    public FindResultResponse<ProjectInfo> Map(
+      List<DbProject> dbProjects,
+      int totalCount,
+      List<DepartmentData> departments,
+      List<string> errors)
     {
       if (dbProjects == null)
       {
