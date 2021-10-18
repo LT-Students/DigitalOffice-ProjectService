@@ -99,12 +99,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         return true;
       }
 
-      var logMessage = "Department with id: {id} not found.";
+      string logMessage = "Department with id: {id} not found.";
 
       try
       {
-        var response = await _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
-          ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value }));
+        Response<IOperationResult<ICheckDepartmentsExistence>> response =
+          await _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
+            ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value }));
         if (response.Message.IsSuccess)
         {
           return response.Message.Body.DepartmentIds.Any();
@@ -130,12 +131,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         return true;
       }
 
-      var logMessage = "Cannot check existing users withs this ids {userIds}";
+      string logMessage = "Cannot check existing users withs this ids {userIds}";
 
       try
       {
-        var response = await _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUsersExistence>>(
-          ICheckUsersExistence.CreateObj(usersIds));
+        Response<IOperationResult<ICheckUsersExistence>> response =
+          await _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUsersExistence>>(
+            ICheckUsersExistence.CreateObj(usersIds));
         if (response.Message.IsSuccess)
         {
           return response.Message.Body.UserIds.Count() == usersIds.Count();

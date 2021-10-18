@@ -13,7 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   public class ImageController : ControllerBase
   {
     [HttpPost("create")]
-    public async Task<OperationResultResponse<List<Guid>>> Create(
+    public async Task<OperationResultResponse<List<Guid>>> CreateAsync(
       [FromServices] ICreateImageCommand command,
       [FromBody] CreateImageRequest request)
     {
@@ -21,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     }
 
     [HttpDelete("remove")]
-    public async Task<OperationResultResponse<bool>> Remove(
+    public async Task<OperationResultResponse<bool>> RemoveAsync(
       [FromServices] IRemoveImageCommand command,
       [FromBody] RemoveImageRequest request)
     {
