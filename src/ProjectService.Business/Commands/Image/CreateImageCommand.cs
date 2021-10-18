@@ -39,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
     private List<Guid> CreateImages(List<ImageContent> context, Guid userId, Guid enityId, List<string> errors)
     {
-      var images = context
+      List<CreateImageData> images = context
         .Select(x => new CreateImageData(x.Name, x.Content, x.Extension, userId))
         .ToList();
 
@@ -47,8 +47,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
       try
       {
-        var response = _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
-          ICreateImagesRequest.CreateObj(images, ImageSource.Project)).Result.Message;
+        IOperationResult<ICreateImagesResponse> response =
+          _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
+            ICreateImagesRequest.CreateObj(images, ImageSource.Project)).Result.Message;
 
         if (response.IsSuccess && response.Body.ImagesIds != null)
         {
