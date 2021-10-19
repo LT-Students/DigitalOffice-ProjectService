@@ -28,6 +28,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRepository _userRepository;
     private readonly IResponseCreater _responseCreater;
+    private readonly ICacheNotebook _cacheNotebook;
 
     public EditProjectCommand(
       IEditProjectRequestValidator validator,
@@ -36,7 +37,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IProjectRepository projectRepository,
       IHttpContextAccessor httpContextAccessor,
       IUserRepository userRepository,
-      IResponseCreater responseCreater)
+      IResponseCreater responseCreater,
+      ICacheNotebook cacheNotebook)
     {
       _validator = validator;
       _accessValidator = accessValidator;
@@ -45,6 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _httpContextAccessor = httpContextAccessor;
       _userRepository = userRepository;
       _responseCreater = responseCreater;
+      _cacheNotebook = cacheNotebook;
     }
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, JsonPatchDocument<EditProjectRequest> request)
@@ -76,6 +79,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         response.Status = OperationResultStatusType.Failed;
         response.Errors.Add("Project can not be edit.");
+      }
+      else
+      {
+        await _cacheNotebook.RemoveAsync(projectId);
       }
 
       return response;

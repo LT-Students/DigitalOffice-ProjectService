@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.Models.Broker.Responses.Project;
@@ -12,18 +13,18 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.UserService.Models.Dto.Configurations;
 using MassTransit;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using StackExchange.Redis;
 
 namespace LT.DigitalOffice.ProjectService.Broker
 {
   public class GetProjectsConsumer : IConsumer<IGetProjectsRequest>
   {
     private readonly IProjectRepository _projectRepository;
-    private readonly IConnectionMultiplexer _cache;
     private readonly IOptions<RedisConfig> _redisConfig;
+    private readonly ICacheNotebook _cacheNotebook;
+    private readonly IRedisHelper _redisHelper;
 
     private async Task<(List<ProjectData> projects, int totalCount)> GetProjectsAsync(IGetProjectsRequest request)
     {
@@ -77,17 +78,19 @@ namespace LT.DigitalOffice.ProjectService.Broker
         additionalArguments.Add(request.TakeCount.Value);
       }
 
-      return ids.GetRedisCacheHashCode(additionalArguments);
+      return ids.GetRedisCacheHashCode(additionalArguments.ToArray());
     }
 
     public GetProjectsConsumer(
       IProjectRepository projectRepository,
-      IConnectionMultiplexer cache,
-      IOptions<RedisConfig> redisConfig)
+      IOptions<RedisConfig> redisConfig,
+      ICacheNotebook cacheNotebook,
+      IRedisHelper redisHelper)
     {
       _projectRepository = projectRepository;
-      _cache = cache;
       _redisConfig = redisConfig;
+      _cacheNotebook = cacheNotebook;
+      _redisHelper = redisHelper;
     }
 
     public async Task Consume(ConsumeContext<IGetProjectsRequest> context)
@@ -98,9 +101,18 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
       await context.RespondAsync<IOperationResult<IGetProjectsResponse>>(response);
 
-      await _cache.GetDatabase(Cache.Projects).StringSetAsync(CreateKey(context.Message),
-        JsonConvert.SerializeObject((projects, totalCount)),
-        TimeSpan.FromMinutes(_redisConfig.Value.CacheLiveInMinutes));
+      if (projects != null)
+      {
+        string key = CreateKey(context.Message);
+
+        await _redisHelper.CreateAsync(
+          Cache.Projects,
+          key,
+          (projects, totalCount),
+          TimeSpan.FromMinutes(_redisConfig.Value.CacheLiveInMinutes));
+
+        _cacheNotebook.Add(projects.Select(p => p.Id).ToList(), Cache.Projects, key);
+      }
     }
   }
 }
