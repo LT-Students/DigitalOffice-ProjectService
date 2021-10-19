@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -14,39 +15,22 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
   [AutoInject]
   public interface IUserRepository
   {
-    /// <summary>
-    /// Returns all users from project with specified id.
-    /// </summary>
-    /// <param name="projectId">Project id.</param>
-    /// <param name="showNotActiveUsers">Include not active users.</param>
-    IEnumerable<DbProjectUser> GetProjectUsers(Guid projectId, bool showNotActiveUsers);
+    Task<(List<DbProjectUser>, int totalCount)> GetAsync(IGetProjectsUsersRequest request);
 
-    bool AddUsersToProject(IEnumerable<DbProjectUser> dbProjectUsers);
+    Task<List<Guid>> GetExistAsync(Guid projectId, IEnumerable<Guid> usersIds);
 
-    /// <summary>
-    /// Get user projects.
-    /// </summary>
-    /// <param name="userId">User Id from request</param>
-    IEnumerable<DbProjectUser> Find(Guid userId);
-    /// <param name="filter">Properties to filter query.</param>
-    IEnumerable<DbProjectUser> Find(FindDbProjectsUserFilter filter);
+    Task<List<DbProjectUser>> GetAsync(List<Guid> usersIds);
 
-    bool AreUserProjectExist(Guid userId, Guid projectId, bool? isManager = null);
+    Task<bool> CreateAsync(List<DbProjectUser> dbProjectUsers);
 
-    /// <summary>
-    /// Check that users are exist.
-    /// </summary>
-    /// <param name="ids">Ids to check that all of them exists.</param>
-    bool AreExist(params Guid[] ids);
+    Task<bool> DoesExistAsync(Guid userId, Guid projectId, bool? isManager = null);
 
-    List<DbProjectUser> Find(List<Guid> userIds);
+    Task<List<Guid>> DoExistAsync(Guid projectId, List<Guid> ids);
 
-    void Remove(Guid userId, Guid removedBy);
+    Task<bool> RemoveAsync(Guid userId, Guid removedBy);
 
-    List<DbProjectUser> Get(IGetProjectsUsersRequest request, out int totalCount);
+    Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> usersIds);
 
-    bool DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds);
-
-    List<Guid> GetExistProjectUsers(Guid projectId, IEnumerable<Guid> userIds);
+    Task<bool> IsProjectAdminAsync(Guid projectId, Guid userId);
   }
 }

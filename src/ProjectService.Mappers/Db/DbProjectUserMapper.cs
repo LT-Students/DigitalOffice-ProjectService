@@ -4,7 +4,6 @@ using System.Linq;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Http;
 
@@ -19,7 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public DbProjectUser Map(ProjectUserRequest request, Guid projectId)
+    public DbProjectUser Map(CreateUserRequest request, Guid projectId)
     {
       if (request == null)
       {
@@ -38,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       };
     }
 
-    public List<DbProjectUser> Map(AddUsersToProjectRequest request)
+    public List<DbProjectUser> Map(CreateProjectUsersRequest request)
     {
       if (request == null)
       {

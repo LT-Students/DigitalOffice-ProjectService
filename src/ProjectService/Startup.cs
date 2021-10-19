@@ -5,12 +5,14 @@ using HealthChecks.UI.Client;
 using LT.DigitalOffice.Kernel.Broker.Consumer;
 using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.Helpers;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
 using LT.DigitalOffice.Kernel.Middlewares.Token;
 using LT.DigitalOffice.ProjectService.Broker;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Mappers.Helpers;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
+using LT.DigitalOffice.UserService.Models.Dto.Configurations;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using MassTransit.RabbitMqTransport;
@@ -49,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService
         .GetSection(BaseRabbitMqConfig.SectionName)
         .Get<RabbitMqConfig>();
 
-            Version = "1.2.1.5";
+            Version = "1.2.2.0";
             Description = "ProjectService is an API intended to work with projects.";
             StartTime = DateTime.UtcNow;
             ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
@@ -89,6 +91,8 @@ namespace LT.DigitalOffice.ProjectService
       services.AddHttpContextAccessor();
 
       services.AddBusinessObjects();
+      services.AddTransient<IRedisHelper, RedisHelper>();
+      services.AddTransient<ICacheNotebook, CacheNotebook>();
 
       string connStr = Environment.GetEnvironmentVariable("ConnectionString");
       if (string.IsNullOrEmpty(connStr))
@@ -182,7 +186,6 @@ namespace LT.DigitalOffice.ProjectService
       using var context = serviceScope.ServiceProvider.GetService<ProjectServiceDbContext>();
 
       context.Database.Migrate();
-      TaskNumberHelper.LoadCache(context);
     }
 
     private string HidePassord(string line)
@@ -210,8 +213,35 @@ namespace LT.DigitalOffice.ProjectService
 
     #region configure masstransit
 
+    private (string username, string password) GetRabbitMqCredentials()
+    {
+      static string GetString(string envVar, string formAppsettings, string generated, string fieldName)
+      {
+        string str = Environment.GetEnvironmentVariable(envVar);
+        if (string.IsNullOrEmpty(str))
+        {
+          str = formAppsettings ?? generated;
+
+          Log.Information(
+            formAppsettings == null
+              ? $"Default RabbitMq {fieldName} was used."
+              : $"RabbitMq {fieldName} from appsetings.json was used.");
+        }
+        else
+        {
+          Log.Information($"RabbitMq {fieldName} from environment was used.");
+        }
+
+        return str;
+      }
+
+      return (GetString("RabbitMqUsername", _rabbitMqConfig.Username, $"{_serviceInfoConfig.Name}_{_serviceInfoConfig.Id}", "Username"),
+        GetString("RabbitMqPassword", _rabbitMqConfig.Password, _serviceInfoConfig.Id, "Password"));
+    }
     private void ConfigureMassTransit(IServiceCollection services)
     {
+      (string username, string password) = GetRabbitMqCredentials();
+
       services.AddMassTransit(busConfigurator =>
       {
         ConfigureConsumers(busConfigurator);
@@ -220,8 +250,8 @@ namespace LT.DigitalOffice.ProjectService
         {
           cfg.Host(_rabbitMqConfig.Host, "/", host =>
           {
-              host.Username($"{_serviceInfoConfig.Name}_{_serviceInfoConfig.Id}");
-              host.Password(_serviceInfoConfig.Id);
+              host.Username(username);
+              host.Password(password);
           });
 
           ConfigureEndpoints(context, cfg, _rabbitMqConfig);
@@ -240,6 +270,8 @@ namespace LT.DigitalOffice.ProjectService
       x.AddConsumer<GetProjectsUsersConsumer>();
       x.AddConsumer<DisactivateUserConsumer>();
       x.AddConsumer<GetProjectsConsumer>();
+      x.AddConsumer<CheckProjectsExistenceConsumer>();
+      x.AddConsumer<CheckProjectUsersExistenceConsumer>();
     }
 
     private void ConfigureEndpoints(
@@ -270,6 +302,16 @@ namespace LT.DigitalOffice.ProjectService
       cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectsEndpoint, ep =>
       {
         ep.ConfigureConsumer<GetProjectsConsumer>(context);
+      });
+
+      cfg.ReceiveEndpoint(rabbitMqConfig.CheckProjectsExistenceEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<CheckProjectsExistenceConsumer>(context);
+      });
+
+      cfg.ReceiveEndpoint(rabbitMqConfig.CheckProjectUsersExistenceEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<CheckProjectUsersExistenceConsumer>(context);
       });
     }
 

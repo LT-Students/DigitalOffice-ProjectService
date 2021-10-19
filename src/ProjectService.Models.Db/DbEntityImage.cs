@@ -13,7 +13,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public Guid ImageId { get; set; }
 
     public DbProject Project { get; set; }
-    public DbTask Task { get; set; }
   }
 
   public class DbProjectImageConfiguration : IEntityTypeConfiguration<DbEntityImage>
@@ -25,10 +24,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
       builder
         .HasKey(p => p.Id);
-
-      builder
-        .HasOne(pu => pu.Project)
-        .WithMany(p => p.Images);
 
       builder
         .HasOne(pu => pu.Project)

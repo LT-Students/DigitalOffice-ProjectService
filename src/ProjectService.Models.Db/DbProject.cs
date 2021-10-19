@@ -12,6 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public const string TableName = "Projects";
 
     public Guid Id { get; set; }
+    // TODO remove
     public Guid? DepartmentId { get; set; }
     public int Status { get; set; }
     public string Name { get; set; }
@@ -24,26 +25,16 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public Guid? ModifiedBy { get; set; }
 
     [IgnoreParse]
-    public ICollection<DbTask> Tasks { get; set; }
-    [IgnoreParse]
     public ICollection<DbProjectUser> Users { get; set; }
     [IgnoreParse]
     public ICollection<DbProjectFile> Files { get; set; }
-    [IgnoreParse]
-    public ICollection<DbTaskProperty> TaskProperties { get; set; }
     [IgnoreParse]
     public ICollection<DbEntityImage> Images { get; set; }
 
     public DbProject()
     {
-      Tasks = new HashSet<DbTask>();
-
       Users = new HashSet<DbProjectUser>();
-
       Files = new HashSet<DbProjectFile>();
-
-      TaskProperties = new HashSet<DbTaskProperty>();
-
       Images = new HashSet<DbEntityImage>();
     }
   }
@@ -79,16 +70,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         .WithOne(f => f.Project);
 
       builder
-        .HasMany(p => p.Tasks)
-        .WithOne(t => t.Project);
-
-      builder
-        .HasMany(p => p.TaskProperties)
-        .WithOne(tp => tp.Project);
-
-      builder
        .HasMany(p => p.Images)
-       .WithOne(tp => tp.Project).HasForeignKey(o => o.EntityId);
+       .WithOne(tp => tp.Project)
+       .HasForeignKey(o => o.EntityId);
     }
   }
 }

@@ -4,7 +4,6 @@ using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.UnitTestKernel;
 using Moq;
@@ -14,14 +13,14 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
 {
-    internal class ProjectResponseMapperTests
+  internal class ProjectResponseMapperTests
     {
         private IProjectResponseMapper _projectIProjectResponseMapper;
         private Mock<IProjectInfoMapper> _projectInfoMapperMock;
 
         private DbProject _dbProject;
         private ProjectInfo _projectInfo;
-        private IEnumerable<ProjectUserInfo> _users;
+        private IEnumerable<UserInfo> _users;
         private IEnumerable<ProjectFileInfo> _files;
         private DepartmentInfo _department;
         private ProjectResponse _expectedResponse;
@@ -44,9 +43,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                 Status = (int)ProjectStatusType.Active
             };
 
-            _users = new List<ProjectUserInfo>
+            _users = new List<UserInfo>
             {
-                new ProjectUserInfo
+                new UserInfo
                 {
                     Id = Guid.NewGuid(),
                     FirstName = "Spartak",

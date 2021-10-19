@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
@@ -23,11 +22,9 @@ using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using MassTransit;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StackExchange.Redis;
@@ -40,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IProjectRepository _repository;
     private readonly IUserRepository _userRepository;
     private readonly IProjectResponseMapper _projectResponseMapper;
-    private readonly IProjectUserInfoMapper _projectUserInfoMapper;
+    private readonly IUserInfoMapper _projectUserInfoMapper;
     private readonly IProjectFileInfoMapper _projectFileInfoMapper;
     private readonly IDepartmentInfoMapper _departmentInfoMapper;
     private readonly IImageInfoMapper _imageMapper;
@@ -50,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRequestClient<IGetImagesRequest> _rcImages;
     private readonly IConnectionMultiplexer _cache;
 
-    private async Task<DepartmentData> GetDepartment(Guid departmentId, List<string> errors)
+    private async Task<DepartmentData> GetDepartmentAsync(Guid departmentId, List<string> errors)
     {
       RedisValue departmentFromCache = await _cache.GetDatabase(Cache.Departments).StringGetAsync(departmentId.GetRedisCacheHashCode());
 
@@ -61,10 +58,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return JsonConvert.DeserializeObject<List<DepartmentData>>(departmentFromCache).FirstOrDefault();
       }
 
-      return await GetDepartmentThroughBroker(departmentId, errors);
+      return await GetDepartmentThroughBrokerAsync(departmentId, errors);
     }
 
-    private async Task<DepartmentData> GetDepartmentThroughBroker(Guid departmentId, List<string> errors)
+    private async Task<DepartmentData> GetDepartmentThroughBrokerAsync(Guid departmentId, List<string> errors)
     {
       try
       {
@@ -92,7 +89,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       return null;
     }
 
-    private async Task<List<ImageInfo>> GetUserAvatars(List<Guid> imageIds, List<string> errors)
+    private async Task<List<ImageInfo>> GetUserAvatarsAsync(List<Guid> imageIds, List<string> errors)
     {
       if (imageIds == null || !imageIds.Any())
       {
@@ -128,7 +125,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       return null;
     }
 
-    private async Task<List<ImageInfo>> GetProjectImages(List<Guid> imageIds, List<string> errors)
+    private async Task<List<ImageInfo>> GetProjectImagesAsync(List<Guid> imageIds, List<string> errors)
     {
       if (imageIds == null || !imageIds.Any())
       {
@@ -162,7 +159,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       return null;
     }
 
-    private async Task<List<UserData>> GetUsersDatas(IEnumerable<DbProjectUser> projectUsers, List<string> errors)
+    private async Task<List<UserData>> GetUsersDatasAsync(IEnumerable<DbProjectUser> projectUsers, List<string> errors)
     {
       if (projectUsers == null || !projectUsers.Any())
       {
@@ -180,10 +177,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return JsonConvert.DeserializeObject<List<UserData>>(usersFromCache);
       }
 
-      return await GetUsersDatasThroughBroker(usersIds, errors);
+      return await GetUsersDatasThroughBrokerAsync(usersIds, errors);
     }
 
-    private async Task<List<UserData>> GetUsersDatasThroughBroker(List<Guid> usersIds, List<string> errors)
+    private async Task<List<UserData>> GetUsersDatasThroughBrokerAsync(List<Guid> usersIds, List<string> errors)
     {
       try
       {
@@ -211,14 +208,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       return null;
     }
 
-    private async Task<(List<DepartmentData> departments, List<PositionData> positions)> GetCompanyEmployee(
+    private async Task<(List<DepartmentData> departments, List<PositionData> positions)> GetCompanyEmployeeAsync(
       List<Guid> usersIds,
       List<string> errors)
     {
       (List<DepartmentData> departments, List<PositionData> positions) =
-        await GetCompanyEmployeesFromCache(usersIds);
+        await GetCompanyEmployeesFromCacheAsync(usersIds);
 
-      IGetCompanyEmployeesResponse brokerResponse = await GetCompanyEmployeesThroughBroker(
+      IGetCompanyEmployeesResponse brokerResponse = await GetCompanyEmployeesThroughBrokerAsync(
         usersIds,
         departments == null,
         positions == null,
@@ -228,7 +225,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         positions ?? brokerResponse?.Positions);
     }
 
-    private async Task<(List<DepartmentData> departments, List<PositionData> positions)> GetCompanyEmployeesFromCache(List<Guid> usersIds)
+    private async Task<(List<DepartmentData> departments, List<PositionData> positions)> GetCompanyEmployeesFromCacheAsync(List<Guid> usersIds)
     {
       List<DepartmentData> departments = null;
       List<PositionData> positions = null;
@@ -253,7 +250,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       return (departments, positions);
     }
 
-    private async Task<IGetCompanyEmployeesResponse> GetCompanyEmployeesThroughBroker(
+    private async Task<IGetCompanyEmployeesResponse> GetCompanyEmployeesThroughBrokerAsync(
       List<Guid> usersIds,
       bool includeDepartments,
       bool includePositions,
@@ -298,7 +295,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IProjectRepository repository,
       IUserRepository userRepository,
       IProjectResponseMapper projectResponsMapper,
-      IProjectUserInfoMapper projectUserInfoMapper,
+      IUserInfoMapper projectUserInfoMapper,
       IProjectFileInfoMapper projectFileInfoMapper,
       IDepartmentInfoMapper departmentInfoMapper,
       IImageInfoMapper imageMapper,
@@ -323,28 +320,29 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _cache = cache;
     }
 
-    public async Task<OperationResultResponse<ProjectResponse>> Execute(GetProjectFilter filter)
+    public async Task<OperationResultResponse<ProjectResponse>> ExecuteAsync(GetProjectFilter filter)
     {
       OperationResultResponse<ProjectResponse> response = new();
       DepartmentData department = null;
-      DbProject dbProject = _repository.Get(filter);
+      DbProject dbProject = await _repository.GetAsync(filter);
 
+      // TODO cut departments
       if (dbProject.DepartmentId.HasValue)
       {
-        department = await GetDepartment(dbProject.DepartmentId.Value, response.Errors);
+        department = await GetDepartmentAsync(dbProject.DepartmentId.Value, response.Errors);
       }
 
-      List<UserData> usersDatas = await GetUsersDatas(dbProject.Users, response.Errors);
-      List<ProjectUserInfo> usersInfo = null;
+      List<UserData> usersDatas = await GetUsersDatasAsync(dbProject.Users, response.Errors);
+      List<UserInfo> usersInfo = null;
       List<Guid> usersIds = dbProject.Users.Select(u => u.UserId).Distinct().ToList();
 
       if (usersDatas != null && usersDatas.Any())
       {
-        (List<DepartmentData> departments, List<PositionData> positions) = await GetCompanyEmployee(usersIds, response.Errors);
-        List<ImageInfo> imagesInfos = await GetUserAvatars(usersDatas.Where(u => u.ImageId.HasValue).Select(u => u.ImageId.Value).ToList(), response.Errors);
+        (List<DepartmentData> departments, List<PositionData> positions) = await GetCompanyEmployeeAsync(usersIds, response.Errors);
+        List<ImageInfo> imagesInfos = await GetUserAvatarsAsync(usersDatas.Where(u => u.ImageId.HasValue).Select(u => u.ImageId.Value).ToList(), response.Errors);
 
         //rework
-        List<DbProjectUser> projectUsersForCount = _userRepository.Find(usersIds);
+        List<DbProjectUser> projectUsersForCount = await _userRepository.GetAsync(usersIds);
 
         usersInfo = dbProject.Users
           .Select(pu =>
@@ -363,7 +361,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
 
       List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
-      List<ImageInfo> imagesinfo = await GetProjectImages(dbProject.Images.Select(x => x.ImageId).ToList(), response.Errors);
+      List<ImageInfo> imagesinfo = await GetProjectImagesAsync(dbProject.Images.Select(x => x.ImageId).ToList(), response.Errors);
 
       response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
       response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, imagesinfo, _departmentInfoMapper.Map(department));

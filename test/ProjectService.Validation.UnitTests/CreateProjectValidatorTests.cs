@@ -4,9 +4,10 @@ using FluentValidation.TestHelper;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Project;
+using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq.AutoMock;
@@ -30,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
       _autoMock.CreateInstance<ILogger<CreateProjectRequestValidator>>(),
       _autoMock.CreateInstance<IRequestClient<ICheckDepartmentsExistence>>(),
       _autoMock.CreateInstance<IRequestClient<ICheckUsersExistence>>(),
-      _autoMock.CreateInstance<IImageContentValidator>());
+      _autoMock.CreateInstance<IImageValidator>());
 
       _newProject = new CreateProjectRequest
       {
@@ -40,9 +41,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
         ShortDescription = "Short description",
         DepartmentId = Guid.NewGuid(),
         Status = ProjectStatusType.Active,
-        Users = new List<ProjectUserRequest>
+        Users = new List<CreateUserRequest>
                 {
-                    new ProjectUserRequest
+                    new CreateUserRequest
                     {
                         UserId = Guid.NewGuid(),
                         Role = ProjectUserRoleType.Manager

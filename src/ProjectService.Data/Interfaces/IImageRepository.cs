@@ -2,14 +2,15 @@
 using LT.DigitalOffice.ProjectService.Models.Db;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
     [AutoInject]
     public interface IImageRepository
     {
-        List<Guid> Create(IEnumerable<DbEntityImage> images);
+        Task<List<Guid>> CreateAsync(List<DbEntityImage> images);
 
-        bool Remove(IEnumerable<Guid> imagesIds);
+        Task<bool> RemoveAsync(List<Guid> imagesIds);
     }
 }
