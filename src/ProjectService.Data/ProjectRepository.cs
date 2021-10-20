@@ -98,7 +98,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public async Task<DbProject> GetAsync(GetProjectFilter filter)
     {
-      return await CreateGetPredicate(filter).FirstOrDefaultAsync();
+      return await CreateGetPredicate(filter).FirstOrDefaultAsync(p => p.Id == filter.ProjectId);
     }
 
     public async Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request)
