@@ -51,9 +51,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
     [AutoInjectRequest(typeof(IGetOfficesRequest))]
     public string GetOfficesEndpoint { get; set; }
 
-    [AutoInjectRequest(typeof(ICheckDepartmentsExistence))]
-    public string CheckDepartmentsExistenceEndpoint { get; set; }
-
     // message
 
     [AutoInjectRequest(typeof(ICreateWorkspaceRequest))]
