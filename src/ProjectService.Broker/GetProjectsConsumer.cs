@@ -100,7 +100,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
       await context.RespondAsync<IOperationResult<IGetProjectsResponse>>(response);
 
-      if (projects != null)
+      if (projects != null && projects.Any())
       {
         string key = CreateKey(context.Message);
 

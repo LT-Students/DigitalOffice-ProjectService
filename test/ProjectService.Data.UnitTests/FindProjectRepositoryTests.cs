@@ -2,7 +2,6 @@
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
-    class FindProjectRepositoryTests
+  class FindProjectRepositoryTests
     {
         private IDataProvider _provider;
         private IProjectRepository _repository;
