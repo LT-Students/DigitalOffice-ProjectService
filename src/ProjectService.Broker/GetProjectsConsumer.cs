@@ -33,7 +33,6 @@ namespace LT.DigitalOffice.ProjectService.Broker
       return (projects.Select(
         p => new ProjectData(
           p.Id,
-          null, // TODO
           p.Name,
           ((ProjectStatusType)p.Status).ToString(),
           p.ShortName,

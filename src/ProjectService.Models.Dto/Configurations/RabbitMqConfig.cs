@@ -48,8 +48,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
     // company
 
-    [AutoInjectRequest(typeof(IGetCompanyEmployeesRequest))]
-    public string GetCompanyEmployeesEndpoint { get; set; }
+    [AutoInjectRequest(typeof(IGetOfficesRequest))]
+    public string GetOfficesEndpoint { get; set; }
 
     [AutoInjectRequest(typeof(ICheckDepartmentsExistence))]
     public string CheckDepartmentsExistenceEndpoint { get; set; }

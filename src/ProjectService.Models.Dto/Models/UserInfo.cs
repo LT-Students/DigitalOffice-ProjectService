@@ -10,7 +10,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
     public string MiddleName { get; set; }
     public string LastName { get; set; }
     public string Status { get; set; }
-    public double Rate { get; set; }
+    public double? Rate { get; set; }
     public int ProjectCount { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? ModifiedAtUtc { get; set; }

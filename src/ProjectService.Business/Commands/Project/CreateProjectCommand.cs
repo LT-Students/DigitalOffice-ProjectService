@@ -171,7 +171,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
         _logger.LogWarning(logMessage, projectId, departmentId);
       }
-      catch(Exception exc)
+      catch (Exception exc)
       {
         _logger.LogError(exc, logMessage, projectId, departmentId);
       }

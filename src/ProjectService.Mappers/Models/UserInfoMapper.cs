@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.Models.Broker.Models;
+﻿using System.Linq;
+using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Models.Department;
 using LT.DigitalOffice.Models.Broker.Models.Position;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
@@ -35,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
         LastName = userData.LastName,
         MiddleName = userData.MiddleName,
         Status = userData.Status,
-        Rate = userData.Rate,
+        Rate = userPosition?.Users?.FirstOrDefault(u => u.UserId == userData.Id)?.Rate,
         ProjectCount = projectCount,
         IsActive = dbProjectUser.IsActive,
         CreatedAtUtc = dbProjectUser.CreatedAtUtc,
