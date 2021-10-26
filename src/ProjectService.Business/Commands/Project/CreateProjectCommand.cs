@@ -154,7 +154,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return;
       }
 
-      string logMessage = "Cannot assing project '{projectId}' to department '{departmentId}'";
+      string logMessage = "Unable to enroll project {projectId} in the department {departmentId}.";
 
       try
       {
@@ -176,7 +176,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         _logger.LogError(exc, logMessage, projectId, departmentId);
       }
 
-      errors.Add("Cannot assign project to department. Please try again later.");
+      errors.Add("Unable to enroll project in the department. Please try again later.");
     }
 
     #endregion
