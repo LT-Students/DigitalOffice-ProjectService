@@ -37,7 +37,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = "Name1",
                 ShortName = "N1",
                 Description = "description",
-                DepartmentId = Guid.NewGuid(),
                 CreatedAtUtc = DateTime.UtcNow,
             };
 
@@ -47,7 +46,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = "Name2",
                 ShortName = "N2",
                 Description = "description",
-                DepartmentId = Guid.NewGuid(),
                 CreatedAtUtc = DateTime.UtcNow,
             };
 
@@ -57,7 +55,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = "NameWithRegular1",
                 ShortName = "NWR1",
                 Description = "description",
-                DepartmentId = Guid.NewGuid(),
                 CreatedAtUtc = DateTime.UtcNow,
             };
 
@@ -67,7 +64,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = "NameWithRegular2",
                 ShortName = "NWR2",
                 Description = "description",
-                DepartmentId = _dbProject3.DepartmentId,
                 CreatedAtUtc = DateTime.UtcNow,
             };
 
