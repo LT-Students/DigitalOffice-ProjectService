@@ -16,7 +16,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
     class FindProjectRepositoryTests
     {
-        private FindProjectsFilter _filter;
         private IDataProvider _provider;
         private IProjectRepository _repository;
         private Mock<IHttpContextAccessor> _accessorMock;
