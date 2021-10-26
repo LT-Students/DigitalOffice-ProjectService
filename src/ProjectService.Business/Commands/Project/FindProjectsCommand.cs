@@ -10,9 +10,9 @@ using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Kernel.Validators.Interfaces;
-using LT.DigitalOffice.Models.Broker.Models.Company;
-using LT.DigitalOffice.Models.Broker.Requests.Company;
-using LT.DigitalOffice.Models.Broker.Responses.Company;
+using LT.DigitalOffice.Models.Broker.Models.Department;
+using LT.DigitalOffice.Models.Broker.Requests.Department;
+using LT.DigitalOffice.Models.Broker.Responses.Department;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
@@ -34,28 +34,28 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRedisHelper _redisHelper;
     private readonly IResponseCreater _responseCreater;
 
-    private async Task<List<DepartmentData>> GetDepartmentsAsync(List<Guid> departmentsIds, List<string> errors)
+    private async Task<List<DepartmentData>> GetDepartmentsAsync(List<Guid> projectsIds, List<string> errors)
     {
-      if (departmentsIds == null || !departmentsIds.Any())
+      if (projectsIds == null || !projectsIds.Any())
       {
         return null;
       }
 
-      List<DepartmentData> departmentDatas = await _redisHelper.GetAsync<List<DepartmentData>>(Cache.Departments, departmentsIds.GetRedisCacheHashCode());
+      List<DepartmentData> departmentDatas = await _redisHelper.GetAsync<List<DepartmentData>>(Cache.Departments, projectsIds.GetRedisCacheHashCode());
 
       if (departmentDatas != null)
       {
-        _logger.LogInformation("Departments were taken from the cache. Departments ids: {departmentsIds}", string.Join(", ", departmentsIds));
+        _logger.LogInformation("Departments were taken from the cache for project with ids: {projectsIds}", string.Join(", ", projectsIds));
 
         return departmentDatas;
       }
 
-      return await GetDepartmentsThroughBrokerAsync(departmentsIds, errors);
+      return await GetDepartmentsThroughBrokerAsync(projectsIds, errors);
     }
 
-    private async Task<List<DepartmentData>> GetDepartmentsThroughBrokerAsync(List<Guid> departmentsIds, List<string> errors)
+    private async Task<List<DepartmentData>> GetDepartmentsThroughBrokerAsync(List<Guid> projectsIds, List<string> errors)
     {
-      if (departmentsIds == null || !departmentsIds.Any())
+      if (projectsIds == null || !projectsIds.Any())
       {
         return null;
       }
@@ -66,11 +66,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       {
         Response<IOperationResult<IGetDepartmentsResponse>> response = await _rcGetDepartments
           .GetResponse<IOperationResult<IGetDepartmentsResponse>>(
-            IGetDepartmentsRequest.CreateObj(departmentsIds));
+            IGetDepartmentsRequest.CreateObj(projectsIds: projectsIds));
 
         if (response.Message.IsSuccess)
         {
-          _logger.LogInformation("Departments were taken from the service. Departments ids: {departmentsIds}", string.Join(", ", departmentsIds));
+          _logger.LogInformation("Departments were taken from the service for project with ids: {projectsIds}", string.Join(", ", projectsIds));
 
           return response.Message.Body.Departments;
         }
@@ -114,9 +114,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       (List<DbProject> dbProjects, int totalCount) = await _repository.FindAsync(filter);
 
-      // TODO cut departments
       List<DepartmentData> departments = await GetDepartmentsAsync(
-        dbProjects.Where(p => p.DepartmentId.HasValue).Select(p => p.DepartmentId.Value).ToList(), errors);
+        dbProjects.Select(p => p.Id).ToList(), errors);
 
       FindResultResponse<ProjectInfo> response = _responseMapper.Map(dbProjects, totalCount, departments, errors);
 

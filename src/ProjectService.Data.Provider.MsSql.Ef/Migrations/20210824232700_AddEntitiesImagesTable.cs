@@ -12,7 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: DbEntityImage.TableName,
+                name: DbProjectImage.TableName,
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),

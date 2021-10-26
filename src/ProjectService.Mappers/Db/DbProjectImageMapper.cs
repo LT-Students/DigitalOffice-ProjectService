@@ -4,11 +4,11 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
-  public class DbEntityImageMapper : IDbEntityImageMapper
+  public class DbProjectImageMapper : IDbProjectImageMapper
   {
-    public DbEntityImage Map(Guid imageId, Guid projectId)
+    public DbProjectImage Map(Guid imageId, Guid projectId)
     {
-      return new DbEntityImage
+      return new DbProjectImage
       {
         Id = Guid.NewGuid(),
         ImageId = imageId,

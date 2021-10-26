@@ -12,8 +12,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public const string TableName = "Projects";
 
     public Guid Id { get; set; }
-    // TODO remove
-    public Guid? DepartmentId { get; set; }
     public int Status { get; set; }
     public string Name { get; set; }
     public string ShortName { get; set; }
@@ -29,13 +27,13 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     [IgnoreParse]
     public ICollection<DbProjectFile> Files { get; set; }
     [IgnoreParse]
-    public ICollection<DbEntityImage> Images { get; set; }
+    public ICollection<DbProjectImage> Images { get; set; }
 
     public DbProject()
     {
       Users = new HashSet<DbProjectUser>();
       Files = new HashSet<DbProjectFile>();
-      Images = new HashSet<DbEntityImage>();
+      Images = new HashSet<DbProjectImage>();
     }
   }
 

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LT.DigitalOffice.ProjectService.Models.Db
 {
-  public class DbEntityImage
+  public class DbProjectImage
   {
-    public const string TableName = "EntitiesImages";
+    public const string TableName = "ProjectImages";
 
     public Guid Id { get; set; }
     public Guid EntityId { get; set; }
@@ -15,12 +15,12 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public DbProject Project { get; set; }
   }
 
-  public class DbProjectImageConfiguration : IEntityTypeConfiguration<DbEntityImage>
+  public class DbProjectImageConfiguration : IEntityTypeConfiguration<DbProjectImage>
   {
-    public void Configure(EntityTypeBuilder<DbEntityImage> builder)
+    public void Configure(EntityTypeBuilder<DbProjectImage> builder)
     {
       builder
-        .ToTable(DbEntityImage.TableName);
+        .ToTable(DbProjectImage.TableName);
 
       builder
         .HasKey(p => p.Id);

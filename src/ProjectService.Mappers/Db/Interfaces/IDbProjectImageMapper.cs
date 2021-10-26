@@ -5,8 +5,8 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 namespace LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces
 {
   [AutoInject]
-  public interface IDbEntityImageMapper
+  public interface IDbProjectImageMapper
   {
-    DbEntityImage Map(Guid imageId, Guid projectId);
+    DbProjectImage Map(Guid imageId, Guid projectId);
   }
 }

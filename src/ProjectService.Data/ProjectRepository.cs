@@ -78,11 +78,6 @@ namespace LT.DigitalOffice.ProjectService.Data
         projects = projects.Where(p => request.ProjectsIds.Contains(p.Id));
       }
 
-      if (request.DepartmentId.HasValue)
-      {
-        projects = projects.Where(p => p.DepartmentId == request.DepartmentId.Value);
-      }
-
       return projects;
     }
 
@@ -165,11 +160,6 @@ namespace LT.DigitalOffice.ProjectService.Data
 
       IQueryable<DbProject> dbProjects = _provider.Projects
         .AsQueryable();
-
-      if (filter.DepartmentId.HasValue)
-      {
-        dbProjects = dbProjects.Where(p => p.DepartmentId == filter.DepartmentId.Value);
-      }
 
       int totalCount = await dbProjects.CountAsync();
 

@@ -13,6 +13,7 @@ using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Requests.Department;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
@@ -37,10 +38,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly ICreateProjectRequestValidator _validator;
     private readonly ILogger<CreateProjectCommand> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IRequestClient<ICreateDepartmentEntityRequest> _rcCreateDepartmentEntity;
     private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IRequestClient<ICreateImagesRequest> _rcImages;
     private readonly IResponseCreater _responseCreater;
+
+    #region private methods
 
     private async Task CreateWorkspaceAsync(string projectName, List<Guid> usersIds, List<string> errors)
     {
@@ -143,6 +147,40 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       return null;
     }
 
+    private async Task CreateDepartmentEntityAsync(Guid projectId, Guid? departmentId, List<string> errors)
+    {
+      if (!departmentId.HasValue)
+      {
+        return;
+      }
+
+      string logMessage = "Cannot assing project '{projectId}' to department '{departmentId}'";
+
+      try
+      {
+        Response<IOperationResult<bool>> response = await _rcCreateDepartmentEntity.GetResponse<IOperationResult<bool>>(
+          ICreateDepartmentEntityRequest.CreateObj(
+            departmentId: departmentId.Value,
+            createdBy: _httpContextAccessor.HttpContext.GetUserId(),
+            projectId: projectId));
+
+        if (response.Message.IsSuccess && response.Message.Body)
+        {
+          return;
+        }
+
+        _logger.LogWarning(logMessage, projectId, departmentId);
+      }
+      catch(Exception exc)
+      {
+        _logger.LogError(exc, logMessage, projectId, departmentId);
+      }
+
+      errors.Add("Cannot assign project to department. Please try again later.");
+    }
+
+    #endregion
+
     public CreateProjectCommand(
       IProjectRepository repository,
       ICreateProjectRequestValidator validator,
@@ -150,6 +188,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IDbProjectMapper mapper,
       ILogger<CreateProjectCommand> logger,
       IHttpContextAccessor httpContextAccessor,
+      IRequestClient<ICreateDepartmentEntityRequest> rcCreateDepartmentEntity,
       IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
       IRequestClient<ICreateImagesRequest> rcImages,
@@ -161,6 +200,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _mapper = mapper;
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
+      _rcCreateDepartmentEntity = rcCreateDepartmentEntity;
       _rcCreateWorkspace = rcCreateWorkspace;
       _rcCreateWorkTime = rcCreateWorkTime;
       _rcImages = rcImages;
@@ -197,9 +237,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<Guid> usersIds = request.Users.Select(u => u.UserId).ToList();
 
-      await CreateWorkTimeAsync(dbProject.Id, usersIds, response.Errors);
-
-      await CreateWorkspaceAsync(request.Name, usersIds, response.Errors);
+      await Task.WhenAll(
+        CreateDepartmentEntityAsync(dbProject.Id, request.DepartmentId, response.Errors),
+        CreateWorkTimeAsync(dbProject.Id, usersIds, response.Errors),
+        CreateWorkspaceAsync(request.Name, usersIds, response.Errors));
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 

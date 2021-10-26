@@ -18,7 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       _provider = provider;
     }
 
-    public async Task<List<Guid>> CreateAsync(List<DbEntityImage> images)
+    public async Task<List<Guid>> CreateAsync(List<DbProjectImage> images)
     {
       if (images == null)
       {
@@ -38,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         return false;
       }
 
-      IEnumerable<DbEntityImage> images = _provider.Images
+      IEnumerable<DbProjectImage> images = _provider.Images
         .Where(x => imagesIds.Contains(x.ImageId));
 
       _provider.Images.RemoveRange(images);
