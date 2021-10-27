@@ -91,7 +91,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => !Enum.TryParse(typeof(ProjectStatusType), x.value?.ToString(), true, out _), "Incorrect project status." }
+          { x => Enum.TryParse(typeof(ProjectStatusType), x.value?.ToString(), true, out _), "Incorrect project status." }
         });
 
       #endregion
