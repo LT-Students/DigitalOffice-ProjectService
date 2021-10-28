@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Models.Company;
+using LT.DigitalOffice.Models.Broker.Models.Department;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -30,17 +30,15 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
     {
       if (dbProjects == null)
       {
-       return null;
+        return null;
       }
-
-      List<DepartmentInfo> departmentsInfos = departments?.Select(_departmentInfoMapper.Map).ToList();
 
       return new FindResultResponse<ProjectInfo>
       {
         TotalCount = totalCount,
         Body = dbProjects.Select(p =>
         {
-          return _mapper.Map(p, departmentsInfos?.FirstOrDefault(d => p.DepartmentId == d.Id));
+          return _mapper.Map(p, _departmentInfoMapper.Map(departments.FirstOrDefault(d => d.ProjectsIds.Contains(d.Id))));
         }).ToList(),
         Errors = errors
       };

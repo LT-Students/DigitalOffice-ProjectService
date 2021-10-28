@@ -1,61 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Validators;
-using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Validators;
-using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
-using MassTransit;
 using Microsoft.AspNetCore.JsonPatch.Operations;
-using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Validation.Project
 {
   public class EditProjectRequestValidator : BaseEditRequestValidator<EditProjectRequest>, IEditProjectRequestValidator
   {
     private readonly IProjectRepository _projectRepository;
-    private readonly ILogger<EditProjectRequestValidator> _logger;
-    private readonly IRequestClient<ICheckDepartmentsExistence> _rcDepartmentsExistence;
-
-    private async Task<bool> CheckValidityDepartmentIdAsync(Guid departmentId)
-    {
-      if (departmentId == Guid.Empty)
-      {
-        return false;
-      }
-
-      try
-      {
-        var response =
-          await _rcDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
-            ICheckDepartmentsExistence.CreateObj(new() { departmentId }));
-
-        if (response.Message.IsSuccess)
-        {
-          return response.Message.Body.DepartmentIds.Any();
-        }
-
-        _logger.LogWarning(
-          "Error while checking department existence with id {departmentId}.\n Errors: {Errors}",
-          departmentId,
-          string.Join('\n', response.Message.Errors));
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(
-          exc,
-          "Cannot check department existence with id {departmentId}.",
-          departmentId);
-      }
-
-      return false;
-    }
 
     private async Task HandleInternalPropertyValidationAsync(Operation<EditProjectRequest> requestedOperation, CustomContext context)
     {
@@ -98,13 +57,12 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
 
       #region DepartmentId
 
-      await AddFailureForPropertyIfAsync(
+      AddFailureForPropertyIf(
         nameof(EditProjectRequest.DepartmentId),
         x => x == OperationType.Replace,
         new()
         {
-          { async x => x.value == null ||
-            Guid.TryParse(x.value.ToString(), out var departmentId) && await CheckValidityDepartmentIdAsync(departmentId),
+          { x => x.value == null || Guid.TryParse(x.value.ToString(), out var departmentId),
             "Incorrect department id value." },
         });
 
@@ -157,13 +115,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
     }
 
     public EditProjectRequestValidator(
-      IProjectRepository projectRepository,
-      ILogger<EditProjectRequestValidator> logger,
-      IRequestClient<ICheckDepartmentsExistence> rcDepartmentsExistence)
+      IProjectRepository projectRepository)
     {
       _projectRepository = projectRepository;
-      _logger = logger;
-      _rcDepartmentsExistence = rcDepartmentsExistence;
 
       RuleForEach(x => x.Operations)
         .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));

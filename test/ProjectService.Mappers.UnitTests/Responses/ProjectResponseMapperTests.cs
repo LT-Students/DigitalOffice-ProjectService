@@ -38,7 +38,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                 ShortName = "Project",
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
-                DepartmentId = Guid.NewGuid(),
                 CreatedAtUtc = DateTime.UtcNow,
                 Status = (int)ProjectStatusType.Active
             };
@@ -69,7 +68,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
 
             _department = new DepartmentInfo
             {
-                Id = _dbProject.DepartmentId.Value,
+                Id = Guid.NewGuid(),
                 Name = "DepartmentName"
             };
 

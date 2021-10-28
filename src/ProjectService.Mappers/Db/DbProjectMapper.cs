@@ -13,12 +13,12 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
   {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDbProjectUserMapper _projectUserMapper;
-    private readonly IDbEntityImageMapper _dbEntityImageMapper;
+    private readonly IDbProjectImageMapper _dbEntityImageMapper;
 
     public DbProjectMapper(
       IHttpContextAccessor httpContextAccessor,
       IDbProjectUserMapper projectUserMapper,
-      IDbEntityImageMapper dbEntityImageMapper)
+      IDbProjectImageMapper dbEntityImageMapper)
     {
       _httpContextAccessor = httpContextAccessor;
       _projectUserMapper = projectUserMapper;
@@ -45,7 +45,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         ShortName = shortName == null || !shortName.Any() ? null : shortName,
         Description = description == null || !description.Any() ? null : description,
         ShortDescription = shortDescription == null || !shortDescription.Any() ? null : shortDescription,
-        DepartmentId = request.DepartmentId,
         CreatedAtUtc = DateTime.UtcNow,
         CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
         Users = request.Users?

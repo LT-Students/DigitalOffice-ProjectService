@@ -29,7 +29,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 middleName: "Alexandrovich",
                 isActive: true,
                 imageId: null,
-                rate: 0,
                 status: null);
 
             _dbProjectUser = new DbProjectUser

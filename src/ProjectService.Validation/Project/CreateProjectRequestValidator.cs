@@ -16,19 +16,16 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
 {
   public class CreateProjectRequestValidator : AbstractValidator<CreateProjectRequest>, ICreateProjectRequestValidator
   {
-    private readonly ILogger<CreateProjectRequestValidator> _logger;
-    private readonly IRequestClient<ICheckDepartmentsExistence> _rcCheckDepartmentsExistence;
     private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
+    private readonly ILogger<CreateProjectRequestValidator> _logger;
 
     public CreateProjectRequestValidator(
-      IProjectRepository projectRepository,
       ILogger<CreateProjectRequestValidator> logger,
-      IRequestClient<ICheckDepartmentsExistence> rcCheckDepartmentsExistence,
+      IProjectRepository projectRepository,
       IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
       IImageValidator imageValidator)
     {
       _logger = logger;
-      _rcCheckDepartmentsExistence = rcCheckDepartmentsExistence;
       _rcCheckUsersExistence = rcCheckUsersExistence;
 
       RuleFor(project => project.Name.Trim())
@@ -60,9 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         RuleFor(project => project.DepartmentId)
           .Cascade(CascadeMode.Stop)
           .Must(departmentId => departmentId != Guid.Empty)
-          .WithMessage("Wrong type of department Id.")
-          .MustAsync(async (id, cancellation) => await CheckValidityDepartmentId(id))
-          .WithMessage("Some departments does not exist.");
+          .WithMessage("Wrong type of department Id.");
       });
 
       When(project => project.Users != null && project.Users.Any(), () =>
@@ -90,38 +85,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         RuleForEach(project => project.ProjectImages)
           .SetValidator(imageValidator);
       });
-    }
-
-    private async Task<bool> CheckValidityDepartmentId(Guid? departmentId)
-    {
-      if (!departmentId.HasValue)
-      {
-        return true;
-      }
-
-      string logMessage = "Department with id: {id} not found.";
-
-      try
-      {
-        Response<IOperationResult<ICheckDepartmentsExistence>> response =
-          await _rcCheckDepartmentsExistence.GetResponse<IOperationResult<ICheckDepartmentsExistence>>(
-            ICheckDepartmentsExistence.CreateObj(new List<Guid> { departmentId.Value }));
-        if (response.Message.IsSuccess)
-        {
-          return response.Message.Body.DepartmentIds.Any();
-        }
-
-        _logger.LogWarning("Can not find department. Reason: '{Errors}'",
-          string.Join(',', response.Message.Errors));
-
-        return false;
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, logMessage);
-      }
-
-      return false;
     }
 
     private async Task<bool> CheckValidityUsersIds(List<Guid> usersIds)
