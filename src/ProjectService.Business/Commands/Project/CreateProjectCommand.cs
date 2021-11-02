@@ -273,7 +273,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
           x.Content,
           x.Extension)).ToList();
 
-      DbProject dbProject;
+      DbProject dbProject = await CreateFileAsync(files, response.Errors) ?
+         _mapper.Map(request, imagesIds, files.Select(x => x.Id).ToList()) :
+         _mapper.Map(request, imagesIds, null);
+
       if (await CreateFileAsync(files, response.Errors))
       {
         dbProject = _mapper.Map(request, imagesIds, files.Select(x => x.Id).ToList());
