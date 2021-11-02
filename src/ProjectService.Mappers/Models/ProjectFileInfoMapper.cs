@@ -6,14 +6,14 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
 {
   public class ProjectFileInfoMapper : IProjectFileInfoMapper
   {
-    public ProjectFileInfo Map(DbProjectFile dbProjectFile)
+    public FileInfo Map(DbProjectFile dbProjectFile)
     {
       if (dbProjectFile == null)
       {
         return null;
       }
 
-      return new ProjectFileInfo
+      return new FileInfo
       {
         FileId = dbProjectFile.FileId,
         ProjectId = dbProjectFile.ProjectId

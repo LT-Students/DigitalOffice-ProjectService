@@ -3,6 +3,7 @@ using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Department;
+using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Position;
@@ -71,5 +72,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
     [AutoInjectRequest(typeof(ICreateWorkTimeRequest))]
     public string CreateWorkTimeEndpoint { get; set; }
+
+    // file
+
+    [AutoInjectRequest(typeof(ICreateFilesRequest))]
+    public string CreateFilesEndpoint { get; set; }
   }
 }

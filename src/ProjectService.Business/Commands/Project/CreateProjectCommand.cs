@@ -13,7 +13,9 @@ using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.Models.Broker.Requests.Department;
+using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
@@ -42,6 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IRequestClient<ICreateImagesRequest> _rcImages;
+    private readonly IRequestClient<ICreateFilesRequest> _rcFiles;
     private readonly IResponseCreater _responseCreater;
 
     #region private methods
@@ -179,6 +182,42 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       errors.Add("Unable to enroll project in the department. Please try again later.");
     }
 
+    private async Task<bool> CreateFileAsync(List<FileData> files, List<string> errors)
+    {
+      if (files == null || !files.Any())
+      {
+        return false;
+      }
+
+      string logMessage = "Errors while creating files. Errors: {Errors}";
+
+      try
+      {
+        Response<IOperationResult<bool>> response =
+          await _rcFiles.GetResponse<IOperationResult<bool>>(
+            ICreateFilesRequest.CreateObj(
+              files,
+              _httpContextAccessor.HttpContext.GetUserId()));
+
+        if (response.Message.IsSuccess)
+        {
+          return true;
+        }
+
+        _logger.LogWarning(
+          logMessage,
+          string.Join('\n', response.Message.Errors));
+      }
+      catch (Exception exc)
+      {
+        _logger.LogError(exc, logMessage);
+      }
+
+      errors.Add("Can not create files. Please try again later.");
+
+      return false;
+    }
+
     #endregion
 
     public CreateProjectCommand(
@@ -192,6 +231,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
       IRequestClient<ICreateImagesRequest> rcImages,
+      IRequestClient<ICreateFilesRequest> rcFiles,
       IResponseCreater responseCreater)
     {
       _logger = logger;
@@ -205,6 +245,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _rcCreateWorkTime = rcCreateWorkTime;
       _rcImages = rcImages;
       _responseCreater = responseCreater;
+      _rcFiles = rcFiles;
     }
 
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateProjectRequest request)
@@ -226,7 +267,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<Guid> imagesIds = await CreateImageAsync(request.ProjectImages, response.Errors);
 
-      DbProject dbProject = _mapper.Map(request, imagesIds);
+      List<FileData> files = request.Files.Select(x =>
+        new FileData(Guid.NewGuid(),
+          x.Name,
+          x.Content,
+          x.Extension)).ToList();
+
+      DbProject dbProject;
+      if (await CreateFileAsync(files, response.Errors))
+      {
+        dbProject = _mapper.Map(request, imagesIds, files.Select(x => x.Id).ToList());
+      }
+      else
+      {
+        dbProject = _mapper.Map(request, imagesIds, null);
+      }
 
       response.Body = await _repository.CreateAsync(dbProject);
 

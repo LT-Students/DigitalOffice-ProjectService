@@ -103,7 +103,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
     private void AddTaskPropertiesTable(MigrationBuilder migrationBuilder)
     {
       migrationBuilder.CreateTable(
-        name: "TaskProperties",
+        name: "TasksProperties",
         columns: table => new
         {
           Id = table.Column<Guid>(nullable: false),
@@ -119,14 +119,14 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         },
         constraints: table =>
         {
-          table.PrimaryKey("PK_TaskProperties", x => x.Id);
+          table.PrimaryKey("PK_TasksProperties", x => x.Id);
         });
     }
 
     private void AddDefaultTypes(MigrationBuilder migrationBuilder)
     {
       migrationBuilder.InsertData(
-        table: "TaskProperties",
+        table: "TasksProperties",
         columns: new[]
         {
           "Id",

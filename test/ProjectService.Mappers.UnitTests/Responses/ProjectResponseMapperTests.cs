@@ -21,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
         private DbProject _dbProject;
         private ProjectInfo _projectInfo;
         private IEnumerable<UserInfo> _users;
-        private IEnumerable<ProjectFileInfo> _files;
+        private IEnumerable<FileInfo> _files;
         private DepartmentInfo _department;
         private ProjectResponse _expectedResponse;
 
@@ -57,9 +57,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                 }
             };
 
-            _files = new List<ProjectFileInfo>
+            _files = new List<FileInfo>
             {
-                new ProjectFileInfo
+                new FileInfo
                 {
                     FileId = Guid.NewGuid(),
                     ProjectId = _dbProject.Id

@@ -354,7 +354,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         department = (await GetDepartmentAsync(dbProject.Id, null, response.Errors))?.FirstOrDefault();
       }
 
-      List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
+      List<FileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
       List<ImageInfo> imagesinfo = await GetProjectImagesAsync(dbProject.Images.Select(x => x.ImageId).ToList(), response.Errors);
 
       response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;

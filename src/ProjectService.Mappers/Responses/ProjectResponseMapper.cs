@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
     public ProjectResponse Map(
       DbProject dbProject,
       IEnumerable<UserInfo> users,
-      IEnumerable<ProjectFileInfo> files,
+      IEnumerable<FileInfo> files,
       IEnumerable<ImageInfo> images,
       DepartmentInfo department)
     {

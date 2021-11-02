@@ -11,7 +11,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
     class ProjectFileInfoMapperTests
     {
         public DbProjectFile _dbProjectFile;
-        public ProjectFileInfo _expectedProjectFileInfo;
+        public FileInfo _expectedProjectFileInfo;
 
         public IProjectFileInfoMapper _mapper;
 
@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 ProjectId = Guid.NewGuid()
             };
 
-            _expectedProjectFileInfo = new ProjectFileInfo
+            _expectedProjectFileInfo = new FileInfo
             {
                 ProjectId = _dbProjectFile.ProjectId,
                 FileId = _dbProjectFile.FileId
