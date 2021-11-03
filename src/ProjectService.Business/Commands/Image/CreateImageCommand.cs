@@ -90,7 +90,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       _userRepository = userRepository;
     }
 
-    public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateImageRequest request)
+    public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateImagesRequest request)
     {
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)

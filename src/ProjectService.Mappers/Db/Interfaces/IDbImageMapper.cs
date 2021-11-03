@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces
     [AutoInject]
     public interface IDbImageMapper
     {
-        DbProjectImage Map(CreateImageRequest request, Guid imageId);
+        DbProjectImage Map(CreateImagesRequest request, Guid imageId);
     }
 }

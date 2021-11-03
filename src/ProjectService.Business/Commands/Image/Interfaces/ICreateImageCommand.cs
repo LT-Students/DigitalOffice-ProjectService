@@ -10,6 +10,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces
   [AutoInject]
   public interface ICreateImageCommand
   {
-    Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateImageRequest request);
+    Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateImagesRequest request);
   }
 }

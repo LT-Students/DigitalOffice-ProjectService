@@ -7,7 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
   public class DbImageMapper : IDbImageMapper
   {
-    public DbProjectImage Map(CreateImageRequest request, Guid imageId)
+    public DbProjectImage Map(CreateImagesRequest request, Guid imageId)
     {
       if (request == null)
       {

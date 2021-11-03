@@ -8,4 +8,8 @@
     <ProjectReference Include="..\ProjectService.Models.Dto\ProjectService.Models.Dto.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="File\Interfaces\" />
+  </ItemGroup>
+
 </Project>

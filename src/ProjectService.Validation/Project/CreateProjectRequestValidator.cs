@@ -7,7 +7,6 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Validation.File.Interfaces;
 using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
 using MassTransit;
@@ -24,8 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       ILogger<CreateProjectRequestValidator> logger,
       IProjectRepository projectRepository,
       IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
-      IImageValidator imageValidator,
-      IFileContentValidator createFileValidator)
+      IImageValidator imageValidator)
     {
       _logger = logger;
       _rcCheckUsersExistence = rcCheckUsersExistence;
@@ -86,12 +84,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       {
         RuleForEach(project => project.ProjectImages)
           .SetValidator(imageValidator);
-      });
-
-      When(project => project.Files != null && project.Files.Any(), () =>
-      {
-        RuleForEach(project => project.Files)
-          .SetValidator(createFileValidator);
       });
     }
 

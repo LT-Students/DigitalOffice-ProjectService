@@ -5,7 +5,7 @@ using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation.Image
 {
-  public class CreateImageValidator : AbstractValidator<CreateImageRequest>, ICreateImageValidator
+  public class CreateImageValidator : AbstractValidator<CreateImagesRequest>, ICreateImageValidator
   {
     public CreateImageValidator(
       IImageValidator imageValidator)
