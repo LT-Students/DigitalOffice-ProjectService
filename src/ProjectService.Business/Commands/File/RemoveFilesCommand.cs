@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
     private readonly IUserRepository _userRepository;
     private readonly IResponseCreater _responseCreator;
 
-    private async Task<bool> RemoveFileAsync(List<Guid> ids, List<string> errors)
+    private async Task<bool> RemoveFilesAsync(List<Guid> ids, List<string> errors)
     {
       if (ids == null || !ids.Any())
       {
@@ -93,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
-      bool result = await RemoveFileAsync(request.FilesIds, response.Errors);
+      bool result = await RemoveFilesAsync(request.FilesIds, response.Errors);
 
       if (!result)
       {
