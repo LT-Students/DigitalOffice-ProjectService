@@ -84,14 +84,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(RemoveFilesRequest request)
     {
-      OperationResultResponse<bool> response = new();
-
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
         && !(await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
+
+      OperationResultResponse<bool> response = new();
 
       bool result = await RemoveFilesAsync(request.FilesIds, response.Errors);
 
