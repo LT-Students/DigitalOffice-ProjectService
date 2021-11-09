@@ -21,17 +21,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IAccessValidator _accessValidator;
     private readonly IResponseCreater _responseCreater;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ICacheNotebook _cacheNotebook;
 
     public RemoveProjectUsersCommand(
       IUserRepository repository,
       IAccessValidator accessValidator,
       IResponseCreater responseCreater,
-      IHttpContextAccessor httpContextAccessor)
+      IHttpContextAccessor httpContextAccessor,
+      ICacheNotebook cacheNotebook)
     {
       _repository = repository;
       _accessValidator = accessValidator;
       _responseCreater = responseCreater;
       _httpContextAccessor = httpContextAccessor;
+      _cacheNotebook = cacheNotebook;
     }
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, List<Guid> userIds)
@@ -48,6 +51,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       }
 
       bool result = await _repository.RemoveAsync(projectId, userIds);
+
+      if (result)
+      {
+        await _cacheNotebook.RemoveAsync(projectId);
+      }
 
       return new()
       {
