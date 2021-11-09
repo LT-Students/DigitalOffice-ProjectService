@@ -189,8 +189,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return false;
       }
 
-      string logMessage = "Errors while creating files.";
-
       try
       {
         Response<IOperationResult<bool>> response =
