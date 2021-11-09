@@ -39,8 +39,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
         return false;
       }
 
-      string logMessage = "Errors while creating files. Errors: {Errors}";
-
       try
       {
         Response<IOperationResult<bool>> response =
@@ -55,12 +53,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
         }
 
         _logger.LogWarning(
-          logMessage,
+          "Errors while creating files. Errors: {Errors}",
           string.Join('\n', response.Message.Errors));
       }
       catch (Exception exc)
       {
-        _logger.LogError(exc, logMessage);
+        _logger.LogError(exc, "Errors while creating files.");
       }
 
       errors.Add("Can not create files. Please try again later.");

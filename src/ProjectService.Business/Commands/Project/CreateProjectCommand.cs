@@ -189,7 +189,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return false;
       }
 
-      string logMessage = "Errors while creating files";
+      string logMessage = "Errors while creating files.";
 
       try
       {
@@ -204,11 +204,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
           return response.Message.Body;
         }
 
-        _logger.LogWarning(logMessage);
+        _logger.LogWarning("Errors while creating files. Errors: {Errors}",
+          string.Join('\n', response.Message.Errors));
       }
       catch (Exception exc)
       {
-        _logger.LogError(exc, logMessage);
+        _logger.LogError(exc, "Errors while creating files.");
       }
 
       errors.Add("Can not create files. Please try again later.");

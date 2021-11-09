@@ -37,8 +37,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
         return false;
       }
 
-      string logMessage = "Errors while removing files ids {ids}.";
-
       try
       {
         Response<IOperationResult<bool>> response =
@@ -51,12 +49,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
         }
 
         _logger.LogWarning(
-          logMessage,
-          string.Join('\n', ids));
+          "Errors while removing files ids {ids}.\nErrors: {Errors}",
+          string.Join('\n', ids),
+          string.Join('\n', response.Message.Errors));
       }
       catch (Exception exc)
       {
-        _logger.LogError(exc, logMessage);
+        _logger.LogError(exc,
+          "Errors while removing files ids {ids}.",
+          string.Join('\n', ids));
       }
 
       errors.Add("Can not remove files. Please try again later.");
