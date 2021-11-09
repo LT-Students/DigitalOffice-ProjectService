@@ -38,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
         TotalCount = totalCount,
         Body = dbProjects.Select(p =>
         {
-          return _mapper.Map(p, _departmentInfoMapper.Map(departments.FirstOrDefault(d => d.ProjectsIds.Contains(d.Id))));
+          return _mapper.Map(p, _departmentInfoMapper.Map(departments?.FirstOrDefault(d => d.ProjectsIds.Contains(d.Id))));
         }).ToList(),
         Errors = errors
       };

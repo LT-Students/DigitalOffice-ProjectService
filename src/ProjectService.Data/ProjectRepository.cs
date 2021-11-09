@@ -183,7 +183,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public async Task<bool> DoesProjectNameExistAsync(string name)
     {
-      return await _provider.Projects.AnyAsync(p => p.Name.Contains(name));
+      return await _provider.Projects.AnyAsync(p => p.Name.Equals(name));
     }
 
     public async Task<List<Guid>> DoExistAsync(List<Guid> projectsIds)
