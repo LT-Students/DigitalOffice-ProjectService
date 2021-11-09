@@ -8,6 +8,7 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
@@ -19,14 +20,15 @@ using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 {
-  public class RemoveFileCommand : IRemoveFileCommand
+  public class RemoveFilesCommand : IRemoveFilesCommand
   {
     private readonly IFileRepository _repository;
     private readonly IRequestClient<IRemoveFilesRequest> _rcFiles;
-    private readonly ILogger<RemoveFileCommand> _logger;
+    private readonly ILogger<RemoveFilesCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRepository _userRepository;
+    private readonly IResponseCreater _responseCreator;
 
     private async Task<bool> RemoveFileAsync(List<Guid> ids, List<string> errors)
     {
@@ -35,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
         return false;
       }
 
-      string logMessage = "Errors while removing files ids {ids}. Errors: {Errors}";
+      string logMessage = "Errors while removing files ids {ids}.";
 
       try
       {
@@ -45,13 +47,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
         if (response.Message.IsSuccess)
         {
-          return true;
+          return response.Message.Body;
         }
 
         _logger.LogWarning(
           logMessage,
-          string.Join('\n', ids),
-          string.Join('\n', response.Message.Errors));
+          string.Join('\n', ids));
       }
       catch (Exception exc)
       {
@@ -63,13 +64,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
       return false;
     }
 
-    public RemoveFileCommand(
+    public RemoveFilesCommand(
       IFileRepository repository,
       IRequestClient<IRemoveFilesRequest> rcFiles,
-      ILogger<RemoveFileCommand> logger,
+      ILogger<RemoveFilesCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
-      IUserRepository userRepository)
+      IUserRepository userRepository,
+      IResponseCreater responseCreator)
     {
       _repository = repository;
       _rcFiles = rcFiles;
@@ -77,24 +79,19 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _userRepository = userRepository;
+      _responseCreator = responseCreator;
     }
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(RemoveFilesRequest request)
     {
+      OperationResultResponse<bool> response = new();
+
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
         && !(await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-
-        return new OperationResultResponse<bool>
-        {
-          Status = OperationResultStatusType.Failed,
-          Errors = new List<string> { "Not enough rights." }
-        };
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
-
-      OperationResultResponse<bool> response = new();
 
       bool result = await RemoveFileAsync(request.FilesIds, response.Errors);
 

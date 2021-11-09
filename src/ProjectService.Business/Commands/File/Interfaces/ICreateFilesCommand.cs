@@ -8,7 +8,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 {
   [AutoInject]
-  public interface ICreateFileCommand
+  public interface ICreateFilesCommand
   {
     Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateFilesRequest request);
   }

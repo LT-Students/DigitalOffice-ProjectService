@@ -14,6 +14,7 @@ using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using MassTransit;

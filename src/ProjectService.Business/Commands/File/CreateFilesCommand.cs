@@ -8,6 +8,7 @@ using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.Models.Broker.Requests.File;
@@ -20,17 +21,18 @@ using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 {
-  public class CreateFileCommand : ICreateFileCommand
+  public class CreateFilesCommand : ICreateFilesCommand
   {
     private readonly IDbProjectFileMapper _mapper;
     private readonly IFileRepository _repository;
     private readonly IRequestClient<ICreateFilesRequest> _rcFiles;
-    private readonly ILogger<CreateFileCommand> _logger;
+    private readonly ILogger<CreateFilesCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRepository _userRepository;
+    private readonly IResponseCreater _responseCreator;
 
-    private async Task<bool> CreateFileAsync(List<FileData> files, List<string> errors)
+    private async Task<bool> CreateFilesAsync(List<FileData> files, List<string> errors)
     {
       if (files == null || !files.Any())
       {
@@ -49,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 
         if (response.Message.IsSuccess)
         {
-          return true;
+          return response.Message.Body;
         }
 
         _logger.LogWarning(
@@ -66,14 +68,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       return false;
     }
 
-    public CreateFileCommand(
+    public CreateFilesCommand(
       IDbProjectFileMapper mapper,
       IFileRepository repository,
       IRequestClient<ICreateFilesRequest> rcFiles,
-      ILogger<CreateFileCommand> logger,
+      ILogger<CreateFilesCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
-      IUserRepository userRepository)
+      IUserRepository userRepository,
+      IResponseCreater responseCreator)
     {
       _mapper = mapper;
       _repository = repository;
@@ -82,6 +85,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _userRepository = userRepository;
+      _responseCreator = responseCreator;
     }
 
     public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateFilesRequest request)
@@ -90,13 +94,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
         && !(await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-
-        return new OperationResultResponse<List<Guid>>
-        {
-          Status = OperationResultStatusType.Failed,
-          Errors = new List<string> { "Not enough rights." }
-        };
+        return _responseCreator.CreateFailureResponse <List<Guid>> (HttpStatusCode.Forbidden);
       }
 
       OperationResultResponse<List<Guid>> response = new();
@@ -107,7 +105,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
           x.Content,
           x.Extension)).ToList();
 
-      await CreateFileAsync(files, response.Errors);
+      await CreateFilesAsync(files, response.Errors);
 
       if (response.Errors.Any())
       {

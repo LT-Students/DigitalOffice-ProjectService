@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   {
     [HttpPost("create")]
     public async Task<OperationResultResponse<List<Guid>>> CreateAsync(
-      [FromServices] ICreateFileCommand command,
+      [FromServices] ICreateFilesCommand command,
       [FromBody] CreateFilesRequest request)
     {
       return await command.ExecuteAsync(request);
@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
 
     [HttpDelete("remove")]
     public async Task<OperationResultResponse<bool>> RemoveAsync(
-      [FromServices] IRemoveFileCommand command,
+      [FromServices] IRemoveFilesCommand command,
       [FromBody] RemoveFilesRequest request)
     {
       return await command.ExecuteAsync(request);

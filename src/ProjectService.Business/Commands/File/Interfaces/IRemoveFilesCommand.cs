@@ -6,7 +6,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 {
   [AutoInject]
-  public interface IRemoveFileCommand
+  public interface IRemoveFilesCommand
   {
     Task<OperationResultResponse<bool>> ExecuteAsync(RemoveFilesRequest request);
   }
