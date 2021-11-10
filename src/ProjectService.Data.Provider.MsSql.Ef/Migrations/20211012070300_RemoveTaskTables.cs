@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
     protected override void Up(MigrationBuilder migrationBuilder)
     {
       migrationBuilder.DropTable("Tasks");
-      migrationBuilder.DropTable("TaskProperties");
+      migrationBuilder.DropTable("TasksProperties");
     }
   }
 }

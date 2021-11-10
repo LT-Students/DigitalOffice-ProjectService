@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IProjectRepository _projectRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRepository _userRepository;
-    private readonly IResponseCreater _responseCreater;
+    private readonly IResponseCreater _responseCreator;
     private readonly ICacheNotebook _cacheNotebook;
 
     public EditProjectCommand(
@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IProjectRepository projectRepository,
       IHttpContextAccessor httpContextAccessor,
       IUserRepository userRepository,
-      IResponseCreater responseCreater,
+      IResponseCreater responseCreator,
       ICacheNotebook cacheNotebook)
     {
       _validator = validator;
@@ -46,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _projectRepository = projectRepository;
       _httpContextAccessor = httpContextAccessor;
       _userRepository = userRepository;
-      _responseCreater = responseCreater;
+      _responseCreator = responseCreator;
       _cacheNotebook = cacheNotebook;
     }
 
@@ -59,14 +59,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
         && !await _userRepository.DoesExistAsync(userId, projectId, true))
       {
-        return _responseCreater.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
       ValidationResult validationResult = await _validator.ValidateAsync(request);
 
       if (!validationResult.IsValid)
       {
-        return _responseCreater.CreateFailureResponse<bool>(HttpStatusCode.BadRequest,
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest,
           validationResult.Errors.Select(e => e.ErrorMessage).ToList());
       }
 

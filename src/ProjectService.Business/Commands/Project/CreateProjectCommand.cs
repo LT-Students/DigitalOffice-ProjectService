@@ -13,7 +13,9 @@ using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.Models.Broker.Requests.Department;
+using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
@@ -21,6 +23,7 @@ using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
@@ -42,7 +45,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IRequestClient<ICreateImagesRequest> _rcImages;
-    private readonly IResponseCreater _responseCreater;
+    private readonly IRequestClient<ICreateFilesRequest> _rcFiles;
+    private readonly IResponseCreater _responseCreator;
+    private readonly IFileDataMapper _fileDataMapper;
 
     #region private methods
 
@@ -179,6 +184,39 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       errors.Add("Unable to enroll project in the department. Please try again later.");
     }
 
+    private async Task<bool> CreateFilesAsync(List<FileData> files, List<string> errors)
+    {
+      if (files == null || !files.Any())
+      {
+        return false;
+      }
+
+      try
+      {
+        Response<IOperationResult<bool>> response =
+          await _rcFiles.GetResponse<IOperationResult<bool>>(
+            ICreateFilesRequest.CreateObj(
+              files,
+              _httpContextAccessor.HttpContext.GetUserId()));
+
+        if (response.Message.IsSuccess)
+        {
+          return response.Message.Body;
+        }
+
+        _logger.LogWarning("Errors while creating files. Errors: {Errors}",
+          string.Join('\n', response.Message.Errors));
+      }
+      catch (Exception exc)
+      {
+        _logger.LogError(exc, "Errors while creating files.");
+      }
+
+      errors.Add("Can not create files. Please try again later.");
+
+      return false;
+    }
+
     #endregion
 
     public CreateProjectCommand(
@@ -192,7 +230,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
       IRequestClient<ICreateImagesRequest> rcImages,
-      IResponseCreater responseCreater)
+      IRequestClient<ICreateFilesRequest> rcFiles,
+      IResponseCreater responseCreator,
+      IFileDataMapper fileDataMapper)
     {
       _logger = logger;
       _validator = validator;
@@ -204,21 +244,23 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _rcCreateWorkspace = rcCreateWorkspace;
       _rcCreateWorkTime = rcCreateWorkTime;
       _rcImages = rcImages;
-      _responseCreater = responseCreater;
+      _responseCreator = responseCreator;
+      _rcFiles = rcFiles;
+      _fileDataMapper = fileDataMapper;
     }
 
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateProjectRequest request)
     {
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
       {
-        return _responseCreater.CreateFailureResponse<Guid?>(HttpStatusCode.Forbidden);
+        return _responseCreator.CreateFailureResponse<Guid?>(HttpStatusCode.Forbidden);
       }
 
       ValidationResult validationResult = await _validator.ValidateAsync(request);
 
       if (!validationResult.IsValid)
       {
-        return _responseCreater.CreateFailureResponse<Guid?>(HttpStatusCode.BadRequest,
+        return _responseCreator.CreateFailureResponse<Guid?>(HttpStatusCode.BadRequest,
           validationResult.Errors.Select(vf => vf.ErrorMessage).ToList());
       }
 
@@ -226,13 +268,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<Guid> imagesIds = await CreateImageAsync(request.ProjectImages, response.Errors);
 
-      DbProject dbProject = _mapper.Map(request, imagesIds);
+      List<FileData> files = request.Files.Select(_fileDataMapper.Map).ToList();
+
+      DbProject dbProject = await CreateFilesAsync(files, response.Errors) ?
+        _mapper.Map(request, imagesIds, files.Select(x => x.Id).ToList()) :
+        _mapper.Map(request, imagesIds, null);
 
       response.Body = await _repository.CreateAsync(dbProject);
 
       if (response.Body == null)
       {
-        return _responseCreater.CreateFailureResponse<Guid?>(HttpStatusCode.BadRequest);
+        return _responseCreator.CreateFailureResponse<Guid?>(HttpStatusCode.BadRequest);
       }
 
       List<Guid> usersIds = request.Users.Select(u => u.UserId).ToList();

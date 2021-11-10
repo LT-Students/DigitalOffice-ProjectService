@@ -10,10 +10,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
   {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-      migrationBuilder.RenameTable(
-        name: "EntitiesImages",
-        newName: DbProjectImage.TableName);
-
       migrationBuilder.DropColumn(
         name: "DepartmentId",
         table: DbProject.TableName);

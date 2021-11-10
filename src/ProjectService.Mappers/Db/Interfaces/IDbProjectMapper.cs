@@ -9,6 +9,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces
     [AutoInject]
     public interface IDbProjectMapper
     {
-        DbProject Map(CreateProjectRequest request, List<Guid> imagesIds);
+        DbProject Map(CreateProjectRequest request, List<Guid> imagesIds, List<Guid> filesIds);
     }
 }

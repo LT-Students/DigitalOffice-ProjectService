@@ -40,7 +40,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IUserRepository _userRepository;
     private readonly IProjectResponseMapper _projectResponseMapper;
     private readonly IUserInfoMapper _projectUserInfoMapper;
-    private readonly IProjectFileInfoMapper _projectFileInfoMapper;
     private readonly IDepartmentInfoMapper _departmentInfoMapper;
     private readonly IImageInfoMapper _imageMapper;
     private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartment;
@@ -283,7 +282,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IUserRepository userRepository,
       IProjectResponseMapper projectResponsMapper,
       IUserInfoMapper projectUserInfoMapper,
-      IProjectFileInfoMapper projectFileInfoMapper,
       IDepartmentInfoMapper departmentInfoMapper,
       IImageInfoMapper imageMapper,
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
@@ -297,7 +295,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _userRepository = userRepository;
       _projectResponseMapper = projectResponsMapper;
       _projectUserInfoMapper = projectUserInfoMapper;
-      _projectFileInfoMapper = projectFileInfoMapper;
       _departmentInfoMapper = departmentInfoMapper;
       _imageMapper = imageMapper;
       _rcGetDepartment = rcGetDepartments;
@@ -354,11 +351,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         department = (await GetDepartmentAsync(dbProject.Id, null, response.Errors))?.FirstOrDefault();
       }
 
-      List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
+      List<Guid> files = dbProject.Files.Select(x => x.FileId).ToList();
       List<ImageInfo> imagesinfo = await GetProjectImagesAsync(dbProject.Images.Select(x => x.ImageId).ToList(), response.Errors);
 
       response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
-      response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, imagesinfo, _departmentInfoMapper.Map(department));
+      response.Body = _projectResponseMapper.Map(dbProject, usersInfo, files, imagesinfo, _departmentInfoMapper.Map(department));
 
       return response;
     }

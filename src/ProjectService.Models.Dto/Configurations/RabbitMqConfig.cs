@@ -1,10 +1,11 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Models.Broker.Common;
-using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Department;
+using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
+using LT.DigitalOffice.Models.Broker.Requests.Office;
 using LT.DigitalOffice.Models.Broker.Requests.Position;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.Models.Broker.Requests.User;
@@ -46,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
     [AutoInjectRequest(typeof(ICreateDepartmentEntityRequest))]
     public string CreateDepartmentEntityEndpoint {get; set;}
 
-    // company
+    // office
 
     [AutoInjectRequest(typeof(IGetOfficesRequest))]
     public string GetOfficesEndpoint { get; set; }
@@ -71,5 +72,13 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
     [AutoInjectRequest(typeof(ICreateWorkTimeRequest))]
     public string CreateWorkTimeEndpoint { get; set; }
+
+    // file
+
+    [AutoInjectRequest(typeof(ICreateFilesRequest))]
+    public string CreateFilesEndpoint { get; set; }
+
+    [AutoInjectRequest(typeof(IRemoveFilesRequest))]
+    public string RemoveFilesEndpoint { get; set; }
   }
 }
