@@ -14,6 +14,7 @@ using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
@@ -31,6 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRepository _userRepository;
     private readonly IResponseCreater _responseCreator;
+    private readonly IFileDataMapper _fileDataMapper;
 
     private async Task<bool> CreateFilesAsync(List<FileData> files, List<string> errors)
     {
@@ -74,7 +76,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IUserRepository userRepository,
-      IResponseCreater responseCreator)
+      IResponseCreater responseCreator,
+      IFileDataMapper fileDataMapper)
     {
       _mapper = mapper;
       _repository = repository;
@@ -84,6 +87,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       _httpContextAccessor = httpContextAccessor;
       _userRepository = userRepository;
       _responseCreator = responseCreator;
+      _fileDataMapper = fileDataMapper;
     }
 
     public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateFilesRequest request)
@@ -96,12 +100,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 
       OperationResultResponse<List<Guid>> response = new();
 
-      List<FileData> files = request.Files.Select(x =>
-        new FileData(
-          Guid.NewGuid(),
-          x.Name,
-          x.Content,
-          x.Extension)).ToList();
+      List<FileData> files = request.Files.Select(_fileDataMapper.Map).ToList();
 
       await CreateFilesAsync(files, response.Errors);
 
