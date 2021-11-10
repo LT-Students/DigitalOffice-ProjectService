@@ -88,17 +88,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 
     public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateFilesRequest request)
     {
-      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
+        && !(await _userRepository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), true)))
       {
-        return _responseCreator.CreateFailureResponse <List<Guid>> (HttpStatusCode.Forbidden);
+        return _responseCreator.CreateFailureResponse <List<Guid>>(HttpStatusCode.Forbidden);
       }
 
       OperationResultResponse<List<Guid>> response = new();
 
       List<FileData> files = request.Files.Select(x =>
-        new FileData(Guid.NewGuid(),
+        new FileData(
+          Guid.NewGuid(),
           x.Name,
           x.Content,
           x.Extension)).ToList();
@@ -107,10 +107,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 
       if (response.Errors.Any())
       {
-        response.Status = OperationResultStatusType.Failed;
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        return response;
+        return _responseCreator.CreateFailureResponse<List<Guid>>(HttpStatusCode.BadRequest, response.Errors);
       }
 
       response.Body = await _repository.CreateAsync(files.Select(x =>

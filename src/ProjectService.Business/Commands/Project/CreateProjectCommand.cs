@@ -23,6 +23,7 @@ using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
@@ -46,6 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRequestClient<ICreateImagesRequest> _rcImages;
     private readonly IRequestClient<ICreateFilesRequest> _rcFiles;
     private readonly IResponseCreater _responseCreator;
+    private readonly IFileDataMapper _fileDataMapper;
 
     #region private methods
 
@@ -229,7 +231,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
       IRequestClient<ICreateImagesRequest> rcImages,
       IRequestClient<ICreateFilesRequest> rcFiles,
-      IResponseCreater responseCreator)
+      IResponseCreater responseCreator,
+      IFileDataMapper fileDataMapper)
     {
       _logger = logger;
       _validator = validator;
@@ -243,6 +246,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _rcImages = rcImages;
       _responseCreator = responseCreator;
       _rcFiles = rcFiles;
+      _fileDataMapper = fileDataMapper;
     }
 
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateProjectRequest request)
@@ -264,15 +268,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<Guid> imagesIds = await CreateImageAsync(request.ProjectImages, response.Errors);
 
-      List<FileData> files = request.Files.Select(x =>
-        new FileData(Guid.NewGuid(),
-          x.Name,
-          x.Content,
-          x.Extension)).ToList();
+      List<FileData> files = request.Files.Select(_fileDataMapper.Map).ToList();
 
       DbProject dbProject = await CreateFilesAsync(files, response.Errors) ?
-         _mapper.Map(request, imagesIds, files.Select(x => x.Id).ToList()) :
-         _mapper.Map(request, imagesIds, null);
+        _mapper.Map(request, imagesIds, files.Select(x => x.Id).ToList()) :
+        _mapper.Map(request, imagesIds, null);
 
       response.Body = await _repository.CreateAsync(dbProject);
 

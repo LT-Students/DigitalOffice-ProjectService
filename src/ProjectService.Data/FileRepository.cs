@@ -38,10 +38,10 @@ namespace LT.DigitalOffice.ProjectService.Data
         return false;
       }
 
-      IEnumerable<DbProjectFile> files = _provider.ProjectsFiles
-        .Where(x => filesIds.Contains(x.FileId));
+      _provider.ProjectsFiles.RemoveRange(
+        _provider.ProjectsFiles
+        .Where(x => filesIds.Contains(x.FileId)));
 
-      _provider.ProjectsFiles.RemoveRange(files);
       await _provider.SaveAsync();
 
       return true;

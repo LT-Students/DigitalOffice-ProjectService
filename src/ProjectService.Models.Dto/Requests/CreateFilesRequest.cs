@@ -4,7 +4,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
-  public class CreateFilesRequest
+  public record CreateFilesRequest
   {
     public Guid ProjectId { get; set; }
     public List<FileContent> Files { get; set; }

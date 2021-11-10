@@ -50,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
         _logger.LogWarning(
           "Errors while removing files ids {ids}.\nErrors: {Errors}",
-          string.Join('\n', ids),
+          string.Join(',', ids),
           string.Join('\n', response.Message.Errors));
       }
       catch (Exception exc)
@@ -85,9 +85,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(RemoveFilesRequest request)
     {
-      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
+        && !(await _userRepository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), true)))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
@@ -98,10 +97,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
       if (!result)
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-        response.Status = OperationResultStatusType.Failed;
-
-        return response;
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, response.Errors);
       }
 
       response.Body = await _repository.RemoveAsync(request.FilesIds);
