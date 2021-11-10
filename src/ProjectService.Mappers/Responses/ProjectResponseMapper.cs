@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -19,7 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
     public ProjectResponse Map(
       DbProject dbProject,
       IEnumerable<UserInfo> users,
-      IEnumerable<FileInfo> files,
+      IEnumerable<Guid> files,
       IEnumerable<ImageInfo> images,
       DepartmentInfo department)
     {
