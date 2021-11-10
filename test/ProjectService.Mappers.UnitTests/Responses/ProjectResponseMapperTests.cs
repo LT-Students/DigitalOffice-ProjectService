@@ -88,8 +88,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
             _expectedResponse = new ProjectResponse
             {
                 Project = _projectInfo,
-                Users = _users,
-                Files = _files,
+                Users = _users
             };
 
             _projectInfoMapperMock
