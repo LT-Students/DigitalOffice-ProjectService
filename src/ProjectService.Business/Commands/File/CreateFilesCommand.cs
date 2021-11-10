@@ -91,7 +91,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
         && !(await _userRepository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), true)))
       {
-        return _responseCreator.CreateFailureResponse <List<Guid>>(HttpStatusCode.Forbidden);
+        return _responseCreator.CreateFailureResponse<List<Guid>>(HttpStatusCode.Forbidden);
       }
 
       OperationResultResponse<List<Guid>> response = new();
