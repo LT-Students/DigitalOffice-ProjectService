@@ -268,7 +268,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<Guid> imagesIds = await CreateImageAsync(request.ProjectImages, response.Errors);
 
-      List<FileData> files = request.Files.Select(_fileDataMapper.Map).ToList();
+      List<FileData> files = request.Files?.Select(_fileDataMapper.Map).ToList();
 
       DbProject dbProject = await CreateFilesAsync(files, response.Errors) ?
         _mapper.Map(request, imagesIds, files.Select(x => x.Id).ToList()) :
