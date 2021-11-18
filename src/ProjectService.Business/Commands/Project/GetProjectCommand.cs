@@ -47,6 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
     private readonly IRequestClient<IGetImagesRequest> _rcImages;
     private readonly IRedisHelper _redisHelper;
+    private readonly IResponseCreater _responseCreator;
 
     #region private methods
     private async Task<List<DepartmentData>> GetDepartmentAsync(Guid projectId, List<Guid> usersIds, List<string> errors)
@@ -288,7 +289,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IRequestClient<IGetUsersDataRequest> usersDataRequestClient,
       IRequestClient<IGetPositionsRequest> rcGetPositions,
       IRequestClient<IGetImagesRequest> rcImages,
-      IRedisHelper redisHelper)
+      IRedisHelper redisHelper,
+      IResponseCreater responseCreator)
     {
       _logger = logger;
       _repository = repository;
@@ -302,16 +304,23 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _rcGetPosition = rcGetPositions;
       _rcImages = rcImages;
       _redisHelper = redisHelper;
+      _responseCreator = responseCreator;
     }
 
     public async Task<OperationResultResponse<ProjectResponse>> ExecuteAsync(GetProjectFilter filter)
     {
-      OperationResultResponse<ProjectResponse> response = new();
-      DepartmentData department = null;
       DbProject dbProject = await _repository.GetAsync(filter);
 
-      List<UserData> usersDatas = await GetUsersDatasAsync(dbProject.Users, response.Errors);
+      if (dbProject is null)
+      {
+        return _responseCreator.CreateFailureResponse<ProjectResponse>(System.Net.HttpStatusCode.NotFound);
+      }
+
+      OperationResultResponse<ProjectResponse> response = new();
+      DepartmentData department = null;
       List<UserInfo> usersInfo = null;
+
+      List<UserData> usersDatas = await GetUsersDatasAsync(dbProject.Users, response.Errors);
       List<Guid> usersIds = dbProject.Users.Select(u => u.UserId).Distinct().ToList();
 
       if (usersDatas != null && usersDatas.Any())

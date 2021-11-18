@@ -26,24 +26,19 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
       IQueryable<DbProject> projects = _provider.Projects.AsQueryable();
 
-      if (filter.IncludeUsers.HasValue && filter.IncludeUsers.Value)
+      if (filter.IncludeUsers)
       {
-        if (filter.ShowNotActiveUsers.HasValue && filter.ShowNotActiveUsers.Value)
-        {
-          projects = projects.Include(x => x.Users);
-        }
-        else
-        {
-          projects = projects.Include(x => x.Users.Where(x => x.IsActive));
-        }
+        projects = filter.ShowNotActiveUsers
+          ? projects.Include(x => x.Users)
+          : projects.Include(x => x.Users.Where(x => x.IsActive));
       }
 
-      if (filter.IncludeFiles.HasValue && filter.IncludeFiles.Value)
+      if (filter.IncludeFiles)
       {
         projects = projects.Include(x => x.Files);
       }
 
-      if (filter.IncludeImages.HasValue && filter.IncludeImages.Value)
+      if (filter.IncludeImages)
       {
         projects = projects.Include(x => x.Images);
       }
