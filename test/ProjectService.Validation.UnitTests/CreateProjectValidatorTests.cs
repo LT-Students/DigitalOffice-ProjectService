@@ -4,9 +4,10 @@ using FluentValidation.TestHelper;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Project;
+using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq.AutoMock;
@@ -16,40 +17,40 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
   class CreateProjectValidatorTests
   {
-    private ICreateProjectRequestValidator _validator;
-    private CreateProjectRequest _newProject;
-    private AutoMocker _autoMock;
+    //private ICreateProjectRequestValidator _validator;
+    //private CreateProjectRequest _newProject;
+    //private AutoMocker _autoMock;
 
-    [SetUp]
-    public void SetUp()
-    {
-      _autoMock = new();
+    //[SetUp]
+    //public void SetUp()
+    //{
+    //  _autoMock = new();
 
-      _validator = new CreateProjectRequestValidator(
-      _autoMock.CreateInstance<IProjectRepository>(),
-      _autoMock.CreateInstance<ILogger<CreateProjectRequestValidator>>(),
-      _autoMock.CreateInstance<IRequestClient<ICheckDepartmentsExistence>>(),
-      _autoMock.CreateInstance<IRequestClient<ICheckUsersExistence>>(),
-      _autoMock.CreateInstance<IImageContentValidator>());
+    //  _validator = new CreateProjectRequestValidator(
+    //  _autoMock.CreateInstance<IProjectRepository>(),
+    //  _autoMock.CreateInstance<ILogger<CreateProjectRequestValidator>>(),
+    //  _autoMock.CreateInstance<IRequestClient<ICheckDepartmentsExistence>>(),
+    //  _autoMock.CreateInstance<IRequestClient<ICheckUsersExistence>>(),
+    //  _autoMock.CreateInstance<IImageValidator>());
 
-      _newProject = new CreateProjectRequest
-      {
-        Name = "Project for Lanit-Tercom",
-        ShortName = "Project",
-        Description = "New project for Lanit-Tercom",
-        ShortDescription = "Short description",
-        DepartmentId = Guid.NewGuid(),
-        Status = ProjectStatusType.Active,
-        Users = new List<ProjectUserRequest>
-                {
-                    new ProjectUserRequest
-                    {
-                        UserId = Guid.NewGuid(),
-                        Role = ProjectUserRoleType.Manager
-                    }
-                }
-      };
-    }
+    //  _newProject = new CreateProjectRequest
+    //  {
+    //    Name = "Project for Lanit-Tercom",
+    //    ShortName = "Project",
+    //    Description = "New project for Lanit-Tercom",
+    //    ShortDescription = "Short description",
+    //    DepartmentId = Guid.NewGuid(),
+    //    Status = ProjectStatusType.Active,
+    //    Users = new List<CreateUserRequest>
+    //            {
+    //                new CreateUserRequest
+    //                {
+    //                    UserId = Guid.NewGuid(),
+    //                    Role = ProjectUserRoleType.Manager
+    //                }
+    //            }
+    //  };
+    //}
 
     /*[Test]
     public void ShouldErrorWhenProjectNameIsEmpty()

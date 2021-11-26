@@ -4,7 +4,6 @@ using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using LT.DigitalOffice.UnitTestKernel;
 using Moq;
@@ -14,15 +13,15 @@ using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
 {
-    internal class ProjectResponseMapperTests
+  internal class ProjectResponseMapperTests
     {
         private IProjectResponseMapper _projectIProjectResponseMapper;
         private Mock<IProjectInfoMapper> _projectInfoMapperMock;
 
         private DbProject _dbProject;
         private ProjectInfo _projectInfo;
-        private IEnumerable<ProjectUserInfo> _users;
-        private IEnumerable<ProjectFileInfo> _files;
+        private IEnumerable<UserInfo> _users;
+        private IEnumerable<FileInfo> _files;
         private DepartmentInfo _department;
         private ProjectResponse _expectedResponse;
 
@@ -39,14 +38,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                 ShortName = "Project",
                 Description = "New project for Lanit-Tercom",
                 ShortDescription = "Short description",
-                DepartmentId = Guid.NewGuid(),
                 CreatedAtUtc = DateTime.UtcNow,
                 Status = (int)ProjectStatusType.Active
             };
 
-            _users = new List<ProjectUserInfo>
+            _users = new List<UserInfo>
             {
-                new ProjectUserInfo
+                new UserInfo
                 {
                     Id = Guid.NewGuid(),
                     FirstName = "Spartak",
@@ -59,9 +57,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                 }
             };
 
-            _files = new List<ProjectFileInfo>
+            _files = new List<FileInfo>
             {
-                new ProjectFileInfo
+                new FileInfo
                 {
                     FileId = Guid.NewGuid(),
                     ProjectId = _dbProject.Id
@@ -70,7 +68,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
 
             _department = new DepartmentInfo
             {
-                Id = _dbProject.DepartmentId.Value,
+                Id = Guid.NewGuid(),
                 Name = "DepartmentName"
             };
 
@@ -90,8 +88,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
             _expectedResponse = new ProjectResponse
             {
                 Project = _projectInfo,
-                Users = _users,
-                Files = _files,
+                Users = _users
             };
 
             _projectInfoMapperMock

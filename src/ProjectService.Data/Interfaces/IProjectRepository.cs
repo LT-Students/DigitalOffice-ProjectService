@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -11,26 +12,22 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
   [AutoInject]
   public interface IProjectRepository
   {
-    DbProject Get(GetProjectFilter filter);
+    Task<DbProject> GetAsync(GetProjectFilter filter);
 
-    IEnumerable<DbProject> Get(Guid departmentId);
+    Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request);
 
-    List<DbProject> Find(List<Guid> projectIds);
+    Task<(List<DbProject>, int totalCount)> FindAsync(FindProjectsFilter filter);
 
-    Guid? Create(DbProject dbProject);
+    Task<Guid?> CreateAsync(DbProject dbProject);
 
-    bool Edit(Guid projectId, JsonPatchDocument<DbProject> request);
+    Task<bool> EditAsync(Guid projectId, JsonPatchDocument<DbProject> request);
 
-    void DisableWorkersInProject(Guid projectId, IEnumerable<Guid> userIds);
+    Task<List<DbProject>> SearchAsync(string text);
 
-    List<DbProject> Find(FindProjectsFilter filter, out int totalCount);
+    Task<bool> DoesExistAsync(Guid projectId);
 
-    List<DbProject> Search(string text);
+    Task<List<Guid>> DoExistAsync(List<Guid> projectsIds);
 
-    List<DbProject> Get(IGetProjectsRequest request, out int totalCount);
-
-    bool IsExist(Guid id);
-
-    bool DoesProjectNameExist(string name);
+    Task<bool> DoesProjectNameExistAsync(string name);
   }
 }

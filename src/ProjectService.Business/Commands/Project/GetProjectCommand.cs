@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
-using LT.DigitalOffice.Models.Broker.Models.Company;
-using LT.DigitalOffice.Models.Broker.Requests.Company;
+using LT.DigitalOffice.Models.Broker.Models.Department;
+using LT.DigitalOffice.Models.Broker.Models.Position;
+using LT.DigitalOffice.Models.Broker.Requests.Department;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
+using LT.DigitalOffice.Models.Broker.Requests.Position;
 using LT.DigitalOffice.Models.Broker.Requests.User;
-using LT.DigitalOffice.Models.Broker.Responses.Company;
+using LT.DigitalOffice.Models.Broker.Responses.Department;
 using LT.DigitalOffice.Models.Broker.Responses.Image;
+using LT.DigitalOffice.Models.Broker.Responses.Position;
 using LT.DigitalOffice.Models.Broker.Responses.User;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -23,14 +26,10 @@ using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using MassTransit;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using StackExchange.Redis;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -40,43 +39,55 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IProjectRepository _repository;
     private readonly IUserRepository _userRepository;
     private readonly IProjectResponseMapper _projectResponseMapper;
-    private readonly IProjectUserInfoMapper _projectUserInfoMapper;
-    private readonly IProjectFileInfoMapper _projectFileInfoMapper;
+    private readonly IUserInfoMapper _projectUserInfoMapper;
     private readonly IDepartmentInfoMapper _departmentInfoMapper;
     private readonly IImageInfoMapper _imageMapper;
     private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartment;
+    private readonly IRequestClient<IGetPositionsRequest> _rcGetPosition;
     private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
-    private readonly IRequestClient<IGetCompanyEmployeesRequest> _rcGetCompanyEmployees;
     private readonly IRequestClient<IGetImagesRequest> _rcImages;
-    private readonly IConnectionMultiplexer _cache;
+    private readonly IRedisHelper _redisHelper;
+    private readonly IResponseCreater _responseCreator;
 
-    private async Task<DepartmentData> GetDepartment(Guid departmentId, List<string> errors)
+    #region private methods
+    private async Task<List<DepartmentData>> GetDepartmentAsync(Guid projectId, List<Guid> usersIds, List<string> errors)
     {
-      RedisValue departmentFromCache = await _cache.GetDatabase(Cache.Departments).StringGetAsync(departmentId.GetRedisCacheHashCode());
+      string key;
 
-      if (departmentFromCache.HasValue)
+      if (usersIds != null && usersIds.Any())
       {
-        _logger.LogInformation($"Department was taken from the cache. Department id: {departmentId}");
-
-        return JsonConvert.DeserializeObject<List<DepartmentData>>(departmentFromCache).FirstOrDefault();
+        key = usersIds.GetRedisCacheHashCode(projectId);
+      }
+      else
+      {
+        key = projectId.GetRedisCacheHashCode();
       }
 
-      return await GetDepartmentThroughBroker(departmentId, errors);
+      List<DepartmentData> departmentsFromCache = await _redisHelper.GetAsync<List<DepartmentData>>(Cache.Departments, key);
+
+      if (departmentsFromCache != null)
+      {
+        _logger.LogInformation($"Department was taken from the cache. Department id: {projectId}");
+
+        return departmentsFromCache;
+      }
+
+      return await GetDepartmentThroughBrokerAsync(projectId, usersIds, errors);
     }
 
-    private async Task<DepartmentData> GetDepartmentThroughBroker(Guid departmentId, List<string> errors)
+    private async Task<List<DepartmentData>> GetDepartmentThroughBrokerAsync(Guid projectId, List<Guid> usersIds, List<string> errors)
     {
       try
       {
         Response<IOperationResult<IGetDepartmentsResponse>> departmentResponse =
           await _rcGetDepartment.GetResponse<IOperationResult<IGetDepartmentsResponse>>(
-            IGetDepartmentsRequest.CreateObj(new() { departmentId }));
+            IGetDepartmentsRequest.CreateObj(projectsIds: new() { projectId }, usersIds: usersIds));
 
         if (departmentResponse.Message.IsSuccess)
         {
-          _logger.LogInformation($"Department was taken from the service. Department id: {departmentId}");
+          _logger.LogInformation($"Departments was taken from the service.");
 
-          return departmentResponse.Message.Body.Departments.FirstOrDefault();
+          return departmentResponse.Message.Body.Departments;
         }
 
         _logger.LogWarning(
@@ -87,12 +98,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         _logger.LogError(exc, "Exception on get department request.");
       }
 
-      errors.Add($"Can not get department info for DepartmentId '{departmentId}'. Please try again later.");
+      errors.Add($"Can not get departments info. Please try again later.");
 
       return null;
     }
 
-    private async Task<List<ImageInfo>> GetUserAvatars(List<Guid> imageIds, List<string> errors)
+    private async Task<List<ImageInfo>> GetUserAvatarsAsync(List<Guid> imageIds, List<string> errors)
     {
       if (imageIds == null || !imageIds.Any())
       {
@@ -128,7 +139,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       return null;
     }
 
-    private async Task<List<ImageInfo>> GetProjectImages(List<Guid> imageIds, List<string> errors)
+    private async Task<List<ImageInfo>> GetProjectImagesAsync(List<Guid> imageIds, List<string> errors)
     {
       if (imageIds == null || !imageIds.Any())
       {
@@ -162,7 +173,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       return null;
     }
 
-    private async Task<List<UserData>> GetUsersDatas(IEnumerable<DbProjectUser> projectUsers, List<string> errors)
+    private async Task<List<UserData>> GetUsersDatasAsync(IEnumerable<DbProjectUser> projectUsers, List<string> errors)
     {
       if (projectUsers == null || !projectUsers.Any())
       {
@@ -171,19 +182,19 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<Guid> usersIds = projectUsers.Select(x => x.UserId).ToList();
 
-      RedisValue usersFromCache = await _cache.GetDatabase(Cache.Users).StringGetAsync(usersIds.GetRedisCacheHashCode());
+      List<UserData> usersFromCache = await _redisHelper.GetAsync<List<UserData>>(Cache.Users, usersIds.GetRedisCacheHashCode());
 
-      if (usersFromCache.HasValue)
+      if (usersFromCache != null)
       {
         _logger.LogInformation("UsersDatas were taken from the cache. Users ids: {usersIds}", string.Join(", ", usersIds));
 
-        return JsonConvert.DeserializeObject<List<UserData>>(usersFromCache);
+        return usersFromCache;
       }
 
-      return await GetUsersDatasThroughBroker(usersIds, errors);
+      return await GetUsersDatasThroughBrokerAsync(usersIds, errors);
     }
 
-    private async Task<List<UserData>> GetUsersDatasThroughBroker(List<Guid> usersIds, List<string> errors)
+    private async Task<List<UserData>> GetUsersDatasThroughBrokerAsync(List<Guid> usersIds, List<string> errors)
     {
       try
       {
@@ -211,140 +222,123 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       return null;
     }
 
-    private async Task<(List<DepartmentData> departments, List<PositionData> positions)> GetCompanyEmployee(
+    private async Task<List<PositionData>> GetPositionsAsync(
       List<Guid> usersIds,
       List<string> errors)
     {
-      (List<DepartmentData> departments, List<PositionData> positions) =
-        await GetCompanyEmployeesFromCache(usersIds);
+      List<PositionData> positions = await _redisHelper.GetAsync<List<PositionData>>(Cache.Positions, usersIds.GetRedisCacheHashCode());
 
-      IGetCompanyEmployeesResponse brokerResponse = await GetCompanyEmployeesThroughBroker(
-        usersIds,
-        departments == null,
-        positions == null,
-        errors);
-
-      return (departments ?? brokerResponse?.Departments,
-        positions ?? brokerResponse?.Positions);
-    }
-
-    private async Task<(List<DepartmentData> departments, List<PositionData> positions)> GetCompanyEmployeesFromCache(List<Guid> usersIds)
-    {
-      List<DepartmentData> departments = null;
-      List<PositionData> positions = null;
-
-      string key = usersIds.GetRedisCacheHashCode();
-
-      Task<RedisValue> departmentsFromCacheTask = _cache.GetDatabase(Cache.Departments).StringGetAsync(key);
-      Task<RedisValue> positionsFromCacheTask = _cache.GetDatabase(Cache.Positions).StringGetAsync(key);
-
-      RedisValue departmentsFromCache = await departmentsFromCacheTask;
-      if (departmentsFromCache.HasValue)
+      if (positions != null)
       {
-        departments = JsonConvert.DeserializeObject<List<DepartmentData>>(departmentsFromCache);
+        _logger.LogInformation($"Positions were taken from the cache.");
+
+        return positions;
       }
 
-      RedisValue positionsFromCache = await positionsFromCacheTask;
-      if (positionsFromCache.HasValue)
-      {
-        positions = JsonConvert.DeserializeObject<List<PositionData>>(positionsFromCache);
-      }
-
-      return (departments, positions);
+      return await GetPositionsThroughBrokerAsync(usersIds, errors);
     }
 
-    private async Task<IGetCompanyEmployeesResponse> GetCompanyEmployeesThroughBroker(
+    private async Task<List<PositionData>> GetPositionsThroughBrokerAsync(
       List<Guid> usersIds,
-      bool includeDepartments,
-      bool includePositions,
       List<string> errors)
     {
-      if (!includeDepartments && !includePositions)
+      if (usersIds == null || !usersIds.Any())
       {
         return null;
       }
 
       try
       {
-        Response<IOperationResult<IGetCompanyEmployeesResponse>> response =
-          await _rcGetCompanyEmployees.GetResponse<IOperationResult<IGetCompanyEmployeesResponse>>(
-            IGetCompanyEmployeesRequest.CreateObj(usersIds, includeDepartments: includeDepartments, includePositions: includePositions));
+        Response<IOperationResult<IGetPositionsResponse>> response =
+          await _rcGetPosition.GetResponse<IOperationResult<IGetPositionsResponse>>(
+            IGetPositionsRequest.CreateObj(usersIds: usersIds));
 
         if (response.Message.IsSuccess)
         {
-          return response.Message.Body;
+          return response.Message.Body.Positions;
         }
         else
         {
-          _logger.LogWarning("Errors while getting users departments and positions for users {UserIds}. Reason: {Errors}",
-            string.Join(", ", usersIds),
+          _logger.LogWarning("Errors while getting users positions. Reason: {Errors}",
             string.Join('\n', response.Message.Errors));
         }
       }
       catch (Exception exc)
       {
         _logger.LogError(exc,
-          "Can not get user's departments and positions for users {UserIds}. Please try again later.",
+          "Can not get user's positions. Please try again later.",
           usersIds);
       }
 
-      errors.Add("Can not get user's departments and positions. Please try again later.");
+      errors.Add("Can not get user's positions. Please try again later.");
 
       return null;
     }
+
+    #endregion
 
     public GetProjectCommand(
       ILogger<GetProjectCommand> logger,
       IProjectRepository repository,
       IUserRepository userRepository,
       IProjectResponseMapper projectResponsMapper,
-      IProjectUserInfoMapper projectUserInfoMapper,
-      IProjectFileInfoMapper projectFileInfoMapper,
+      IUserInfoMapper projectUserInfoMapper,
       IDepartmentInfoMapper departmentInfoMapper,
       IImageInfoMapper imageMapper,
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
       IRequestClient<IGetUsersDataRequest> usersDataRequestClient,
-      IRequestClient<IGetCompanyEmployeesRequest> rcGetCompanyEmployees,
+      IRequestClient<IGetPositionsRequest> rcGetPositions,
       IRequestClient<IGetImagesRequest> rcImages,
-      IConnectionMultiplexer cache)
+      IRedisHelper redisHelper,
+      IResponseCreater responseCreator)
     {
       _logger = logger;
       _repository = repository;
       _userRepository = userRepository;
       _projectResponseMapper = projectResponsMapper;
       _projectUserInfoMapper = projectUserInfoMapper;
-      _projectFileInfoMapper = projectFileInfoMapper;
       _departmentInfoMapper = departmentInfoMapper;
       _imageMapper = imageMapper;
       _rcGetDepartment = rcGetDepartments;
       _usersDataRequestClient = usersDataRequestClient;
-      _rcGetCompanyEmployees = rcGetCompanyEmployees;
+      _rcGetPosition = rcGetPositions;
       _rcImages = rcImages;
-      _cache = cache;
+      _redisHelper = redisHelper;
+      _responseCreator = responseCreator;
     }
 
-    public async Task<OperationResultResponse<ProjectResponse>> Execute(GetProjectFilter filter)
+    public async Task<OperationResultResponse<ProjectResponse>> ExecuteAsync(GetProjectFilter filter)
     {
-      OperationResultResponse<ProjectResponse> response = new();
-      DepartmentData department = null;
-      DbProject dbProject = _repository.Get(filter);
+      DbProject dbProject = await _repository.GetAsync(filter);
 
-      if (dbProject.DepartmentId.HasValue)
+      if (dbProject is null)
       {
-        department = await GetDepartment(dbProject.DepartmentId.Value, response.Errors);
+        return _responseCreator.CreateFailureResponse<ProjectResponse>(System.Net.HttpStatusCode.NotFound);
       }
 
-      List<UserData> usersDatas = await GetUsersDatas(dbProject.Users, response.Errors);
-      List<ProjectUserInfo> usersInfo = null;
+      OperationResultResponse<ProjectResponse> response = new();
+      DepartmentData department = null;
+      List<UserInfo> usersInfo = null;
+
+      List<UserData> usersDatas = await GetUsersDatasAsync(dbProject.Users, response.Errors);
       List<Guid> usersIds = dbProject.Users.Select(u => u.UserId).Distinct().ToList();
 
       if (usersDatas != null && usersDatas.Any())
       {
-        (List<DepartmentData> departments, List<PositionData> positions) = await GetCompanyEmployee(usersIds, response.Errors);
-        List<ImageInfo> imagesInfos = await GetUserAvatars(usersDatas.Where(u => u.ImageId.HasValue).Select(u => u.ImageId.Value).ToList(), response.Errors);
+        var positionsTask = GetPositionsAsync(usersIds, response.Errors);
+        var departmentsTask = GetDepartmentAsync(dbProject.Id, usersIds, response.Errors);
+        var imagesTask = GetUserAvatarsAsync(usersDatas.Where(u => u.ImageId.HasValue).Select(u => u.ImageId.Value).ToList(), response.Errors);
+
+        await Task.WhenAll(positionsTask, departmentsTask, imagesTask);
+
+        List<DepartmentData> departments = await departmentsTask;
+        List<PositionData> positions = await positionsTask;
+        List<ImageInfo> imagesInfos = await imagesTask;
+
+        department = departments?.FirstOrDefault(d => d.ProjectsIds != null && d.ProjectsIds.Contains(dbProject.Id));
 
         //rework
-        List<DbProjectUser> projectUsersForCount = _userRepository.Find(usersIds);
+        List<DbProjectUser> projectUsersForCount = await _userRepository.GetAsync(usersIds);
 
         usersInfo = dbProject.Users
           .Select(pu =>
@@ -354,19 +348,23 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             return _projectUserInfoMapper.Map(
               mappedUser,
               imagesInfos?.FirstOrDefault(i => i.Id == mappedUser.ImageId),
-              positions?.FirstOrDefault(p => p.UsersIds.Any(id => id == pu.UserId)),
+              positions?.FirstOrDefault(p => p.Users.Any(user => user.UserId == pu.UserId)),
               departments?.FirstOrDefault(d => d.UsersIds.Any(id => id == pu.UserId)),
               pu,
               projectUsersForCount.Where(u => u.UserId == pu.UserId).Count());
           })
           .ToList();
       }
+      else
+      {
+        department = (await GetDepartmentAsync(dbProject.Id, null, response.Errors))?.FirstOrDefault();
+      }
 
-      List<ProjectFileInfo> filesInfo = dbProject.Files.Select(_projectFileInfoMapper.Map).ToList();
-      List<ImageInfo> imagesinfo = await GetProjectImages(dbProject.Images.Select(x => x.ImageId).ToList(), response.Errors);
+      List<Guid> files = dbProject.Files.Select(x => x.FileId).ToList();
+      List<ImageInfo> imagesinfo = await GetProjectImagesAsync(dbProject.Images.Select(x => x.ImageId).ToList(), response.Errors);
 
       response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
-      response.Body = _projectResponseMapper.Map(dbProject, usersInfo, filesInfo, imagesinfo, _departmentInfoMapper.Map(department));
+      response.Body = _projectResponseMapper.Map(dbProject, usersInfo, files, imagesinfo, _departmentInfoMapper.Map(department));
 
       return response;
     }

@@ -2,25 +2,25 @@
 using LT.DigitalOffice.ProjectService.Mappers.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models.ProjectUser;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.UnitTestKernel;
 using NUnit.Framework;
 using System;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
 {
-    class ProjectUserInfoMapperTests
+  class ProjectUserInfoMapperTests
     {
         public DbProjectUser _dbProjectUser;
-        public ProjectUserInfo _expectedProjectUserInfo;
+        public UserInfo _expectedProjectUserInfo;
         public UserData _userData;
 
-        public IProjectUserInfoMapper _mapper;
+        public IUserInfoMapper _mapper;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _mapper = new ProjectUserInfoMapper();
+            _mapper = new UserInfoMapper();
 
             _userData = new UserData(
                 id: Guid.NewGuid(),
@@ -29,7 +29,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 middleName: "Alexandrovich",
                 isActive: true,
                 imageId: null,
-                rate: 0,
                 status: null);
 
             _dbProjectUser = new DbProjectUser
@@ -42,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 ModifiedAtUtc = DateTime.UtcNow
             };
 
-            _expectedProjectUserInfo = new ProjectUserInfo
+            _expectedProjectUserInfo = new UserInfo
             {
                 Id = _userData.Id,
                 FirstName = _userData.FirstName,

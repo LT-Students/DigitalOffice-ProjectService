@@ -16,36 +16,36 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   public class ProjectController : ControllerBase
   {
     [HttpGet("find")]
-    public async Task<FindResultResponse<ProjectInfo>> Find(
+    public async Task<FindResultResponse<ProjectInfo>> FindAsync(
       [FromServices] IFindProjectsCommand command,
       [FromQuery] FindProjectsFilter filter)
     {
-      return await command.Execute(filter);
+      return await command.ExecuteAsync(filter);
     }
 
     [HttpGet("get")]
-    public async Task<OperationResultResponse<ProjectResponse>> Get(
+    public async Task<OperationResultResponse<ProjectResponse>> GetAsync(
       [FromServices] IGetProjectCommand command,
       [FromQuery] GetProjectFilter filter)
     {
-      return await command.Execute(filter);
+      return await command.ExecuteAsync(filter);
     }
 
     [HttpPost("create")]
-    public async Task<OperationResultResponse<Guid?>> Create(
+    public async Task<OperationResultResponse<Guid?>> CreateAsync(
       [FromServices] ICreateProjectCommand command,
       [FromBody] CreateProjectRequest request)
     {
-      return await command.Execute(request);
+      return await command.ExecuteAsync(request);
     }
 
     [HttpPatch("edit")]
-    public OperationResultResponse<bool> Edit(
+    public async Task<OperationResultResponse<bool>> EditAsync(
       [FromServices] IEditProjectCommand command,
       [FromQuery] Guid projectId,
       [FromBody] JsonPatchDocument<EditProjectRequest> request)
     {
-      return command.Execute(projectId, request);
+      return await command.ExecuteAsync(projectId, request);
     }
   }
 }

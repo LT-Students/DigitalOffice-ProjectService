@@ -7,6 +7,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces
     [AutoInject]
     public interface IProjectFileInfoMapper
     {
-        ProjectFileInfo Map(DbProjectFile dbProjectFile);
+        FileInfo Map(DbProjectFile dbProjectFile);
     }
 }

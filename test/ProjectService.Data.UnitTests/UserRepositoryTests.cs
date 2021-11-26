@@ -1,110 +1,110 @@
-﻿using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Data.Provider;
-using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-using LT.DigitalOffice.UnitTestKernel;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
+﻿//using LT.DigitalOffice.ProjectService.Data.Interfaces;
+//using LT.DigitalOffice.ProjectService.Data.Provider;
+//using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
+//using LT.DigitalOffice.ProjectService.Models.Db;
+//using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+//using LT.DigitalOffice.UnitTestKernel;
+//using Microsoft.AspNetCore.Http;
+//using Microsoft.EntityFrameworkCore;
+//using Moq;
+//using NUnit.Framework;
+//using System;
+//using System.Collections.Generic;
 
-namespace LT.DigitalOffice.ProjectService.Data.UnitTests
-{
-    class UserRepositoryTests
-    {
-        private IDataProvider _provider;
-        private UserRepository _userRepository;
-        private IProjectRepository _projectRepository;
-        private DbContextOptions<ProjectServiceDbContext> _dbOptionsProjectService;
+//namespace LT.DigitalOffice.ProjectService.Data.UnitTests
+//{
+//    class UserRepositoryTests
+//    {
+//        private IDataProvider _provider;
+//        private UserRepository _userRepository;
+//        private IProjectRepository _projectRepository;
+//        private DbContextOptions<ProjectServiceDbContext> _dbOptionsProjectService;
 
-        private List<DbProject> _projects;
-        private List<DbProjectUser> _projectsUser;
+//        private List<DbProject> _projects;
+//        private List<DbProjectUser> _projectsUser;
 
-        private Mock<IHttpContextAccessor> _accessorMock;
-        private Guid _creatorId = Guid.NewGuid();
-        private Guid _userId = Guid.NewGuid();
-        private Guid _firstProject = Guid.NewGuid();
-        private Guid _secondProject = Guid.NewGuid();
+//        private Mock<IHttpContextAccessor> _accessorMock;
+//        private Guid _creatorId = Guid.NewGuid();
+//        private Guid _userId = Guid.NewGuid();
+//        private Guid _firstProject = Guid.NewGuid();
+//        private Guid _secondProject = Guid.NewGuid();
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            _projectsUser = new List<DbProjectUser>
-            {
-                new DbProjectUser
-                {
-                    UserId = _userId,
-                    ProjectId = _firstProject
-                },
-                new DbProjectUser
-                {
-                    UserId = _userId,
-                    ProjectId = _secondProject
-                }
-            };
+//        [OneTimeSetUp]
+//        public void OneTimeSetUp()
+//        {
+//            _projectsUser = new List<DbProjectUser>
+//            {
+//                new DbProjectUser
+//                {
+//                    UserId = _userId,
+//                    ProjectId = _firstProject
+//                },
+//                new DbProjectUser
+//                {
+//                    UserId = _userId,
+//                    ProjectId = _secondProject
+//                }
+//            };
 
-            _projects = new List<DbProject>
-            {
-                new DbProject
-                {
-                    Id = _firstProject,
-                    Users = new List<DbProjectUser> { _projectsUser[0] }
-                },
-                new DbProject
-                {
-                    Id = _secondProject,
-                    Users = new List<DbProjectUser> { _projectsUser[1] }
-                },
-            };
-        }
+//            _projects = new List<DbProject>
+//            {
+//                new DbProject
+//                {
+//                    Id = _firstProject,
+//                    Users = new List<DbProjectUser> { _projectsUser[0] }
+//                },
+//                new DbProject
+//                {
+//                    Id = _secondProject,
+//                    Users = new List<DbProjectUser> { _projectsUser[1] }
+//                },
+//            };
+//        }
 
-        [SetUp]
-        public void SetUp()
-        {
-            _accessorMock = new();
-            IDictionary<object, object> _items = new Dictionary<object, object>();
-            _items.Add("UserId", _creatorId);
+//        [SetUp]
+//        public void SetUp()
+//        {
+//            _accessorMock = new();
+//            IDictionary<object, object> _items = new Dictionary<object, object>();
+//            _items.Add("UserId", _creatorId);
 
-            _accessorMock
-                .Setup(x => x.HttpContext.Items)
-                .Returns(_items);
+//            _accessorMock
+//                .Setup(x => x.HttpContext.Items)
+//                .Returns(_items);
 
-            _dbOptionsProjectService = new DbContextOptionsBuilder<ProjectServiceDbContext>()
-                .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
-                .Options;
+//            _dbOptionsProjectService = new DbContextOptionsBuilder<ProjectServiceDbContext>()
+//                .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
+//                .Options;
 
-            _provider = new ProjectServiceDbContext(_dbOptionsProjectService);
-            _userRepository = new UserRepository(_provider);
-            _projectRepository = new ProjectRepository(_provider, _accessorMock.Object);
-        }
+//            _provider = new ProjectServiceDbContext(_dbOptionsProjectService);
+//            _userRepository = new UserRepository(_provider);
+//            _projectRepository = new ProjectRepository(_provider, _accessorMock.Object);
+//        }
 
-        // [Test]
-        // public void ShouldReturnDbProjectUser()
-        // {
-        //     _provider.ProjectsUsers.AddRange(_projectsUser);
-        //     _provider.Save();
-        //
-        //     SerializerAssert.AreEqual(_projectsUser, _userRepository.Find(_userId));
-        // }
+//        // [Test]
+//        // public void ShouldReturnDbProjectUser()
+//        // {
+//        //     _provider.ProjectsUsers.AddRange(_projectsUser);
+//        //     _provider.Save();
+//        //
+//        //     SerializerAssert.AreEqual(_projectsUser, _userRepository.Find(_userId));
+//        // }
 
-        [Test]
-        public void ThrowExceptionWhenFilterIsNull()
-        {
-            FindDbProjectsUserFilter filter = null;
+//        [Test]
+//        public void ThrowExceptionWhenFilterIsNull()
+//        {
+//            FindDbProjectsUserFilter filter = null;
 
-            Assert.Throws<ArgumentNullException>(() => _userRepository.Find(filter));
-        }
+//            Assert.Throws<ArgumentNullException>(() => _userRepository.Find(filter));
+//        }
 
-        [TearDown]
-        public void CleanMemoryDb()
-        {
-            if (_provider.IsInMemory())
-            {
-                _provider.EnsureDeleted();
-            }
-        }
-    }
-}
+//        [TearDown]
+//        public void CleanMemoryDb()
+//        {
+//            if (_provider.IsInMemory())
+//            {
+//                _provider.EnsureDeleted();
+//            }
+//        }
+//    }
+//}

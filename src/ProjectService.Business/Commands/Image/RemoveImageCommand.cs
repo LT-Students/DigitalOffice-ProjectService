@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Broker;
 using LT.DigitalOffice.Kernel.Constants;
@@ -13,10 +14,8 @@ using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Validation.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -32,9 +31,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRemoveImageValidator _validator;
     private readonly IUserRepository _userRepository;
-    private readonly ITaskRepository _taskRepository;
 
-    private bool RemoveImage(List<Guid> ids, List<string> errors)
+    private async Task<bool> RemoveImageAsync(List<Guid> ids, List<string> errors)
     {
       if (ids == null || !ids.Any())
       {
@@ -45,10 +43,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
       try
       {
-        IOperationResult<bool> response = _rcImages.GetResponse<IOperationResult<bool>>(
-          IRemoveImagesRequest.CreateObj(ids, ImageSource.Project)).Result.Message;
+        Response<IOperationResult<bool>> response =
+          await _rcImages.GetResponse<IOperationResult<bool>>(
+            IRemoveImagesRequest.CreateObj(ids, ImageSource.Project));
 
-        if (response.IsSuccess)
+        if (response.Message.IsSuccess)
         {
           return true;
         }
@@ -56,7 +55,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         _logger.LogWarning(
           logMessage,
           string.Join('\n', ids),
-          string.Join('\n', response.Errors));
+          string.Join('\n', response.Message.Errors));
       }
       catch (Exception exc)
       {
@@ -75,7 +74,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IRemoveImageValidator validator,
-      ITaskRepository taskRepository,
       IUserRepository userRepository)
     {
       _repository = repository;
@@ -84,22 +82,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _validator = validator;
-      _taskRepository = taskRepository;
       _userRepository = userRepository;
     }
 
-    public OperationResultResponse<bool> Execute(RemoveImageRequest request)
+    public async Task<OperationResultResponse<bool>> ExecuteAsync(RemoveImageRequest request)
     {
-      DbTask task = null;
-      if (request.ImageType == ImageType.Task)
-      {
-        task = _taskRepository.Get(request.EntityId, false);
-      }
-
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
-      if (!_accessValidator.HasRights(Rights.AddEditRemoveProjects)
-        && !(request.ImageType == ImageType.Task && _userRepository.AreUserProjectExist(task.ProjectId, userId))
-        && !(request.ImageType == ImageType.Project && _userRepository.AreUserProjectExist(request.EntityId, userId, true)))
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
+        && !(await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
@@ -123,7 +113,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
       OperationResultResponse<bool> response = new();
 
-      bool result = RemoveImage(request.ImagesIds, response.Errors);
+      bool result = await RemoveImageAsync(request.ImagesIds, response.Errors);
 
       if (!result)
       {
@@ -133,7 +123,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
         return response;
       }
 
-      response.Body = _repository.Remove(request.ImagesIds);
+      response.Body = await _repository.RemoveAsync(request.ImagesIds);
       response.Status = OperationResultStatusType.FullSuccess;
 
       return response;

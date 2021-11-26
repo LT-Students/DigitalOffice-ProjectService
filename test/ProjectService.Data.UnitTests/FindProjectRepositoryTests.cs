@@ -2,7 +2,6 @@
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -10,12 +9,12 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 {
-    class FindProjectRepositoryTests
+  class FindProjectRepositoryTests
     {
-        private FindProjectsFilter _filter;
         private IDataProvider _provider;
         private IProjectRepository _repository;
         private Mock<IHttpContextAccessor> _accessorMock;
@@ -36,7 +35,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = "Name1",
                 ShortName = "N1",
                 Description = "description",
-                DepartmentId = Guid.NewGuid(),
                 CreatedAtUtc = DateTime.UtcNow,
             };
 
@@ -46,7 +44,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = "Name2",
                 ShortName = "N2",
                 Description = "description",
-                DepartmentId = Guid.NewGuid(),
                 CreatedAtUtc = DateTime.UtcNow,
             };
 
@@ -56,7 +53,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = "NameWithRegular1",
                 ShortName = "NWR1",
                 Description = "description",
-                DepartmentId = Guid.NewGuid(),
                 CreatedAtUtc = DateTime.UtcNow,
             };
 
@@ -66,7 +62,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 Name = "NameWithRegular2",
                 ShortName = "NWR2",
                 Description = "description",
-                DepartmentId = _dbProject3.DepartmentId,
                 CreatedAtUtc = DateTime.UtcNow,
             };
 
@@ -141,7 +136,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         }*/
 
         [Test]
-        public void ShouldSearchProject()
+        public async Task ShouldSearchProject()
         {
             List<DbProject> projects = new()
             {
@@ -149,7 +144,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
                 _dbProject4
             };
 
-            SerializerAssert.AreEqual(projects, _repository.Search("Regular"));
+            SerializerAssert.AreEqual(projects, await _repository.SearchAsync("Regular"));
         }
 
 /*        [Test]

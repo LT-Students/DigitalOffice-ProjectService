@@ -1,129 +1,129 @@
-﻿using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.Exceptions.Models;
-using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers;
-using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
-using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
+﻿﻿//using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+//using LT.DigitalOffice.Kernel.Exceptions.Models;
+//using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers;
+//using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
+//using LT.DigitalOffice.ProjectService.Data.Interfaces;
+//using Moq;
+//using NUnit.Framework;
+//using System;
+//using System.Collections.Generic;
 
-namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
-{
-    class DisableWorkersInProjectCommandTests
-    {
-        private IDisableWorkersInProjectCommand command;
+//namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
+//{
+//    class DisableWorkersInProjectCommandTests
+//    {
+//        private IRemoveUsersFromProjectCommand command;
 
-        private Mock<IProjectRepository> repositoryMock;
-        private Mock<IAccessValidator> accessValidatorMock;
+//        private Mock<IProjectRepository> repositoryMock;
+//        private Mock<IAccessValidator> accessValidatorMock;
 
-        private Guid projectId;
-        private IEnumerable<Guid> userIds;
+//        private Guid projectId;
+//        private IEnumerable<Guid> userIds;
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            projectId = Guid.NewGuid();
-            userIds = new List<Guid>
-            {
-                Guid.NewGuid(),
-                Guid.NewGuid()
-            };
-        }
+//        [OneTimeSetUp]
+//        public void OneTimeSetUp()
+//        {
+//            projectId = Guid.NewGuid();
+//            userIds = new List<Guid>
+//            {
+//                Guid.NewGuid(),
+//                Guid.NewGuid()
+//            };
+//        }
 
-        [SetUp]
-        public void SetUp()
-        {
-            repositoryMock = new Mock<IProjectRepository>();
-            accessValidatorMock = new Mock<IAccessValidator>();
+//        [SetUp]
+//        public void SetUp()
+//        {
+//            repositoryMock = new Mock<IProjectRepository>();
+//            accessValidatorMock = new Mock<IAccessValidator>();
 
-            accessValidatorMock
-                .Setup(x => x.IsAdmin(null))
-                .Returns(true);
+//            accessValidatorMock
+//                .Setup(x => x.IsAdmin(null))
+//                .Returns(true);
 
-            accessValidatorMock
-                .Setup(x => x.HasRights(It.IsAny<int>()))
-                .Returns(true);
+//            accessValidatorMock
+//                .Setup(x => x.HasRights(It.IsAny<int>()))
+//                .Returns(true);
 
-            repositoryMock
-                .Setup(x => x.DisableWorkersInProject(projectId, userIds));
+//            repositoryMock
+//                .Setup(x => x.DisableWorkersInProject(projectId, userIds));
 
-            command = new DisableWorkersInProjectCommand(repositoryMock.Object, accessValidatorMock.Object);
-        }
+//            command = new RemoveUsersFromProjectCommand(repositoryMock.Object, accessValidatorMock.Object);
+//        }
 
-        [Test]
-        public void ShouldDisableWorkersSuccess()
-        {
-            Assert.DoesNotThrow(() => command.Execute(projectId, userIds));
+//        [Test]
+//        public void ShouldDisableWorkersSuccess()
+//        {
+//            Assert.DoesNotThrow(() => command.Execute(projectId, userIds));
 
-            repositoryMock.Verify(repository =>
-            repository.DisableWorkersInProject(It.IsAny<Guid>(), It.IsAny<IEnumerable<Guid>>()), Times.Once);
-        }
+//            repositoryMock.Verify(repository =>
+//            repository.DisableWorkersInProject(It.IsAny<Guid>(), It.IsAny<IEnumerable<Guid>>()), Times.Once);
+//        }
 
-        [Test]
-        public void ShouldThrowExceptionWhenUsersIsNull()
-        {
-            Assert.Throws<BadRequestException>(() => command.Execute(projectId, null));
+//        [Test]
+//        public void ShouldThrowExceptionWhenUsersIsNull()
+//        {
+//            Assert.Throws<BadRequestException>(() => command.Execute(projectId, null));
 
-            repositoryMock.Verify(repository =>
-            repository.DisableWorkersInProject(It.IsAny<Guid>(), It.IsAny<IEnumerable<Guid>>()), Times.Never);
-        }
+//            repositoryMock.Verify(repository =>
+//            repository.DisableWorkersInProject(It.IsAny<Guid>(), It.IsAny<IEnumerable<Guid>>()), Times.Never);
+//        }
 
-        [Test]
-        public void ShouldThrowExceptionWhenUsersNotSpecified()
-        {
-            Assert.Throws<BadRequestException>(() => command.Execute(projectId, new List<Guid>()));
+//        [Test]
+//        public void ShouldThrowExceptionWhenUsersNotSpecified()
+//        {
+//            Assert.Throws<BadRequestException>(() => command.Execute(projectId, new List<Guid>()));
 
-            repositoryMock.Verify(repository =>
-            repository.DisableWorkersInProject(It.IsAny<Guid>(), It.IsAny<IEnumerable<Guid>>()), Times.Never);
-        }
+//            repositoryMock.Verify(repository =>
+//            repository.DisableWorkersInProject(It.IsAny<Guid>(), It.IsAny<IEnumerable<Guid>>()), Times.Never);
+//        }
 
-        [Test]
-        public void ShouldThrowExceptionWhenRepositoryThrowsIt()
-        {
+//        [Test]
+//        public void ShouldThrowExceptionWhenRepositoryThrowsIt()
+//        {
 
-            repositoryMock
-                .Setup(x => x.DisableWorkersInProject(projectId, userIds))
-                .Throws(new NullReferenceException());
+//            repositoryMock
+//                .Setup(x => x.DisableWorkersInProject(projectId, userIds))
+//                .Throws(new NullReferenceException());
 
-            Assert.Throws<NullReferenceException>(() => command.Execute(projectId, userIds));
-        }
+//            Assert.Throws<NullReferenceException>(() => command.Execute(projectId, userIds));
+//        }
 
-        [Test]
-        public void ShouldDisableWorkersSuccessWhenUserIsAdmin()
-        {
-            accessValidatorMock
-                .Setup(x => x.HasRights(It.IsAny<int>()))
-                .Returns(false);
+//        [Test]
+//        public void ShouldDisableWorkersSuccessWhenUserIsAdmin()
+//        {
+//            accessValidatorMock
+//                .Setup(x => x.HasRights(It.IsAny<int>()))
+//                .Returns(false);
 
-            Assert.DoesNotThrow(() => command.Execute(projectId, userIds));
-        }
+//            Assert.DoesNotThrow(() => command.Execute(projectId, userIds));
+//        }
 
-        [Test]
-        public void ShouldDisableWorkersWhenUserIsNotAdminAndHasRights()
-        {
-            accessValidatorMock
-                .Setup(x => x.IsAdmin(null))
-                .Returns(false);
+//        [Test]
+//        public void ShouldDisableWorkersWhenUserIsNotAdminAndHasRights()
+//        {
+//            accessValidatorMock
+//                .Setup(x => x.IsAdmin(null))
+//                .Returns(false);
 
-            Assert.DoesNotThrow(() => command.Execute(projectId, userIds));
-        }
+//            Assert.DoesNotThrow(() => command.Execute(projectId, userIds));
+//        }
 
-        [Test]
-        public void ShouldThrowExceptionWhenUserIsNotAdminAndHasNotRights()
-        {
-            accessValidatorMock
-                .Setup(x => x.IsAdmin(null))
-                .Returns(false);
+//        [Test]
+//        public void ShouldThrowExceptionWhenUserIsNotAdminAndHasNotRights()
+//        {
+//            accessValidatorMock
+//                .Setup(x => x.IsAdmin(null))
+//                .Returns(false);
 
-            accessValidatorMock
-                .Setup(x => x.HasRights(It.IsAny<int>()))
-                .Returns(false);
+//            accessValidatorMock
+//                .Setup(x => x.HasRights(It.IsAny<int>()))
+//                .Returns(false);
 
-            Assert.That(() => command.Execute(projectId, userIds), Throws.InstanceOf<Exception>());
+//            Assert.That(() => command.Execute(projectId, userIds), Throws.InstanceOf<Exception>());
 
-            repositoryMock.Verify(repository =>
-            repository.DisableWorkersInProject(It.IsAny<Guid>(), It.IsAny<IEnumerable<Guid>>()), Times.Never);
-        }
-    }
-}
+//            repositoryMock.Verify(repository =>
+//            repository.DisableWorkersInProject(It.IsAny<Guid>(), It.IsAny<IEnumerable<Guid>>()), Times.Never);
+//        }
+//    }
+//}

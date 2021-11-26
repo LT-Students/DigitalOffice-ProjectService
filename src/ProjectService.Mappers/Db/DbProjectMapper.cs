@@ -13,19 +13,22 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
   {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDbProjectUserMapper _projectUserMapper;
-    private readonly IDbEntityImageMapper _dbEntityImageMapper;
+    private readonly IDbProjectImageMapper _dbEntityImageMapper;
+    private readonly IDbProjectFileMapper _dbProjectFileMapper;
 
     public DbProjectMapper(
       IHttpContextAccessor httpContextAccessor,
       IDbProjectUserMapper projectUserMapper,
-      IDbEntityImageMapper dbEntityImageMapper)
+      IDbProjectImageMapper dbEntityImageMapper,
+      IDbProjectFileMapper dbProjectFileMapper)
     {
       _httpContextAccessor = httpContextAccessor;
       _projectUserMapper = projectUserMapper;
       _dbEntityImageMapper = dbEntityImageMapper;
+      _dbProjectFileMapper = dbProjectFileMapper;
     }
 
-    public DbProject Map(CreateProjectRequest request, List<Guid> imagesIds)
+    public DbProject Map(CreateProjectRequest request, List<Guid> imagesIds, List<Guid> filesIds)
     {
       if (request == null)
       {
@@ -45,7 +48,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         ShortName = shortName == null || !shortName.Any() ? null : shortName,
         Description = description == null || !description.Any() ? null : description,
         ShortDescription = shortDescription == null || !shortDescription.Any() ? null : shortDescription,
-        DepartmentId = request.DepartmentId,
         CreatedAtUtc = DateTime.UtcNow,
         CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
         Users = request.Users?
@@ -53,6 +55,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
           .ToList(),
         Images = imagesIds?
           .Select(imageId => _dbEntityImageMapper.Map(imageId, projectId))
+          .ToList(),
+        Files = filesIds?
+          .Select(fileId => _dbProjectFileMapper.Map(fileId, projectId))
           .ToList()
       };
     }

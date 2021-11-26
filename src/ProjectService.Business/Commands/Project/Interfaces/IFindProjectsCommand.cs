@@ -9,6 +9,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
   [AutoInject]
   public interface IFindProjectsCommand
   {
-    Task<FindResultResponse<ProjectInfo>> Execute(FindProjectsFilter filter);
+    Task<FindResultResponse<ProjectInfo>> ExecuteAsync(FindProjectsFilter filter);
   }
 }
