@@ -3,11 +3,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentValidation.Results;
-using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -27,7 +28,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IProjectRepository _projectRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRepository _userRepository;
-    private readonly IResponseCreater _responseCreator;
+    private readonly IResponseCreator _responseCreator;
     private readonly ICacheNotebook _cacheNotebook;
 
     public EditProjectCommand(
@@ -37,7 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IProjectRepository projectRepository,
       IHttpContextAccessor httpContextAccessor,
       IUserRepository userRepository,
-      IResponseCreater responseCreator,
+      IResponseCreator responseCreator,
       ICacheNotebook cacheNotebook)
     {
       _validator = validator;

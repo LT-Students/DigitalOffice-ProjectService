@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.Kernel.Constants;
+using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.RedisSupport.Constants;
+using LT.DigitalOffice.Kernel.RedisSupport.Extensions;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
@@ -47,7 +48,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
     private readonly IRequestClient<IGetImagesRequest> _rcImages;
     private readonly IRedisHelper _redisHelper;
-    private readonly IResponseCreater _responseCreator;
+    private readonly IResponseCreator _responseCreator;
 
     #region private methods
     private async Task<List<DepartmentData>> GetDepartmentAsync(Guid projectId, List<Guid> usersIds, List<string> errors)
@@ -290,7 +291,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IRequestClient<IGetPositionsRequest> rcGetPositions,
       IRequestClient<IGetImagesRequest> rcImages,
       IRedisHelper redisHelper,
-      IResponseCreater responseCreator)
+      IResponseCreator responseCreator)
     {
       _logger = logger;
       _repository = repository;
