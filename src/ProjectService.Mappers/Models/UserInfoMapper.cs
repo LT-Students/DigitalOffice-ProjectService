@@ -36,7 +36,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
         LastName = userData.LastName,
         MiddleName = userData.MiddleName,
         Status = userData.Status,
-        Rate = userPosition?.Users?.FirstOrDefault(u => u.UserId == userData.Id)?.Rate,
         ProjectCount = projectCount,
         IsActive = dbProjectUser.IsActive,
         CreatedAtUtc = dbProjectUser.CreatedAtUtc,

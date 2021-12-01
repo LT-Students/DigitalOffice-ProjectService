@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -19,20 +20,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
   {
     private readonly IUserRepository _repository;
     private readonly IAccessValidator _accessValidator;
-    private readonly IResponseCreater _responseCreater;
+    private readonly IResponseCreator _responseCreator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ICacheNotebook _cacheNotebook;
 
     public RemoveProjectUsersCommand(
       IUserRepository repository,
       IAccessValidator accessValidator,
-      IResponseCreater responseCreater,
+      IResponseCreator responseCreator,
       IHttpContextAccessor httpContextAccessor,
       ICacheNotebook cacheNotebook)
     {
       _repository = repository;
       _accessValidator = accessValidator;
-      _responseCreater = responseCreater;
+      _responseCreator = responseCreator;
       _httpContextAccessor = httpContextAccessor;
       _cacheNotebook = cacheNotebook;
     }
@@ -42,12 +43,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
         && !await _repository.IsProjectAdminAsync(projectId, _httpContextAccessor.HttpContext.GetUserId()))
       {
-        return _responseCreater.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
       if (userIds == null || !userIds.Any())
       {
-        return _responseCreater.CreateFailureResponse<bool>(HttpStatusCode.BadRequest);
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest);
       }
 
       bool result = await _repository.RemoveAsync(projectId, userIds);
