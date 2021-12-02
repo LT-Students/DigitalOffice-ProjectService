@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Models.Department;
 using LT.DigitalOffice.Models.Broker.Models.Position;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
@@ -15,6 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
       UserData userData,
       ImageInfo image,
       PositionData userPosition,
+      CompanyData userCompany,
       DepartmentData userDepartment,
       DbProjectUser dbProjectUser,
       int projectCount)
@@ -36,6 +38,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
         LastName = userData.LastName,
         MiddleName = userData.MiddleName,
         Status = userData.Status,
+        Rate = userCompany?.Users?.FirstOrDefault(u => u.UserId == userData.Id)?.Rate,
         ProjectCount = projectCount,
         IsActive = dbProjectUser.IsActive,
         CreatedAtUtc = dbProjectUser.CreatedAtUtc,
