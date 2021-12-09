@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
@@ -31,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRepository _userRepository;
-    private readonly IResponseCreater _responseCreator;
+    private readonly IResponseCreator _responseCreator;
     private readonly IFileDataMapper _fileDataMapper;
 
     private async Task<bool> CreateFilesAsync(List<FileData> files, List<string> errors)
@@ -76,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IUserRepository userRepository,
-      IResponseCreater responseCreator,
+      IResponseCreator responseCreator,
       IFileDataMapper fileDataMapper)
     {
       _mapper = mapper;

@@ -2,20 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.Kernel.Constants;
+using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.RedisSupport.Constants;
+using LT.DigitalOffice.Kernel.RedisSupport.Extensions;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Models.Company;
 using LT.DigitalOffice.Models.Broker.Models.Department;
 using LT.DigitalOffice.Models.Broker.Models.Position;
+using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Department;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Position;
 using LT.DigitalOffice.Models.Broker.Requests.User;
+using LT.DigitalOffice.Models.Broker.Responses.Company;
 using LT.DigitalOffice.Models.Broker.Responses.Department;
 using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.Models.Broker.Responses.Position;
@@ -44,10 +48,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IImageInfoMapper _imageMapper;
     private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartment;
     private readonly IRequestClient<IGetPositionsRequest> _rcGetPosition;
+    private readonly IRequestClient<IGetCompaniesRequest> _rcGetCompanies;
     private readonly IRequestClient<IGetUsersDataRequest> _usersDataRequestClient;
     private readonly IRequestClient<IGetImagesRequest> _rcImages;
     private readonly IRedisHelper _redisHelper;
-    private readonly IResponseCreater _responseCreator;
+    private readonly IResponseCreator _responseCreator;
 
     #region private methods
     private async Task<List<DepartmentData>> GetDepartmentAsync(Guid projectId, List<Guid> usersIds, List<string> errors)
@@ -275,6 +280,59 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       return null;
     }
 
+    private async Task<List<CompanyData>> GetCompaniesAsync(
+      List<Guid> usersIds,
+      List<string> errors)
+    {
+      List<CompanyData> companies = await _redisHelper.GetAsync<List<CompanyData>>(Cache.Companies, usersIds.GetRedisCacheHashCode());
+
+      if (companies != null)
+      {
+        _logger.LogInformation($"Companies were taken from the cache.");
+
+        return companies;
+      }
+
+      return await GetCompaniesThroughBrokerAsync(usersIds, errors);
+    }
+
+    private async Task<List<CompanyData>> GetCompaniesThroughBrokerAsync(
+      List<Guid> usersIds,
+      List<string> errors)
+    {
+      if (usersIds == null || !usersIds.Any())
+      {
+        return null;
+      }
+
+      try
+      {
+        Response<IOperationResult<IGetCompaniesResponse>> response =
+          await _rcGetCompanies.GetResponse<IOperationResult<IGetCompaniesResponse>>(
+            IGetCompaniesRequest.CreateObj(usersIds: usersIds));
+
+        if (response.Message.IsSuccess)
+        {
+          return response.Message.Body.Companies;
+        }
+        else
+        {
+          _logger.LogWarning("Errors while getting users companies. Reason: {Errors}",
+            string.Join('\n', response.Message.Errors));
+        }
+      }
+      catch (Exception exc)
+      {
+        _logger.LogError(exc,
+          "Can not get user's companies. Please try again later.",
+          usersIds);
+      }
+
+      errors.Add("Can not get user's companies. Please try again later.");
+
+      return null;
+    }
+
     #endregion
 
     public GetProjectCommand(
@@ -288,9 +346,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
       IRequestClient<IGetUsersDataRequest> usersDataRequestClient,
       IRequestClient<IGetPositionsRequest> rcGetPositions,
+      IRequestClient<IGetCompaniesRequest> rcGetCompanies,
       IRequestClient<IGetImagesRequest> rcImages,
       IRedisHelper redisHelper,
-      IResponseCreater responseCreator)
+      IResponseCreator responseCreator)
     {
       _logger = logger;
       _repository = repository;
@@ -302,6 +361,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _rcGetDepartment = rcGetDepartments;
       _usersDataRequestClient = usersDataRequestClient;
       _rcGetPosition = rcGetPositions;
+      _rcGetCompanies = rcGetCompanies;
       _rcImages = rcImages;
       _redisHelper = redisHelper;
       _responseCreator = responseCreator;
@@ -326,13 +386,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       if (usersDatas != null && usersDatas.Any())
       {
         var positionsTask = GetPositionsAsync(usersIds, response.Errors);
+        var companiesTask = GetCompaniesAsync(usersIds, response.Errors);
         var departmentsTask = GetDepartmentAsync(dbProject.Id, usersIds, response.Errors);
         var imagesTask = GetUserAvatarsAsync(usersDatas.Where(u => u.ImageId.HasValue).Select(u => u.ImageId.Value).ToList(), response.Errors);
 
-        await Task.WhenAll(positionsTask, departmentsTask, imagesTask);
+        await Task.WhenAll(positionsTask, departmentsTask, companiesTask, imagesTask);
 
         List<DepartmentData> departments = await departmentsTask;
         List<PositionData> positions = await positionsTask;
+        List<CompanyData> companies = await companiesTask;
         List<ImageInfo> imagesInfos = await imagesTask;
 
         department = departments?.FirstOrDefault(d => d.ProjectsIds != null && d.ProjectsIds.Contains(dbProject.Id));
@@ -349,6 +411,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
               mappedUser,
               imagesInfos?.FirstOrDefault(i => i.Id == mappedUser.ImageId),
               positions?.FirstOrDefault(p => p.Users.Any(user => user.UserId == pu.UserId)),
+              companies?.FirstOrDefault(c => c.Users.Any(user => user.UserId == pu.UserId)),
               departments?.FirstOrDefault(d => d.UsersIds.Any(id => id == pu.UserId)),
               pu,
               projectUsersForCount.Where(u => u.UserId == pu.UserId).Count());

@@ -4,18 +4,18 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentValidation.Results;
-using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.Broker;
+using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 using MassTransit;
@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IAddUsersToProjectValidator _validator;
     private readonly ILogger<CreateProjectUsersCommand> _logger;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
-    private readonly IResponseCreater _responseCreater;
+    private readonly IResponseCreator _responseCreator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ICacheNotebook _cacheNotebook;
 
@@ -68,7 +68,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       IAddUsersToProjectValidator validator,
       ILogger<CreateProjectUsersCommand> logger,
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
-      IResponseCreater responseCreater,
+      IResponseCreator responseCreator,
       IHttpContextAccessor httpContextAccessor,
       ICacheNotebook cacheNotebook)
     {
@@ -78,7 +78,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _accessValidator = accessValidator;
       _logger = logger;
       _rcCreateWorkTime = rcCreateWorkTime;
-      _responseCreater = responseCreater;
+      _responseCreator = responseCreator;
       _httpContextAccessor = httpContextAccessor;
       _cacheNotebook = cacheNotebook;
     }
@@ -90,7 +90,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
         && !await _repository.IsProjectAdminAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId()))
       {
-        return _responseCreater.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
       ValidationResult validationResult = await _validator.ValidateAsync(request);
@@ -99,7 +99,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       if (!validationResult.IsValid)
       {
-        return _responseCreater.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
       }
 
       List<Guid> existUsers = await _repository.GetExistAsync(request.ProjectId, request.Users.Select(u => u.UserId).ToList());
@@ -110,7 +110,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       {
         errors.Add("Request doesn't contains users who still are not emloyees of this project.");
 
-        return _responseCreater.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
       }
 
       bool result = await _repository.CreateAsync(_mapper.Map(request));

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.Broker;
-using LT.DigitalOffice.Kernel.Constants;
-using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.RedisSupport.Constants;
+using LT.DigitalOffice.Kernel.RedisSupport.Extensions;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models.Department;
@@ -32,7 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IFindProjectsResponseMapper _responseMapper;
     private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartments;
     private readonly IRedisHelper _redisHelper;
-    private readonly IResponseCreater _responseCreater;
+    private readonly IResponseCreator _responseCreator;
 
     private async Task<List<DepartmentData>> GetDepartmentsAsync(List<Guid> projectsIds, List<string> errors)
     {
@@ -94,7 +95,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IFindProjectsResponseMapper responseMapper,
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
       IRedisHelper redisHelper,
-      IResponseCreater responseCreater)
+      IResponseCreator responseCreator)
     {
       _logger = logger;
       _repository = repository;
@@ -102,14 +103,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _responseMapper = responseMapper;
       _rcGetDepartments = rcGetDepartments;
       _redisHelper = redisHelper;
-      _responseCreater = responseCreater;
+      _responseCreator = responseCreator;
     }
 
     public async Task<FindResultResponse<ProjectInfo>> ExecuteAsync(FindProjectsFilter filter)
     {
       if (!_findFilterValidator.ValidateCustom(filter, out List<string> errors))
       {
-        return _responseCreater.CreateFailureFindResponse<ProjectInfo>(HttpStatusCode.BadRequest, errors);
+        return _responseCreator.CreateFailureFindResponse<ProjectInfo>(HttpStatusCode.BadRequest, errors);
       }
 
       (List<DbProject> dbProjects, int totalCount) = await _repository.FindAsync(filter);

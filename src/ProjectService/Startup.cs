@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using HealthChecks.UI.Client;
-using LT.DigitalOffice.Kernel.Broker.Consumer;
+using LT.DigitalOffice.Kernel.BrokerSupport.Broker.Consumer;
+using LT.DigitalOffice.Kernel.BrokerSupport.Configurations;
+using LT.DigitalOffice.Kernel.BrokerSupport.Extensions;
+using LT.DigitalOffice.Kernel.BrokerSupport.Middlewares.Token;
 using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers;
-using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
-using LT.DigitalOffice.Kernel.Middlewares.Token;
+using LT.DigitalOffice.Kernel.RedisSupport.Configurations;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.ProjectService.Broker;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
-using LT.DigitalOffice.UserService.Models.Dto.Configurations;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using MassTransit.RabbitMqTransport;
@@ -99,11 +101,11 @@ namespace LT.DigitalOffice.ProjectService
       {
         connStr = Configuration.GetConnectionString("SQLConnectionString");
 
-        Log.Information($"SQL connection string from appsettings.json was used. Value '{HidePassord(connStr)}'.");
+        Log.Information($"SQL connection string from appsettings.json was used. Value '{HidePasswordHelper.HidePassword(connStr)}'.");
       }
       else
       {
-        Log.Information( $"SQL connection string from environment was used. Value '{HidePassord(connStr)}'.");
+        Log.Information( $"SQL connection string from environment was used. Value '{HidePasswordHelper.HidePassword(connStr)}'.");
       }
 
       services.AddDbContext<ProjectServiceDbContext>(options =>
@@ -116,11 +118,11 @@ namespace LT.DigitalOffice.ProjectService
       {
         redisConnStr = Configuration.GetConnectionString("Redis");
 
-        Log.Information( $"Redis connection string from appsettings.json was used. Value '{HidePassord(redisConnStr)}'");
+        Log.Information( $"Redis connection string from appsettings.json was used. Value '{HidePasswordHelper.HidePassword(redisConnStr)}'");
       }
       else
       {
-        Log.Information( $"Redis connection string from environment was used. Value '{HidePassord(redisConnStr)}'");
+        Log.Information( $"Redis connection string from environment was used. Value '{HidePasswordHelper.HidePassword(redisConnStr)}'");
       }
 
       services.AddSingleton<IConnectionMultiplexer>(
@@ -186,29 +188,6 @@ namespace LT.DigitalOffice.ProjectService
       using var context = serviceScope.ServiceProvider.GetService<ProjectServiceDbContext>();
 
       context.Database.Migrate();
-    }
-
-    private string HidePassord(string line)
-    {
-      string password = "Password";
-
-      int index = line.IndexOf(password, 0, StringComparison.OrdinalIgnoreCase);
-
-      if (index != -1)
-      {
-        string[] words = Regex.Split(line, @"[=,; ]");
-
-        for (int i = 0; i < words.Length; i++)
-        {
-          if (string.Equals(password, words[i], StringComparison.OrdinalIgnoreCase))
-          {
-            line = line.Replace(words[i + 1], "****");
-            break;
-          }
-        }
-      }
-
-      return line;
     }
 
     #region configure masstransit
