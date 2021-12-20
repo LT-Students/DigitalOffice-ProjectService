@@ -27,7 +27,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         new List<string>
         {
           nameof(EditProjectRequest.Status),
-          nameof(EditProjectRequest.DepartmentId),
           nameof(EditProjectRequest.Name),
           nameof(EditProjectRequest.ShortName),
           nameof(EditProjectRequest.Description),
@@ -35,7 +34,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         });
 
       AddСorrectOperations(nameof(EditProjectRequest.Status), new List<OperationType> { OperationType.Replace });
-      AddСorrectOperations(nameof(EditProjectRequest.DepartmentId), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.Name), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.ShortName), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.Description), new List<OperationType> { OperationType.Replace });
@@ -51,19 +49,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
           { x => Enum.TryParse(typeof(ProjectStatusType), x.value?.ToString(), true, out _), "Incorrect project status." }
-        });
-
-      #endregion
-
-      #region DepartmentId
-
-      AddFailureForPropertyIf(
-        nameof(EditProjectRequest.DepartmentId),
-        x => x == OperationType.Replace,
-        new()
-        {
-          { x => x.value == null || Guid.TryParse(x.value.ToString(), out var departmentId),
-            "Incorrect department id value." },
         });
 
       #endregion
