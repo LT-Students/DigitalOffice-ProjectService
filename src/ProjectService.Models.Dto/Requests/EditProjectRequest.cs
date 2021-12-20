@@ -1,5 +1,4 @@
-﻿using System;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+﻿using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
@@ -10,6 +9,5 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
     public string Description { get; set; }
     public string ShortDescription { get; set; }
     public ProjectStatusType Status { get; set; }
-    public Guid? DepartmentId { get; set; }
   }
 }
