@@ -40,6 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
             u => new ProjectUserData(
               u.UserId,
               u.ProjectId,
+              u.IsActive,
               u.CreatedAtUtc))
             .ToList()))
           .ToList(), totalCount);
