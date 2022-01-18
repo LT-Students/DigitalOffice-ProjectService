@@ -123,14 +123,14 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public async Task<bool> RemoveAsync(Guid userId, Guid removedBy)
     {
-      IQueryable<DbProjectUser> dbUserProjects = _provider.ProjectsUsers.AsQueryable()
+      IQueryable<DbProjectUser> dbProjectsUser = _provider.ProjectsUsers.AsQueryable()
         .Where(u => u.UserId == userId && u.IsActive);
 
-      foreach (DbProjectUser project in dbUserProjects)
+      foreach (DbProjectUser dbProjectUser in dbProjectsUser)
       {
-        project.IsActive = false;
-        project.ModifiedBy = removedBy;
-        project.ModifiedAtUtc = DateTime.UtcNow;
+        dbProjectUser.IsActive = false;
+        dbProjectUser.ModifiedBy = removedBy;
+        dbProjectUser.ModifiedAtUtc = DateTime.UtcNow;
       }
 
       await _provider.SaveAsync();
