@@ -126,11 +126,11 @@ namespace LT.DigitalOffice.ProjectService.Data
       IQueryable<DbProjectUser> dbUserProjects = _provider.ProjectsUsers.AsQueryable()
         .Where(u => u.UserId == userId && u.IsActive);
 
-      foreach (DbProjectUser dbUserProject in dbUserProjects)
+      foreach (DbProjectUser project in dbUserProjects)
       {
-        dbUserProject.IsActive = false;
-        dbUserProject.ModifiedBy = removedBy;
-        dbUserProject.ModifiedAtUtc = DateTime.UtcNow;
+        project.IsActive = false;
+        project.ModifiedBy = removedBy;
+        project.ModifiedAtUtc = DateTime.UtcNow;
       }
 
       await _provider.SaveAsync();
