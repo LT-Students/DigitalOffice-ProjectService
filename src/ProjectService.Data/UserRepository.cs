@@ -7,14 +7,15 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
   public class UserRepository : IUserRepository
   {
     private readonly IDataProvider _provider;
+    private readonly ILogger<UserRepository> _logger;
 
     #region private methods
 
@@ -42,9 +43,12 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     #endregion
 
-    public UserRepository(IDataProvider provider)
+    public UserRepository(
+      IDataProvider provider,
+      ILogger<UserRepository> logger)
     {
       _provider = provider;
+      _logger = logger;
     }
 
     public async Task<List<DbProjectUser>> GetAsync(Guid projectId, bool showNotActive)
@@ -123,8 +127,11 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public async Task<bool> RemoveAsync(Guid userId, Guid removedBy)
     {
-      IQueryable<DbProjectUser> dbProjectsUser = _provider.ProjectsUsers.AsQueryable()
-        .Where(u => u.UserId == userId && u.IsActive);
+      List<DbProjectUser> dbProjectsUser = await _provider.ProjectsUsers
+        .Where(u => u.UserId == userId && u.IsActive).ToListAsync();
+
+      _logger.LogInformation("selected ids to delete: {UserProjectsIds}.",
+        string.Join(", ", dbProjectsUser.Select(x => x.Id)));
 
       foreach (DbProjectUser dbProjectUser in dbProjectsUser)
       {
@@ -132,7 +139,6 @@ namespace LT.DigitalOffice.ProjectService.Data
         dbProjectUser.ModifiedBy = removedBy;
         dbProjectUser.ModifiedAtUtc = DateTime.UtcNow;
       }
-
       _provider.ProjectsUsers.UpdateRange(dbProjectsUser);
       await _provider.SaveAsync();
 
