@@ -133,6 +133,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         dbProjectUser.ModifiedAtUtc = DateTime.UtcNow;
       }
 
+      _provider.ProjectsUsers.UpdateRange(dbProjectsUser);
       await _provider.SaveAsync();
 
       return true;
