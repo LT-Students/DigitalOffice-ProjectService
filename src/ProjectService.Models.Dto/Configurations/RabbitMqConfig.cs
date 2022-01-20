@@ -20,7 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
     public string FindParseEntitiesEndpoint { get; set; }
     public string GetProjectsUsersEndpoint { get; set; }
     public string GetProjectsEndpoint { get; set; }
-    public string DisactivateUserEndpoint { get; set; }
+    public string DisactivateProjectUserEndpoint { get; set; }
     public string CheckProjectsExistenceEndpoint { get; set; }
     public string CheckProjectUsersExistenceEndpoint { get; set; }
 
