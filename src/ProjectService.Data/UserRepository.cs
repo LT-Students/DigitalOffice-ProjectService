@@ -130,16 +130,13 @@ namespace LT.DigitalOffice.ProjectService.Data
       List<DbProjectUser> dbProjectsUser = await _provider.ProjectsUsers
         .Where(u => u.UserId == userId && u.IsActive).ToListAsync();
 
-      _logger.LogInformation("selected ids to delete: {UserProjectsIds}.",
-        string.Join(", ", dbProjectsUser.Select(x => x.Id)));
-
       foreach (DbProjectUser dbProjectUser in dbProjectsUser)
       {
         dbProjectUser.IsActive = false;
         dbProjectUser.ModifiedBy = removedBy;
         dbProjectUser.ModifiedAtUtc = DateTime.UtcNow;
       }
-      _provider.ProjectsUsers.UpdateRange(dbProjectsUser);
+
       await _provider.SaveAsync();
 
       return true;

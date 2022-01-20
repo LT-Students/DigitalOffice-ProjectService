@@ -5,11 +5,11 @@ using MassTransit;
 
 namespace LT.DigitalOffice.ProjectService.Broker
 {
-  public class DisactivateUserConsumer : IConsumer<IDisactivateUserRequest>
+  public class DisactivateProjectUserConsumer : IConsumer<IDisactivateUserRequest>
   {
     private readonly IUserRepository _repository;
 
-    public DisactivateUserConsumer(
+    public DisactivateProjectUserConsumer(
       IUserRepository repository)
     {
       _repository = repository;
