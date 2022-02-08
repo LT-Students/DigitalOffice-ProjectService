@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IResponseCreator _responseCreator;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly ICacheNotebook _cacheNotebook;
+    private readonly IGlobalCacheRepository _globalCache;
 
     private async Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds, List<string> errors)
     {
@@ -70,7 +70,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
       IResponseCreator responseCreator,
       IHttpContextAccessor httpContextAccessor,
-      ICacheNotebook cacheNotebook)
+      IGlobalCacheRepository globalCache)
     {
       _mapper = mapper;
       _validator = validator;
@@ -80,7 +80,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _rcCreateWorkTime = rcCreateWorkTime;
       _responseCreator = responseCreator;
       _httpContextAccessor = httpContextAccessor;
-      _cacheNotebook = cacheNotebook;
+      _globalCache = globalCache;
     }
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(CreateProjectUsersRequest request)
@@ -124,7 +124,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       if (result)
       {
-        await _cacheNotebook.RemoveAsync(request.ProjectId);
+        await _globalCache.RemoveAsync(request.ProjectId);
       }
 
       return new()

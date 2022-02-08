@@ -20,6 +20,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<List<DbProjectUser>> GetAsync(List<Guid> usersIds);
 
+    Task<List<DbProjectUser>> GetAsync(Guid userId);
+
     Task<bool> CreateAsync(List<DbProjectUser> dbProjectUsers);
 
     Task<bool> DoesExistAsync(Guid userId, Guid projectId, bool? isManager = null);

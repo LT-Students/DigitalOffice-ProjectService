@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRepository _userRepository;
     private readonly IResponseCreator _responseCreator;
-    private readonly ICacheNotebook _cacheNotebook;
+    private readonly IGlobalCacheRepository _globalCache;
 
     public EditProjectCommand(
       IEditProjectRequestValidator validator,
@@ -39,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IHttpContextAccessor httpContextAccessor,
       IUserRepository userRepository,
       IResponseCreator responseCreator,
-      ICacheNotebook cacheNotebook)
+      IGlobalCacheRepository globalCache)
     {
       _validator = validator;
       _accessValidator = accessValidator;
@@ -48,7 +48,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _httpContextAccessor = httpContextAccessor;
       _userRepository = userRepository;
       _responseCreator = responseCreator;
-      _cacheNotebook = cacheNotebook;
+      _globalCache = globalCache;
     }
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, JsonPatchDocument<EditProjectRequest> request)
@@ -83,7 +83,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
       else
       {
-        await _cacheNotebook.RemoveAsync(projectId);
+        await _globalCache.RemoveAsync(projectId);
       }
 
       return response;

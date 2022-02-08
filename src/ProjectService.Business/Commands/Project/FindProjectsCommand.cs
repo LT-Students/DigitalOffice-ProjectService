@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IBaseFindFilterValidator _findFilterValidator;
     private readonly IFindProjectsResponseMapper _responseMapper;
     private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartments;
-    private readonly IRedisHelper _redisHelper;
+    private readonly IGlobalCacheRepository _globalCache;
     private readonly IResponseCreator _responseCreator;
 
     private async Task<List<DepartmentData>> GetDepartmentsAsync(List<Guid> projectsIds, List<string> errors)
@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return null;
       }
 
-      List<DepartmentData> departmentDatas = await _redisHelper.GetAsync<List<DepartmentData>>(Cache.Departments, projectsIds.GetRedisCacheHashCode());
+      List<DepartmentData> departmentDatas = await _globalCache.GetAsync<List<DepartmentData>>(Cache.Departments, projectsIds.GetRedisCacheHashCode());
 
       if (departmentDatas != null)
       {
@@ -94,7 +94,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IBaseFindFilterValidator findFilterValidator,
       IFindProjectsResponseMapper responseMapper,
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
-      IRedisHelper redisHelper,
+      IGlobalCacheRepository _globalCache,
       IResponseCreator responseCreator)
     {
       _logger = logger;
@@ -102,7 +102,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _findFilterValidator = findFilterValidator;
       _responseMapper = responseMapper;
       _rcGetDepartments = rcGetDepartments;
-      _redisHelper = redisHelper;
+      _globalCache = _globalCache;
       _responseCreator = responseCreator;
     }
 
