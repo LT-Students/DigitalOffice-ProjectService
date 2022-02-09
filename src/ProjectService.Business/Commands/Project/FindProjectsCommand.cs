@@ -94,7 +94,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IBaseFindFilterValidator findFilterValidator,
       IFindProjectsResponseMapper responseMapper,
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
-      IGlobalCacheRepository _globalCache,
+      IGlobalCacheRepository globalCache,
       IResponseCreator responseCreator)
     {
       _logger = logger;
@@ -102,7 +102,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _findFilterValidator = findFilterValidator;
       _responseMapper = responseMapper;
       _rcGetDepartments = rcGetDepartments;
-      _globalCache = _globalCache;
+      _globalCache = globalCache;
       _responseCreator = responseCreator;
     }
 
