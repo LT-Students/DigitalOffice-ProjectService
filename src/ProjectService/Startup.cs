@@ -12,6 +12,7 @@ using LT.DigitalOffice.Kernel.Helpers;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
 using LT.DigitalOffice.Kernel.RedisSupport.Configurations;
 using LT.DigitalOffice.Kernel.RedisSupport.Constants;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers;
 using LT.DigitalOffice.ProjectService.Broker;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
@@ -144,7 +145,11 @@ namespace LT.DigitalOffice.ProjectService
     {
       UpdateDatabase(app);
 
-      FlushRedisDatabase(redisConnStr);
+      string error = FlushRedisDbHelper.FlushDatabase(redisConnStr, Cache.Projects);
+      if (error is not null)
+      {
+        Log.Error(error);
+      }
 
       app.UseForwardedHeaders();
 
@@ -189,27 +194,6 @@ namespace LT.DigitalOffice.ProjectService
       using var context = serviceScope.ServiceProvider.GetService<ProjectServiceDbContext>();
 
       context.Database.Migrate();
-    }
-
-    private void FlushRedisDatabase(string redisConnStr)
-    {
-      try
-      {
-        using (ConnectionMultiplexer cm = ConnectionMultiplexer.Connect(redisConnStr + ",allowAdmin=true,connectRetry=1,connectTimeout=2000"))
-        {
-          EndPoint[] endpoints = cm.GetEndPoints(true);
-
-          foreach (EndPoint endpoint in endpoints)
-          {
-            IServer server = cm.GetServer(endpoint);
-            server.FlushDatabase(Cache.Projects);
-          }
-        }
-      }
-      catch (Exception ex)
-      {
-        Log.Error($"Error while flushing Redis database. Text: {ex.Message}");
-      }
     }
 
     #region configure masstransit

@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
 using MassTransit;
 
 namespace LT.DigitalOffice.ProjectService.Broker
@@ -23,10 +24,12 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
     public async Task Consume(ConsumeContext<IDisactivateUserRequest> context)
     {
-      await _repository.RemoveAsync(context.Message.UserId, context.Message.ModifiedBy);
+      List<Guid> projectsIds = await _repository.RemoveAsync(context.Message.UserId, context.Message.ModifiedBy);
 
-      List<DbProjectUser> projectsUsers = await _repository.GetAsync(context.Message.UserId);
-      projectsUsers.ForEach(async pj => await _globalCache.RemoveAsync(pj.ProjectId));
+      if (projectsIds.Any())
+      {
+        projectsIds.ForEach(async projectId => await _globalCache.RemoveAsync(projectId));
+      }
     }
   }
 }

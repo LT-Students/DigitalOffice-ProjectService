@@ -130,21 +130,30 @@ namespace LT.DigitalOffice.ProjectService.Data
         .AnyAsync(x => x.UserId == userId && x.ProjectId == projectId && x.IsActive);
     }
 
-    public async Task<bool> RemoveAsync(Guid userId, Guid removedBy)
+    public async Task<List<Guid>> RemoveAsync(Guid userId, Guid removedBy)
     {
       List<DbProjectUser> dbProjectsUser = await _provider.ProjectsUsers
         .Where(u => u.UserId == userId && u.IsActive).ToListAsync();
+
+      List<Guid> projectsIds = new();
+
+      if (dbProjectsUser is null || !dbProjectsUser.Any())
+      {
+        return projectsIds;
+      }
 
       foreach (DbProjectUser dbProjectUser in dbProjectsUser)
       {
         dbProjectUser.IsActive = false;
         dbProjectUser.ModifiedBy = removedBy;
         dbProjectUser.ModifiedAtUtc = DateTime.UtcNow;
+
+        projectsIds.Add(dbProjectUser.ProjectId);
       }
 
       await _provider.SaveAsync();
 
-      return true;
+      return projectsIds;
     }
 
     public async Task<List<Guid>> DoExistAsync(Guid projectId, List<Guid> ids)
