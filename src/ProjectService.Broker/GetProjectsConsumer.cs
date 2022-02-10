@@ -22,8 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
   {
     private readonly IProjectRepository _projectRepository;
     private readonly IOptions<RedisConfig> _redisConfig;
-    private readonly ICacheNotebook _cacheNotebook;
-    private readonly IRedisHelper _redisHelper;
+    private readonly IGlobalCacheRepository _globalCache;
 
     private async Task<(List<ProjectData> projects, int totalCount)> GetProjectsAsync(IGetProjectsRequest request)
     {
@@ -83,13 +82,11 @@ namespace LT.DigitalOffice.ProjectService.Broker
     public GetProjectsConsumer(
       IProjectRepository projectRepository,
       IOptions<RedisConfig> redisConfig,
-      ICacheNotebook cacheNotebook,
-      IRedisHelper redisHelper)
+      IGlobalCacheRepository globalCache)
     {
       _projectRepository = projectRepository;
       _redisConfig = redisConfig;
-      _cacheNotebook = cacheNotebook;
-      _redisHelper = redisHelper;
+      _globalCache = globalCache;
     }
 
     public async Task Consume(ConsumeContext<IGetProjectsRequest> context)
@@ -104,13 +101,12 @@ namespace LT.DigitalOffice.ProjectService.Broker
       {
         string key = CreateKey(context.Message);
 
-        await _redisHelper.CreateAsync(
+        await _globalCache.CreateAsync(
           Cache.Projects,
           key,
           (projects, totalCount),
+          projects.Select(p => p.Id).ToList(),
           TimeSpan.FromMinutes(_redisConfig.Value.CacheLiveInMinutes));
-
-        _cacheNotebook.Add(projects.Select(p => p.Id).ToList(), Cache.Projects, key);
       }
     }
   }

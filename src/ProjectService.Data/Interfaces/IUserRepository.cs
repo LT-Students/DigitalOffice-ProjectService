@@ -26,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<List<Guid>> DoExistAsync(Guid projectId, List<Guid> ids);
 
-    Task<bool> RemoveAsync(Guid userId, Guid removedBy);
+    Task<List<Guid>> RemoveAsync(Guid userId, Guid removedBy);
 
     Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> usersIds);
 
