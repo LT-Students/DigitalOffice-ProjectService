@@ -31,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
           nameof(EditProjectRequest.ShortName),
           nameof(EditProjectRequest.Description),
           nameof(EditProjectRequest.ShortDescription),
-          nameof(EditProjectRequest.Сustomer),
+          nameof(EditProjectRequest.Customer),
           nameof(EditProjectRequest.StartProject)
         });
 
@@ -40,7 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       AddСorrectOperations(nameof(EditProjectRequest.ShortName), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.Description), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.ShortDescription), new List<OperationType> { OperationType.Replace });
-      AddСorrectOperations(nameof(EditProjectRequest.Сustomer), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditProjectRequest.Customer), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.StartProject), new List<OperationType> { OperationType.Replace });
 
       #endregion
@@ -105,7 +105,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       #region Customer
 
       AddFailureForPropertyIf(
-        nameof(EditProjectRequest.Сustomer),
+        nameof(EditProjectRequest.Customer),
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {

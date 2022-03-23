@@ -26,11 +26,11 @@ namespace LT.DigitalOffice.ProjectService.Mappers.PatchDocument
           ProjectStatusType status = Enum.Parse<ProjectStatusType>(item.value?.ToString());
           if (status == ProjectStatusType.Active)
           {
-            dbRequest.Operations.Add(new Operation<DbProject>("replace", "/EndProject", null));
+            dbRequest.Operations.Add(new Operation<DbProject>("replace", "/EndProject", null, null));
           } 
           else
           {
-            dbRequest.Operations.Add(new Operation<DbProject>("replace", "/EndProject", DateTime.UtcNow.ToString()));
+            dbRequest.Operations.Add(new Operation<DbProject>("replace", "/EndProject", null, DateTime.UtcNow));
           }
           
           dbRequest.Operations.Add(new Operation<DbProject>(item.op, item.path, item.from, (int)status));
