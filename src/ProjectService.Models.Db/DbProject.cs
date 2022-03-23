@@ -17,6 +17,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public string ShortName { get; set; }
     public string Description { get; set; }
     public string ShortDescription { get; set; }
+    public string Customer { get; set; }
+    public DateTime StartProject { get; set; }
+    public DateTime? EndProject { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public Guid CreatedBy { get; set; }
     public DateTime? ModifiedAtUtc { get; set; }
@@ -49,15 +52,20 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
       builder
         .Property(P => P.Name)
+        .HasMaxLength(150)
         .IsRequired();
 
       builder
         .Property(p => p.ShortName)
-        .HasMaxLength(30);
+        .HasMaxLength(150);
 
       builder
         .Property(p => p.ShortDescription)
         .HasMaxLength(300);
+
+      builder
+        .Property(p => p.Customer)
+        .HasMaxLength(150);
 
       builder
         .HasMany(p => p.Users)

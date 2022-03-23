@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       When(project => !string.IsNullOrEmpty(project.ShortName?.Trim()), () =>
       {
         RuleFor(project => project.ShortName)
-          .MaximumLength(30)
+          .MaximumLength(150)
           .WithMessage("Project short name is too long.");
       });
 
@@ -50,6 +50,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         RuleFor(project => project.ShortDescription)
           .MaximumLength(300)
           .WithMessage("Project short description is too long.");
+      });
+
+      When(project => !string.IsNullOrEmpty(project.Customer?.Trim()), () =>
+      {
+        RuleFor(project => project.ShortDescription)
+          .MaximumLength(150)
+          .WithMessage("Project customer is too long.");
       });
 
       When(project => project.DepartmentId.HasValue, () =>
