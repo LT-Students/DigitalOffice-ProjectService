@@ -78,7 +78,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
       builder
        .HasMany(p => p.Images)
        .WithOne(tp => tp.Project)
-       .HasForeignKey(o => o.EntityId);
+       .HasForeignKey(o => o.ProjectId);
     }
   }
 }

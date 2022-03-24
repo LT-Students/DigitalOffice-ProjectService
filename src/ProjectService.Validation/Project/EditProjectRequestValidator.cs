@@ -32,7 +32,8 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
           nameof(EditProjectRequest.Description),
           nameof(EditProjectRequest.ShortDescription),
           nameof(EditProjectRequest.Customer),
-          nameof(EditProjectRequest.StartProject)
+          nameof(EditProjectRequest.StartProject),
+          nameof(EditProjectRequest.EndProject)
         });
 
       AddСorrectOperations(nameof(EditProjectRequest.Status), new List<OperationType> { OperationType.Replace });
@@ -42,6 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       AddСorrectOperations(nameof(EditProjectRequest.ShortDescription), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.Customer), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.StartProject), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditProjectRequest.EndProject), new List<OperationType> { OperationType.Replace });
 
       #endregion
 

@@ -33,7 +33,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         constraints: table =>
         {
           table.PrimaryKey("PK_Projects", x => x.Id);
-          table.UniqueConstraint("UX_Project_Name_Unique", x => x.Name);
         });
     }
 
@@ -82,12 +81,12 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         columns: table => new
         {
           Id = table.Column<Guid>(nullable: false),
-          EntityId = table.Column<Guid>(nullable: false),
+          ProjectId = table.Column<Guid>(nullable: false),
           ImageId = table.Column<Guid>(nullable: false)
         },
         constraints: table =>
         {
-          table.PrimaryKey("PK_EntitiesImages", x => x.Id);
+          table.PrimaryKey("PK_ProjectsImages", x => x.Id);
         });
     }
 

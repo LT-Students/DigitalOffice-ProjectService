@@ -13,6 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
     public string ShortDescription { get; set; }
     public string Customer { get; set; }
     public DateTime? StartProject { get; set; }
+    public DateTime? EndProject { get; set; }
     public Guid? DepartmentId { get; set; }
     public ProjectStatusType Status { get; set; }
     public List<CreateUserRequest> Users { get; set; }
