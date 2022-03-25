@@ -67,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         new()
         {
           { x => !string.IsNullOrEmpty(x.value?.ToString().Trim()), "Name must not be empty." },
-          { x => x.value.ToString().Trim().Length < 150, "Name is too long." },
+          { x => x.value.ToString().Trim().Length <= 150, "Name is too long." },
         }, CascadeMode.Stop);
 
       await AddFailureForPropertyIfAsync(
@@ -99,7 +99,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => x.value == null || x.value.ToString().Trim().Length < 300, "Short description is too long." },
+          { x => x.value == null || x.value.ToString().Trim().Length <= 300, "Short description is too long." },
         });
 
       #endregion
@@ -111,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => x.value == null || x.value.ToString().Trim().Length < 150, "Customer is too long." },
+          { x => x.value == null || x.value.ToString().Trim().Length <= 150, "Customer is too long." },
         });
 
       #endregion
