@@ -63,7 +63,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       When(project => !project.Status.Equals(ProjectStatusType.Active), () =>
       {
         RuleFor(project => project.EndProject)
-          .Must(endProject => endProject is not null)
+          .Must(endProject => endProject.HasValue)
           .WithMessage("EndProject date is null.");
       });
 
