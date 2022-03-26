@@ -30,7 +30,10 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
           nameof(EditProjectRequest.Name),
           nameof(EditProjectRequest.ShortName),
           nameof(EditProjectRequest.Description),
-          nameof(EditProjectRequest.ShortDescription)
+          nameof(EditProjectRequest.ShortDescription),
+          nameof(EditProjectRequest.Customer),
+          nameof(EditProjectRequest.StartProject),
+          nameof(EditProjectRequest.EndProject)
         });
 
       AddСorrectOperations(nameof(EditProjectRequest.Status), new List<OperationType> { OperationType.Replace });
@@ -38,6 +41,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       AddСorrectOperations(nameof(EditProjectRequest.ShortName), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.Description), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.ShortDescription), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditProjectRequest.Customer), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditProjectRequest.StartProject), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditProjectRequest.EndProject), new List<OperationType> { OperationType.Replace });
 
       #endregion
 
@@ -61,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         new()
         {
           { x => !string.IsNullOrEmpty(x.value?.ToString().Trim()), "Name must not be empty." },
-          { x => x.value.ToString().Trim().Length < 150, "Name is too long." },
+          { x => x.value.ToString().Trim().Length <= 150, "Name is too long." },
         }, CascadeMode.Stop);
 
       await AddFailureForPropertyIfAsync(
@@ -93,7 +99,19 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => x.value == null || x.value.ToString().Trim().Length < 300, "Short description is too long." },
+          { x => x.value == null || x.value.ToString().Trim().Length <= 300, "Short description is too long." },
+        });
+
+      #endregion
+
+      #region Customer
+
+      AddFailureForPropertyIf(
+        nameof(EditProjectRequest.Customer),
+        x => x == OperationType.Replace,
+        new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
+        {
+          { x => x.value == null || x.value.ToString().Trim().Length <= 150, "Customer is too long." },
         });
 
       #endregion

@@ -6,6 +6,7 @@ using FluentValidation;
 using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
@@ -41,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       When(project => !string.IsNullOrEmpty(project.ShortName?.Trim()), () =>
       {
         RuleFor(project => project.ShortName)
-          .MaximumLength(30)
+          .MaximumLength(150)
           .WithMessage("Project short name is too long.");
       });
 
@@ -50,6 +51,20 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         RuleFor(project => project.ShortDescription)
           .MaximumLength(300)
           .WithMessage("Project short description is too long.");
+      });
+
+      When(project => !string.IsNullOrEmpty(project.Customer?.Trim()), () =>
+      {
+        RuleFor(project => project.ShortDescription)
+          .MaximumLength(150)
+          .WithMessage("Project customer is too long.");
+      });
+
+      When(project => !project.Status.Equals(ProjectStatusType.Active), () =>
+      {
+        RuleFor(project => project.EndProject)
+          .Must(endProject => endProject.HasValue)
+          .WithMessage("EndProject date is null.");
       });
 
       When(project => project.DepartmentId.HasValue, () =>

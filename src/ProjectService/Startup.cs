@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using HealthChecks.UI.Client;
 using LT.DigitalOffice.Kernel.BrokerSupport.Broker.Consumer;
 using LT.DigitalOffice.Kernel.BrokerSupport.Configurations;
@@ -55,7 +54,7 @@ namespace LT.DigitalOffice.ProjectService
         .GetSection(BaseRabbitMqConfig.SectionName)
         .Get<RabbitMqConfig>();
 
-            Version = "1.2.2.1";
+            Version = "1.2.2.2";
             Description = "ProjectService is an API intended to work with projects.";
             StartTime = DateTime.UtcNow;
             ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";

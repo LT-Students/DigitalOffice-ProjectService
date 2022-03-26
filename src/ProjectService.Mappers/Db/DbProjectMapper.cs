@@ -48,6 +48,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         ShortName = shortName == null || !shortName.Any() ? null : shortName,
         Description = description == null || !description.Any() ? null : description,
         ShortDescription = shortDescription == null || !shortDescription.Any() ? null : shortDescription,
+        Customer = request.Customer,
+        StartProject = request.StartProject == null ? DateTime.UtcNow : request.StartProject.Value,
+        EndProject = request.EndProject,
         CreatedAtUtc = DateTime.UtcNow,
         CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
         Users = request.Users?
