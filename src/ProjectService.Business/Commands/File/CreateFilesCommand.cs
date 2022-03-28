@@ -111,7 +111,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       }
 
       response.Body = await _repository.CreateAsync(files.Select(x =>
-        _mapper.Map(x.Id, request.ProjectId)).ToList());
+        _mapper.Map(x.Id, request.ProjectId, request.Access)).ToList());
 
       response.Status = OperationResultStatusType.FullSuccess;
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;

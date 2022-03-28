@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
+using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.RedisSupport.Constants;
 using LT.DigitalOffice.Kernel.RedisSupport.Extensions;
@@ -29,10 +32,12 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using MassTransit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
@@ -53,6 +58,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IRequestClient<IGetImagesRequest> _rcImages;
     private readonly IGlobalCacheRepository _globalCache;
     private readonly IResponseCreator _responseCreator;
+    private readonly IAccessValidator _accessValidator;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     #region private methods
     private async Task<List<DepartmentData>> GetDepartmentAsync(Guid projectId, List<Guid> usersIds, List<string> errors)
@@ -349,7 +356,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IRequestClient<IGetCompaniesRequest> rcGetCompanies,
       IRequestClient<IGetImagesRequest> rcImages,
       IGlobalCacheRepository globalCache,
-      IResponseCreator responseCreator)
+      IResponseCreator responseCreator,
+      IAccessValidator accessValidator,
+      IHttpContextAccessor httpContextAccessor)
     {
       _logger = logger;
       _repository = repository;
@@ -365,6 +374,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _rcImages = rcImages;
       _globalCache = globalCache;
       _responseCreator = responseCreator;
+      _accessValidator = accessValidator;
+      _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<OperationResultResponse<ProjectResponse>> ExecuteAsync(GetProjectFilter filter)
@@ -423,7 +434,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         department = (await GetDepartmentAsync(dbProject.Id, null, response.Errors))?.FirstOrDefault();
       }
 
-      List<Guid> files = dbProject.Files.Select(x => x.FileId).ToList();
+      AccessType accessType = AccessType.SystemUser;
+
+      bool isManager = true;
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
+        && !(await _userRepository.DoesExistAsync(dbProject.Id, _httpContextAccessor.HttpContext.GetUserId(), isManager)))
+      {
+        accessType = AccessType.Manager;
+      }
+      else if (!await _userRepository.DoesExistAsync(dbProject.Id, _httpContextAccessor.HttpContext.GetUserId()))
+      {
+        accessType = AccessType.ProjectUser;
+      }
+
+      List<Guid> files = dbProject.Files.Where(x => x.Access == (int)accessType).Select(x => x.FileId).ToList();
       List<ImageInfo> imagesinfo = await GetProjectImagesAsync(dbProject.Images.Select(x => x.ImageId).ToList(), response.Errors);
 
       response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;

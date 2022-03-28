@@ -4,6 +4,7 @@ using System.Linq;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Http;
 
@@ -60,7 +61,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
           .Select(imageId => _dbEntityImageMapper.Map(imageId, projectId))
           .ToList(),
         Files = filesIds?
-          .Select(fileId => _dbProjectFileMapper.Map(fileId, projectId))
+          .Select(fileId => _dbProjectFileMapper.Map(fileId, projectId, AccessType.SystemUser))
           .ToList()
       };
     }
