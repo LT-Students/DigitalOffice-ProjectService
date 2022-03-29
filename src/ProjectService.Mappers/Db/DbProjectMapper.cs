@@ -61,7 +61,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
           .Select(imageId => _dbEntityImageMapper.Map(imageId, projectId))
           .ToList(),
         Files = filesIds?
-          .Select(fileId => _dbProjectFileMapper.Map(fileId, projectId, AccessType.SystemUser))
+          .Select(fileId => _dbProjectFileMapper.Map(fileId, projectId, AccessType.Public))
           .ToList()
       };
     }

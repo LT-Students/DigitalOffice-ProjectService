@@ -434,17 +434,23 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         department = (await GetDepartmentAsync(dbProject.Id, null, response.Errors))?.FirstOrDefault();
       }
 
-      AccessType accessType = AccessType.SystemUser;
+      AccessType accessType = AccessType.Public;
 
-      bool isManager = true;
+      DbProjectUser user = null;
+      List<DbProjectUser> users = await _userRepository.GetAsync(new List<Guid>() { _httpContextAccessor.HttpContext.GetUserId() });
+      if (users.Count > 0)
+      {
+        user = users[0];
+      }
+
       if (await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        || await _userRepository.DoesExistAsync(dbProject.Id, _httpContextAccessor.HttpContext.GetUserId(), isManager))
+        || user?.Role == (int)ProjectUserRoleType.Manager)
       {
         accessType = AccessType.Manager;
       }
-      else if (await _userRepository.DoesExistAsync(dbProject.Id, _httpContextAccessor.HttpContext.GetUserId()))
+      else if (user != null)
       {
-        accessType = AccessType.ProjectUser;
+        accessType = AccessType.Team;
       }
 
       List<Guid> files = dbProject.Files.Where(x => x.Access >= (int)accessType).Select(x => x.FileId).ToList();
