@@ -437,17 +437,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       AccessType accessType = AccessType.SystemUser;
 
       bool isManager = true;
-      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(await _userRepository.DoesExistAsync(dbProject.Id, _httpContextAccessor.HttpContext.GetUserId(), isManager)))
+      if (await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
+        || await _userRepository.DoesExistAsync(dbProject.Id, _httpContextAccessor.HttpContext.GetUserId(), isManager))
       {
         accessType = AccessType.Manager;
       }
-      else if (!await _userRepository.DoesExistAsync(dbProject.Id, _httpContextAccessor.HttpContext.GetUserId()))
+      else if (await _userRepository.DoesExistAsync(dbProject.Id, _httpContextAccessor.HttpContext.GetUserId()))
       {
         accessType = AccessType.ProjectUser;
       }
 
-      List<Guid> files = dbProject.Files.Where(x => x.Access == (int)accessType).Select(x => x.FileId).ToList();
+      List<Guid> files = dbProject.Files.Where(x => x.Access >= (int)accessType).Select(x => x.FileId).ToList();
       List<ImageInfo> imagesinfo = await GetProjectImagesAsync(dbProject.Images.Select(x => x.ImageId).ToList(), response.Errors);
 
       response.Status = response.Errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;

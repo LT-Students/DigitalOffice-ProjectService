@@ -33,7 +33,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         constraints: table =>
         {
           table.PrimaryKey("PK_Projects", x => x.Id);
-          table.UniqueConstraint("UX_Project_Name_Unique", x => x.Name);
         });
     }
 

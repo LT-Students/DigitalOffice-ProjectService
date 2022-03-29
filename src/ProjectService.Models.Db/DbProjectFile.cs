@@ -21,15 +21,15 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public void Configure(EntityTypeBuilder<DbProjectFile> builder)
     {
       builder
-          .ToTable(DbProjectFile.TableName);
+        .ToTable(DbProjectFile.TableName);
 
       builder
-          .HasKey(pf => pf.Id);
+        .HasKey(pf => pf.Id);
 
       builder
-          .HasOne(pf => pf.Project)
-          .WithMany(p => p.Files)
-          .HasForeignKey(pf => pf.ProjectId);
+        .HasOne(pf => pf.Project)
+        .WithMany(p => p.Files)
+        .HasForeignKey(pf => pf.ProjectId);
     }
   }
 }
