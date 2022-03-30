@@ -25,6 +25,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
 using MassTransit;
@@ -268,10 +269,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<Guid> imagesIds = await CreateImageAsync(request.ProjectImages, response.Errors);
 
-      List<FileData> files = request.Files?.Select(_fileDataMapper.Map).ToList();
+      List<FileAccess> accesses = new List<FileAccess>();
+      List<FileData> files = request.Files?.Select(x => _fileDataMapper.Map(x, accesses)).ToList();
 
       DbProject dbProject = await CreateFilesAsync(files, response.Errors) ?
-        _mapper.Map(request, imagesIds, files.Select(x => x.Id).ToList()) :
+        _mapper.Map(request, imagesIds, accesses) :
         _mapper.Map(request, imagesIds, null);
 
       response.Body = await _repository.CreateAsync(dbProject);
