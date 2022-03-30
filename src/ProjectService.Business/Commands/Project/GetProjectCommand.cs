@@ -436,19 +436,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       AccessType accessType = AccessType.Public;
 
-      DbProjectUser user = null;
-      List<DbProjectUser> users = await _userRepository.GetAsync(new List<Guid>() { _httpContextAccessor.HttpContext.GetUserId() });
-      if (users.Count > 0)
-      {
-        user = users[0];
-      }
+      DbProjectUser dbProjectUser = (await _userRepository.GetAsync(new List<Guid>() { _httpContextAccessor.HttpContext.GetUserId() }))
+        ?.FirstOrDefault();
 
       if (await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        || user?.Role == (int)ProjectUserRoleType.Manager)
+        || dbProjectUser?.Role == (int)ProjectUserRoleType.Manager)
       {
         accessType = AccessType.Manager;
       }
-      else if (user != null)
+      else if (dbProjectUser != null)
       {
         accessType = AccessType.Team;
       }
