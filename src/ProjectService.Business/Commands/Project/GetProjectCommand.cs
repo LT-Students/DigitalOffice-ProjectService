@@ -444,7 +444,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       {
         accessType = AccessType.Manager;
       }
-      else if (dbProjectUser != null)
+      else if (dbProjectUser is not null)
       {
         accessType = AccessType.Team;
       }
