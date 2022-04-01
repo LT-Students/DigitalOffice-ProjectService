@@ -21,7 +21,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
         private DbProject _dbProject;
         private ProjectInfo _projectInfo;
         private IEnumerable<UserInfo> _users;
-        private IEnumerable<FileIdentifier> _files;
         private DepartmentInfo _department;
         private ProjectResponse _expectedResponse;
 
@@ -54,15 +53,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                     ModifiedAtUtc = DateTime.UtcNow,
                     IsActive = true,
                     Role = ProjectUserRoleType.Manager
-                }
-            };
-
-            _files = new List<FileIdentifier>
-            {
-                new FileIdentifier
-                {
-                    FileId = Guid.NewGuid(),
-                    ProjectId = _dbProject.Id
                 }
             };
 

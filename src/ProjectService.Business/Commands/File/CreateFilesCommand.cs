@@ -93,9 +93,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 
     public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateFilesRequest request)
     {
-      bool isManager = true;
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(await _userRepository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), isManager)))
+        && !await _userRepository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), isManager: true))
       {
         return _responseCreator.CreateFailureResponse<List<Guid>>(HttpStatusCode.Forbidden);
       }
