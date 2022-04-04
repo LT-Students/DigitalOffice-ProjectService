@@ -100,11 +100,11 @@ namespace LT.DigitalOffice.ProjectService
       {
         connStr = Configuration.GetConnectionString("SQLConnectionString");
 
-        Log.Information($"SQL connection string from appsettings.json was used. Value '{HidePasswordHelper.HidePassword(connStr)}'.");
+        Log.Information($"SQL connection string from appsettings.json was used. Value '{PasswordHider.Hide(connStr)}'.");
       }
       else
       {
-        Log.Information( $"SQL connection string from environment was used. Value '{HidePasswordHelper.HidePassword(connStr)}'.");
+        Log.Information( $"SQL connection string from environment was used. Value '{PasswordHider.Hide(connStr)}'.");
       }
 
       services.AddDbContext<ProjectServiceDbContext>(options =>
@@ -117,11 +117,11 @@ namespace LT.DigitalOffice.ProjectService
       {
         redisConnStr = Configuration.GetConnectionString("Redis");
 
-        Log.Information( $"Redis connection string from appsettings.json was used. Value '{HidePasswordHelper.HidePassword(redisConnStr)}'");
+        Log.Information( $"Redis connection string from appsettings.json was used. Value '{PasswordHider.Hide(redisConnStr)}'");
       }
       else
       {
-        Log.Information( $"Redis connection string from environment was used. Value '{HidePasswordHelper.HidePassword(redisConnStr)}'");
+        Log.Information( $"Redis connection string from environment was used. Value '{PasswordHider.Hide(redisConnStr)}'");
       }
 
       services.AddSingleton<IConnectionMultiplexer>(
