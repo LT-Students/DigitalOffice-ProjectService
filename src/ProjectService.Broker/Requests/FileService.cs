@@ -37,7 +37,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
         : (await RequestHandler
           .ProcessRequest<ICreateFilesRequest, bool>(
             _rcCreateFiles,
-            ICreateFilesRequest.CreateObj(files,
+            ICreateFilesRequest.CreateObj(
+              files,
               _httpContextAccessor.HttpContext.GetUserId()),
             errors,
             _logger));

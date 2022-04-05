@@ -45,24 +45,23 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
 
       List<Guid> usersIds = projectUsers.Select(x => x.UserId).ToList();
 
-      List<UserData> usersFromCache = await _globalCache.GetAsync<List<UserData>>(Cache.Users, usersIds.GetRedisCacheHashCode());
+      List<UserData> usersData = await _globalCache.GetAsync<List<UserData>>(Cache.Users, usersIds.GetRedisCacheHashCode());
 
-
-      if (usersFromCache is not null)
+      if (usersData is not null)
       {
         _logger.LogInformation(
           "UsersDatas were taken from the cache. Users ids: {usersIds}", string.Join(", ", usersIds));
       }
       else
       {
-        usersFromCache = (await RequestHandler.ProcessRequest<IGetUsersDataRequest, IGetUsersDataResponse>(
+        usersData = (await RequestHandler.ProcessRequest<IGetUsersDataRequest, IGetUsersDataResponse>(
             _rcGetUsersdata,
             IGetUsersDataRequest.CreateObj(usersIds),
             errors,
             _logger))?.UsersData;
       }
 
-      return usersFromCache;
+      return usersData;
     }
   }
 }
