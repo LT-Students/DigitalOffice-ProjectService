@@ -50,29 +50,14 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
         return null;
       }
 
-      if (imageSource == ImageSource.User)
-      {
-        return (await RequestHandler.ProcessRequest<IGetImagesRequest, IGetImagesResponse>(
-            _rcGetImages,
-            IGetImagesRequest.CreateObj(imagesIds, ImageSource.User),
-            errors,
-            _logger))
-          ?.ImagesData
-          .Select(_mapper.Map).ToList();
-      }
-      
-      if (imageSource == ImageSource.Project)
-      {
-        return (await RequestHandler.ProcessRequest<IGetImagesRequest, IGetImagesResponse>(
-            _rcGetImages,
-            IGetImagesRequest.CreateObj(imagesIds, ImageSource.Project),
-            errors,
-            _logger))
-          ?.ImagesData
-          .Select(_mapper.Map).ToList();
-      }
+      return (await RequestHandler.ProcessRequest<IGetImagesRequest, IGetImagesResponse>(
+          _rcGetImages,
+          IGetImagesRequest.CreateObj(imagesIds, imageSource),
+          errors,
+          _logger))
+        ?.ImagesData
+        .Select(_mapper.Map).ToList();
 
-      return null;
     }
 
     public async Task<List<Guid>> CreateImageAsync(List<ImageContent> projectImages, List<string> errors)
@@ -101,7 +86,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
         : (await RequestHandler
           .ProcessRequest<IRemoveImagesRequest, bool>(
             _rcRemoveImages,
-            IRemoveImagesRequest.CreateObj(imagesIds: imagesIds, imageSource: ImageSource.User)),
+            IRemoveImagesRequest.CreateObj(imagesIds: imagesIds, imageSource: ImageSource.Project)),
             errors,
             _logger).Item1;
     }
