@@ -18,7 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         {
           Id = table.Column<Guid>(nullable: false),
           Status = table.Column<int>(nullable: false),
-          Name = table.Column<string>(nullable: false),
+          Name = table.Column<string>(nullable: false, maxLength: 150),
           ShortName = table.Column<string>(nullable: true),
           Description = table.Column<string>(nullable: true),
           ShortDescription = table.Column<string>(nullable: true),
@@ -46,6 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           Id = table.Column<Guid>(nullable: false),
           ProjectId = table.Column<Guid>(nullable: false),
           FileId = table.Column<Guid>(nullable: false),
+          Access = table.Column<int>(nullable: false),
         },
         constraints: table =>
         {

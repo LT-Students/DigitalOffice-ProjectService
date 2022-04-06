@@ -4,6 +4,8 @@ using System.Linq;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Http;
 
@@ -28,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       _dbProjectFileMapper = dbProjectFileMapper;
     }
 
-    public DbProject Map(CreateProjectRequest request, List<Guid> imagesIds, List<Guid> filesIds)
+    public DbProject Map(CreateProjectRequest request, List<Guid> imagesIds, List<FileAccess> accesses)
     {
       if (request == null)
       {
@@ -59,8 +61,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         Images = imagesIds?
           .Select(imageId => _dbEntityImageMapper.Map(imageId, projectId))
           .ToList(),
-        Files = filesIds?
-          .Select(fileId => _dbProjectFileMapper.Map(fileId, projectId))
+        Files = accesses?
+          .Select(x => _dbProjectFileMapper.Map(x.FileId, projectId, x.Access))
           .ToList()
       };
     }

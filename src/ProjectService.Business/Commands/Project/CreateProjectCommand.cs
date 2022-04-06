@@ -5,31 +5,21 @@ using System.Net;
 using System.Threading.Tasks;
 using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Enums;
-using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Models.File;
-using LT.DigitalOffice.Models.Broker.Requests.Department;
-using LT.DigitalOffice.Models.Broker.Requests.File;
-using LT.DigitalOffice.Models.Broker.Requests.Image;
-using LT.DigitalOffice.Models.Broker.Requests.Message;
-using LT.DigitalOffice.Models.Broker.Requests.Time;
-using LT.DigitalOffice.Models.Broker.Responses.Image;
+using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
-using MassTransit;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -39,214 +29,41 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IDbProjectMapper _mapper;
     private readonly IAccessValidator _accessValidator;
     private readonly ICreateProjectRequestValidator _validator;
-    private readonly ILogger<CreateProjectCommand> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IRequestClient<ICreateDepartmentEntityRequest> _rcCreateDepartmentEntity;
-    private readonly IRequestClient<ICreateWorkspaceRequest> _rcCreateWorkspace;
-    private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
-    private readonly IRequestClient<ICreateImagesRequest> _rcImages;
-    private readonly IRequestClient<ICreateFilesRequest> _rcFiles;
     private readonly IResponseCreator _responseCreator;
     private readonly IFileDataMapper _fileDataMapper;
-
-    #region private methods
-
-    private async Task CreateWorkspaceAsync(string projectName, List<Guid> usersIds, List<string> errors)
-    {
-      string errorMessage = $"Failed to create a workspace for the project {projectName}";
-      string logMessage = "Cannot create workspace for project {name}";
-
-      Guid creatorId = _httpContextAccessor.HttpContext.GetUserId();
-
-      try
-      {
-        if (!usersIds.Contains(creatorId))
-        {
-          usersIds.Add(creatorId);
-        }
-
-        Response<IOperationResult<bool>> response =
-          await _rcCreateWorkspace.GetResponse<IOperationResult<bool>>(
-            ICreateWorkspaceRequest.CreateObj(
-              projectName,
-              creatorId,
-              usersIds));
-
-        if (!(response.Message.IsSuccess && response.Message.Body))
-        {
-          _logger.LogWarning(logMessage, projectName);
-          errors.Add(errorMessage);
-        }
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, logMessage, projectName);
-
-        errors.Add(errorMessage);
-      }
-    }
-
-    private async Task CreateWorkTimeAsync(Guid projectId, List<Guid> userIds, List<string> errors)
-    {
-      string errorMessage = $"Failed to create a work time for project {projectId} with users: {string.Join(", ", userIds)}.";
-      const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
-
-      try
-      {
-        Response<IOperationResult<bool>> response =
-          await _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
-            ICreateWorkTimeRequest.CreateObj(projectId, userIds));
-
-        if (!(response.Message.IsSuccess && response.Message.Body))
-        {
-          _logger.LogWarning(logMessage, projectId, string.Join(", ", userIds));
-          errors.Add(errorMessage);
-        }
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, logMessage, projectId, string.Join(", ", userIds));
-
-        errors.Add(errorMessage);
-      }
-    }
-
-    private async Task<List<Guid>> CreateImageAsync(List<ImageContent> projectImages, List<string> errors)
-    {
-      if (projectImages == null || !projectImages.Any())
-      {
-        return null;
-      }
-
-      string logMessage = "Errors while creating images. Errors: {Errors}";
-
-      try
-      {
-        Response<IOperationResult<ICreateImagesResponse>> response =
-          await _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
-            ICreateImagesRequest.CreateObj(
-              projectImages.Select(x => new CreateImageData(
-                x.Name,
-                x.Content,
-                x.Extension,
-                _httpContextAccessor.HttpContext.GetUserId()))
-              .ToList(),
-              ImageSource.Project));
-
-        if (response.Message.IsSuccess && response.Message.Body.ImagesIds != null)
-        {
-          return response.Message.Body.ImagesIds;
-        }
-
-        _logger.LogWarning(
-          logMessage,
-          string.Join('\n', response.Message.Errors));
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, logMessage);
-      }
-
-      errors.Add("Can not create images. Please try again later.");
-
-      return null;
-    }
-
-    private async Task CreateDepartmentEntityAsync(Guid projectId, Guid? departmentId, List<string> errors)
-    {
-      if (!departmentId.HasValue)
-      {
-        return;
-      }
-
-      string logMessage = "Unable to enroll project {projectId} in the department {departmentId}.";
-
-      try
-      {
-        Response<IOperationResult<bool>> response = await _rcCreateDepartmentEntity.GetResponse<IOperationResult<bool>>(
-          ICreateDepartmentEntityRequest.CreateObj(
-            departmentId: departmentId.Value,
-            createdBy: _httpContextAccessor.HttpContext.GetUserId(),
-            projectId: projectId));
-
-        if (response.Message.IsSuccess && response.Message.Body)
-        {
-          return;
-        }
-
-        _logger.LogWarning(logMessage, projectId, departmentId);
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, logMessage, projectId, departmentId);
-      }
-
-      errors.Add("Unable to enroll project in the department. Please try again later.");
-    }
-
-    private async Task<bool> CreateFilesAsync(List<FileData> files, List<string> errors)
-    {
-      if (files == null || !files.Any())
-      {
-        return false;
-      }
-
-      try
-      {
-        Response<IOperationResult<bool>> response =
-          await _rcFiles.GetResponse<IOperationResult<bool>>(
-            ICreateFilesRequest.CreateObj(
-              files,
-              _httpContextAccessor.HttpContext.GetUserId()));
-
-        if (response.Message.IsSuccess)
-        {
-          return response.Message.Body;
-        }
-
-        _logger.LogWarning("Errors while creating files. Errors: {Errors}",
-          string.Join('\n', response.Message.Errors));
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, "Errors while creating files.");
-      }
-
-      errors.Add("Can not create files. Please try again later.");
-
-      return false;
-    }
-
-    #endregion
+    private readonly IDepartmentService _departmentService;
+    private readonly IImageService _imageService;
+    private readonly IFileService _fileService;
+    private readonly ITimeService _timeService;
+    private readonly IMessageService _messageService;
 
     public CreateProjectCommand(
       IProjectRepository repository,
       ICreateProjectRequestValidator validator,
       IAccessValidator accessValidator,
       IDbProjectMapper mapper,
-      ILogger<CreateProjectCommand> logger,
       IHttpContextAccessor httpContextAccessor,
-      IRequestClient<ICreateDepartmentEntityRequest> rcCreateDepartmentEntity,
-      IRequestClient<ICreateWorkspaceRequest> rcCreateWorkspace,
-      IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
-      IRequestClient<ICreateImagesRequest> rcImages,
-      IRequestClient<ICreateFilesRequest> rcFiles,
       IResponseCreator responseCreator,
-      IFileDataMapper fileDataMapper)
+      IFileDataMapper fileDataMapper,
+      IDepartmentService departmentService,
+      IImageService imageService,
+      IFileService fileService,
+      ITimeService timeService,
+      IMessageService messageService)
     {
-      _logger = logger;
       _validator = validator;
       _repository = repository;
       _mapper = mapper;
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
-      _rcCreateDepartmentEntity = rcCreateDepartmentEntity;
-      _rcCreateWorkspace = rcCreateWorkspace;
-      _rcCreateWorkTime = rcCreateWorkTime;
-      _rcImages = rcImages;
       _responseCreator = responseCreator;
-      _rcFiles = rcFiles;
       _fileDataMapper = fileDataMapper;
+      _departmentService = departmentService;
+      _imageService = imageService;
+      _fileService = fileService;
+      _timeService = timeService;
+      _messageService = messageService;
     }
 
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateProjectRequest request)
@@ -266,12 +83,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       OperationResultResponse<Guid?> response = new();
 
-      List<Guid> imagesIds = await CreateImageAsync(request.ProjectImages, response.Errors);
+      List<Guid> imagesIds = await _imageService.CreateImageAsync(request.ProjectImages, response.Errors);
 
-      List<FileData> files = request.Files?.Select(_fileDataMapper.Map).ToList();
+      List<FileAccess> accesses = new List<FileAccess>();
+      List<FileData> files = request.Files?.Select(x => _fileDataMapper.Map(x, accesses)).ToList();
 
-      DbProject dbProject = await CreateFilesAsync(files, response.Errors) ?
-        _mapper.Map(request, imagesIds, files.Select(x => x.Id).ToList()) :
+      DbProject dbProject = await _fileService.CreateFilesAsync(files, response.Errors) ?
+        _mapper.Map(request, imagesIds, accesses) :
         _mapper.Map(request, imagesIds, null);
 
       response.Body = await _repository.CreateAsync(dbProject);
@@ -284,9 +102,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       List<Guid> usersIds = request.Users.Select(u => u.UserId).ToList();
 
       await Task.WhenAll(
-        CreateDepartmentEntityAsync(dbProject.Id, request.DepartmentId, response.Errors),
-        CreateWorkTimeAsync(dbProject.Id, usersIds, response.Errors),
-        CreateWorkspaceAsync(request.Name, usersIds, response.Errors));
+        _departmentService.CreateDepartmentEntityAsync(request.DepartmentId, dbProject.Id, response.Errors),
+        _timeService.CreateWorkTimeAsync(dbProject.Id, usersIds, response.Errors),
+        _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors));
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 

@@ -4,9 +4,9 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces
 {
-    [AutoInject]
-    public interface IProjectFileInfoMapper
-    {
-        FileInfo Map(DbProjectFile dbProjectFile);
-    }
+  [AutoInject]
+  public interface IFileAccessMapper
+  {
+    FileAccess Map(DbProjectFile file);
+  }
 }

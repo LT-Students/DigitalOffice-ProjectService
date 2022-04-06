@@ -18,6 +18,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
     public ProjectStatusType Status { get; set; }
     public List<CreateUserRequest> Users { get; set; }
     public List<ImageContent> ProjectImages { get; set; }
-    public List<FileContent> Files { get; set; }
+    public List<FileInfo> Files { get; set; }
   }
 }

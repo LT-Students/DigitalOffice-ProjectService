@@ -15,6 +15,7 @@ using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
@@ -92,16 +93,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 
     public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateFilesRequest request)
     {
-      bool isManager = true;
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(await _userRepository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), isManager)))
+        && !await _userRepository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), isManager: true))
       {
         return _responseCreator.CreateFailureResponse<List<Guid>>(HttpStatusCode.Forbidden);
       }
 
       OperationResultResponse<List<Guid>> response = new();
 
-      List<FileData> files = request.Files.Select(_fileDataMapper.Map).ToList();
+      List<FileAccess> accesses = new List<FileAccess>();
+      List<FileData> files = request.Files.Select(x => _fileDataMapper.Map(x, accesses)).ToList();
 
       await CreateFilesAsync(files, response.Errors);
 
@@ -110,8 +111,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
         return _responseCreator.CreateFailureResponse<List<Guid>>(HttpStatusCode.BadRequest, response.Errors);
       }
 
-      response.Body = await _repository.CreateAsync(files.Select(x =>
-        _mapper.Map(x.Id, request.ProjectId)).ToList());
+      response.Body = await _repository.CreateAsync(accesses.Select(x =>
+        _mapper.Map(x.FileId, request.ProjectId, x.Access)).ToList());
 
       response.Status = OperationResultStatusType.FullSuccess;
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;

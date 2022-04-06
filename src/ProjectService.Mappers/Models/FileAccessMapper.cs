@@ -1,22 +1,23 @@
 ﻿using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Models
 {
-  public class ProjectFileInfoMapper : IProjectFileInfoMapper
+  public class FileAccessMapper : IFileAccessMapper
   {
-    public FileInfo Map(DbProjectFile dbProjectFile)
+    public FileAccess Map(DbProjectFile file)
     {
-      if (dbProjectFile == null)
+      if (file is null)
       {
         return null;
       }
 
-      return new FileInfo
+      return new FileAccess
       {
-        FileId = dbProjectFile.FileId,
-        ProjectId = dbProjectFile.ProjectId
+        FileId = file.FileId,
+        Access = (AccessType)file.Access
       };
     }
   }

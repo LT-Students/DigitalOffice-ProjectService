@@ -4,6 +4,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectService.Data\ProjectService.Data.csproj" />
+    <ProjectReference Include="..\ProjectService.Mappers\ProjectService.Mappers.csproj" />
   </ItemGroup>
 
 </Project>
