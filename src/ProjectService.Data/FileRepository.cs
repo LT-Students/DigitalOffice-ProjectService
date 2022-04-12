@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using Microsoft.EntityFrameworkCore;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
@@ -29,6 +30,11 @@ namespace LT.DigitalOffice.ProjectService.Data
       await _provider.SaveAsync();
 
       return files.Select(x => x.FileId).ToList();
+    }
+
+    public async Task<List<DbProjectFile>> GetAsync(List<Guid> filesIds)
+    {
+      return await _provider.ProjectsFiles.Where(x => filesIds.Contains(x.FileId)).ToListAsync();
     }
 
     public async Task<bool> RemoveAsync(List<Guid> filesIds)

@@ -23,6 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
     public string DisactivateProjectUserEndpoint { get; set; }
     public string CheckProjectsExistenceEndpoint { get; set; }
     public string CheckProjectUsersExistenceEndpoint { get; set; }
+    public string CheckFilesAccessesEndpoint { get; set; }
 
     // positions
 

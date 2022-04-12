@@ -12,5 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     Task<List<Guid>> CreateAsync(List<DbProjectFile> files);
 
     Task<bool> RemoveAsync(List<Guid> filesIds);
+
+    Task<List<DbProjectFile>> GetAsync(List<Guid> filesIds);
   }
 }
