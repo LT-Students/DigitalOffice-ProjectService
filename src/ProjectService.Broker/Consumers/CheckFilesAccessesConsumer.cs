@@ -32,11 +32,12 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
     public async Task Consume(ConsumeContext<ICheckProjectFilesAccessesRequest> context)
     {
       AccessType accessType = AccessType.Public;
+      Guid userId = context.Message.UserId;
 
-      DbProjectUser dbProjectUser = (await _userRepository.GetAsync(new List<Guid>() { context.Message.UserId }))
+      DbProjectUser dbProjectUser = (await _userRepository.GetAsync(new List<Guid>() { userId }))
         ?.FirstOrDefault();
 
-      if (await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
+      if (await _accessValidator.HasRightsAsync(userId, Rights.AddEditRemoveProjects)
         || dbProjectUser?.Role == (int)ProjectUserRoleType.Manager)
       {
         accessType = AccessType.Manager;
@@ -49,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
       List<DbProjectFile> files =  await _fileRepository.GetAsync(context.Message.FilesIds);
 
       object response = OperationResultWrapper.CreateResponse(
-        (_) => files.Select(x => x.Access >= (int)accessType), context);
+        (_) => files.Where(x => x.Access >= (int)accessType).Select(x => x.FileId).ToList(), context);
 
       await context.RespondAsync<IOperationResult<List<Guid>>>(response);
     }
