@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
-using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -17,28 +15,19 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
   {
     private readonly IUserRepository _userRepository;
     private readonly IFileRepository _fileRepository;
-    private readonly IAccessValidator _accessValidator;
 
     public CheckFilesAccessesConsumer(
       IUserRepository userRepository,
-      IFileRepository fileRepository,
-      IAccessValidator accessValidator)
+      IFileRepository fileRepository)
     {
       _userRepository = userRepository;
       _fileRepository = fileRepository;
-      _accessValidator = accessValidator;
     }
 
     public async Task Consume(ConsumeContext<ICheckProjectFilesAccessesRequest> context)
     {
       AccessType accessType = AccessType.Public;
       Guid userId = context.Message.UserId;
-      bool isManager = false;
-
-      if (await _accessValidator.HasRightsAsync(userId, Rights.AddEditRemoveProjects))
-      {
-        isManager = true;
-      } 
 
       List<DbProjectFile> files = await _fileRepository.GetAsync(context.Message.FilesIds);
       List<Guid> resultFiles = new List<Guid>();
@@ -48,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
       {
         DbProjectUser dbProjectUser = dbProjectUsers.Where(x => x.ProjectId == file.ProjectId).FirstOrDefault();
 
-        if (isManager || dbProjectUser?.Role == (int)ProjectUserRoleType.Manager)
+        if (dbProjectUser?.Role == (int)ProjectUserRoleType.Manager)
         {
           accessType = AccessType.Manager;
         }
