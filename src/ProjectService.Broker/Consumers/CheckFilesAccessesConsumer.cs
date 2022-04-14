@@ -33,24 +33,37 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
     {
       AccessType accessType = AccessType.Public;
       Guid userId = context.Message.UserId;
+      bool isManage = false;
 
-      DbProjectUser dbProjectUser = (await _userRepository.GetAsync(new List<Guid>() { userId }))
-        ?.FirstOrDefault();
-
-      if (await _accessValidator.HasRightsAsync(userId, Rights.AddEditRemoveProjects)
-        || dbProjectUser?.Role == (int)ProjectUserRoleType.Manager)
+      if (await _accessValidator.HasRightsAsync(userId, Rights.AddEditRemoveProjects))
       {
-        accessType = AccessType.Manager;
-      }
-      else if (dbProjectUser is not null)
+        isManage = true;
+      } 
+
+      List<DbProjectFile> files = await _fileRepository.GetAsync(context.Message.FilesIds);
+      List<Guid> resultFiles = null;
+
+      foreach (DbProjectFile file in files)
       {
-        accessType = AccessType.Team;
+        DbProjectUser dbProjectUser = (await _userRepository.GetAsync(new List<Guid>() { userId }, file.ProjectId))
+          ?.FirstOrDefault();
+
+        if (isManage || dbProjectUser?.Role == (int)ProjectUserRoleType.Manager)
+        {
+          accessType = AccessType.Manager;
+        }
+        else if (dbProjectUser is not null)
+        {
+          accessType = AccessType.Team;
+        }
+
+        if (file.Access == (int)accessType)
+        {
+          resultFiles.Add(file.FileId);
+        }
       }
 
-      List<DbProjectFile> files =  await _fileRepository.GetAsync(context.Message.FilesIds);
-
-      object response = OperationResultWrapper.CreateResponse(
-        (_) => files.Where(x => x.Access >= (int)accessType).Select(x => x.FileId).ToList(), context);
+      object response = OperationResultWrapper.CreateResponse((_) => resultFiles, context);
 
       await context.RespondAsync<IOperationResult<List<Guid>>>(response);
     }
