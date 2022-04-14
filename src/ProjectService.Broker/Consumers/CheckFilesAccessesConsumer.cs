@@ -57,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
           accessType = AccessType.Team;
         }
 
-        if (file.Access == (int)accessType)
+        if (file.Access >= (int)accessType)
         {
           resultFiles.Add(file.FileId);
         }
