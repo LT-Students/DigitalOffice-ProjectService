@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
       } 
 
       List<DbProjectFile> files = await _fileRepository.GetAsync(context.Message.FilesIds);
-      List<Guid> resultFiles = null;
+      List<Guid> resultFiles = new List<Guid>();
       List<DbProjectUser> dbProjectUsers = await _userRepository.GetAsync(new List<Guid>() { userId });
 
       foreach (DbProjectFile file in files)
