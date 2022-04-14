@@ -27,11 +27,10 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
     public async Task Consume(ConsumeContext<ICheckProjectFilesAccessesRequest> context)
     {
       AccessType accessType = AccessType.Public;
-      Guid userId = context.Message.UserId;
 
       List<DbProjectFile> files = await _fileRepository.GetAsync(context.Message.FilesIds);
       List<Guid> resultFiles = new List<Guid>();
-      List<DbProjectUser> dbProjectUsers = await _userRepository.GetAsync(new List<Guid>() { userId });
+      List<DbProjectUser> dbProjectUsers = await _userRepository.GetAsync(new List<Guid>() { context.Message.UserId });
 
       foreach (DbProjectFile file in files)
       {
