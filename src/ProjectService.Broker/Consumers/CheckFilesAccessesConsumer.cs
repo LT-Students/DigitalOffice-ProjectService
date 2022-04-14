@@ -33,22 +33,22 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
     {
       AccessType accessType = AccessType.Public;
       Guid userId = context.Message.UserId;
-      bool isManage = false;
+      bool isManager = false;
 
       if (await _accessValidator.HasRightsAsync(userId, Rights.AddEditRemoveProjects))
       {
-        isManage = true;
+        isManager = true;
       } 
 
       List<DbProjectFile> files = await _fileRepository.GetAsync(context.Message.FilesIds);
       List<Guid> resultFiles = null;
+      List<DbProjectUser> dbProjectUsers = await _userRepository.GetAsync(new List<Guid>() { userId });
 
       foreach (DbProjectFile file in files)
       {
-        DbProjectUser dbProjectUser = (await _userRepository.GetAsync(new List<Guid>() { userId }, file.ProjectId))
-          ?.FirstOrDefault();
+        DbProjectUser dbProjectUser = dbProjectUsers.Where(x => x.ProjectId == file.ProjectId).FirstOrDefault();
 
-        if (isManage || dbProjectUser?.Role == (int)ProjectUserRoleType.Manager)
+        if (isManager || dbProjectUser?.Role == (int)ProjectUserRoleType.Manager)
         {
           accessType = AccessType.Manager;
         }

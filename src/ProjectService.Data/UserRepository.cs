@@ -67,14 +67,9 @@ namespace LT.DigitalOffice.ProjectService.Data
       return await dbProjectQueryable.ToListAsync();
     }
 
-    public async Task<List<DbProjectUser>> GetAsync(List<Guid> usersIds, Guid? projectId)
+    public async Task<List<DbProjectUser>> GetAsync(List<Guid> usersIds)
     {
-      if (projectId is null)
-      {
-        return await _provider.ProjectsUsers.Where(u => usersIds.Contains(u.UserId) && u.IsActive).ToListAsync();
-      }
-      
-      return await _provider.ProjectsUsers.Where(u => usersIds.Contains(u.UserId) && u.IsActive && u.ProjectId == projectId).ToListAsync();
+      return await _provider.ProjectsUsers.Where(u => usersIds.Contains(u.UserId) && u.IsActive).ToListAsync();
     }
 
     public async Task<List<Guid>> GetExistAsync(Guid projectId, IEnumerable<Guid> usersIds)
