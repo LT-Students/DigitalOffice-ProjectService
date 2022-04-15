@@ -13,6 +13,7 @@ using LT.DigitalOffice.Kernel.RedisSupport.Configurations;
 using LT.DigitalOffice.Kernel.RedisSupport.Constants;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers;
 using LT.DigitalOffice.ProjectService.Broker;
+using LT.DigitalOffice.ProjectService.Broker.Consumers;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
 using MassTransit;
@@ -256,6 +257,7 @@ namespace LT.DigitalOffice.ProjectService
       x.AddConsumer<CheckProjectsExistenceConsumer>();
       x.AddConsumer<CheckProjectUsersExistenceConsumer>();
       x.AddConsumer<DisactivateProjectUserConsumer>();
+      x.AddConsumer<CheckFilesAccessesConsumer>();
     }
 
     private void ConfigureEndpoints(
@@ -296,6 +298,11 @@ namespace LT.DigitalOffice.ProjectService
       cfg.ReceiveEndpoint(rabbitMqConfig.CheckProjectUsersExistenceEndpoint, ep =>
       {
         ep.ConfigureConsumer<CheckProjectUsersExistenceConsumer>(context);
+      });
+
+      cfg.ReceiveEndpoint(rabbitMqConfig.CheckFilesAccessesEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<CheckFilesAccessesConsumer>(context);
       });
     }
 

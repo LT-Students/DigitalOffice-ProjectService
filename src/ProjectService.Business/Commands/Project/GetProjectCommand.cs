@@ -24,13 +24,11 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
   public class GetProjectCommand : IGetProjectCommand
   {
-    private readonly ILogger<GetProjectCommand> _logger;
     private readonly IProjectRepository _repository;
     private readonly IUserRepository _userRepository;
     private readonly IProjectResponseMapper _projectResponseMapper;
@@ -47,7 +45,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly ICompanyService _companyService;
 
     public GetProjectCommand(
-      ILogger<GetProjectCommand> logger,
       IProjectRepository repository,
       IUserRepository userRepository,
       IProjectResponseMapper projectResponsMapper,
@@ -63,7 +60,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IPositionService positionService,
       ICompanyService companyService)
     {
-      _logger = logger;
       _repository = repository;
       _userRepository = userRepository;
       _projectResponseMapper = projectResponsMapper;
