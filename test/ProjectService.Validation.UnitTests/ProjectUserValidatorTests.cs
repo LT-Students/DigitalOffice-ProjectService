@@ -1,6 +1,6 @@
 ﻿using System;
 using FluentValidation.TestHelper;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.User;
 using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
