@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models.Project;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.Models.Broker.Responses.Project;
@@ -26,6 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
             p.UserId,
             p.ProjectId,
             p.IsActive,
+            (ProjectUserRoleType)p.Role,
             p.CreatedAtUtc
           )).ToList(),
         totalCount);

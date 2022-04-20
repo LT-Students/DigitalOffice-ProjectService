@@ -1,5 +1,5 @@
-﻿using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using System;
+﻿using System;
+using LT.DigitalOffice.Models.Broker.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
 {

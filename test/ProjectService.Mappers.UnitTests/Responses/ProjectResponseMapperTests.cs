@@ -1,15 +1,15 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
+﻿using System;
+using System.Collections.Generic;
+using LT.DigitalOffice.Models.Broker.Enums;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
-using LT.DigitalOffice.UnitTestKernel;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
 {
