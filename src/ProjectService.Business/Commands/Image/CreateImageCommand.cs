@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
@@ -33,8 +35,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDbImageMapper _dbProjectImageMapper;
-    private readonly ICreateImageValidator _validator;
+    private readonly ICreateImagesRequestValidator _validator;
     private readonly IUserRepository _userRepository;
+    private readonly IResponseCreator _responseCreator;
 
     private List<Guid> CreateImagesAsync(List<ImageContent> context, Guid userId, Guid enityId, List<string> errors)
     {
@@ -76,8 +79,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IDbImageMapper dbProjectImageMapper,
-      ICreateImageValidator validator,
-      IUserRepository userRepository)
+      ICreateImagesRequestValidator validator,
+      IUserRepository userRepository,
+      IResponseCreator responseCreator)
     {
       _repository = repository;
       _rcImages = rcImages;
@@ -87,6 +91,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       _dbProjectImageMapper = dbProjectImageMapper;
       _validator = validator;
       _userRepository = userRepository;
+      _responseCreator = responseCreator;
     }
 
     public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateImagesRequest request)
@@ -103,16 +108,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
           Errors = new List<string> { "Not enough rights." }
         };
       }
-
-      if (!_validator.ValidateCustom(request, out List<string> errors))
+      
+      ValidationResult validationResult = await _validator.ValidateAsync(request);
+      
+      if (!validationResult.IsValid)
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        return new OperationResultResponse<List<Guid>>
-        {
-          Status = OperationResultStatusType.Failed,
-          Errors = errors
-        };
+        return _responseCreator.CreateFailureResponse<List<Guid>>(
+          HttpStatusCode.BadRequest,
+          validationResult.Errors.Select(x => x.ErrorMessage)
+          .ToList());
       }
 
       OperationResultResponse<List<Guid>> response = new();

@@ -1,0 +1,33 @@
+﻿using FluentValidation;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
+
+namespace LT.DigitalOffice.ProjectService.Validation.Image
+{
+  public class CreateImagesRequestValidator : AbstractValidator<CreateImagesRequest>, ICreateImagesRequestValidator
+  {
+    public CreateImagesRequestValidator(
+      IImageValidator imageValidator,
+      IProjectRepository projectRepository)
+    {
+      RuleFor(images => images.Images)
+        .Cascade(CascadeMode.Stop)
+        .NotNull().WithMessage("List must not be null.")
+        .NotEmpty().WithMessage("List must not be empty.")
+        .ForEach(image =>
+        {
+          image
+          .Cascade(CascadeMode.Stop)
+          .NotNull().WithMessage("Image content must not be null.")
+          .SetValidator(imageValidator);
+        });
+
+      RuleFor(images => images.ProjectId)
+        .Cascade(CascadeMode.Stop)
+        .NotEmpty().WithMessage("Project id must not be empty.")
+        .MustAsync(async (x, _) => await projectRepository.DoesExistAsync(x))
+        .WithMessage("Project id is invalid");
+    }
+  }
+}

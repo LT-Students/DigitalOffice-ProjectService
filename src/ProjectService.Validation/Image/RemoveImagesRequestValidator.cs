@@ -4,14 +4,15 @@ using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation.Image
 {
-  public class RemoveImageValidator : AbstractValidator<RemoveImageRequest>, IRemoveImageValidator
+  public class RemoveImagesRequestValidator : AbstractValidator<RemoveImageRequest>, IRemoveImagesRequestValidator
   {
-    public RemoveImageValidator()
+    public RemoveImagesRequestValidator()
     {
       RuleFor(list => list.ImagesIds)
         .NotNull().WithMessage("List must not be null.")
         .NotEmpty().WithMessage("List must not be empty.")
-        .ForEach(x => x.NotEmpty().WithMessage("Image's Id must not be empty."));
+        .ForEach(x =>
+          x.NotEmpty().WithMessage("Image Id must not be empty."));
     }
   }
 }
