@@ -8,9 +8,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.Image
   {
     public RemoveImagesRequestValidator()
     {
-      RuleFor(list => list.ImagesIds)
-        .NotNull().WithMessage("List must not be null.")
-        .NotEmpty().WithMessage("List must not be empty.")
+      RuleFor(request => request.ImagesIds)
+        .NotNull().WithMessage("List of images ids must not be null.")
+        .NotEmpty().WithMessage("List of images ids must not be empty.")
         .ForEach(x =>
           x.NotEmpty().WithMessage("Image Id must not be empty."));
     }

@@ -115,8 +115,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       {
         return _responseCreator.CreateFailureResponse<List<Guid>>(
           HttpStatusCode.BadRequest,
-          validationResult.Errors.Select(x => x.ErrorMessage)
-          .ToList());
+          validationResult.Errors.Select(x => x.ErrorMessage).ToList());
       }
 
       OperationResultResponse<List<Guid>> response = new();

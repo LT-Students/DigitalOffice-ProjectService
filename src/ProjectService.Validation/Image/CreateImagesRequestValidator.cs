@@ -11,10 +11,10 @@ namespace LT.DigitalOffice.ProjectService.Validation.Image
       IImageValidator imageValidator,
       IProjectRepository projectRepository)
     {
-      RuleFor(images => images.Images)
+      RuleFor(request => request.Images)
         .Cascade(CascadeMode.Stop)
-        .NotNull().WithMessage("List must not be null.")
-        .NotEmpty().WithMessage("List must not be empty.")
+        .NotNull().WithMessage("List of images must not be null.")
+        .NotEmpty().WithMessage("List of images must not be empty.")
         .ForEach(image =>
         {
           image
@@ -23,11 +23,11 @@ namespace LT.DigitalOffice.ProjectService.Validation.Image
           .SetValidator(imageValidator);
         });
 
-      RuleFor(images => images.ProjectId)
+      RuleFor(request => request.ProjectId)
         .Cascade(CascadeMode.Stop)
         .NotEmpty().WithMessage("Project id must not be empty.")
         .MustAsync(async (x, _) => await projectRepository.DoesExistAsync(x))
-        .WithMessage("Project id is invalid");
+        .WithMessage("Invalid project id.");
     }
   }
 }
