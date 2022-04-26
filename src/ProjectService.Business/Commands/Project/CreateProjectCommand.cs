@@ -7,9 +7,11 @@ using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.File;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Department;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -19,6 +21,7 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
+using MassTransit;
 using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
@@ -32,11 +35,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IResponseCreator _responseCreator;
     private readonly IFileDataMapper _fileDataMapper;
-    private readonly IDepartmentService _departmentService;
     private readonly IImageService _imageService;
     private readonly IFileService _fileService;
     private readonly ITimeService _timeService;
     private readonly IMessageService _messageService;
+    private readonly IBus _bus;
 
     public CreateProjectCommand(
       IProjectRepository repository,
@@ -46,11 +49,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IHttpContextAccessor httpContextAccessor,
       IResponseCreator responseCreator,
       IFileDataMapper fileDataMapper,
-      IDepartmentService departmentService,
       IImageService imageService,
       IFileService fileService,
       ITimeService timeService,
-      IMessageService messageService)
+      IMessageService messageService,
+      IBus bus)
     {
       _validator = validator;
       _repository = repository;
@@ -59,11 +62,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _httpContextAccessor = httpContextAccessor;
       _responseCreator = responseCreator;
       _fileDataMapper = fileDataMapper;
-      _departmentService = departmentService;
       _imageService = imageService;
       _fileService = fileService;
       _timeService = timeService;
       _messageService = messageService;
+      _bus = bus;
     }
 
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateProjectRequest request)
@@ -102,7 +105,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       List<Guid> usersIds = request.Users.Select(u => u.UserId).ToList();
 
       await Task.WhenAll(
-        _departmentService.CreateDepartmentEntityAsync(request.DepartmentId, dbProject.Id, response.Errors),
+        request.DepartmentId.HasValue
+          ? _bus.Publish<ICreateDepartmentEntityPublish>(ICreateDepartmentEntityPublish.CreateObj(
+            departmentId: request.DepartmentId.Value,
+            createdBy: _httpContextAccessor.HttpContext.GetUserId(),
+            projectId: response.Body.Value))
+          : Task.CompletedTask,
         _timeService.CreateWorkTimeAsync(dbProject.Id, usersIds, response.Errors),
         _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors));
 

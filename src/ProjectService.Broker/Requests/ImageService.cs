@@ -6,6 +6,7 @@ using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
@@ -22,16 +23,16 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
   {
     private readonly ILogger<ImageService> _logger;
     private readonly IRequestClient<IGetImagesRequest> _rcGetImages;
-    private readonly IRequestClient<ICreateImagesRequest> _rcCreateImages;
-    private readonly IRequestClient<IRemoveImagesRequest> _rcRemoveImages;
+    private readonly IRequestClient<ICreateImagesPublish> _rcCreateImages;
+    private readonly IRequestClient<IRemoveImagesPublish> _rcRemoveImages;
     private readonly IImageInfoMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public ImageService(
       ILogger<ImageService> logger,
       IRequestClient<IGetImagesRequest> rcGetImages,
-      IRequestClient<ICreateImagesRequest> rcCreateImages,
-      IRequestClient<IRemoveImagesRequest> rcRemoveImages,
+      IRequestClient<ICreateImagesPublish> rcCreateImages,
+      IRequestClient<IRemoveImagesPublish> rcRemoveImages,
       IImageInfoMapper mapper,
       IHttpContextAccessor httpContextAccessor)
     {
@@ -65,9 +66,9 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       return projectImages is null || !projectImages.Any()
         ? null
         : (await RequestHandler
-          .ProcessRequest<ICreateImagesRequest, ICreateImagesResponse>(
+          .ProcessRequest<ICreateImagesPublish, ICreateImagesResponse>(
             _rcCreateImages,
-            ICreateImagesRequest.CreateObj(
+            ICreateImagesPublish.CreateObj(
               projectImages.Select(x => new CreateImageData(
                 x.Name,
                 x.Content,
@@ -84,9 +85,9 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       return imagesIds is null || imagesIds.Any()
         ? false
         : (await RequestHandler
-          .ProcessRequest<IRemoveImagesRequest, bool>(
+          .ProcessRequest<IRemoveImagesPublish, bool>(
             _rcRemoveImages,
-            IRemoveImagesRequest.CreateObj(imagesIds: imagesIds, imageSource: ImageSource.Project)),
+            IRemoveImagesPublish.CreateObj(imagesIds: imagesIds, imageSource: ImageSource.Project)),
             errors,
             _logger).Item1;
     }

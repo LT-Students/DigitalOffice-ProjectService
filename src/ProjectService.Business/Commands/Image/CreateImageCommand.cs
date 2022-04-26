@@ -9,12 +9,11 @@ using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
-using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
-using LT.DigitalOffice.Models.Broker.Requests.Image;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
 using LT.DigitalOffice.Models.Broker.Responses.Image;
 using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -30,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
   public class CreateImageCommand : ICreateImageCommand
   {
     private readonly IImageRepository _repository;
-    private readonly IRequestClient<ICreateImagesRequest> _rcImages;
+    private readonly IRequestClient<ICreateImagesPublish> _rcImages;
     private readonly ILogger<CreateImageCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -51,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       {
         IOperationResult<ICreateImagesResponse> response =
           _rcImages.GetResponse<IOperationResult<ICreateImagesResponse>>(
-            ICreateImagesRequest.CreateObj(images, ImageSource.Project)).Result.Message;
+            ICreateImagesPublish.CreateObj(images, ImageSource.Project)).Result.Message;
 
         if (response.IsSuccess && response.Body.ImagesIds != null)
         {
@@ -74,7 +73,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
     public CreateImageCommand(
       IImageRepository repository,
-      IRequestClient<ICreateImagesRequest> rcImages,
+      IRequestClient<ICreateImagesPublish> rcImages,
       ILogger<CreateImageCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
@@ -108,9 +107,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
           Errors = new List<string> { "Not enough rights." }
         };
       }
-      
+
       ValidationResult validationResult = await _validator.ValidateAsync(request);
-      
+
       if (!validationResult.IsValid)
       {
         return _responseCreator.CreateFailureResponse<List<Guid>>(

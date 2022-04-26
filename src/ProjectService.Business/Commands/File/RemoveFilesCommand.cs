@@ -10,7 +10,7 @@ using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Requests.File;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
   public class RemoveFilesCommand : IRemoveFilesCommand
   {
     private readonly IFileRepository _repository;
-    private readonly IRequestClient<IRemoveFilesRequest> _rcFiles;
+    private readonly IRequestClient<IRemoveFilesPublish> _rcFiles;
     private readonly ILogger<RemoveFilesCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
       {
         Response<IOperationResult<bool>> response =
           await _rcFiles.GetResponse<IOperationResult<bool>>(
-            IRemoveFilesRequest.CreateObj(ids));
+            IRemoveFilesPublish.CreateObj(ids));
 
         if (response.Message.IsSuccess)
         {
@@ -67,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
     public RemoveFilesCommand(
       IFileRepository repository,
-      IRequestClient<IRemoveFilesRequest> rcFiles,
+      IRequestClient<IRemoveFilesPublish> rcFiles,
       ILogger<RemoveFilesCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,

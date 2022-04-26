@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
-using LT.DigitalOffice.Models.Broker.Common;
+using LT.DigitalOffice.Models.Broker.Publishing;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using MassTransit;
 
 namespace LT.DigitalOffice.ProjectService.Broker
 {
-  public class DisactivateProjectUserConsumer : IConsumer<IDisactivateUserRequest>
+  public class DisactivateProjectUserConsumer : IConsumer<IDisactivateUserPublish>
   {
     private readonly IUserRepository _repository;
     private readonly IGlobalCacheRepository _globalCache;
@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
       _globalCache = globalCache;
     }
 
-    public async Task Consume(ConsumeContext<IDisactivateUserRequest> context)
+    public async Task Consume(ConsumeContext<IDisactivateUserPublish> context)
     {
       List<Guid> projectsIds = await _repository.RemoveAsync(context.Message.UserId, context.Message.ModifiedBy);
 

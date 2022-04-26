@@ -1,10 +1,10 @@
 ﻿using LT.DigitalOffice.Kernel.BrokerSupport.Attributes;
 using LT.DigitalOffice.Kernel.BrokerSupport.Configurations;
 using LT.DigitalOffice.Models.Broker.Common;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Department;
-using LT.DigitalOffice.Models.Broker.Requests.File;
-using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Office;
 using LT.DigitalOffice.Models.Broker.Requests.Position;
@@ -37,22 +37,19 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
     // image
 
-    [AutoInjectRequest(typeof(IRemoveImagesRequest))]
+    [AutoInjectRequest(typeof(IRemoveImagesPublish))]
     public string RemoveImagesEndpoint { get; set; }
 
     [AutoInjectRequest(typeof(IGetImagesRequest))]
     public string GetImagesEndpoint { get; set; }
 
-    [AutoInjectRequest(typeof(ICreateImagesRequest))]
+    [AutoInjectRequest(typeof(ICreateImagesPublish))]
     public string CreateImagesEndpoint { get; set; }
 
     // department
 
     [AutoInjectRequest(typeof(IGetDepartmentsRequest))]
     public string GetDepartmentsEndpoint { get; set; }
-
-    [AutoInjectRequest(typeof(ICreateDepartmentEntityRequest))]
-    public string CreateDepartmentEntityEndpoint {get; set;}
 
     // office
 
@@ -82,10 +79,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
     // file
 
-    [AutoInjectRequest(typeof(ICreateFilesRequest))]
+    [AutoInjectRequest(typeof(ICreateFilesPublish))]
     public string CreateFilesEndpoint { get; set; }
 
-    [AutoInjectRequest(typeof(IRemoveFilesRequest))]
+    [AutoInjectRequest(typeof(IRemoveFilesPublish))]
     public string RemoveFilesEndpoint { get; set; }
   }
 }

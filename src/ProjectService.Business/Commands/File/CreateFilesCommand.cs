@@ -11,7 +11,7 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.File;
-using LT.DigitalOffice.Models.Broker.Requests.File;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
   {
     private readonly IDbProjectFileMapper _mapper;
     private readonly IFileRepository _repository;
-    private readonly IRequestClient<ICreateFilesRequest> _rcFiles;
+    private readonly IRequestClient<ICreateFilesPublish> _rcFiles;
     private readonly ILogger<CreateFilesCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -46,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       {
         Response<IOperationResult<bool>> response =
           await _rcFiles.GetResponse<IOperationResult<bool>>(
-            ICreateFilesRequest.CreateObj(
+            ICreateFilesPublish.CreateObj(
               files,
               _httpContextAccessor.HttpContext.GetUserId()));
 
@@ -72,7 +72,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
     public CreateFilesCommand(
       IDbProjectFileMapper mapper,
       IFileRepository repository,
-      IRequestClient<ICreateFilesRequest> rcFiles,
+      IRequestClient<ICreateFilesPublish> rcFiles,
       ILogger<CreateFilesCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
