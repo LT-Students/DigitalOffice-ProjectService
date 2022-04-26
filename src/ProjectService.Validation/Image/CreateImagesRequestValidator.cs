@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Image
         {
           image
           .Cascade(CascadeMode.Stop)
-          .NotNull().WithMessage("Image content must not be null.")
+          .NotNull().WithMessage("Image must not be null.")
           .SetValidator(imageValidator);
         });
 
