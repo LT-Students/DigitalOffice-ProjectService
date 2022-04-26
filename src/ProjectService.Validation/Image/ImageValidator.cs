@@ -5,19 +5,17 @@ using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation.Image
 {
-  public class ImageContentValidator : AbstractValidator<ImageContent>, IImageValidator
+  public class ImageValidator : AbstractValidator<ImageContent>, IImageValidator
   {
-    public ImageContentValidator(
+    public ImageValidator(
       IImageContentValidator contentValidator,
       IImageExtensionValidator extensionValidator)
     {
       RuleFor(i => i.Content)
-        .SetValidator(contentValidator)
-        .WithMessage("Incorrect image content.");
+        .SetValidator(contentValidator);
 
       RuleFor(i => i.Extension)
-        .SetValidator(extensionValidator)
-        .WithMessage("Incorrect image extension.");
+        .SetValidator(extensionValidator);
     }
   }
 }

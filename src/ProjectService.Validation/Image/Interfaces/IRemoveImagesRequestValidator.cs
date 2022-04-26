@@ -5,7 +5,7 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 namespace LT.DigitalOffice.ProjectService.Validation.Image.Interfaces
 {
   [AutoInject]
-  public interface ICreateImageValidator : IValidator<CreateImagesRequest>
+  public interface IRemoveImagesRequestValidator : IValidator<RemoveImageRequest>
   {
   }
 }
