@@ -61,10 +61,6 @@ namespace LT.DigitalOffice.ProjectService.Broker
         ids.Add(request.UserId.Value);
       }
 
-      if (request.DepartmentId.HasValue)
-      {
-        ids.Add(request.DepartmentId.Value);
-      }
 
       List<object> additionalArguments = new() { request.IncludeUsers };
 
