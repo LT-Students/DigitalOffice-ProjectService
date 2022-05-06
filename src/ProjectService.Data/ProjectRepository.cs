@@ -156,19 +156,19 @@ namespace LT.DigitalOffice.ProjectService.Data
       IQueryable<DbProject> dbProjects = _provider.Projects
         .AsQueryable();
 
-      if (filter.NameIncludeSubstring != null)
+      if (!string.IsNullOrWhiteSpace(filter.NameIncludeSubstring))
       {
         dbProjects = dbProjects
           .Where(p => p.Name.Contains(filter.NameIncludeSubstring));
       }
 
-      if (filter.ProjectStatus != null)
+      if (filter.ProjectStatus.HasValue)
       {
         dbProjects = dbProjects
           .Where(p => p.Status == (int)filter.ProjectStatus);
       }
 
-      if (filter.IsAscendingSort != null)
+      if (filter.IsAscendingSort.HasValue)
       {
         dbProjects = filter.IsAscendingSort.Value
           ? dbProjects
