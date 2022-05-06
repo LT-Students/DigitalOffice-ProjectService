@@ -156,6 +156,27 @@ namespace LT.DigitalOffice.ProjectService.Data
       IQueryable<DbProject> dbProjects = _provider.Projects
         .AsQueryable();
 
+      if (!string.IsNullOrWhiteSpace(filter.NameIncludeSubstring))
+      {
+        dbProjects = dbProjects
+          .Where(p => p.Name.Contains(filter.NameIncludeSubstring));
+      }
+
+      if (filter.ProjectStatus.HasValue)
+      {
+        dbProjects = dbProjects
+          .Where(p => p.Status == (int)filter.ProjectStatus);
+      }
+
+      if (filter.IsAscendingSort.HasValue)
+      {
+        dbProjects = filter.IsAscendingSort.Value
+          ? dbProjects
+            .OrderBy(p => p.Name)
+          : dbProjects
+            .OrderByDescending(p => p.Name);
+      }
+
       int totalCount = await dbProjects.CountAsync();
 
       return (await dbProjects.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(), totalCount);
