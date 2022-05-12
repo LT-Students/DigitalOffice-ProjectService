@@ -70,7 +70,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
 
     public async Task<List<Guid>> CheckUsersExistenceAsync(List<Guid> usersIds, List<string> errors = null)
     {
-      if (usersIds == null || !usersIds.Any())
+      if (usersIds is null || !usersIds.Any())
       {
         return null;
       }

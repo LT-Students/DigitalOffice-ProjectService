@@ -24,7 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.User
         .DependentRules(() =>
         {
           RuleFor(projectUser => projectUser.Users)
-            .Must(users => users != null && users.Any())
+            .Must(users => users is not null && users.Any())
             .WithMessage("The request must contain users")
             .MustAsync(async (projectUser, cancellation) =>
               (await userService.CheckUsersExistenceAsync(projectUser.Select(user => user.UserId).ToList())).Count() == projectUser.Count())
