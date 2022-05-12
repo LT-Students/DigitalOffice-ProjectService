@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Attributes;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Db;
 
@@ -29,6 +30,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     Task<List<Guid>> RemoveAsync(Guid userId, Guid removedBy);
 
     Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> usersIds);
+
+    Task<bool> EditProjectUsers(Guid projectId, List<Guid> usersIds, List<ProjectUserRoleType> roleTypes);
 
     Task<bool> IsProjectAdminAsync(Guid projectId, Guid userId);
   }
