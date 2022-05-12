@@ -83,7 +83,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _globalCache = globalCache;
     }
 
-    public async Task<OperationResultResponse<bool>> ExecuteAsync(CreateProjectUsersRequest request)
+    public async Task<OperationResultResponse<bool>> ExecuteAsync(ProjectUsersRequest request)
     {
       List<string> errors = new();
 

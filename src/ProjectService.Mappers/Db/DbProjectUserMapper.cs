@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       };
     }
 
-    public List<DbProjectUser> Map(CreateProjectUsersRequest request)
+    public List<DbProjectUser> Map(ProjectUsersRequest request)
     {
       if (request == null)
       {

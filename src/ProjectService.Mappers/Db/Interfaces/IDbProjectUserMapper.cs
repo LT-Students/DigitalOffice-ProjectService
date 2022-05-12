@@ -11,6 +11,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces
   {
     DbProjectUser Map(CreateUserRequest request, Guid projectId);
 
-    List<DbProjectUser> Map(CreateProjectUsersRequest request);
+    List<DbProjectUser> Map(ProjectUsersRequest request);
   }
 }
