@@ -12,7 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
   /// Provides methods for working with the database of ProjectService.
   /// </summary>
   [AutoInject]
-  public interface IUserRepository
+  public interface IProjectUserRepository
   {
     Task<(List<DbProjectUser>, int totalCount)> GetAsync(IGetProjectsUsersRequest request);
 

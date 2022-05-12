@@ -14,11 +14,11 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
 {
   public class CheckFilesAccessesConsumer : IConsumer<ICheckProjectFilesAccessesRequest>
   {
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
     private readonly IFileRepository _fileRepository;
 
     public CheckFilesAccessesConsumer(
-      IUserRepository userRepository,
+      IProjectUserRepository userRepository,
       IFileRepository fileRepository)
     {
       _userRepository = userRepository;

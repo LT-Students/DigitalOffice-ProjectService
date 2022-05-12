@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
   public class GetProjectCommand : IGetProjectCommand
   {
     private readonly IProjectRepository _repository;
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
     private readonly IProjectResponseMapper _projectResponseMapper;
     private readonly IUserInfoMapper _projectUserInfoMapper;
     private readonly IDepartmentInfoMapper _departmentInfoMapper;
@@ -46,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
     public GetProjectCommand(
       IProjectRepository repository,
-      IUserRepository userRepository,
+      IProjectUserRepository userRepository,
       IProjectResponseMapper projectResponsMapper,
       IUserInfoMapper projectUserInfoMapper,
       IDepartmentInfoMapper departmentInfoMapper,

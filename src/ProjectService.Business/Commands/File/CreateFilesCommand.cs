@@ -31,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
     private readonly ILogger<CreateFilesCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
     private readonly IResponseCreator _responseCreator;
     private readonly IFileDataMapper _fileDataMapper;
 
@@ -76,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       ILogger<CreateFilesCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
-      IUserRepository userRepository,
+      IProjectUserRepository userRepository,
       IResponseCreator responseCreator,
       IFileDataMapper fileDataMapper)
     {

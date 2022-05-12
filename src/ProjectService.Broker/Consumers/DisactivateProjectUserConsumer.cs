@@ -11,11 +11,11 @@ namespace LT.DigitalOffice.ProjectService.Broker
 {
   public class DisactivateProjectUserConsumer : IConsumer<IDisactivateUserPublish>
   {
-    private readonly IUserRepository _repository;
+    private readonly IProjectUserRepository _repository;
     private readonly IGlobalCacheRepository _globalCache;
 
     public DisactivateProjectUserConsumer(
-      IUserRepository repository,
+      IProjectUserRepository repository,
       IGlobalCacheRepository globalCache)
     {
       _repository = repository;

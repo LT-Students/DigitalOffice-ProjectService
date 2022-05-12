@@ -26,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 {
   public class CreateProjectUsersCommand : ICreateProjectUsersCommand
   {
-    private readonly IUserRepository _repository;
+    private readonly IProjectUserRepository _repository;
     private readonly IDbProjectUserMapper _mapper;
     private readonly IAccessValidator _accessValidator;
     private readonly IAddUsersToProjectValidator _validator;
@@ -62,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     }
 
     public CreateProjectUsersCommand(
-      IUserRepository repository,
+      IProjectUserRepository repository,
       IDbProjectUserMapper mapper,
       IAccessValidator accessValidator,
       IAddUsersToProjectValidator validator,

@@ -18,14 +18,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 {
   public class RemoveProjectUsersCommand : IRemoveProjectUsersCommand
   {
-    private readonly IUserRepository _repository;
+    private readonly IProjectUserRepository _repository;
     private readonly IAccessValidator _accessValidator;
     private readonly IResponseCreator _responseCreator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IGlobalCacheRepository _globalCache;
 
     public RemoveProjectUsersCommand(
-      IUserRepository repository,
+      IProjectUserRepository repository,
       IAccessValidator accessValidator,
       IResponseCreator responseCreator,
       IHttpContextAccessor httpContextAccessor,

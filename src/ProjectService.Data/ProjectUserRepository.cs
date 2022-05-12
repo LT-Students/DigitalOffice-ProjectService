@@ -12,10 +12,10 @@ using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
-  public class UserRepository : IUserRepository
+  public class ProjectUserRepository : IProjectUserRepository
   {
     private readonly IDataProvider _provider;
-    private readonly ILogger<UserRepository> _logger;
+    private readonly ILogger<ProjectUserRepository> _logger;
 
     #region private methods
 
@@ -43,9 +43,9 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     #endregion
 
-    public UserRepository(
+    public ProjectUserRepository(
       IDataProvider provider,
-      ILogger<UserRepository> logger)
+      ILogger<ProjectUserRepository> logger)
     {
       _provider = provider;
       _logger = logger;
