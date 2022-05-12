@@ -4,7 +4,7 @@ using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation.User
 {
-  public class ProjectUserValidator : AbstractValidator<CreateUserRequest>, IProjectUserValidator
+  public class ProjectUserValidator : AbstractValidator<UserRequest>, IProjectUserValidator
   {
     public ProjectUserValidator()
     {

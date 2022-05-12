@@ -16,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
     public DateTime? EndProject { get; set; }
     public Guid? DepartmentId { get; set; }
     public ProjectStatusType Status { get; set; }
-    public List<CreateUserRequest> Users { get; set; }
+    public List<UserRequest> Users { get; set; }
     public List<ImageContent> ProjectImages { get; set; }
     public List<FileInfo> Files { get; set; }
   }

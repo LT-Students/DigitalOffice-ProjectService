@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
     [Test]
     public void ShouldNotErrorsWhenRequestIsValid()
     {
-      var projectUserRequest = new CreateUserRequest
+      var projectUserRequest = new UserRequest
       {
         UserId = Guid.NewGuid(),
         Role = ProjectUserRoleType.Manager
