@@ -108,7 +108,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       if (!request.Users.Any())
       {
-        errors.Add("Request doesn't contains users who still are not emloyees of this project.");
+        errors.Add("Request doesn't contain users who are not employees of this project.");
 
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
       }
