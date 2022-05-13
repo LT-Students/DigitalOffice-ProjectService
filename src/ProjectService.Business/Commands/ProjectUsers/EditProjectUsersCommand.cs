@@ -23,14 +23,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IProjectUserRepository _repository;
     private readonly IAccessValidator _accessValidator;
     private readonly IResponseCreator _responseCreator;
-    private readonly IEditProjectUsersRequestValidator _validator;
+    private readonly IProjectUsersRequestValidator _validator;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public EditProjectUsersCommand(
       IProjectUserRepository repository,
       IAccessValidator accessValidator,
       IResponseCreator responseCreator,
-      IEditProjectUsersRequestValidator validator,
+      IProjectUsersRequestValidator validator,
       IHttpContextAccessor httpContextAccessor)
     {
       _repository = repository;
@@ -40,12 +40,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<OperationResultResponse<bool>> ExecuteAsync(EditProjectUsersRequest request)
+    public async Task<OperationResultResponse<bool>> ExecuteAsync(ProjectUsersRequest request)
     {
       List<string> errors = new();
 
-      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-          && !await _repository.IsProjectAdminAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId()))
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects) && 
+          !await _repository.IsProjectAdminAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId()))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
@@ -59,28 +59,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
       }
 
-      if (request.UsersIds.Count != request.RoleTypes.Count)
-      {
-        errors.Add("Different quantity of users and roles");
-
-        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest);
-      }
-
-      List<Guid> existUsers = await _repository.GetExistAsync(request.ProjectId, request.UsersIds);
-
-      if (existUsers.Distinct().Count() != request.UsersIds.Count)
-      {
-        errors.Add("");
-
-        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest);
-      }
-
-      bool result = await _repository.EditProjectUsers(request.ProjectId, request.UsersIds, request.RoleTypes);
+      bool result = await _repository.EditProjectUsers(request);
 
       return new OperationResultResponse<bool>
       {
-        Status = OperationResultStatusType.FullSuccess, 
-        Body = result
+        Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess, 
+        Body = result,
+        Errors = errors
       };
     }
   }

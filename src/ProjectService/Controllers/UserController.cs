@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [HttpPut("edit")]
     public async Task<OperationResultResponse<bool>> EditAsync(
       [FromServices] IEditProjectUsersCommand command,
-      [FromBody] EditProjectUsersRequest request)
+      [FromBody] ProjectUsersRequest request)
     {
       return await command.ExecuteAsync(request);
     }

@@ -8,6 +8,7 @@ using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -42,22 +43,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       }
 
       return projectUsers;
-    }
-
-    private static Dictionary<Guid, int> CreateUserIdByRoleTypeDictionary(
-      IReadOnlyCollection<Guid> userIds,
-      IReadOnlyCollection<ProjectUserRoleType> roleTypes)
-    {
-      Dictionary<Guid, int> userRoleTypes = new();
-
-      for (int i = 0; i < userIds.Count(); i++)
-      {
-        userRoleTypes.Add(
-          userIds.ElementAt(i),
-          (int)roleTypes.ElementAt(i));
-      }
-
-      return userRoleTypes;
     }
 
     #endregion
@@ -201,21 +186,20 @@ namespace LT.DigitalOffice.ProjectService.Data
       return true;
     }
 
-    public async Task<bool> EditProjectUsers(
-      Guid projectId, 
-      List<Guid> usersIds,
-      List<ProjectUserRoleType> roleTypes)
+    public async Task<bool> EditProjectUsers(ProjectUsersRequest request)
     {
-      Dictionary<Guid, int> userIdByRoleType = CreateUserIdByRoleTypeDictionary(usersIds, roleTypes);
+      Dictionary<Guid, int> userIdByRoleType = request.Users.ToDictionary(user => user.UserId, user => (int)user.Role);
 
       await _provider.ProjectsUsers
-        .Where(pu => pu.ProjectId == projectId && usersIds.Contains(pu.UserId))
+        .Where(pu => pu.ProjectId == request.ProjectId && userIdByRoleType.ContainsKey(pu.UserId))
         .ForEachAsync(pu =>
         {
           pu.Role = userIdByRoleType[pu.UserId];
           pu.ModifiedBy = _contextAccessor.HttpContext.GetUserId();
           pu.ModifiedAtUtc = DateTime.Now;
         });
+
+      await _provider.SaveAsync();
 
       return true;
     }

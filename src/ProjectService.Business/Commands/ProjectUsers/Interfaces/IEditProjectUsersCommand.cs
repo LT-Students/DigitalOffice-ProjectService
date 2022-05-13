@@ -8,6 +8,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfa
   [AutoInject]
   public interface IEditProjectUsersCommand
   {
-    Task<OperationResultResponse<bool>> ExecuteAsync(EditProjectUsersRequest request);
+    Task<OperationResultResponse<bool>> ExecuteAsync(ProjectUsersRequest request);
   }
 }

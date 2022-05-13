@@ -4,11 +4,10 @@ using LT.DigitalOffice.ProjectService.Validation.ProjectUser.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation.ProjectUser
 {
-  public class EditProjectUsersRequestValidator : AbstractValidator<EditProjectUsersRequest>, IEditProjectUsersRequestValidator
+  public class ProjectUsersRequestValidator : AbstractValidator<ProjectUsersRequest>, IProjectUsersRequestValidator
   {
-    public EditProjectUsersRequestValidator()
+    public ProjectUsersRequestValidator()
     {
-      
     }
   }
 }
