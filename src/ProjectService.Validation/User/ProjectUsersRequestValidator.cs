@@ -7,10 +7,10 @@ using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation.User
 {
-  public class AddUsersToProjectValidator : AbstractValidator<ProjectUsersRequest>, IAddUsersToProjectValidator
+  public class ProjectUsersRequestValidator : AbstractValidator<ProjectUsersRequest>, IProjectUsersRequestValidator
   {
-    public AddUsersToProjectValidator(
-      IProjectUserValidator projectUserValidator,
+    public ProjectUsersRequestValidator(
+      IUserRequestValidator projectUserValidator,
       IProjectRepository projectRepository,
       IUserService userService)
     {

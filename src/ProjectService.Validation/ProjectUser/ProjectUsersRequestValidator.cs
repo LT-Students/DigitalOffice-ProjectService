@@ -8,6 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.ProjectUser
   {
     public ProjectUsersRequestValidator()
     {
+
     }
   }
 }

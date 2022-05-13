@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IProjectUserRepository _repository;
     private readonly IDbProjectUserMapper _mapper;
     private readonly IAccessValidator _accessValidator;
-    private readonly IAddUsersToProjectValidator _validator;
+    private readonly IProjectUsersRequestValidator _validator;
     private readonly ILogger<CreateProjectUsersCommand> _logger;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IResponseCreator _responseCreator;
@@ -65,7 +65,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       IProjectUserRepository repository,
       IDbProjectUserMapper mapper,
       IAccessValidator accessValidator,
-      IAddUsersToProjectValidator validator,
+      IProjectUsersRequestValidator validator,
       ILogger<CreateProjectUsersCommand> logger,
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
       IResponseCreator responseCreator,
