@@ -10,7 +10,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.User
   public class ProjectUsersRequestValidator : AbstractValidator<ProjectUsersRequest>, IProjectUsersRequestValidator
   {
     public ProjectUsersRequestValidator(
-      IUserRequestValidator projectUserValidator,
+      IUserRequestValidator userRequestValidator,
       IProjectRepository projectRepository,
       IUserService userService)
     {
@@ -31,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.User
             .WithMessage("Some users does not exist.");
 
           RuleForEach(projectUser => projectUser.Users)
-            .SetValidator(projectUserValidator);
+            .SetValidator(userRequestValidator);
         });
     }
   }
