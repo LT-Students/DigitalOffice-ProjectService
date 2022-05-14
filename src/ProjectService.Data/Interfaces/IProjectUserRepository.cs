@@ -31,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> usersIds);
 
-    Task<bool> EditProjectUsers(ProjectUsersRequest request);
+    Task<bool> EditAsync(ProjectUsersRequest request);
 
     Task<bool> IsProjectAdminAsync(Guid projectId, Guid userId);
   }

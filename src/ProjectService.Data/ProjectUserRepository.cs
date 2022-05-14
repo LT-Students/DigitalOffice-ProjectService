@@ -186,7 +186,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       return true;
     }
 
-    public async Task<bool> EditProjectUsers(ProjectUsersRequest request)
+    public async Task<bool> EditAsync(ProjectUsersRequest request)
     {
       Dictionary<Guid, int> userIdByRoleType = request.Users.ToDictionary(user => user.UserId, user => (int)user.Role);
 

@@ -58,11 +58,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
       }
 
-      bool result = await _repository.EditProjectUsers(request);
+      bool result = await _repository.EditAsync(request);
 
       return new OperationResultResponse<bool>
       {
-        Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess, 
+        Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
         Body = result,
         Errors = errors
       };
