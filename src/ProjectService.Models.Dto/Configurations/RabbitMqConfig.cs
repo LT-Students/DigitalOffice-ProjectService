@@ -8,7 +8,6 @@ using LT.DigitalOffice.Models.Broker.Requests.Department;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Office;
 using LT.DigitalOffice.Models.Broker.Requests.Position;
-using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using IGetImagesRequest = LT.DigitalOffice.Models.Broker.Requests.Image.IGetImagesRequest;
 
@@ -71,11 +70,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
     [AutoInjectRequest(typeof(IGetUsersDataRequest))]
     public string GetUsersDataEndpoint { get; set; }
-
-    // time
-
-    [AutoInjectRequest(typeof(ICreateWorkTimeRequest))]
-    public string CreateWorkTimeEndpoint { get; set; }
 
     // file
 
