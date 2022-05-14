@@ -5,7 +5,6 @@ using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
-using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
