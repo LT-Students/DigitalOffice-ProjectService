@@ -5,14 +5,13 @@ using System.Net;
 using System.Threading.Tasks;
 using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Requests.Time;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Time;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
@@ -31,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IAccessValidator _accessValidator;
     private readonly IProjectUsersRequestValidator _validator;
     private readonly ILogger<CreateProjectUsersCommand> _logger;
-    private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
+    private readonly IBus _bus;
     private readonly IResponseCreator _responseCreator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IGlobalCacheRepository _globalCache;
@@ -42,16 +41,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       try
       {
-        Response<IOperationResult<bool>> response =
-          await _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
-            ICreateWorkTimeRequest.CreateObj(projectId, usersIds));
+        await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(projectId, usersIds));
 
-        if (response.Message.IsSuccess && response.Message.Body)
-        {
-          return;
-        }
-
-        _logger.LogWarning(logMessage, projectId, string.Join(", ", usersIds));
+        return;
       }
       catch (Exception exc)
       {
@@ -67,7 +59,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       IAccessValidator accessValidator,
       IProjectUsersRequestValidator validator,
       ILogger<CreateProjectUsersCommand> logger,
-      IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
+      IBus bus,
       IResponseCreator responseCreator,
       IHttpContextAccessor httpContextAccessor,
       IGlobalCacheRepository globalCache)
@@ -77,7 +69,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _repository = repository;
       _accessValidator = accessValidator;
       _logger = logger;
-      _rcCreateWorkTime = rcCreateWorkTime;
+      _bus = bus;
       _responseCreator = responseCreator;
       _httpContextAccessor = httpContextAccessor;
       _globalCache = globalCache;
