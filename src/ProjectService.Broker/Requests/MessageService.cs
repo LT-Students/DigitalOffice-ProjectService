@@ -34,18 +34,11 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
 
     public async Task CreateWorkspaceAsync(string projectName, List<Guid> usersIds, List<string> errors)
     {
-      Guid creatorId = _httpContextAccessor.HttpContext.GetUserId();
-
-      if (!usersIds.Contains(creatorId))
-      {
-        usersIds.Add(creatorId);
-      }
-
       await RequestHandler.ProcessRequest<ICreateWorkspaceRequest, bool>(
         _rcCreateWorkspace,
         ICreateWorkspaceRequest.CreateObj(
           projectName,
-          creatorId,
+          _httpContextAccessor.HttpContext.GetUserId(),
           usersIds),
         errors,
         _logger);
