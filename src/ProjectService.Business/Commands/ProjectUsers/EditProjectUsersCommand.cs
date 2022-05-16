@@ -43,8 +43,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     {
       List<string> errors = new();
 
-      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects) && 
-          !await _repository.IsProjectAdminAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId()))
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects) 
+        && await _repository.IsProjectAdminAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId()))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
@@ -62,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       return new OperationResultResponse<bool>
       {
-        Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
+        Status = result ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
         Body = result,
         Errors = errors
       };
