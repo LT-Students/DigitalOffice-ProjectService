@@ -62,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       return new OperationResultResponse<bool>
       {
-        Status = result ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
+        Status = result ? OperationResultStatusType.FullSuccess : OperationResultStatusType.Failed,
         Body = result,
         Errors = errors
       };
