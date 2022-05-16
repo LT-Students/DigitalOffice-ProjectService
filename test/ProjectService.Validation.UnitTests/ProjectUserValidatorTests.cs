@@ -10,12 +10,12 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
 {
   class ProjectUserValidatorTests
   {
-    private IProjectUserValidator _validator;
+    private IUserRequestValidator _validator;
 
     [SetUp]
     public void SetUp()
     {
-      _validator = new ProjectUserValidator();
+      _validator = new UserRequestValidator();
     }
 
     [Test]
@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.UnitTests
     [Test]
     public void ShouldNotErrorsWhenRequestIsValid()
     {
-      var projectUserRequest = new CreateUserRequest
+      var projectUserRequest = new UserRequest
       {
         UserId = Guid.NewGuid(),
         Role = ProjectUserRoleType.Manager

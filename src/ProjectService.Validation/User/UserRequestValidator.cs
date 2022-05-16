@@ -4,9 +4,9 @@ using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation.User
 {
-  public class ProjectUserValidator : AbstractValidator<CreateUserRequest>, IProjectUserValidator
+  public class UserRequestValidator : AbstractValidator<UserRequest>, IUserRequestValidator
   {
-    public ProjectUserValidator()
+    public UserRequestValidator()
     {
       RuleFor(pu => pu.UserId)
         .NotEmpty()

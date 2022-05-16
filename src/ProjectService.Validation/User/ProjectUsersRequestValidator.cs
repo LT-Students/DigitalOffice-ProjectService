@@ -7,10 +7,10 @@ using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation.User
 {
-  public class AddUsersToProjectValidator : AbstractValidator<CreateProjectUsersRequest>, IAddUsersToProjectValidator
+  public class ProjectUsersRequestValidator : AbstractValidator<ProjectUsersRequest>, IProjectUsersRequestValidator
   {
-    public AddUsersToProjectValidator(
-      IProjectUserValidator projectUserValidator,
+    public ProjectUsersRequestValidator(
+      IUserRequestValidator userRequestValidator,
       IProjectRepository projectRepository,
       IUserService userService)
     {
@@ -31,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.User
             .WithMessage("Some users does not exist.");
 
           RuleForEach(projectUser => projectUser.Users)
-            .SetValidator(projectUserValidator);
+            .SetValidator(userRequestValidator);
         });
     }
   }

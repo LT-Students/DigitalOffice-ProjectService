@@ -35,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDbImageMapper _dbProjectImageMapper;
     private readonly ICreateImagesRequestValidator _validator;
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
     private readonly IResponseCreator _responseCreator;
 
     private List<Guid> CreateImagesAsync(List<ImageContent> context, Guid userId, Guid enityId, List<string> errors)
@@ -79,7 +79,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       IHttpContextAccessor httpContextAccessor,
       IDbImageMapper dbProjectImageMapper,
       ICreateImagesRequestValidator validator,
-      IUserRepository userRepository,
+      IProjectUserRepository userRepository,
       IResponseCreator responseCreator)
     {
       _repository = repository;

@@ -14,7 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 {
   public class GetProjectsUsersConsumer : IConsumer<IGetProjectsUsersRequest>
   {
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
 
     private async Task<object> GetProjectUsersAsync(IGetProjectsUsersRequest request)
     {
@@ -33,7 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
         totalCount);
     }
 
-    public GetProjectsUsersConsumer(IUserRepository userRepository)
+    public GetProjectsUsersConsumer(IProjectUserRepository userRepository)
     {
       _userRepository = userRepository;
     }

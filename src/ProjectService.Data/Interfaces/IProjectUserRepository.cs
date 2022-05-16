@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
@@ -12,7 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
   /// Provides methods for working with the database of ProjectService.
   /// </summary>
   [AutoInject]
-  public interface IUserRepository
+  public interface IProjectUserRepository
   {
     Task<(List<DbProjectUser>, int totalCount)> GetAsync(IGetProjectsUsersRequest request);
 
@@ -29,6 +30,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     Task<List<Guid>> RemoveAsync(Guid userId, Guid removedBy);
 
     Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> usersIds);
+
+    Task<bool> EditAsync(ProjectUsersRequest request);
 
     Task<bool> IsProjectAdminAsync(Guid projectId, Guid userId);
   }

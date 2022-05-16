@@ -30,7 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRemoveImagesRequestValidator _validator;
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
 
     private async Task<bool> RemoveImageAsync(List<Guid> ids, List<string> errors)
     {
@@ -74,7 +74,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IRemoveImagesRequestValidator validator,
-      IUserRepository userRepository)
+      IProjectUserRepository userRepository)
     {
       _repository = repository;
       _rcImages = rcImages;

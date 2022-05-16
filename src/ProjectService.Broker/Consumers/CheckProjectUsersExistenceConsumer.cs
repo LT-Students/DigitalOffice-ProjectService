@@ -10,9 +10,9 @@ namespace LT.DigitalOffice.ProjectService.Broker
 {
   public class CheckProjectUsersExistenceConsumer : IConsumer<ICheckProjectUsersExistenceRequest>
   {
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
 
-    public CheckProjectUsersExistenceConsumer(IUserRepository userRepository)
+    public CheckProjectUsersExistenceConsumer(IProjectUserRepository userRepository)
     {
       _userRepository = userRepository;
     }

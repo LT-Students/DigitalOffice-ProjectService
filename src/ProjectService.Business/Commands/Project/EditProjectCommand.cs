@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IPatchDbProjectMapper _mapper;
     private readonly IProjectRepository _projectRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
     private readonly IResponseCreator _responseCreator;
     private readonly IGlobalCacheRepository _globalCache;
 
@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IPatchDbProjectMapper mapper,
       IProjectRepository projectRepository,
       IHttpContextAccessor httpContextAccessor,
-      IUserRepository userRepository,
+      IProjectUserRepository userRepository,
       IResponseCreator responseCreator,
       IGlobalCacheRepository globalCache)
     {

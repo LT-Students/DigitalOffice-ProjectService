@@ -26,10 +26,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 {
   public class CreateProjectUsersCommand : ICreateProjectUsersCommand
   {
-    private readonly IUserRepository _repository;
+    private readonly IProjectUserRepository _repository;
     private readonly IDbProjectUserMapper _mapper;
     private readonly IAccessValidator _accessValidator;
-    private readonly IAddUsersToProjectValidator _validator;
+    private readonly IProjectUsersRequestValidator _validator;
     private readonly ILogger<CreateProjectUsersCommand> _logger;
     private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
     private readonly IResponseCreator _responseCreator;
@@ -62,10 +62,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     }
 
     public CreateProjectUsersCommand(
-      IUserRepository repository,
+      IProjectUserRepository repository,
       IDbProjectUserMapper mapper,
       IAccessValidator accessValidator,
-      IAddUsersToProjectValidator validator,
+      IProjectUsersRequestValidator validator,
       ILogger<CreateProjectUsersCommand> logger,
       IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
       IResponseCreator responseCreator,
@@ -83,7 +83,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _globalCache = globalCache;
     }
 
-    public async Task<OperationResultResponse<bool>> ExecuteAsync(CreateProjectUsersRequest request)
+    public async Task<OperationResultResponse<bool>> ExecuteAsync(ProjectUsersRequest request)
     {
       List<string> errors = new();
 
@@ -108,7 +108,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       if (!request.Users.Any())
       {
-        errors.Add("Request doesn't contains users who still are not emloyees of this project.");
+        errors.Add("Request doesn't contain users who are not employees of this project.");
 
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
       }

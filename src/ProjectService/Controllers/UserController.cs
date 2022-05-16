@@ -15,7 +15,15 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [HttpPost("create")]
     public async Task<OperationResultResponse<bool>> CreateAsync(
       [FromServices] ICreateProjectUsersCommand command,
-      [FromBody] CreateProjectUsersRequest request)
+      [FromBody] ProjectUsersRequest request)
+    {
+      return await command.ExecuteAsync(request);
+    }
+
+    [HttpPut("edit")]
+    public async Task<OperationResultResponse<bool>> EditAsync(
+      [FromServices] IEditProjectUsersCommand command,
+      [FromBody] ProjectUsersRequest request)
     {
       return await command.ExecuteAsync(request);
     }

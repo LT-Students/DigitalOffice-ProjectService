@@ -2,20 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
-  public class UserRepository : IUserRepository
+  public class ProjectUserRepository : IProjectUserRepository
   {
     private readonly IDataProvider _provider;
-    private readonly ILogger<UserRepository> _logger;
+    private readonly ILogger<ProjectUserRepository> _logger;
+    private readonly IHttpContextAccessor _contextAccessor;
 
     #region private methods
 
@@ -43,12 +47,14 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     #endregion
 
-    public UserRepository(
+    public ProjectUserRepository(
       IDataProvider provider,
-      ILogger<UserRepository> logger)
+      ILogger<ProjectUserRepository> logger,
+      IHttpContextAccessor contextAccessor)
     {
       _provider = provider;
       _logger = logger;
+      _contextAccessor = contextAccessor;
     }
 
     public async Task<List<DbProjectUser>> GetAsync(Guid projectId, bool showNotActive)
@@ -175,6 +181,24 @@ namespace LT.DigitalOffice.ProjectService.Data
       }
 
       _provider.ProjectsUsers.UpdateRange(users);
+      await _provider.SaveAsync();
+
+      return true;
+    }
+
+    public async Task<bool> EditAsync(ProjectUsersRequest request)
+    {
+      Dictionary<Guid, int> userIdByRoleType = request.Users.ToDictionary(user => user.UserId, user => (int)user.Role);
+
+      await _provider.ProjectsUsers
+        .Where(pu => pu.ProjectId == request.ProjectId && userIdByRoleType.ContainsKey(pu.UserId))
+        .ForEachAsync(pu =>
+        {
+          pu.Role = userIdByRoleType[pu.UserId];
+          pu.ModifiedBy = _contextAccessor.HttpContext.GetUserId();
+          pu.ModifiedAtUtc = DateTime.Now;
+        });
+
       await _provider.SaveAsync();
 
       return true;
