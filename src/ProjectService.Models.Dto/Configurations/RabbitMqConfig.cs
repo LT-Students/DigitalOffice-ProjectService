@@ -9,7 +9,7 @@ using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Office;
 using LT.DigitalOffice.Models.Broker.Requests.Position;
 using LT.DigitalOffice.Models.Broker.Requests.User;
-using IGetImagesRequest = LT.DigitalOffice.Models.Broker.Requests.Image.IGetImagesRequest;
+using LT.DigitalOffice.Models.Broker.Requests.Image;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 {
@@ -64,9 +64,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
     [AutoInjectRequest(typeof(ICheckUsersExistence))]
     public string CheckUsersExistenceEndpoint { get; set; }
-
-    [AutoInjectRequest(typeof(IGetUserDataRequest))]
-    public string GetUserDataEndpoint { get; set; }
 
     [AutoInjectRequest(typeof(IGetUsersDataRequest))]
     public string GetUsersDataEndpoint { get; set; }
