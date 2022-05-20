@@ -19,7 +19,6 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 {
@@ -29,36 +28,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IDbProjectUserMapper _mapper;
     private readonly IAccessValidator _accessValidator;
     private readonly IProjectUsersRequestValidator _validator;
-    private readonly ILogger<CreateProjectUsersCommand> _logger;
     private readonly IBus _bus;
     private readonly IResponseCreator _responseCreator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IGlobalCacheRepository _globalCache;
-
-    private async Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds, List<string> errors)
-    {
-      const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
-
-      try
-      {
-        await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(projectId, usersIds));
-
-        return;
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, logMessage, projectId, string.Join(", ", usersIds));
-      }
-
-      errors.Add($"Failed to create a work time for project {projectId} with users: {string.Join(", ", usersIds)}.");
-    }
 
     public CreateProjectUsersCommand(
       IProjectUserRepository repository,
       IDbProjectUserMapper mapper,
       IAccessValidator accessValidator,
       IProjectUsersRequestValidator validator,
-      ILogger<CreateProjectUsersCommand> logger,
       IBus bus,
       IResponseCreator responseCreator,
       IHttpContextAccessor httpContextAccessor,
@@ -68,7 +47,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _validator = validator;
       _repository = repository;
       _accessValidator = accessValidator;
-      _logger = logger;
       _bus = bus;
       _responseCreator = responseCreator;
       _httpContextAccessor = httpContextAccessor;
@@ -107,7 +85,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       bool result = await _repository.CreateAsync(_mapper.Map(request));
 
-      await CreateWorkTimeAsync(request.ProjectId, request.Users.Select(u => u.UserId).ToList(), errors);
+      await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(
+        request.ProjectId, 
+        request.Users.Select(u => u.UserId).ToList()));
 
       if (existUsers.Any())
       {

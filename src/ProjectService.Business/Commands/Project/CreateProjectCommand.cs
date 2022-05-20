@@ -109,10 +109,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             createdBy: _httpContextAccessor.HttpContext.GetUserId(),
             projectId: response.Body.Value))
           : Task.CompletedTask,
-        _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(
-          dbProject.Id,
-          usersIds)),
-        _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors));
+        usersIds.Any() 
+          ? _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(
+            dbProject.Id,
+            usersIds))
+          : Task.CompletedTask,
+        usersIds.Any()
+          ? _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors)
+          : Task.CompletedTask);
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
