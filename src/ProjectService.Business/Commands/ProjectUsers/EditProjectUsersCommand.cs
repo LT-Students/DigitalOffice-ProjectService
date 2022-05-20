@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -41,30 +41,26 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(ProjectUsersRequest request)
     {
-      List<string> errors = new();
-
-      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects) && 
-          !await _repository.IsProjectAdminAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId()))
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects) 
+        && !await _repository.IsProjectAdminAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId()))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
       ValidationResult validationResult = await _validator.ValidateAsync(request);
-
-      errors.AddRange(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
-
       if (!validationResult.IsValid)
       {
-        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
+        return _responseCreator.CreateFailureResponse<bool>(
+          HttpStatusCode.BadRequest,
+          validationResult.Errors.Select(e => e.ErrorMessage).ToList());
       }
 
       bool result = await _repository.EditAsync(request);
 
       return new OperationResultResponse<bool>
       {
-        Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
-        Body = result,
-        Errors = errors
+        Status = result ? OperationResultStatusType.FullSuccess : OperationResultStatusType.Failed,
+        Body = result
       };
     }
   }
