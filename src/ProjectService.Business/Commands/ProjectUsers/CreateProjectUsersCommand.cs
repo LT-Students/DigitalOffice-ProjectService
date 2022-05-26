@@ -5,14 +5,13 @@ using System.Net;
 using System.Threading.Tasks;
 using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Requests.Time;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Time;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
@@ -20,7 +19,6 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 {
@@ -30,44 +28,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IDbProjectUserMapper _mapper;
     private readonly IAccessValidator _accessValidator;
     private readonly IProjectUsersRequestValidator _validator;
-    private readonly ILogger<CreateProjectUsersCommand> _logger;
-    private readonly IRequestClient<ICreateWorkTimeRequest> _rcCreateWorkTime;
+    private readonly IBus _bus;
     private readonly IResponseCreator _responseCreator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IGlobalCacheRepository _globalCache;
-
-    private async Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds, List<string> errors)
-    {
-      const string logMessage = "Failed to create a work time for project {projectId} with users {userIds}";
-
-      try
-      {
-        Response<IOperationResult<bool>> response =
-          await _rcCreateWorkTime.GetResponse<IOperationResult<bool>>(
-            ICreateWorkTimeRequest.CreateObj(projectId, usersIds));
-
-        if (response.Message.IsSuccess && response.Message.Body)
-        {
-          return;
-        }
-
-        _logger.LogWarning(logMessage, projectId, string.Join(", ", usersIds));
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, logMessage, projectId, string.Join(", ", usersIds));
-      }
-
-      errors.Add($"Failed to create a work time for project {projectId} with users: {string.Join(", ", usersIds)}.");
-    }
 
     public CreateProjectUsersCommand(
       IProjectUserRepository repository,
       IDbProjectUserMapper mapper,
       IAccessValidator accessValidator,
       IProjectUsersRequestValidator validator,
-      ILogger<CreateProjectUsersCommand> logger,
-      IRequestClient<ICreateWorkTimeRequest> rcCreateWorkTime,
+      IBus bus,
       IResponseCreator responseCreator,
       IHttpContextAccessor httpContextAccessor,
       IGlobalCacheRepository globalCache)
@@ -76,8 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _validator = validator;
       _repository = repository;
       _accessValidator = accessValidator;
-      _logger = logger;
-      _rcCreateWorkTime = rcCreateWorkTime;
+      _bus = bus;
       _responseCreator = responseCreator;
       _httpContextAccessor = httpContextAccessor;
       _globalCache = globalCache;
@@ -115,7 +85,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       bool result = await _repository.CreateAsync(_mapper.Map(request));
 
-      await CreateWorkTimeAsync(request.ProjectId, request.Users.Select(u => u.UserId).ToList(), errors);
+      await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(
+        request.ProjectId, 
+        request.Users.Select(u => u.UserId).ToList()));
 
       if (existUsers.Any())
       {

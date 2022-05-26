@@ -12,6 +12,7 @@ using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Department;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Time;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -37,7 +38,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IFileDataMapper _fileDataMapper;
     private readonly IImageService _imageService;
     private readonly IFileService _fileService;
-    private readonly ITimeService _timeService;
     private readonly IMessageService _messageService;
     private readonly IBus _bus;
 
@@ -51,7 +51,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IFileDataMapper fileDataMapper,
       IImageService imageService,
       IFileService fileService,
-      ITimeService timeService,
       IMessageService messageService,
       IBus bus)
     {
@@ -64,7 +63,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _fileDataMapper = fileDataMapper;
       _imageService = imageService;
       _fileService = fileService;
-      _timeService = timeService;
       _messageService = messageService;
       _bus = bus;
     }
@@ -111,8 +109,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             createdBy: _httpContextAccessor.HttpContext.GetUserId(),
             projectId: response.Body.Value))
           : Task.CompletedTask,
-        _timeService.CreateWorkTimeAsync(dbProject.Id, usersIds, response.Errors),
-        _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors));
+        usersIds.Any() 
+          ? _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(
+            dbProject.Id,
+            usersIds))
+          : Task.CompletedTask,
+        usersIds.Any()
+          ? _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors)
+          : Task.CompletedTask);
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
