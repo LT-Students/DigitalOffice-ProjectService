@@ -15,7 +15,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public int Role { get; set; }
     public Guid CreatedBy { get; set; }
     public bool IsActive { get; set; }
-    public DateTime PeriodStart1 { get; set; }
 
     public DbProject Project { get; set; }
   }
@@ -37,9 +36,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         .HasOne(pu => pu.Project)
         .WithMany(p => p.Users)
         .HasForeignKey(pu => pu.ProjectId);
-
-      builder
-        .Ignore(pu => pu.PeriodStart1);
     }
   }
 }
