@@ -6,10 +6,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
   [DbContext(typeof(ProjectServiceDbContext))]
-  [Migration("20220321165600_InitialTables")]
+  [Migration("20220531121500_InitialTables")]
   public class InitialTables : Migration
   {
-
     private void AddProjectsTable(MigrationBuilder migrationBuilder)
     {
       migrationBuilder.CreateTable(
@@ -65,15 +64,24 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           UserId = table.Column<Guid>(nullable: false),
           Role = table.Column<int>(nullable: false),
           CreatedBy = table.Column<Guid>(nullable: false),
-          CreatedAtUtc = table.Column<DateTime>(nullable: false),
-          ModifiedBy = table.Column<Guid?>(nullable: true),
-          ModifiedAtUtc = table.Column<DateTime?>(nullable: true),
-          IsActive = table.Column<bool>(nullable: false)
+          IsActive = table.Column<bool>(nullable: false),
+          PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
+            .Annotation("SqlServer:IsTemporal", true)
+            .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
+            .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart"),
+          PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
+            .Annotation("SqlServer:IsTemporal", true)
+            .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
+            .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart")
         },
         constraints: table =>
         {
           table.PrimaryKey("PK_ProjectsUsers", x => x.Id);
-        });
+        })
+        .Annotation("SqlServer:IsTemporal", true)
+        .Annotation("SqlServer:TemporalHistoryTableName", DbProjectUser.HistoryTableName)
+        .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
+        .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
     }
 
     private void AddProjectImagesTable(MigrationBuilder migrationBuilder)

@@ -78,10 +78,16 @@ namespace LT.DigitalOffice.ProjectService.Data
       return await _provider.ProjectsUsers.Where(u => usersIds.Contains(u.UserId) && u.IsActive).ToListAsync();
     }
 
-    public async Task<List<Guid>> GetExistAsync(Guid projectId, IEnumerable<Guid> usersIds)
+    public async Task<List<Guid>> GetExistingIdsAsync(Guid projectId, IEnumerable<Guid> usersIds)
     {
       return await _provider.ProjectsUsers
-        .Where(pu => pu.IsActive && pu.ProjectId == projectId && usersIds.Contains(pu.UserId)).Select(pu => pu.UserId).ToListAsync();
+        .Where(pu => pu.ProjectId == projectId && usersIds.Contains(pu.UserId)).Select(pu => pu.UserId).ToListAsync();
+    }
+
+    public async Task<List<DbProjectUser>> GetExistingUsersAsync(Guid projectId, IEnumerable<Guid> usersIds)
+    {
+      return await _provider.ProjectsUsers
+        .Where(pu => pu.ProjectId == projectId && usersIds.Contains(pu.UserId)).ToListAsync();
     }
 
     public async Task<(List<DbProjectUser>, int totalCount)> GetAsync(IGetProjectsUsersRequest request)
@@ -103,15 +109,23 @@ namespace LT.DigitalOffice.ProjectService.Data
       return (await projectUsers.ToListAsync(), totalCount);
     }
 
-
-    public async Task<bool> CreateAsync(List<DbProjectUser> dbProjectUsers)
+    public async Task<bool> CreateAsync(List<DbProjectUser> newUsers, List<DbProjectUser> oldUsers)
     {
-      if (dbProjectUsers == null)
+      if (newUsers is null)
       {
         return false;
       }
+      
+      if (oldUsers is not null)
+      {
+        foreach (DbProjectUser oldUser in oldUsers)
+        {
+          oldUser.IsActive = true;
+        }
+      }
 
-      _provider.ProjectsUsers.AddRange(dbProjectUsers);
+      _provider.ProjectsUsers.AddRange(newUsers);
+
       await _provider.SaveAsync();
 
       return true;
@@ -146,8 +160,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       foreach (DbProjectUser dbProjectUser in dbProjectsUser)
       {
         dbProjectUser.IsActive = false;
-        dbProjectUser.ModifiedBy = removedBy;
-        dbProjectUser.ModifiedAtUtc = DateTime.UtcNow;
+        dbProjectUser.CreatedBy = removedBy;
 
         projectsIds.Add(dbProjectUser.ProjectId);
       }
@@ -195,8 +208,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         .ForEachAsync(pu =>
         {
           pu.Role = userIdByRoleType[pu.UserId];
-          pu.ModifiedBy = _contextAccessor.HttpContext.GetUserId();
-          pu.ModifiedAtUtc = DateTime.Now;
+          pu.CreatedBy = _contextAccessor.HttpContext.GetUserId();
         });
 
       await _provider.SaveAsync();

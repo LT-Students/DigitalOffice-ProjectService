@@ -15,6 +15,7 @@ using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Time;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 using MassTransit;
@@ -72,36 +73,24 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
       }
 
-      List<Guid> existUsers = await _repository.GetExistAsync(request.ProjectId, request.Users.Select(u => u.UserId).ToList());
+      List<DbProjectUser> existingUsers = await _repository.GetExistingUsersAsync(request.ProjectId, request.Users.Select(u => u.UserId));
 
-      request.Users = request.Users.GroupBy(u => u.UserId).Select(g => g.First()).Where(u => !existUsers.Contains(u.UserId)).ToList();
+      request.Users = request.Users.ExceptBy(existingUsers.Select(x => x.UserId), request => request.UserId).ToList();
 
-      if (!request.Users.Any())
-      {
-        errors.Add("Request doesn't contain users who are not employees of this project.");
-
-        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
-      }
-
-      bool result = await _repository.CreateAsync(_mapper.Map(request));
-
-      await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(
-        request.ProjectId, 
-        request.Users.Select(u => u.UserId).ToList()));
-
-      if (existUsers.Any())
-      {
-        errors.Add("Exist user were not added again.");
-      }
+      bool result = await _repository.CreateAsync(_mapper.Map(request), existingUsers);
 
       if (result)
       {
+        await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(
+          request.ProjectId,
+          request.Users.Select(u => u.UserId).ToList()));
+
         await _globalCache.RemoveAsync(request.ProjectId);
       }
 
       return new()
       {
-        Status = errors.Any() ? OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess,
+        Status = result ? OperationResultStatusType.FullSuccess : OperationResultStatusType.Failed,
         Body = result,
         Errors = errors
       };

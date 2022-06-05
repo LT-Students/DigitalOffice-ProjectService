@@ -41,8 +41,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
         Rate = userCompany?.Users?.FirstOrDefault(u => u.UserId == userData.Id)?.Rate,
         ProjectCount = projectCount,
         IsActive = dbProjectUser.IsActive,
-        CreatedAtUtc = dbProjectUser.CreatedAtUtc,
-        ModifiedAtUtc = dbProjectUser.ModifiedAtUtc,
         AvatarImage = image,
         Role = (ProjectUserRoleType)dbProjectUser.Role,
         Department = userDepartment == null

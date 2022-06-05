@@ -31,7 +31,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         ProjectId = projectId,
         UserId = request.UserId,
         Role = (int)request.Role,
-        CreatedAtUtc = DateTime.UtcNow,
         CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
         IsActive = true
       };
@@ -51,7 +50,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
           ProjectId = request.ProjectId,
           UserId = u.UserId,
           Role = (int)u.Role,
-          CreatedAtUtc = DateTime.UtcNow,
           CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
           IsActive = true
         }).ToList();
