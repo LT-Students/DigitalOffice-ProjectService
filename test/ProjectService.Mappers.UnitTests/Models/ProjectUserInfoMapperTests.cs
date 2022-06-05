@@ -36,9 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 Id = Guid.NewGuid(),
                 ProjectId = Guid.NewGuid(),
                 UserId = _userData.Id,
-                IsActive = _userData.IsActive,
-                CreatedAtUtc = DateTime.UtcNow,
-                ModifiedAtUtc = DateTime.UtcNow
+                IsActive = _userData.IsActive
             };
 
             _expectedProjectUserInfo = new UserInfo
@@ -47,9 +45,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
                 FirstName = _userData.FirstName,
                 LastName = _userData.LastName,
                 MiddleName = _userData.MiddleName,
-                IsActive = _userData.IsActive,
-                CreatedAtUtc = _dbProjectUser.CreatedAtUtc,
-                ModifiedAtUtc = _dbProjectUser.ModifiedAtUtc
+                IsActive = _userData.IsActive
             };
         }
 
