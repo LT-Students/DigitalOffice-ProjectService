@@ -78,12 +78,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       return await _provider.ProjectsUsers.Where(u => usersIds.Contains(u.UserId) && u.IsActive).ToListAsync();
     }
 
-    public async Task<List<Guid>> GetExistingIdsAsync(Guid projectId, IEnumerable<Guid> usersIds)
-    {
-      return await _provider.ProjectsUsers
-        .Where(pu => pu.ProjectId == projectId && usersIds.Contains(pu.UserId)).Select(pu => pu.UserId).ToListAsync();
-    }
-
     public async Task<List<DbProjectUser>> GetExistingUsersAsync(Guid projectId, IEnumerable<Guid> usersIds)
     {
       return await _provider.ProjectsUsers
@@ -204,7 +198,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       Dictionary<Guid, int> userIdByRoleType = request.Users.ToDictionary(user => user.UserId, user => (int)user.Role);
 
       await _provider.ProjectsUsers
-        .Where(pu => pu.ProjectId == request.ProjectId && userIdByRoleType.ContainsKey(pu.UserId))
+        .Where(pu => pu.ProjectId == request.ProjectId && request.Users.Select(x => x.UserId).Contains(pu.UserId))
         .ForEachAsync(pu =>
         {
           pu.Role = userIdByRoleType[pu.UserId];

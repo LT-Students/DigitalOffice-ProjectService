@@ -17,8 +17,6 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
   {
     Task<(List<DbProjectUser>, int totalCount)> GetAsync(IGetProjectsUsersRequest request);
 
-    Task<List<Guid>> GetExistingIdsAsync(Guid projectId, IEnumerable<Guid> usersIds);
-
     Task<List<DbProjectUser>> GetExistingUsersAsync(Guid projectId, IEnumerable<Guid> usersIds);
 
     Task<List<DbProjectUser>> GetAsync(List<Guid> usersIds);
