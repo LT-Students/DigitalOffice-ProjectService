@@ -121,7 +121,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
               imagesInfos?.FirstOrDefault(i => i.Id == mappedUser.ImageId),
               positions?.FirstOrDefault(p => p.Users.Any(user => user.UserId == pu.UserId)),
               companies?.FirstOrDefault(c => c.Users.Any(user => user.UserId == pu.UserId)),
-              departments?.FirstOrDefault(d => d.UsersIds.Any(id => id == pu.UserId)),
+              departments?.FirstOrDefault(d => d.Users.FirstOrDefault(user => user.UserId == pu.UserId) != null),
               pu,
               projectUsersForCount.Where(u => u.UserId == pu.UserId).Count());
           })
