@@ -22,8 +22,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           Description = table.Column<string>(nullable: true),
           ShortDescription = table.Column<string>(nullable: true),
           Customer = table.Column<string>(nullable: true),
-          StartProject = table.Column<DateTime>(nullable: false),
-          EndProject = table.Column<DateTime>(nullable: true),
+          StartDateUtc = table.Column<DateTime>(nullable: false),
+          EndDateUtc = table.Column<DateTime>(nullable: true),
           CreatedBy = table.Column<Guid>(nullable: false),
           CreatedAtUtc = table.Column<DateTime>(nullable: false),
           ModifiedBy = table.Column<Guid?>(nullable: true),
@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         constraints: table =>
         {
           table.PrimaryKey("PK_Projects", x => x.Id);
-          table.UniqueConstraint("UX_Project_Name_Unique", x => x.Name);
+          table.UniqueConstraint("UC_Projects_Name_Unique", x => x.Name);
         });
     }
 

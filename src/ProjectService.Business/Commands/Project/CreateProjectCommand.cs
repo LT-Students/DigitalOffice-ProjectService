@@ -11,8 +11,7 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.File;
-using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Department;
-using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Time;
+using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -22,7 +21,6 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
-using MassTransit;
 using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
@@ -39,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IImageService _imageService;
     private readonly IFileService _fileService;
     private readonly IMessageService _messageService;
-    private readonly IBus _bus;
+    private readonly IPublishHelper _publishHelper;
 
     public CreateProjectCommand(
       IProjectRepository repository,
@@ -52,7 +50,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IImageService imageService,
       IFileService fileService,
       IMessageService messageService,
-      IBus bus)
+      IPublishHelper publishHelper)
     {
       _validator = validator;
       _repository = repository;
@@ -64,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _imageService = imageService;
       _fileService = fileService;
       _messageService = messageService;
-      _bus = bus;
+      _publishHelper = publishHelper;
     }
 
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateProjectRequest request)
@@ -104,15 +102,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       await Task.WhenAll(
         request.DepartmentId.HasValue
-          ? _bus.Publish<ICreateDepartmentEntityPublish>(ICreateDepartmentEntityPublish.CreateObj(
-            departmentId: request.DepartmentId.Value,
-            createdBy: _httpContextAccessor.HttpContext.GetUserId(),
-            projectId: response.Body.Value))
+          ? _publishHelper.CreateDepartmentEntityPublish(
+              departmentId: request.DepartmentId.Value,
+              createdBy: _httpContextAccessor.HttpContext.GetUserId(),
+              projectId: response.Body.Value)
           : Task.CompletedTask,
         usersIds.Any() 
-          ? _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(
-            dbProject.Id,
-            usersIds))
+          ? _publishHelper.CreateWorkTimePublish(
+              dbProject.Id,
+              usersIds)
           : Task.CompletedTask,
         usersIds.Any()
           ? _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors)

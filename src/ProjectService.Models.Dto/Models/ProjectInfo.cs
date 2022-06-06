@@ -13,8 +13,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
     public string Description { get; set; }
     public string ShortDescription { get; set; }
     public string Customer { get; set; }
-    public DateTime StartProject { get; set; }
-    public DateTime? EndProject { get; set; }
+    public DateTime StartDateUtc { get; set; }
+    public DateTime? EndDateUtc { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DepartmentInfo Department { get; set; }
   }

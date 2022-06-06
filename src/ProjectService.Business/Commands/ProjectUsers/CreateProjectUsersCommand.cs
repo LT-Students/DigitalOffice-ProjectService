@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,14 +10,13 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Time;
+using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
-using MassTransit;
 using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
@@ -29,29 +27,29 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IDbProjectUserMapper _mapper;
     private readonly IAccessValidator _accessValidator;
     private readonly IProjectUsersRequestValidator _validator;
-    private readonly IBus _bus;
     private readonly IResponseCreator _responseCreator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IGlobalCacheRepository _globalCache;
+    private readonly IPublishHelper _publishHelper;
 
     public CreateProjectUsersCommand(
       IProjectUserRepository repository,
       IDbProjectUserMapper mapper,
       IAccessValidator accessValidator,
       IProjectUsersRequestValidator validator,
-      IBus bus,
       IResponseCreator responseCreator,
       IHttpContextAccessor httpContextAccessor,
-      IGlobalCacheRepository globalCache)
+      IGlobalCacheRepository globalCache,
+      IPublishHelper publishHelper)
     {
       _mapper = mapper;
       _validator = validator;
       _repository = repository;
       _accessValidator = accessValidator;
-      _bus = bus;
       _responseCreator = responseCreator;
       _httpContextAccessor = httpContextAccessor;
       _globalCache = globalCache;
+      _publishHelper = publishHelper;
     }
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(ProjectUsersRequest request)
@@ -59,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       List<string> errors = new();
 
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !await _repository.IsProjectAdminAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId()))
+        && !await _repository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), isManager: true))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
@@ -74,16 +72,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       }
 
       List<DbProjectUser> existingUsers = await _repository.GetExistingUsersAsync(request.ProjectId, request.Users.Select(u => u.UserId));
+      List<UserRequest> newUsers =  request.Users.ExceptBy(existingUsers.Select(x => x.UserId), request => request.UserId).ToList();
 
-      request.Users = request.Users.ExceptBy(existingUsers.Select(x => x.UserId), request => request.UserId).ToList();
-
-      bool result = await _repository.CreateAsync(_mapper.Map(request), existingUsers);
+      bool result = await _repository.CreateAsync(_mapper.Map(request.ProjectId, newUsers));
+      await _repository.ReturnUsersAsync(existingUsers);
 
       if (result)
       {
-        await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(
+        await _publishHelper.CreateWorkTimePublish(
           request.ProjectId,
-          request.Users.Select(u => u.UserId).ToList()));
+          newUsers.Select(u => u.UserId).ToList());
 
         await _globalCache.RemoveAsync(request.ProjectId);
       }

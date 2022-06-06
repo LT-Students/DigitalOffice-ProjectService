@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     public async Task<OperationResultResponse<bool>> ExecuteAsync(ProjectUsersRequest request)
     {
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects) 
-        && !await _repository.IsProjectAdminAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId()))
+        && !await _repository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), isManager: true))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }

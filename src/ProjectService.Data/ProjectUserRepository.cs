@@ -103,19 +103,11 @@ namespace LT.DigitalOffice.ProjectService.Data
       return (await projectUsers.ToListAsync(), totalCount);
     }
 
-    public async Task<bool> CreateAsync(List<DbProjectUser> newUsers, List<DbProjectUser> oldUsers)
+    public async Task<bool> CreateAsync(List<DbProjectUser> newUsers)
     {
       if (newUsers is null)
       {
         return false;
-      }
-      
-      if (oldUsers is not null)
-      {
-        foreach (DbProjectUser oldUser in oldUsers)
-        {
-          oldUser.IsActive = true;
-        }
       }
 
       _provider.ProjectsUsers.AddRange(newUsers);
@@ -125,7 +117,24 @@ namespace LT.DigitalOffice.ProjectService.Data
       return true;
     }
 
-    public async Task<bool> DoesExistAsync(Guid userId, Guid projectId, bool? isManager)
+    public async Task<bool> ReturnUsersAsync(List<DbProjectUser> oldUsers)
+    {
+      if (oldUsers is null)
+      {
+        return false;
+      }
+
+      foreach (DbProjectUser oldUser in oldUsers)
+      {
+        oldUser.IsActive = true;
+      }
+
+      await _provider.SaveAsync();
+
+      return true;
+    }
+
+    public async Task<bool> DoesExistAsync(Guid userId, Guid projectId, bool? isManager = null)
     {
       if (isManager.HasValue && isManager.Value)
       {
@@ -137,6 +146,14 @@ namespace LT.DigitalOffice.ProjectService.Data
       return await _provider
         .ProjectsUsers
         .AnyAsync(x => x.UserId == userId && x.ProjectId == projectId && x.IsActive);
+    }
+
+    public async Task<List<Guid>> DoExistAsync(Guid projectId, List<Guid> usersIds)
+    {
+      return await _provider.ProjectsUsers
+        .Where(pu => pu.ProjectId == projectId && usersIds.Contains(pu.UserId) && pu.IsActive)
+        .Select(pu => pu.UserId)
+        .ToListAsync();
     }
 
     public async Task<List<Guid>> RemoveAsync(Guid userId, Guid removedBy)
@@ -162,14 +179,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       await _provider.SaveAsync();
 
       return projectsIds;
-    }
-
-    public async Task<List<Guid>> DoExistAsync(Guid projectId, List<Guid> ids)
-    {
-      return await _provider.ProjectsUsers
-        .Where(pu => pu.ProjectId == projectId && ids.Contains(pu.UserId) && pu.IsActive)
-        .Select(pu => pu.UserId)
-        .ToListAsync();
     }
 
     public async Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> usersIds)
@@ -208,11 +217,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       await _provider.SaveAsync();
 
       return true;
-    }
-
-    public async Task<bool> IsProjectAdminAsync(Guid projectId, Guid userId)
-    {
-      return await _provider.ProjectsUsers.AnyAsync(pu => pu.IsActive && pu.ProjectId == projectId && pu.UserId == userId);
     }
   }
 }
