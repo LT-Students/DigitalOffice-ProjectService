@@ -9,9 +9,11 @@ using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
+using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
@@ -31,41 +33,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRemoveImagesRequestValidator _validator;
     private readonly IProjectUserRepository _userRepository;
-
-    private async Task<bool> RemoveImageAsync(List<Guid> ids, List<string> errors)
-    {
-      if (ids == null || !ids.Any())
-      {
-        return false;
-      }
-
-      string logMessage = "Errors while removing images ids {ids}. Errors: {Errors}";
-
-      try
-      {
-        Response<IOperationResult<bool>> response =
-          await _rcImages.GetResponse<IOperationResult<bool>>(
-            IRemoveImagesPublish.CreateObj(ids, ImageSource.Project));
-
-        if (response.Message.IsSuccess)
-        {
-          return true;
-        }
-
-        _logger.LogWarning(
-          logMessage,
-          string.Join('\n', ids),
-          string.Join('\n', response.Message.Errors));
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, logMessage);
-      }
-
-      errors.Add("Can not remove images. Please try again later.");
-
-      return false;
-    }
+    private readonly IImageService _imageService;
+    private readonly IResponseCreator _responseCreator;
 
     public RemoveImageCommand(
       IImageRepository repository,
@@ -74,7 +43,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IRemoveImagesRequestValidator validator,
-      IProjectUserRepository userRepository)
+      IProjectUserRepository userRepository,
+      IImageService imageService,
+      IResponseCreator responseCreator)
     {
       _repository = repository;
       _rcImages = rcImages;
@@ -83,6 +54,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       _httpContextAccessor = httpContextAccessor;
       _validator = validator;
       _userRepository = userRepository;
+      _imageService = imageService;
+      _responseCreator = responseCreator;
     }
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(RemoveImageRequest request)
@@ -91,40 +64,26 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
         && !(await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-
-        return new OperationResultResponse<bool>
-        {
-          Status = OperationResultStatusType.Failed,
-          Errors = new List<string> { "Not enough rights." }
-        };
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
       if (!_validator.ValidateCustom(request, out List<string> errors))
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        return new OperationResultResponse<bool>
-        {
-          Status = OperationResultStatusType.Failed,
-          Errors = errors
-        };
+        return _responseCreator.CreateFailureResponse<bool>(
+          HttpStatusCode.BadRequest,
+          errors);
       }
 
       OperationResultResponse<bool> response = new();
 
-      bool result = await RemoveImageAsync(request.ImagesIds, response.Errors);
+      bool result = await _imageService.RemoveImagesAsync(request.ImagesIds, response.Errors);
 
       if (!result)
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-        response.Status = OperationResultStatusType.Failed;
-
-        return response;
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, response.Errors);
       }
 
       response.Body = await _repository.RemoveAsync(request.ImagesIds);
-      response.Status = OperationResultStatusType.FullSuccess;
 
       return response;
     }

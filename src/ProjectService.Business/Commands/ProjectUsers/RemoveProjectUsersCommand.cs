@@ -57,10 +57,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       {
         await _globalCache.RemoveAsync(projectId);
       }
+      else
+      {
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+      }
 
       return new()
       {
-        Status = result ? OperationResultStatusType.FullSuccess : OperationResultStatusType.Failed,
         Body = result
       };
     }

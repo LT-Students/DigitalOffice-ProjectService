@@ -7,28 +7,33 @@ using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation.User
 {
-  public class ProjectUsersRequestValidator : AbstractValidator<ProjectUsersRequest>, IProjectUsersRequestValidator
+  public class CreateProjectUsersRequestValidator : AbstractValidator<CreateProjectUsersRequest>, ICreateProjectUsersRequestValidator
   {
-    public ProjectUsersRequestValidator(
+    public CreateProjectUsersRequestValidator(
       IUserRequestValidator userRequestValidator,
       IProjectRepository projectRepository,
+      IProjectUserRepository projectUserRepository,
       IUserService userService)
     {
       CascadeMode = CascadeMode.Stop;
 
-      RuleFor(projectUser => projectUser.ProjectId)
+      RuleFor(request => request.ProjectId)
         .NotEmpty()
         .WithMessage("Request must have a project Id")
-        .MustAsync(async (x, _) => await projectRepository.DoesExistAsync(x))
+        .MustAsync(async (projectId, _) => await projectRepository.DoesExistAsync(projectId))
         .WithMessage("This project id does not exist")
         .DependentRules(() =>
         {
-          RuleFor(projectUser => projectUser.Users)
+          RuleFor(request => request.Users)
             .Must(users => users is not null && users.Any())
             .WithMessage("The request must contain users")
             .MustAsync(async (projectUser, cancellation) =>
               (await userService.CheckUsersExistenceAsync(projectUser.Select(user => user.UserId).ToList())).Count() == projectUser.Count())
             .WithMessage("Some users does not exist.");
+
+          RuleFor(request => request)
+            .MustAsync(async (r, _) => !(await projectUserRepository.DoExistAsync(r.ProjectId, r.Users.Select(x => x.UserId), isActive: true)).Any())
+            .WithMessage("Some users are already in this project.");
 
           RuleForEach(projectUser => projectUser.Users)
             .SetValidator(userRequestValidator);

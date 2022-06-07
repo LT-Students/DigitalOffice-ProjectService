@@ -12,6 +12,7 @@ using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
+using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
@@ -34,40 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
     private readonly IProjectUserRepository _userRepository;
     private readonly IResponseCreator _responseCreator;
     private readonly IFileDataMapper _fileDataMapper;
-
-    private async Task<bool> CreateFilesAsync(List<FileData> files, List<string> errors)
-    {
-      if (files == null || !files.Any())
-      {
-        return false;
-      }
-
-      try
-      {
-        Response<IOperationResult<bool>> response =
-          await _rcFiles.GetResponse<IOperationResult<bool>>(
-            ICreateFilesPublish.CreateObj(
-              files,
-              _httpContextAccessor.HttpContext.GetUserId()));
-
-        if (response.Message.IsSuccess)
-        {
-          return response.Message.Body;
-        }
-
-        _logger.LogWarning(
-          "Errors while creating files. Errors: {Errors}",
-          string.Join('\n', response.Message.Errors));
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, "Errors while creating files.");
-      }
-
-      errors.Add("Can not create files. Please try again later.");
-
-      return false;
-    }
+    private readonly IFileService _fileService;
 
     public CreateFilesCommand(
       IDbProjectFileMapper mapper,
@@ -78,7 +46,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       IHttpContextAccessor httpContextAccessor,
       IProjectUserRepository userRepository,
       IResponseCreator responseCreator,
-      IFileDataMapper fileDataMapper)
+      IFileDataMapper fileDataMapper,
+      IFileService fileService)
     {
       _mapper = mapper;
       _repository = repository;
@@ -89,6 +58,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       _userRepository = userRepository;
       _responseCreator = responseCreator;
       _fileDataMapper = fileDataMapper;
+      _fileService = fileService;
     }
 
     public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateFilesRequest request)
@@ -104,7 +74,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       List<FileAccess> accesses = new List<FileAccess>();
       List<FileData> files = request.Files.Select(x => _fileDataMapper.Map(x, accesses)).ToList();
 
-      await CreateFilesAsync(files, response.Errors);
+      await _fileService.CreateFilesAsync(files, response.Errors);
 
       if (response.Errors.Any())
       {
@@ -114,7 +84,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       response.Body = await _repository.CreateAsync(accesses.Select(x =>
         _mapper.Map(x.FileId, request.ProjectId, x.Access)).ToList());
 
-      response.Status = OperationResultStatusType.FullSuccess;
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
       return response;

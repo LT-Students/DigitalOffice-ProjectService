@@ -26,21 +26,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IProjectUserRepository _repository;
     private readonly IDbProjectUserMapper _mapper;
     private readonly IAccessValidator _accessValidator;
-    private readonly IProjectUsersRequestValidator _validator;
+    private readonly ICreateProjectUsersRequestValidator _validator;
     private readonly IResponseCreator _responseCreator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IGlobalCacheRepository _globalCache;
-    private readonly IPublishHelper _publishHelper;
+    private readonly IPublish _publishHelper;
 
     public CreateProjectUsersCommand(
       IProjectUserRepository repository,
       IDbProjectUserMapper mapper,
       IAccessValidator accessValidator,
-      IProjectUsersRequestValidator validator,
+      ICreateProjectUsersRequestValidator validator,
       IResponseCreator responseCreator,
       IHttpContextAccessor httpContextAccessor,
       IGlobalCacheRepository globalCache,
-      IPublishHelper publishHelper)
+      IPublish publishHelper)
     {
       _mapper = mapper;
       _validator = validator;
@@ -52,7 +52,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _publishHelper = publishHelper;
     }
 
-    public async Task<OperationResultResponse<bool>> ExecuteAsync(ProjectUsersRequest request)
+    public async Task<OperationResultResponse<bool>> ExecuteAsync(CreateProjectUsersRequest request)
     {
       List<string> errors = new();
 
@@ -75,20 +75,23 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       List<UserRequest> newUsers =  request.Users.ExceptBy(existingUsers.Select(x => x.UserId), request => request.UserId).ToList();
 
       bool result = await _repository.CreateAsync(_mapper.Map(request.ProjectId, newUsers));
-      await _repository.ReturnUsersAsync(existingUsers);
+      await _repository.ReturnUsersAsync(existingUsers, _httpContextAccessor.HttpContext.GetUserId());
 
       if (result)
       {
-        await _publishHelper.CreateWorkTimePublish(
+        await _publishHelper.CreateWorkTimeAsync(
           request.ProjectId,
           newUsers.Select(u => u.UserId).ToList());
 
         await _globalCache.RemoveAsync(request.ProjectId);
       }
+      else
+      {
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+      }
 
       return new()
       {
-        Status = result ? OperationResultStatusType.FullSuccess : OperationResultStatusType.Failed,
         Body = result,
         Errors = errors
       };

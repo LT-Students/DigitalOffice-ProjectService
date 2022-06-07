@@ -8,26 +8,25 @@ using MassTransit;
 
 namespace LT.DigitalOffice.ProjectService.Broker.Publishes
 {
-  public class PublishHelper : IPublishHelper
+  public class Publish : IPublish
   {
     private readonly IBus _bus;
 
-    public PublishHelper(
+    public Publish(
       IBus bus)
     {
       _bus = bus;
     }
 
-    public async Task CreateDepartmentEntityPublish(Guid departmentId, Guid createdBy, Guid? userId = null, Guid? projectId = null)
+    public async Task CreateDepartmentEntityAsync(Guid departmentId, Guid createdBy, Guid projectId)
     {
       await _bus.Publish<ICreateDepartmentEntityPublish>(ICreateDepartmentEntityPublish.CreateObj(
         departmentId: departmentId,
         createdBy: createdBy,
-        userId: userId,
         projectId: projectId));
     }
 
-    public async Task CreateWorkTimePublish(Guid projectId, List<Guid> usersIds)
+    public async Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds)
     {
       await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(projectId, usersIds));
     }
