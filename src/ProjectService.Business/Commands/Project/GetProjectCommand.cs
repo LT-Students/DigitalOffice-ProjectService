@@ -119,7 +119,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
             return _projectUserInfoMapper.Map(
               mappedUser,
               imagesInfos?.FirstOrDefault(i => i.Id == mappedUser.ImageId),
-              positions?.FirstOrDefault(p => p.Users.Any(user => user.UserId == pu.UserId)),
+              positions?.FirstOrDefault(p => p.UsersIds.Any(userId => userId == pu.UserId)),
               companies?.FirstOrDefault(c => c.Users.Any(user => user.UserId == pu.UserId)),
               departments?.FirstOrDefault(d => d.Users.FirstOrDefault(user => user.UserId == pu.UserId) != null),
               pu,
