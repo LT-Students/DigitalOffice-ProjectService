@@ -75,7 +75,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       List<UserRequest> newUsers =  request.Users.ExceptBy(existingUsers.Select(x => x.UserId), request => request.UserId).ToList();
 
       bool result = await _repository.CreateAsync(_mapper.Map(request.ProjectId, newUsers));
-      await _repository.ReturnUsersAsync(existingUsers, _httpContextAccessor.HttpContext.GetUserId());
+      await _repository.EditIsActiveAsync(existingUsers, _httpContextAccessor.HttpContext.GetUserId());
 
       if (result)
       {

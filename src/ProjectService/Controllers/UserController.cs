@@ -20,7 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
       return await command.ExecuteAsync(request);
     }
 
-    [HttpPut("edit")]
+    [HttpPut("editrole")]
     public async Task<OperationResultResponse<bool>> EditAsync(
       [FromServices] IEditProjectUsersRoleCommand command,
       [FromQuery] Guid projectId,

@@ -76,8 +76,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       if (!response.Body)
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        response.Errors.Add("Project can not be edit.");
       }
       else
       {

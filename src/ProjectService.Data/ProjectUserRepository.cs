@@ -97,14 +97,14 @@ namespace LT.DigitalOffice.ProjectService.Data
       return true;
     }
 
-    public async Task<bool> ReturnUsersAsync(List<DbProjectUser> oldUsers, Guid createdBy)
+    public async Task<bool> EditIsActiveAsync(List<DbProjectUser> dbUsers, Guid createdBy)
     {
-      if (oldUsers is null)
+      if (dbUsers is null)
       {
         return false;
       }
 
-      foreach (DbProjectUser oldUser in oldUsers)
+      foreach (DbProjectUser oldUser in dbUsers)
       {
         oldUser.IsActive = true;
         oldUser.CreatedBy = createdBy;
@@ -136,18 +136,14 @@ namespace LT.DigitalOffice.ProjectService.Data
         return default;
       }
 
+      IQueryable<DbProjectUser> dbUsers = _provider.ProjectsUsers.Where(pu => pu.ProjectId == projectId && usersIds.Contains(pu.UserId));
+
       if (isActive.HasValue)
       {
-        return await _provider.ProjectsUsers
-        .Where(pu => pu.ProjectId == projectId && usersIds.Contains(pu.UserId) && pu.IsActive == isActive.Value)
-        .Select(pu => pu.UserId)
-        .ToListAsync();
+        dbUsers = dbUsers.Where(x => x.IsActive == isActive.Value);
       }
 
-      return await _provider.ProjectsUsers
-        .Where(pu => pu.ProjectId == projectId && usersIds.Contains(pu.UserId))
-        .Select(pu => pu.UserId)
-        .ToListAsync();
+      return await dbUsers.Select(x => x.UserId).ToListAsync();
     }
 
     public async Task<List<Guid>> RemoveAsync(Guid userId, Guid removedBy)

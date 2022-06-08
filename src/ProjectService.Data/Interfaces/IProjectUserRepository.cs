@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<bool> CreateAsync(List<DbProjectUser> newUsers);
 
-    Task<bool> ReturnUsersAsync(List<DbProjectUser> oldUsers, Guid createdBy);
+    Task<bool> EditIsActiveAsync(List<DbProjectUser> oldUsers, Guid createdBy);
 
     Task<bool> DoesExistAsync(Guid userId, Guid projectId, bool? isManager = null);
 

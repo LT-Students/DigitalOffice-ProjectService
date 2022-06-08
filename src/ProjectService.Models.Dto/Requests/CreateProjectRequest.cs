@@ -8,6 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
 {
   public record CreateProjectRequest
   {
+    [Required]
     public string Name { get; set; }
     public string ShortName { get; set; }
     public string Description { get; set; }
@@ -17,7 +18,11 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
     public DateTime? EndDateUtc { get; set; }
     public Guid? DepartmentId { get; set; }
     public ProjectStatusType Status { get; set; }
+
+    [Required]
     public List<ImageContent> ProjectImages { get; set; }
+
+    [Required]
     public List<FileInfo> Files { get; set; }
 
     [Required]
