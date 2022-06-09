@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
     public async Task Consume(ConsumeContext<ICheckProjectUsersExistenceRequest> context)
     {
-      List<Guid> existUsers = await _userRepository.DoExistAsync(context.Message.ProjectId, context.Message.UsersIds);
+      List<Guid> existUsers = await _userRepository.DoExistAsync(context.Message.ProjectId, context.Message.UsersIds, isActive: true);
 
       object response = OperationResultWrapper.CreateResponse((_) => existUsers, context);
 

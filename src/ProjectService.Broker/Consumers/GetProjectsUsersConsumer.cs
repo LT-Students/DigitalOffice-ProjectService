@@ -20,7 +20,6 @@ namespace LT.DigitalOffice.ProjectService.Broker
     {
       (List<DbProjectUser> users, int totalCount) = await _userRepository.GetAsync(request);
 
-
       return IGetProjectsUsersResponse.CreateObj(users.Select(
         p =>
           new ProjectUserData(
@@ -28,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
             p.ProjectId,
             p.IsActive,
             (ProjectUserRoleType)p.Role,
-            p.CreatedAtUtc
+            createdAtUtc: default //TODO - remove this field from model
           )).ToList(),
         totalCount);
     }

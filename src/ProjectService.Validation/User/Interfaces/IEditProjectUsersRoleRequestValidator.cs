@@ -1,11 +1,12 @@
-﻿using FluentValidation;
+﻿using System;
+using FluentValidation;
 using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 
 namespace LT.DigitalOffice.ProjectService.Validation.User.Interfaces
 {
   [AutoInject]
-  public interface IUserRequestValidator : IValidator<UserRequest>
+  public interface IEditProjectUsersRoleRequestValidator : IValidator<(Guid projectId, EditProjectUsersRoleRequest request)>
   {
   }
 }

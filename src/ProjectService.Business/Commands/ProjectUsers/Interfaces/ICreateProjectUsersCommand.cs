@@ -16,6 +16,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfa
     /// Added new users id to specific project.
     /// </summary>
     /// <param name="request">List of users for a specific project.</param>
-    Task<OperationResultResponse<bool>> ExecuteAsync(ProjectUsersRequest request);
+    Task<OperationResultResponse<bool>> ExecuteAsync(CreateProjectUsersRequest request);
   }
 }

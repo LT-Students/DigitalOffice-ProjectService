@@ -17,22 +17,22 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
   {
     Task<(List<DbProjectUser>, int totalCount)> GetAsync(IGetProjectsUsersRequest request);
 
-    Task<List<Guid>> GetExistAsync(Guid projectId, IEnumerable<Guid> usersIds);
+    Task<List<DbProjectUser>> GetExistingUsersAsync(Guid projectId, IEnumerable<Guid> usersIds);
 
     Task<List<DbProjectUser>> GetAsync(List<Guid> usersIds);
 
-    Task<bool> CreateAsync(List<DbProjectUser> dbProjectUsers);
+    Task<bool> CreateAsync(List<DbProjectUser> newUsers);
+
+    Task<bool> EditIsActiveAsync(List<DbProjectUser> oldUsers, Guid createdBy);
 
     Task<bool> DoesExistAsync(Guid userId, Guid projectId, bool? isManager = null);
 
-    Task<List<Guid>> DoExistAsync(Guid projectId, List<Guid> ids);
+    Task<List<Guid>> DoExistAsync(Guid projectId, IEnumerable<Guid> usersIds, bool? isActive = null);
 
     Task<List<Guid>> RemoveAsync(Guid userId, Guid removedBy);
 
     Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> usersIds);
 
-    Task<bool> EditAsync(ProjectUsersRequest request);
-
-    Task<bool> IsProjectAdminAsync(Guid projectId, Guid userId);
+    Task<bool> EditAsync(Guid projectId, EditProjectUsersRoleRequest request);
   }
 }

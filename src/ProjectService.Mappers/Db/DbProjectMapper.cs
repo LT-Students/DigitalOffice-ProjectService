@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
 
     public DbProject Map(CreateProjectRequest request, List<Guid> imagesIds, List<FileAccess> accesses)
     {
-      if (request == null)
+      if (request is null)
       {
         return null;
       }
@@ -47,12 +47,12 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         Id = projectId,
         Name = request.Name.Trim(),
         Status = (int)request.Status,
-        ShortName = shortName == null || !shortName.Any() ? null : shortName,
-        Description = description == null || !description.Any() ? null : description,
-        ShortDescription = shortDescription == null || !shortDescription.Any() ? null : shortDescription,
+        ShortName = shortName is null || !shortName.Any() ? null : shortName,
+        Description = description is null || !description.Any() ? null : description,
+        ShortDescription = shortDescription is null || !shortDescription.Any() ? null : shortDescription,
         Customer = request.Customer,
-        StartProject = request.StartProject == null ? DateTime.UtcNow : request.StartProject.Value,
-        EndProject = request.EndProject,
+        StartDateUtc = request.StartDateUtc == default ? DateTime.UtcNow : request.StartDateUtc.Value,
+        EndDateUtc = request.EndDateUtc,
         CreatedAtUtc = DateTime.UtcNow,
         CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
         Users = request.Users?

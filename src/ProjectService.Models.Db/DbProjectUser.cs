@@ -4,37 +4,38 @@ using System;
 
 namespace LT.DigitalOffice.ProjectService.Models.Db
 {
-    public class DbProjectUser
+  public class DbProjectUser
+  {
+    public const string TableName = "ProjectsUsers";
+    public const string HistoryTableName = "ProjectsUsersHistory";
+
+    public Guid Id { get; set; }
+    public Guid ProjectId { get; set; }
+    public Guid UserId { get; set; }
+    public int Role { get; set; }
+    public Guid CreatedBy { get; set; }
+    public bool IsActive { get; set; }
+
+    public DbProject Project { get; set; }
+  }
+
+  public class DbProjectUserConfiguration : IEntityTypeConfiguration<DbProjectUser>
+  {
+    public void Configure(EntityTypeBuilder<DbProjectUser> builder)
     {
-        public const string TableName = "ProjectsUsers";
+      builder
+        .ToTable(
+          DbProjectUser.TableName,
+          pu => pu.IsTemporal(
+            builder => builder.UseHistoryTable(DbProjectUser.HistoryTableName)));
 
-        public Guid Id { get; set; }
-        public Guid ProjectId { get; set; }
-        public Guid UserId { get; set; }
-        public int Role { get; set; }
-        public DateTime CreatedAtUtc { get; set; }
-        public Guid CreatedBy { get; set; }
-        public DateTime? ModifiedAtUtc { get; set; }
-        public Guid? ModifiedBy { get; set; }
-        public bool IsActive { get; set; }
+      builder
+        .HasKey(pu => pu.Id);
 
-        public DbProject Project { get; set; }
+      builder
+        .HasOne(pu => pu.Project)
+        .WithMany(p => p.Users)
+        .HasForeignKey(pu => pu.ProjectId);
     }
-
-    public class DbProjectUserConfiguration : IEntityTypeConfiguration<DbProjectUser>
-    {
-        public void Configure(EntityTypeBuilder<DbProjectUser> builder)
-        {
-            builder
-                .ToTable(DbProjectUser.TableName);
-
-            builder
-                .HasKey(pu => pu.Id);
-
-            builder
-                .HasOne(pu => pu.Project)
-                .WithMany(p => p.Users)
-                .HasForeignKey(pu => pu.ProjectId);
-        }
-    }
+  }
 }

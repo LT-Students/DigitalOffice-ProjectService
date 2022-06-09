@@ -33,7 +33,6 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
 
       RuleFor(project => project.Name.Trim())
         .Cascade(CascadeMode.Stop)
-        .NotEmpty().WithMessage("Project name must not be empty.")
         .MaximumLength(150).WithMessage("Project name is too long.")
         .MustAsync(async (name, _) => !await projectRepository.DoesProjectNameExistAsync(name))
         .WithMessage(project => $"Project with name '{project.Name}' already exists.");
@@ -64,9 +63,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
 
       When(project => !project.Status.Equals(ProjectStatusType.Active), () =>
       {
-        RuleFor(project => project.EndProject)
-          .Must(endProject => endProject.HasValue)
-          .WithMessage("EndProject date is null.");
+        RuleFor(project => project.EndDateUtc)
+          .Must(endDateUtc => endDateUtc.HasValue)
+          .WithMessage("EndDateUtc can't be null if project is not active.");
       });
 
       When(project => project.DepartmentId.HasValue, () =>
@@ -77,7 +76,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
           .WithMessage("Wrong type of department Id.");
       });
 
-      When(project => project.Users != null && project.Users.Any(), () =>
+      When(project => project.Users.Any(), () =>
       {
         RuleForEach(project => project.Users)
           .ChildRules(user =>
@@ -98,7 +97,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
           .WithMessage("Some users does not exist.");
       });
 
-      When(project => project.ProjectImages != null && project.ProjectImages.Any(), () =>
+      When(project => project.ProjectImages.Any(), () =>
       {
         RuleForEach(project => project.ProjectImages)
           .SetValidator(imageValidator);

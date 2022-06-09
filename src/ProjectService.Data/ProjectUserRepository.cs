@@ -11,14 +11,12 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
   public class ProjectUserRepository : IProjectUserRepository
   {
     private readonly IDataProvider _provider;
-    private readonly ILogger<ProjectUserRepository> _logger;
     private readonly IHttpContextAccessor _contextAccessor;
 
     #region private methods
@@ -49,28 +47,10 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public ProjectUserRepository(
       IDataProvider provider,
-      ILogger<ProjectUserRepository> logger,
       IHttpContextAccessor contextAccessor)
     {
       _provider = provider;
-      _logger = logger;
       _contextAccessor = contextAccessor;
-    }
-
-    public async Task<List<DbProjectUser>> GetAsync(Guid projectId, bool showNotActive)
-    {
-      IQueryable<DbProjectUser> dbProjectQueryable = _provider.ProjectsUsers.AsQueryable();
-
-      if (showNotActive)
-      {
-        dbProjectQueryable = dbProjectQueryable.Where(x => x.ProjectId == projectId);
-      }
-      else
-      {
-        dbProjectQueryable = dbProjectQueryable.Where(x => x.ProjectId == projectId && x.IsActive);
-      }
-
-      return await dbProjectQueryable.ToListAsync();
     }
 
     public async Task<List<DbProjectUser>> GetAsync(List<Guid> usersIds)
@@ -78,10 +58,10 @@ namespace LT.DigitalOffice.ProjectService.Data
       return await _provider.ProjectsUsers.Where(u => usersIds.Contains(u.UserId) && u.IsActive).ToListAsync();
     }
 
-    public async Task<List<Guid>> GetExistAsync(Guid projectId, IEnumerable<Guid> usersIds)
+    public async Task<List<DbProjectUser>> GetExistingUsersAsync(Guid projectId, IEnumerable<Guid> usersIds)
     {
       return await _provider.ProjectsUsers
-        .Where(pu => pu.IsActive && pu.ProjectId == projectId && usersIds.Contains(pu.UserId)).Select(pu => pu.UserId).ToListAsync();
+        .Where(pu => pu.ProjectId == projectId && usersIds.Contains(pu.UserId)).ToListAsync();
     }
 
     public async Task<(List<DbProjectUser>, int totalCount)> GetAsync(IGetProjectsUsersRequest request)
@@ -103,21 +83,39 @@ namespace LT.DigitalOffice.ProjectService.Data
       return (await projectUsers.ToListAsync(), totalCount);
     }
 
-
-    public async Task<bool> CreateAsync(List<DbProjectUser> dbProjectUsers)
+    public async Task<bool> CreateAsync(List<DbProjectUser> newUsers)
     {
-      if (dbProjectUsers == null)
+      if (newUsers is null)
       {
         return false;
       }
 
-      _provider.ProjectsUsers.AddRange(dbProjectUsers);
+      _provider.ProjectsUsers.AddRange(newUsers);
+
       await _provider.SaveAsync();
 
       return true;
     }
 
-    public async Task<bool> DoesExistAsync(Guid userId, Guid projectId, bool? isManager)
+    public async Task<bool> EditIsActiveAsync(List<DbProjectUser> dbUsers, Guid createdBy)
+    {
+      if (dbUsers is null)
+      {
+        return false;
+      }
+
+      foreach (DbProjectUser oldUser in dbUsers)
+      {
+        oldUser.IsActive = true;
+        oldUser.CreatedBy = createdBy;
+      }
+
+      await _provider.SaveAsync();
+
+      return true;
+    }
+
+    public async Task<bool> DoesExistAsync(Guid userId, Guid projectId, bool? isManager = null)
     {
       if (isManager.HasValue && isManager.Value)
       {
@@ -129,6 +127,23 @@ namespace LT.DigitalOffice.ProjectService.Data
       return await _provider
         .ProjectsUsers
         .AnyAsync(x => x.UserId == userId && x.ProjectId == projectId && x.IsActive);
+    }
+
+    public async Task<List<Guid>> DoExistAsync(Guid projectId, IEnumerable<Guid> usersIds, bool? isActive = null)
+    {
+      if (usersIds is null)
+      {
+        return default;
+      }
+
+      IQueryable<DbProjectUser> dbUsers = _provider.ProjectsUsers.Where(pu => pu.ProjectId == projectId && usersIds.Contains(pu.UserId));
+
+      if (isActive.HasValue)
+      {
+        dbUsers = dbUsers.Where(x => x.IsActive == isActive.Value);
+      }
+
+      return await dbUsers.Select(x => x.UserId).ToListAsync();
     }
 
     public async Task<List<Guid>> RemoveAsync(Guid userId, Guid removedBy)
@@ -146,8 +161,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       foreach (DbProjectUser dbProjectUser in dbProjectsUser)
       {
         dbProjectUser.IsActive = false;
-        dbProjectUser.ModifiedBy = removedBy;
-        dbProjectUser.ModifiedAtUtc = DateTime.UtcNow;
+        dbProjectUser.CreatedBy = removedBy;
 
         projectsIds.Add(dbProjectUser.ProjectId);
       }
@@ -155,14 +169,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       await _provider.SaveAsync();
 
       return projectsIds;
-    }
-
-    public async Task<List<Guid>> DoExistAsync(Guid projectId, List<Guid> ids)
-    {
-      return await _provider.ProjectsUsers
-        .Where(pu => pu.ProjectId == projectId && ids.Contains(pu.UserId) && pu.IsActive)
-        .Select(pu => pu.UserId)
-        .ToListAsync();
     }
 
     public async Task<bool> RemoveAsync(Guid projectId, IEnumerable<Guid> usersIds)
@@ -186,27 +192,19 @@ namespace LT.DigitalOffice.ProjectService.Data
       return true;
     }
 
-    public async Task<bool> EditAsync(ProjectUsersRequest request)
+    public async Task<bool> EditAsync(Guid projectId, EditProjectUsersRoleRequest request)
     {
-      Dictionary<Guid, int> userIdByRoleType = request.Users.ToDictionary(user => user.UserId, user => (int)user.Role);
-
       await _provider.ProjectsUsers
-        .Where(pu => pu.ProjectId == request.ProjectId && userIdByRoleType.ContainsKey(pu.UserId))
+        .Where(pu => pu.ProjectId == projectId && request.UsersIds.Contains(pu.UserId))
         .ForEachAsync(pu =>
         {
-          pu.Role = userIdByRoleType[pu.UserId];
-          pu.ModifiedBy = _contextAccessor.HttpContext.GetUserId();
-          pu.ModifiedAtUtc = DateTime.Now;
+          pu.Role = (int)request.Role;
+          pu.CreatedBy = _contextAccessor.HttpContext.GetUserId();
         });
 
       await _provider.SaveAsync();
 
       return true;
-    }
-
-    public async Task<bool> IsProjectAdminAsync(Guid projectId, Guid userId)
-    {
-      return await _provider.ProjectsUsers.AnyAsync(pu => pu.IsActive && pu.ProjectId == projectId && pu.UserId == userId);
     }
   }
 }

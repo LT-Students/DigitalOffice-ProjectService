@@ -58,10 +58,9 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
           _logger))
         ?.ImagesData
         .Select(_mapper.Map).ToList();
-
     }
 
-    public async Task<List<Guid>> CreateImageAsync(List<ImageContent> projectImages, List<string> errors)
+    public async Task<List<Guid>> CreateImagesAsync(List<ImageContent> projectImages, List<string> errors)
     {
       return projectImages is null || !projectImages.Any()
         ? null
@@ -80,7 +79,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
             _logger)).ImagesIds;
     }
 
-    public async Task<bool> RemoveImages(List<Guid> imagesIds, List<string> errors)
+    public async Task<bool> RemoveImagesAsync(List<Guid> imagesIds, List<string> errors)
     {
       return imagesIds is null || imagesIds.Any()
         ? false

@@ -31,27 +31,25 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         ProjectId = projectId,
         UserId = request.UserId,
         Role = (int)request.Role,
-        CreatedAtUtc = DateTime.UtcNow,
         CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
         IsActive = true
       };
     }
 
-    public List<DbProjectUser> Map(ProjectUsersRequest request)
+    public List<DbProjectUser> Map(Guid projectId, List<UserRequest> users)
     {
-      if (request == null)
+      if (users is null)
       {
         return null;
       }
 
-      return request.Users.Select(u =>
+      return users.Select(u =>
         new DbProjectUser
         {
           Id = Guid.NewGuid(),
-          ProjectId = request.ProjectId,
+          ProjectId = projectId,
           UserId = u.UserId,
           Role = (int)u.Role,
-          CreatedAtUtc = DateTime.UtcNow,
           CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
           IsActive = true
         }).ToList();
