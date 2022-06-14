@@ -81,12 +81,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
       response.Body = await _repository.RemoveAsync(request.ImagesIds);
 
-      await Task.WhenAll(
-        response.Body
-          ? _publish.RemoveImagesAsync(
-            imageIds: request.ImagesIds,
-            imageSource: ImageSource.Project)
-          : Task.CompletedTask);
+      if (response.Body)
+      {
+        await _publish.RemoveImagesAsync(request.ImagesIds, ImageSource.Project);
+      }
 
       return response;
     }
