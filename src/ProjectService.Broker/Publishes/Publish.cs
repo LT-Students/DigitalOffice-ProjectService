@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Department;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Time;
 using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using MassTransit;
@@ -29,6 +31,13 @@ namespace LT.DigitalOffice.ProjectService.Broker.Publishes
     public async Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds)
     {
       await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(projectId, usersIds));
+    }
+
+    public async Task RemoveImagesAsync(List<Guid> imageIds, ImageSource imageSource)
+    {
+      await _bus.Publish<IRemoveImagesPublish>(IRemoveImagesPublish.CreateObj(
+        imagesIds: imageIds,
+        imageSource: imageSource));
     }
   }
 }
