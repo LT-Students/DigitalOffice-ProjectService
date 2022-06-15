@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Attributes;
-using LT.DigitalOffice.Models.Broker.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces
 {
@@ -11,6 +10,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces
   {
     Task CreateDepartmentEntityAsync(Guid departmentId, Guid createdBy, Guid projectId);
     Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds);
-    Task RemoveImagesAsync(List<Guid> imageIds, ImageSource imageSource);
+    Task RemoveImagesAsync(List<Guid> imageIds);
   }
 }

@@ -8,7 +8,6 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
@@ -83,7 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
       if (response.Body)
       {
-        await _publish.RemoveImagesAsync(request.ImagesIds, ImageSource.Project);
+        await _publish.RemoveImagesAsync(request.ImagesIds);
       }
 
       return response;

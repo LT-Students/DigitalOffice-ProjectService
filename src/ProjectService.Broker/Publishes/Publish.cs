@@ -33,11 +33,11 @@ namespace LT.DigitalOffice.ProjectService.Broker.Publishes
       await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(projectId, usersIds));
     }
 
-    public async Task RemoveImagesAsync(List<Guid> imageIds, ImageSource imageSource)
+    public async Task RemoveImagesAsync(List<Guid> imageIds)
     {
       await _bus.Publish<IRemoveImagesPublish>(IRemoveImagesPublish.CreateObj(
         imagesIds: imageIds,
-        imageSource: imageSource));
+        imageSource: ImageSource.Project));
     }
   }
 }
