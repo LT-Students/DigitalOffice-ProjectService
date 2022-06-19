@@ -25,7 +25,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
     private readonly ILogger<ImageService> _logger;
     private readonly IRequestClient<IGetImagesRequest> _rcGetImages;
     private readonly IRequestClient<ICreateImagesRequest> _rcCreateImages;
-    private readonly IRequestClient<IRemoveImagesPublish> _rcRemoveImages;
     private readonly IImageInfoMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -33,14 +32,12 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       ILogger<ImageService> logger,
       IRequestClient<IGetImagesRequest> rcGetImages,
       IRequestClient<ICreateImagesRequest> rcCreateImages,
-      IRequestClient<IRemoveImagesPublish> rcRemoveImages,
       IImageInfoMapper mapper,
       IHttpContextAccessor httpContextAccessor)
     {
       _logger = logger;
       _rcCreateImages = rcCreateImages;
       _rcGetImages = rcGetImages;
-      _rcRemoveImages = rcRemoveImages;
       _mapper = mapper;
       _httpContextAccessor = httpContextAccessor;
     }
@@ -74,18 +71,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
               createdBy: _httpContextAccessor.HttpContext.GetUserId()),
             errors,
             _logger)).ImagesIds;
-    }
-
-    public async Task<bool> RemoveImagesAsync(List<Guid> imagesIds, List<string> errors)
-    {
-      return imagesIds is null || imagesIds.Any()
-        ? false
-        : (await RequestHandler
-          .ProcessRequest<IRemoveImagesPublish, bool>(
-            _rcRemoveImages,
-            IRemoveImagesPublish.CreateObj(imagesIds: imagesIds, imageSource: ImageSource.Project)),
-            errors,
-            _logger).Item1;
     }
   }
 }

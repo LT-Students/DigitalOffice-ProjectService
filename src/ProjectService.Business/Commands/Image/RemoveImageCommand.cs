@@ -27,7 +27,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRemoveImagesRequestValidator _validator;
     private readonly IProjectUserRepository _userRepository;
-    private readonly IImageService _imageService;
     private readonly IResponseCreator _responseCreator;
     private readonly IPublish _publish;
 
@@ -38,7 +37,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       IHttpContextAccessor httpContextAccessor,
       IRemoveImagesRequestValidator validator,
       IProjectUserRepository userRepository,
-      IImageService imageService,
       IResponseCreator responseCreator,
       IPublish publish)
     {
@@ -48,7 +46,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       _httpContextAccessor = httpContextAccessor;
       _validator = validator;
       _userRepository = userRepository;
-      _imageService = imageService;
       _responseCreator = responseCreator;
       _publish = publish;
     }
@@ -70,13 +67,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       }
 
       OperationResultResponse<bool> response = new();
-
-      bool result = await _imageService.RemoveImagesAsync(request.ImagesIds, response.Errors);
-
-      if (!result)
-      {
-        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, response.Errors);
-      }
 
       response.Body = await _repository.RemoveAsync(request.ImagesIds);
 
