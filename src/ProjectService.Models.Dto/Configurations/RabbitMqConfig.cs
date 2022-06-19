@@ -36,9 +36,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
     // image
 
-    [AutoInjectRequest(typeof(IRemoveImagesPublish))]
-    public string RemoveImagesEndpoint { get; set; }
-
     [AutoInjectRequest(typeof(IGetImagesRequest))]
     public string GetImagesEndpoint { get; set; }
 
