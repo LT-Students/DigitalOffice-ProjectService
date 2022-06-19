@@ -26,8 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
             p.UserId,
             p.ProjectId,
             p.IsActive,
-            (ProjectUserRoleType)p.Role,
-            createdAtUtc: default //TODO - remove this field from model
+            (ProjectUserRoleType)p.Role
           )).ToList(),
         totalCount);
     }

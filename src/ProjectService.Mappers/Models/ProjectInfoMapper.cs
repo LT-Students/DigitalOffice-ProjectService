@@ -7,7 +7,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
 {
   public class ProjectInfoMapper : IProjectInfoMapper
   {
-    public ProjectInfo Map(DbProject dbProject, DepartmentInfo department)
+    public ProjectInfo Map(DbProject dbProject, int usersCount, DepartmentInfo department)
     {
       if (dbProject == null)
       {
@@ -27,7 +27,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
         Department = department,
         StartDateUtc = dbProject.StartDateUtc,
         EndDateUtc = dbProject.EndDateUtc,
-        Customer = dbProject.Customer
+        Customer = dbProject.Customer,
+        UsersCount = usersCount
       };
     }
   }

@@ -13,6 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
     public string Description { get; set; }
     public string ShortDescription { get; set; }
     public string Customer { get; set; }
+    public int UsersCount { get; set; }
     public DateTime StartDateUtc { get; set; }
     public DateTime? EndDateUtc { get; set; }
     public DateTime CreatedAtUtc { get; set; }

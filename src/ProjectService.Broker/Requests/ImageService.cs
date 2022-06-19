@@ -6,6 +6,7 @@ using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Models.Image;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Responses.Image;
@@ -23,7 +24,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
   {
     private readonly ILogger<ImageService> _logger;
     private readonly IRequestClient<IGetImagesRequest> _rcGetImages;
-    private readonly IRequestClient<ICreateImagesPublish> _rcCreateImages;
+    private readonly IRequestClient<ICreateImagesRequest> _rcCreateImages;
     private readonly IRequestClient<IRemoveImagesPublish> _rcRemoveImages;
     private readonly IImageInfoMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -31,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
     public ImageService(
       ILogger<ImageService> logger,
       IRequestClient<IGetImagesRequest> rcGetImages,
-      IRequestClient<ICreateImagesPublish> rcCreateImages,
+      IRequestClient<ICreateImagesRequest> rcCreateImages,
       IRequestClient<IRemoveImagesPublish> rcRemoveImages,
       IImageInfoMapper mapper,
       IHttpContextAccessor httpContextAccessor)
@@ -65,16 +66,12 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       return projectImages is null || !projectImages.Any()
         ? null
         : (await RequestHandler
-          .ProcessRequest<ICreateImagesPublish, ICreateImagesResponse>(
+          .ProcessRequest<ICreateImagesRequest, ICreateImagesResponse>(
             _rcCreateImages,
-            ICreateImagesPublish.CreateObj(
-              projectImages.Select(x => new CreateImageData(
-                x.Name,
-                x.Content,
-                x.Extension,
-                _httpContextAccessor.HttpContext.GetUserId()))
-              .ToList(),
-              ImageSource.Project),
+            ICreateImagesRequest.CreateObj(
+              images: projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension)).ToList(),
+              imageSource: ImageSource.Project,
+              createdBy: _httpContextAccessor.HttpContext.GetUserId()),
             errors,
             _logger)).ImagesIds;
     }

@@ -10,6 +10,7 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
+using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -25,8 +26,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
   public class CreateImageCommand : ICreateImageCommand
   {
     private readonly IImageRepository _repository;
-    private readonly IRequestClient<ICreateImagesPublish> _rcImages;
-    private readonly ILogger<CreateImageCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDbImageMapper _dbProjectImageMapper;
@@ -37,8 +36,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
     public CreateImageCommand(
       IImageRepository repository,
-      IRequestClient<ICreateImagesPublish> rcImages,
-      ILogger<CreateImageCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IDbImageMapper dbProjectImageMapper,
@@ -48,8 +45,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       IImageService imageService)
     {
       _repository = repository;
-      _rcImages = rcImages;
-      _logger = logger;
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _dbProjectImageMapper = dbProjectImageMapper;

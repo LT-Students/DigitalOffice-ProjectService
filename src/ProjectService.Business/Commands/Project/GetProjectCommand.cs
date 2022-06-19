@@ -78,7 +78,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
     public async Task<OperationResultResponse<ProjectResponse>> ExecuteAsync(GetProjectFilter filter)
     {
-      DbProject dbProject = await _repository.GetAsync(filter);
+      (DbProject dbProject, int usersCount) = await _repository.GetAsync(filter);
 
       if (dbProject is null)
       {
@@ -92,7 +92,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       List<UserData> usersDatas = await _userService.GetUsersDatasAsync(dbProject.Users, response.Errors);
       List<Guid> usersIds = dbProject.Users.Select(u => u.UserId).Distinct().ToList();
 
-      if (usersDatas != null && usersDatas.Any())
+      if (usersDatas is not null && usersDatas.Any())
       {
         var positionsTask = _positionService.GetPositionsAsync(usersIds, response.Errors);
         var companiesTask = _companyService.GetCompaniesAsync(usersIds, response.Errors);
@@ -150,7 +150,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       List<FileAccess> files = dbProject.Files.Where(x => x.Access >= (int)accessType).Select(_accessMapper.Map).ToList();
       List<ImageInfo> imagesinfo = await _imageService.GetImagesAsync(dbProject.Images.Select(x => x.ImageId).ToList(), ImageSource.Project, response.Errors);
 
-      response.Body = _projectResponseMapper.Map(dbProject, usersInfo, files, imagesinfo, _departmentInfoMapper.Map(department));
+      response.Body = _projectResponseMapper.Map(dbProject, usersCount, usersInfo, files, imagesinfo, _departmentInfoMapper.Map(department));
 
       return response;
     }

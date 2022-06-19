@@ -23,12 +23,12 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
     }
 
     public FindResultResponse<ProjectInfo> Map(
-      List<DbProject> dbProjects,
+      List<(DbProject dbProject, int usersCount)> projects,
       int totalCount,
       List<DepartmentData> departments,
       List<string> errors)
     {
-      if (dbProjects == null)
+      if (projects == null)
       {
         return null;
       }
@@ -36,9 +36,9 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
       return new FindResultResponse<ProjectInfo>
       {
         TotalCount = totalCount,
-        Body = dbProjects.Select(p =>
+        Body = projects.Select(p =>
         {
-          return _mapper.Map(p, _departmentInfoMapper.Map(departments?.FirstOrDefault(d => d.ProjectsIds.Contains(d.Id))));
+          return _mapper.Map(p.dbProject, p.usersCount, _departmentInfoMapper.Map(departments?.FirstOrDefault(d => d.ProjectsIds.Contains(d.Id))));
         }).ToList(),
         Errors = errors
       };
