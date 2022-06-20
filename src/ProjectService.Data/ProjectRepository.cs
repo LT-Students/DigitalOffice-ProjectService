@@ -24,26 +24,26 @@ namespace LT.DigitalOffice.ProjectService.Data
     private IQueryable<DbProject> CreateGetPredicate(
       GetProjectFilter filter)
     {
-      IQueryable<DbProject> projects = _provider.Projects.AsQueryable();
+      IQueryable<DbProject> projectsQuery = _provider.Projects.AsQueryable();
 
       if (filter.IncludeUsers)
       {
-        projects = filter.ShowNotActiveUsers
-          ? projects.Include(x => x.Users)
-          : projects.Include(x => x.Users.Where(x => x.IsActive));
+        projectsQuery = filter.ShowNotActiveUsers
+          ? projectsQuery.Include(x => x.Users)
+          : projectsQuery.Include(x => x.Users.Where(x => x.IsActive));
       }
 
       if (filter.IncludeFiles)
       {
-        projects = projects.Include(x => x.Files);
+        projectsQuery = projectsQuery.Include(x => x.Files);
       }
 
       if (filter.IncludeImages)
       {
-        projects = projects.Include(x => x.Images);
+        projectsQuery = projectsQuery.Include(x => x.Images);
       }
 
-      return projects;
+      return projectsQuery;
     }
 
     private IQueryable<DbProject> CreateGetPredicate(
@@ -86,9 +86,11 @@ namespace LT.DigitalOffice.ProjectService.Data
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<DbProject> GetAsync(GetProjectFilter filter)
+    public async Task<(DbProject dbProject, int usersCount)> GetAsync(GetProjectFilter filter)
     {
-      return await CreateGetPredicate(filter).FirstOrDefaultAsync(p => p.Id == filter.ProjectId);
+      return (
+        await CreateGetPredicate(filter).FirstOrDefaultAsync(p => p.Id == filter.ProjectId),
+        await _provider.ProjectsUsers.CountAsync(pu => pu.ProjectId == filter.ProjectId && pu.IsActive));
     }
 
     public async Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request)
@@ -96,6 +98,13 @@ namespace LT.DigitalOffice.ProjectService.Data
       IQueryable<DbProject> projects = CreateGetPredicate(request);
 
       int totalCount = await projects.CountAsync();
+
+      if (request.AscendingSort.HasValue)
+      {
+        projects = request.AscendingSort.Value
+          ? projects.OrderBy(p => p.Name)
+          : projects.OrderByDescending(p => p.Name);
+      }
 
       if (request.SkipCount.HasValue)
       {
@@ -146,40 +155,50 @@ namespace LT.DigitalOffice.ProjectService.Data
       return true;
     }
 
-    public async Task<(List<DbProject>, int totalCount)> FindAsync(FindProjectsFilter filter)
+    public async Task<(List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount)> FindAsync(FindProjectsFilter filter)
     {
       if (filter == null)
       {
         return (null, 0);
       }
 
-      IQueryable<DbProject> dbProjects = _provider.Projects
+      IQueryable<DbProject> dbProjectsQuery = _provider.Projects
         .AsQueryable();
 
       if (!string.IsNullOrWhiteSpace(filter.NameIncludeSubstring))
       {
-        dbProjects = dbProjects
-          .Where(p => p.Name.Contains(filter.NameIncludeSubstring));
+        dbProjectsQuery = dbProjectsQuery
+          .Where(p =>
+            p.Name.ToUpper().Contains(filter.NameIncludeSubstring.ToUpper())
+            || p.ShortName.ToUpper().Contains(filter.NameIncludeSubstring.ToUpper()));
       }
 
       if (filter.ProjectStatus.HasValue)
       {
-        dbProjects = dbProjects
+        dbProjectsQuery = dbProjectsQuery
           .Where(p => p.Status == (int)filter.ProjectStatus);
       }
 
       if (filter.IsAscendingSort.HasValue)
       {
-        dbProjects = filter.IsAscendingSort.Value
-          ? dbProjects
-            .OrderBy(p => p.Name)
-          : dbProjects
-            .OrderByDescending(p => p.Name);
+        dbProjectsQuery = filter.IsAscendingSort.Value
+          ? dbProjectsQuery.OrderBy(p => p.Name)
+          : dbProjectsQuery.OrderByDescending(p => p.Name);
       }
 
-      int totalCount = await dbProjects.CountAsync();
+      List<(DbProject dbProject, int usersCount)> dbProjects =
+        (await
+          (from project in dbProjectsQuery.Skip(filter.SkipCount).Take(filter.TakeCount)
+           select new
+           {
+             Project = project,
+             UsersCount = _provider.ProjectsUsers.Count(pu => pu.ProjectId == project.Id && pu.IsActive)
+           }).ToListAsync())
+           .Select(p => (p.Project, p.UsersCount)).ToList();
 
-      return (await dbProjects.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(), totalCount);
+      int totalCount = dbProjects.Count();
+
+      return (dbProjects, totalCount);
     }
 
     public async Task<List<DbProject>> SearchAsync(string text)

@@ -14,7 +14,5 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces
     Task<List<ImageInfo>> GetImagesAsync(List<Guid> imagesIds, ImageSource imageSource, List<string> errors);
 
     Task<List<Guid>> CreateImagesAsync(List<ImageContent> projectImages, List<string> errors);
-
-    Task<bool> RemoveImagesAsync(List<Guid> imagesIds, List<string> errors);
   }
 }

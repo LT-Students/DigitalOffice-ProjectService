@@ -113,10 +113,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return _responseCreator.CreateFailureFindResponse<ProjectInfo>(HttpStatusCode.BadRequest, errors);
       }
 
-      (List<DbProject> dbProjects, int totalCount) = await _repository.FindAsync(filter);
+      (List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount) = await _repository.FindAsync(filter);
 
       List<DepartmentData> departments = await GetDepartmentsAsync(
-        dbProjects.Select(p => p.Id).ToList(), errors);
+        dbProjects.Select(p => p.dbProject.Id).ToList(), errors);
 
       FindResultResponse<ProjectInfo> response = _responseMapper.Map(dbProjects, totalCount, departments, errors);
 

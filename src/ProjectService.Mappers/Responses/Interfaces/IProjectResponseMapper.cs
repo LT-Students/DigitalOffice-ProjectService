@@ -11,6 +11,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces
   {
     ProjectResponse Map(
       DbProject dbProject,
+      int usersCount,
       IEnumerable<UserInfo> users,
       IEnumerable<FileAccess> files,
       IEnumerable<ImageInfo> images,

@@ -39,7 +39,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
     [AutoInjectRequest(typeof(IGetImagesRequest))]
     public string GetImagesEndpoint { get; set; }
 
-    [AutoInjectRequest(typeof(ICreateImagesPublish))]
+    [AutoInjectRequest(typeof(ICreateImagesRequest))]
     public string CreateImagesEndpoint { get; set; }
 
     // department

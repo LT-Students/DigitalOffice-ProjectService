@@ -82,7 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
             };
 
             _projectInfoMapperMock
-                .Setup(x => x.Map(_dbProject, _department))
+                .Setup(x => x.Map(_dbProject, It.IsAny<int>(), _department))
                 .Returns(_projectInfo);
 
             _projectIProjectResponseMapper = new ProjectResponseMapper(_projectInfoMapperMock.Object);
