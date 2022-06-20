@@ -113,7 +113,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
           : Task.CompletedTask,
         _timeService.CreateWorkTimeAsync(dbProject.Id, usersIds, response.Errors),
         _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors));
-
+      
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
       response.Status = response.Errors.Any() ?

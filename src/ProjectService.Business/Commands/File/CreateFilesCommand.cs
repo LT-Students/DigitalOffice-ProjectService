@@ -12,6 +12,7 @@ using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
+using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
@@ -27,48 +28,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
   {
     private readonly IDbProjectFileMapper _mapper;
     private readonly IFileRepository _repository;
-    private readonly IRequestClient<ICreateFilesPublish> _rcFiles;
     private readonly ILogger<CreateFilesCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRepository _userRepository;
     private readonly IResponseCreator _responseCreator;
     private readonly IFileDataMapper _fileDataMapper;
-
-    private async Task<bool> CreateFilesAsync(List<FileData> files, List<string> errors)
-    {
-      if (files == null || !files.Any())
-      {
-        return false;
-      }
-
-      try
-      {
-        Response<IOperationResult<bool>> response =
-          await _rcFiles.GetResponse<IOperationResult<bool>>(
-            ICreateFilesPublish.CreateObj(
-              files,
-              _httpContextAccessor.HttpContext.GetUserId()));
-
-        if (response.Message.IsSuccess)
-        {
-          return response.Message.Body;
-        }
-
-        _logger.LogWarning(
-          "Errors while creating files. Errors: {Errors}",
-          string.Join('\n', response.Message.Errors));
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, "Errors while creating files.");
-      }
-
-      errors.Add("Can not create files. Please try again later.");
-
-      return false;
-    }
-
+    private readonly IPublish _publish;
+   
     public CreateFilesCommand(
       IDbProjectFileMapper mapper,
       IFileRepository repository,
@@ -78,11 +45,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
       IHttpContextAccessor httpContextAccessor,
       IUserRepository userRepository,
       IResponseCreator responseCreator,
-      IFileDataMapper fileDataMapper)
+      IFileDataMapper fileDataMapper,
+      IPublish publish)
     {
       _mapper = mapper;
       _repository = repository;
-      _rcFiles = rcFiles;
       _logger = logger;
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
@@ -99,23 +66,22 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
         return _responseCreator.CreateFailureResponse<List<Guid>>(HttpStatusCode.Forbidden);
       }
 
-      OperationResultResponse<List<Guid>> response = new();
+      
 
       List<FileAccess> accesses = new List<FileAccess>();
       List<FileData> files = request.Files.Select(x => _fileDataMapper.Map(x, accesses)).ToList();
+      OperationResultResponse<List<Guid>> response = new(body: await _repository.
+        CreateAsync(accesses.Select(x => _mapper.Map(x.FileId, request.ProjectId, x.Access)).ToList()));
 
-      await CreateFilesAsync(files, response.Errors);
-
-      if (response.Errors.Any())
+      if (response.Body.Any())
       {
-        return _responseCreator.CreateFailureResponse<List<Guid>>(HttpStatusCode.BadRequest, response.Errors);
+        await _publish.CreateFilesAsync(files, _httpContextAccessor.HttpContext.GetUserId());// httpcontext!
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
       }
-
-      response.Body = await _repository.CreateAsync(accesses.Select(x =>
-        _mapper.Map(x.FileId, request.ProjectId, x.Access)).ToList());
-
-      response.Status = OperationResultStatusType.FullSuccess;
-      _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
+      else
+      {
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+      }
 
       return response;
     }
