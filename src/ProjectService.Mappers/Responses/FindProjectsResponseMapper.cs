@@ -28,7 +28,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
       List<DepartmentData> departments,
       List<string> errors)
     {
-      if (projects == null)
+      if (projects is null)
       {
         return null;
       }
