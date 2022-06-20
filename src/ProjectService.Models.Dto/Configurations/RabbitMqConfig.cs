@@ -67,9 +67,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
     // file
 
-    [AutoInjectRequest(typeof(ICreateFilesPublish))]
-    public string CreateFilesEndpoint { get; set; }
-
     [AutoInjectRequest(typeof(IRemoveFilesPublish))]
     public string RemoveFilesEndpoint { get; set; }
   }

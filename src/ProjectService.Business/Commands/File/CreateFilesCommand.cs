@@ -28,7 +28,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
   {
     private readonly IDbProjectFileMapper _mapper;
     private readonly IFileRepository _repository;
-    private readonly ILogger<CreateFilesCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IProjectUserRepository _userRepository;
@@ -39,8 +38,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
     public CreateFilesCommand(
       IDbProjectFileMapper mapper,
       IFileRepository repository,
-      IRequestClient<ICreateFilesPublish> rcFiles,
-      ILogger<CreateFilesCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IProjectUserRepository userRepository,
@@ -50,13 +47,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
     {
       _mapper = mapper;
       _repository = repository;
-      _logger = logger;
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _userRepository = userRepository;
       _responseCreator = responseCreator;
       _fileDataMapper = fileDataMapper;
-      _fileService = fileService;
+      _publish = publish;
     }
 
     public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateFilesRequest request)
@@ -67,16 +63,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
         return _responseCreator.CreateFailureResponse<List<Guid>>(HttpStatusCode.Forbidden);
       }
 
-      OperationResultResponse<List<Guid>> response = new();
-
       List<FileAccess> accesses = new List<FileAccess>();
       List<FileData> files = request.Files.Select(x => _fileDataMapper.Map(x, accesses)).ToList();
+
       OperationResultResponse<List<Guid>> response = new(body: await _repository.
         CreateAsync(accesses.Select(x => _mapper.Map(x.FileId, request.ProjectId, x.Access)).ToList()));
 
       if (response.Body.Any())
       {
-        await _publish.CreateFilesAsync(files, _httpContextAccessor.HttpContext.GetUserId());// httpcontext!
+        await _publish.CreateFilesAsync(files);// httpcontext!
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
       }
       else

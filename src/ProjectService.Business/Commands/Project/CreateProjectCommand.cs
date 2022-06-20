@@ -114,7 +114,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
           : Task.CompletedTask,
         usersIds.Any()
           ? _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors)
-          : Task.CompletedTask);
+          : Task.CompletedTask)
+        request.Files.Any()
+        ? _publish;
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
