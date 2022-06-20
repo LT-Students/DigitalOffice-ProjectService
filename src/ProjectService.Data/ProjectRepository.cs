@@ -192,7 +192,7 @@ namespace LT.DigitalOffice.ProjectService.Data
            select new
            {
              Project = project,
-             UsersCount = _provider.ProjectsUsers.Count(pu => pu.ProjectId == project.Id)
+             UsersCount = _provider.ProjectsUsers.Count(pu => pu.ProjectId == project.Id && pu.IsActive)
            }).ToListAsync())
            .Select(p => (p.Project, p.UsersCount)).ToList();
 
