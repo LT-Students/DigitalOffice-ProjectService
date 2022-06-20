@@ -4,23 +4,19 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.Constants;
-using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.File;
-using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
 using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using MassTransit;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 {
@@ -71,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 
       if (response.Body.Any())
       {
-        await _publish.CreateFilesAsync(files);// httpcontext!
+        await _publish.CreateFilesAsync(files);
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
       }
       else

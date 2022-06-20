@@ -107,16 +107,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
               createdBy: _httpContextAccessor.HttpContext.GetUserId(),
               projectId: response.Body.Value)
           : Task.CompletedTask,
-        usersIds.Any() 
+        usersIds.Any()
           ? _publish.CreateWorkTimeAsync(
               dbProject.Id,
               usersIds)
           : Task.CompletedTask,
         usersIds.Any()
           ? _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors)
-          : Task.CompletedTask)
+          : Task.CompletedTask,
         request.Files.Any()
-        ? _publish;
+          ? _publish.CreateFilesAsync(files)
+          : Task.CompletedTask);
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
