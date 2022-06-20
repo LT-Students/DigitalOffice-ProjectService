@@ -18,6 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
 
     public ProjectResponse Map(
       DbProject dbProject,
+      int usersCount,
       IEnumerable<UserInfo> users,
       IEnumerable<FileAccess> files,
       IEnumerable<ImageInfo> images,
@@ -30,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
 
       return new ProjectResponse
       {
-        Project = _projectInfoMapper.Map(dbProject, department),
+        Project = _projectInfoMapper.Map(dbProject, usersCount, department),
         Users = users,
         Files = files,
         Images = images

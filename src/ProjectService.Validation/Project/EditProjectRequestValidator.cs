@@ -32,8 +32,8 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
           nameof(EditProjectRequest.Description),
           nameof(EditProjectRequest.ShortDescription),
           nameof(EditProjectRequest.Customer),
-          nameof(EditProjectRequest.StartProject),
-          nameof(EditProjectRequest.EndProject)
+          nameof(EditProjectRequest.StartDateUtc),
+          nameof(EditProjectRequest.EndDateUtc)
         });
 
       AddСorrectOperations(nameof(EditProjectRequest.Status), new List<OperationType> { OperationType.Replace });
@@ -42,8 +42,8 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       AddСorrectOperations(nameof(EditProjectRequest.Description), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.ShortDescription), new List<OperationType> { OperationType.Replace });
       AddСorrectOperations(nameof(EditProjectRequest.Customer), new List<OperationType> { OperationType.Replace });
-      AddСorrectOperations(nameof(EditProjectRequest.StartProject), new List<OperationType> { OperationType.Replace });
-      AddСorrectOperations(nameof(EditProjectRequest.EndProject), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditProjectRequest.StartDateUtc), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditProjectRequest.EndDateUtc), new List<OperationType> { OperationType.Replace });
 
       #endregion
 

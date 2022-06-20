@@ -14,12 +14,11 @@ namespace LT.DigitalOffice.ProjectService.Broker
 {
   public class GetProjectsUsersConsumer : IConsumer<IGetProjectsUsersRequest>
   {
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
 
     private async Task<object> GetProjectUsersAsync(IGetProjectsUsersRequest request)
     {
       (List<DbProjectUser> users, int totalCount) = await _userRepository.GetAsync(request);
-
 
       return IGetProjectsUsersResponse.CreateObj(users.Select(
         p =>
@@ -27,13 +26,12 @@ namespace LT.DigitalOffice.ProjectService.Broker
             p.UserId,
             p.ProjectId,
             p.IsActive,
-            (ProjectUserRoleType)p.Role,
-            p.CreatedAtUtc
+            (ProjectUserRoleType)p.Role
           )).ToList(),
         totalCount);
     }
 
-    public GetProjectsUsersConsumer(IUserRepository userRepository)
+    public GetProjectsUsersConsumer(IProjectUserRepository userRepository)
     {
       _userRepository = userRepository;
     }

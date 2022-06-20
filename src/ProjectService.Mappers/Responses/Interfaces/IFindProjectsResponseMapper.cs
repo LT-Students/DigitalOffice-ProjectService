@@ -11,7 +11,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces
   public interface IFindProjectsResponseMapper
   {
     FindResultResponse<ProjectInfo> Map(
-      List<DbProject> dbProject,
+      List<(DbProject dbProject, int usersCount)> projects,
       int totalCount,
       List<DepartmentData> departments,
       List<string> errors);

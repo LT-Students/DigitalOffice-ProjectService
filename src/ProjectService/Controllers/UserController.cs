@@ -20,6 +20,15 @@ namespace LT.DigitalOffice.ProjectService.Controllers
       return await command.ExecuteAsync(request);
     }
 
+    [HttpPut("editrole")]
+    public async Task<OperationResultResponse<bool>> EditAsync(
+      [FromServices] IEditProjectUsersRoleCommand command,
+      [FromQuery] Guid projectId,
+      [FromBody] EditProjectUsersRoleRequest request)
+    {
+      return await command.ExecuteAsync(projectId, request);
+    }
+
     [HttpDelete("remove")]
     public async Task<OperationResultResponse<bool>> RemoveAsync(
       [FromServices] IRemoveProjectUsersCommand command,

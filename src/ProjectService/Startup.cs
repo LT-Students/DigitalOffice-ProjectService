@@ -16,6 +16,8 @@ using LT.DigitalOffice.ProjectService.Broker;
 using LT.DigitalOffice.ProjectService.Broker.Consumers;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
+using LT.DigitalOffice.Kernel.EFSupport.Extensions;
+using LT.DigitalOffice.Kernel.EFSupport.Helpers;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using MassTransit.RabbitMqTransport;
@@ -55,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService
         .GetSection(BaseRabbitMqConfig.SectionName)
         .Get<RabbitMqConfig>();
 
-            Version = "1.2.2.2";
+            Version = "1.2.2.6";
             Description = "ProjectService is an API intended to work with projects.";
             StartTime = DateTime.UtcNow;
             ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
@@ -96,17 +98,7 @@ namespace LT.DigitalOffice.ProjectService
 
       services.AddBusinessObjects();
 
-      string connStr = Environment.GetEnvironmentVariable("ConnectionString");
-      if (string.IsNullOrEmpty(connStr))
-      {
-        connStr = Configuration.GetConnectionString("SQLConnectionString");
-
-        Log.Information($"SQL connection string from appsettings.json was used. Value '{PasswordHider.Hide(connStr)}'.");
-      }
-      else
-      {
-        Log.Information( $"SQL connection string from environment was used. Value '{PasswordHider.Hide(connStr)}'.");
-      }
+      string connStr = ConnectionStringHandler.Get(Configuration);
 
       services.AddDbContext<ProjectServiceDbContext>(options =>
       {
@@ -143,7 +135,7 @@ namespace LT.DigitalOffice.ProjectService
 
     public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
     {
-      UpdateDatabase(app);
+      app.UpdateDatabase<ProjectServiceDbContext>();
 
       string error = FlushRedisDbHelper.FlushDatabase(redisConnStr, Cache.Projects);
       if (error is not null)
@@ -184,17 +176,6 @@ namespace LT.DigitalOffice.ProjectService
     #endregion
 
     #region private methods
-
-    private void UpdateDatabase(IApplicationBuilder app)
-    {
-      using var serviceScope = app.ApplicationServices
-        .GetRequiredService<IServiceScopeFactory>()
-        .CreateScope();
-
-      using var context = serviceScope.ServiceProvider.GetService<ProjectServiceDbContext>();
-
-      context.Database.Migrate();
-    }
 
     #region configure masstransit
 

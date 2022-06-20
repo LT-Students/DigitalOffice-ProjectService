@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using LT.DigitalOffice.Models.Broker.Enums;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Department;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Time;
 using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
@@ -15,17 +19,35 @@ namespace LT.DigitalOffice.ProjectService.Broker.Publishes
   {
     private readonly IBus _bus;
 
-    public Publish(IBus bus)
+    public Publish(
+      IBus bus)
     {
       _bus = bus;
     }
-    
+
+    public async Task CreateDepartmentEntityAsync(Guid departmentId, Guid createdBy, Guid projectId)
     public async Task CreateFilesAsync(List<FileData> files, Guid createdBy) // httpcontext take Guid
     {
+      await _bus.Publish<ICreateDepartmentEntityPublish>(ICreateDepartmentEntityPublish.CreateObj(
+        departmentId: departmentId,
+        createdBy: createdBy,
+        projectId: projectId));
       await _bus.Publish<ICreateFilesPublish>(ICreateFilesPublish.CreateObj(
       files: files,
       createdBy: createdBy));
     }
+    }
+
+    public async Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds)
+    {
+      await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(projectId, usersIds));
+    }
+
+    public async Task RemoveImagesAsync(List<Guid> imagesIds)
+    {
+      await _bus.Publish<IRemoveImagesPublish>(IRemoveImagesPublish.CreateObj(
+        imagesIds: imagesIds,
+        imageSource: ImageSource.Project));
+    }
   }
 }
-

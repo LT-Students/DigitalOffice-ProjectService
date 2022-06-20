@@ -6,6 +6,7 @@ using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
+using LT.DigitalOffice.Models.Broker.Models.Image;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Responses.Image;
@@ -23,23 +24,20 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
   {
     private readonly ILogger<ImageService> _logger;
     private readonly IRequestClient<IGetImagesRequest> _rcGetImages;
-    private readonly IRequestClient<ICreateImagesPublish> _rcCreateImages;
-    private readonly IRequestClient<IRemoveImagesPublish> _rcRemoveImages;
+    private readonly IRequestClient<ICreateImagesRequest> _rcCreateImages;
     private readonly IImageInfoMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public ImageService(
       ILogger<ImageService> logger,
       IRequestClient<IGetImagesRequest> rcGetImages,
-      IRequestClient<ICreateImagesPublish> rcCreateImages,
-      IRequestClient<IRemoveImagesPublish> rcRemoveImages,
+      IRequestClient<ICreateImagesRequest> rcCreateImages,
       IImageInfoMapper mapper,
       IHttpContextAccessor httpContextAccessor)
     {
       _logger = logger;
       _rcCreateImages = rcCreateImages;
       _rcGetImages = rcGetImages;
-      _rcRemoveImages = rcRemoveImages;
       _mapper = mapper;
       _httpContextAccessor = httpContextAccessor;
     }
@@ -58,38 +56,21 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
           _logger))
         ?.ImagesData
         .Select(_mapper.Map).ToList();
-
     }
 
-    public async Task<List<Guid>> CreateImageAsync(List<ImageContent> projectImages, List<string> errors)
+    public async Task<List<Guid>> CreateImagesAsync(List<ImageContent> projectImages, List<string> errors)
     {
       return projectImages is null || !projectImages.Any()
         ? null
         : (await RequestHandler
-          .ProcessRequest<ICreateImagesPublish, ICreateImagesResponse>(
+          .ProcessRequest<ICreateImagesRequest, ICreateImagesResponse>(
             _rcCreateImages,
-            ICreateImagesPublish.CreateObj(
-              projectImages.Select(x => new CreateImageData(
-                x.Name,
-                x.Content,
-                x.Extension,
-                _httpContextAccessor.HttpContext.GetUserId()))
-              .ToList(),
-              ImageSource.Project),
+            ICreateImagesRequest.CreateObj(
+              images: projectImages.Select(x => new CreateImageData(x.Name, x.Content, x.Extension)).ToList(),
+              imageSource: ImageSource.Project,
+              createdBy: _httpContextAccessor.HttpContext.GetUserId()),
             errors,
             _logger)).ImagesIds;
-    }
-
-    public async Task<bool> RemoveImages(List<Guid> imagesIds, List<string> errors)
-    {
-      return imagesIds is null || imagesIds.Any()
-        ? false
-        : (await RequestHandler
-          .ProcessRequest<IRemoveImagesPublish, bool>(
-            _rcRemoveImages,
-            IRemoveImagesPublish.CreateObj(imagesIds: imagesIds, imageSource: ImageSource.Project)),
-            errors,
-            _logger).Item1;
     }
   }
 }

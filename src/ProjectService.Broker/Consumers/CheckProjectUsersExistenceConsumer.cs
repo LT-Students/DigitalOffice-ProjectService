@@ -10,16 +10,16 @@ namespace LT.DigitalOffice.ProjectService.Broker
 {
   public class CheckProjectUsersExistenceConsumer : IConsumer<ICheckProjectUsersExistenceRequest>
   {
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
 
-    public CheckProjectUsersExistenceConsumer(IUserRepository userRepository)
+    public CheckProjectUsersExistenceConsumer(IProjectUserRepository userRepository)
     {
       _userRepository = userRepository;
     }
 
     public async Task Consume(ConsumeContext<ICheckProjectUsersExistenceRequest> context)
     {
-      List<Guid> existUsers = await _userRepository.DoExistAsync(context.Message.ProjectId, context.Message.UsersIds);
+      List<Guid> existUsers = await _userRepository.DoExistAsync(context.Message.ProjectId, context.Message.UsersIds, isActive: true);
 
       object response = OperationResultWrapper.CreateResponse((_) => existUsers, context);
 

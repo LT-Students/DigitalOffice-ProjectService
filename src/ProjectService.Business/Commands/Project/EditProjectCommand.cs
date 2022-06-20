@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IPatchDbProjectMapper _mapper;
     private readonly IProjectRepository _projectRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
     private readonly IResponseCreator _responseCreator;
     private readonly IGlobalCacheRepository _globalCache;
 
@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IPatchDbProjectMapper mapper,
       IProjectRepository projectRepository,
       IHttpContextAccessor httpContextAccessor,
-      IUserRepository userRepository,
+      IProjectUserRepository userRepository,
       IResponseCreator responseCreator,
       IGlobalCacheRepository globalCache)
     {
@@ -73,13 +73,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       response.Body = await _projectRepository.EditAsync(projectId, _mapper.Map(request));
 
-      response.Status = OperationResultStatusType.FullSuccess;
       if (!response.Body)
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.Add("Project can not be edit.");
       }
       else
       {

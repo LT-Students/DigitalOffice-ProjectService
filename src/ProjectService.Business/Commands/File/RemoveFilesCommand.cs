@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
     private readonly ILogger<RemoveFilesCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IUserRepository _userRepository;
+    private readonly IProjectUserRepository _userRepository;
     private readonly IResponseCreator _responseCreator;
 
     private async Task<bool> RemoveFilesAsync(List<Guid> ids, List<string> errors)
@@ -71,7 +71,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
       ILogger<RemoveFilesCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
-      IUserRepository userRepository,
+      IProjectUserRepository userRepository,
       IResponseCreator responseCreator)
     {
       _repository = repository;

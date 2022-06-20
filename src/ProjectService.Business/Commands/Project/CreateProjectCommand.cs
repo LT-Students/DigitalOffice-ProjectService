@@ -11,7 +11,7 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.File;
-using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Department;
+using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -21,7 +21,6 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
-using MassTransit;
 using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
@@ -37,9 +36,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IFileDataMapper _fileDataMapper;
     private readonly IImageService _imageService;
     private readonly IFileService _fileService;
-    private readonly ITimeService _timeService;
     private readonly IMessageService _messageService;
-    private readonly IBus _bus;
+    private readonly IPublish _publish;
 
     public CreateProjectCommand(
       IProjectRepository repository,
@@ -51,9 +49,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IFileDataMapper fileDataMapper,
       IImageService imageService,
       IFileService fileService,
-      ITimeService timeService,
       IMessageService messageService,
-      IBus bus)
+      IPublish publish)
     {
       _validator = validator;
       _repository = repository;
@@ -64,9 +61,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _fileDataMapper = fileDataMapper;
       _imageService = imageService;
       _fileService = fileService;
-      _timeService = timeService;
       _messageService = messageService;
-      _bus = bus;
+      _publish = publish;
     }
 
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateProjectRequest request)
@@ -86,7 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       OperationResultResponse<Guid?> response = new();
 
-      List<Guid> imagesIds = await _imageService.CreateImageAsync(request.ProjectImages, response.Errors);
+      List<Guid> imagesIds = await _imageService.CreateImagesAsync(request.ProjectImages, response.Errors);
 
       List<FileAccess> accesses = new List<FileAccess>();
       List<FileData> files = request.Files?.Select(x => _fileDataMapper.Map(x, accesses)).ToList();
@@ -97,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       response.Body = await _repository.CreateAsync(dbProject);
 
-      if (response.Body == null)
+      if (response.Body is null)
       {
         return _responseCreator.CreateFailureResponse<Guid?>(HttpStatusCode.BadRequest);
       }
@@ -106,18 +102,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       await Task.WhenAll(
         request.DepartmentId.HasValue
-          ? _bus.Publish<ICreateDepartmentEntityPublish>(ICreateDepartmentEntityPublish.CreateObj(
-            departmentId: request.DepartmentId.Value,
-            createdBy: _httpContextAccessor.HttpContext.GetUserId(),
-            projectId: response.Body.Value))
+          ? _publish.CreateDepartmentEntityAsync(
+              departmentId: request.DepartmentId.Value,
+              createdBy: _httpContextAccessor.HttpContext.GetUserId(),
+              projectId: response.Body.Value)
           : Task.CompletedTask,
-        _timeService.CreateWorkTimeAsync(dbProject.Id, usersIds, response.Errors),
-        _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors));
-      
-      _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
+        usersIds.Any() 
+          ? _publish.CreateWorkTimeAsync(
+              dbProject.Id,
+              usersIds)
+          : Task.CompletedTask,
+        usersIds.Any()
+          ? _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors)
+          : Task.CompletedTask);
 
-      response.Status = response.Errors.Any() ?
-        OperationResultStatusType.PartialSuccess : OperationResultStatusType.FullSuccess;
+      _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
       return response;
     }

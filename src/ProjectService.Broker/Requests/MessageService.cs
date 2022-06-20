@@ -5,7 +5,6 @@ using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
-using LT.DigitalOffice.Models.Broker.Requests.Time;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
@@ -34,18 +33,11 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
 
     public async Task CreateWorkspaceAsync(string projectName, List<Guid> usersIds, List<string> errors)
     {
-      Guid creatorId = _httpContextAccessor.HttpContext.GetUserId();
-
-      if (!usersIds.Contains(creatorId))
-      {
-        usersIds.Add(creatorId);
-      }
-
       await RequestHandler.ProcessRequest<ICreateWorkspaceRequest, bool>(
         _rcCreateWorkspace,
         ICreateWorkspaceRequest.CreateObj(
           projectName,
-          creatorId,
+          _httpContextAccessor.HttpContext.GetUserId(),
           usersIds),
         errors,
         _logger);
