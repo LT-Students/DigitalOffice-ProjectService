@@ -11,5 +11,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces
     Task CreateDepartmentEntityAsync(Guid departmentId, Guid createdBy, Guid projectId);
     Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds);
     Task RemoveImagesAsync(List<Guid> imagesIds);
+    Task RemoveFilesAsync(List<Guid> filesIds);
   }
 }
