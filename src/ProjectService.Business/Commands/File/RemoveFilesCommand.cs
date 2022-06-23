@@ -46,13 +46,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
-      OperationResultResponse<bool> response = new();
-
-      response.Body = await _repository.RemoveAsync(request.FilesIds);
+      OperationResultResponse<bool> response = new (body: await _repository.RemoveAsync(request.FilesIds));
 
       if (response.Body)
       {
         await _publish.RemoveFilesAsync(request.FilesIds);
+      }
+      else
+      {
+        response = _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, response.Errors);
       }
 
       return response;
