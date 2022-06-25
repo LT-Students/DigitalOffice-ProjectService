@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
-using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.RedisSupport.Constants;
 using LT.DigitalOffice.Kernel.RedisSupport.Extensions;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models.Department;
-using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Department;
 using LT.DigitalOffice.Models.Broker.Requests.Department;
 using LT.DigitalOffice.Models.Broker.Responses.Department;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using MassTransit;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Broker.Requests
@@ -35,19 +32,23 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
     }
 
     public async Task<List<DepartmentData>> GetDepartmentsAsync(
-      Guid projectId,
-      List<Guid> usersIds,
-      List<string> errors)
+      List<string> errors,
+      List<Guid> projectsIds = null,
+      List<Guid> usersIds = null)
     {
       string key;
 
       if (usersIds != null && usersIds.Any())
       {
-        key = usersIds.GetRedisCacheHashCode(projectId);
+        key = usersIds.GetRedisCacheHashCode(projectsIds.FirstOrDefault());
+      }
+      else if (projectsIds != null && projectsIds.Any())
+      {
+        key = projectsIds.GetRedisCacheHashCode();
       }
       else
       {
-        key = projectId.GetRedisCacheHashCode();
+        return null;
       }
 
       List<DepartmentData> departments = await _globalCache
@@ -56,13 +57,12 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       if (departments is not null)
       {
         _logger.LogInformation(
-          $"Department was taken from the cache. Department id: {projectId}");
+          $"Department was taken from the cache.");
       }
       else
       {
-        departments = (await RequestHandler.ProcessRequest<IGetDepartmentsRequest, IGetDepartmentsResponse>(
-            _rcGetDepartments,
-            IGetDepartmentsRequest.CreateObj(projectsIds: new() { projectId }, usersIds: usersIds),
+        departments = (await _rcGetDepartments.ProcessRequest<IGetDepartmentsRequest, IGetDepartmentsResponse>(
+            IGetDepartmentsRequest.CreateObj(projectsIds: projectsIds, usersIds: usersIds),
             errors,
             _logger))
           ?.Departments;

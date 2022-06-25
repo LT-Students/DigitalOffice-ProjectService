@@ -14,5 +14,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
 
     [FromQuery(Name = "nameincludesubstring")]
     public string NameIncludeSubstring { get; set; }
+
+    [FromQuery(Name = "includeDepartment")]
+    public bool IncludeDepartment { get; set; } = false;
   }
 }

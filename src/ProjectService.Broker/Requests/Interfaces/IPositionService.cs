@@ -9,6 +9,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces
   [AutoInject]
   public interface IPositionService
   {
-    Task<List<PositionData>> GetPositionsAsync(List<Guid> usersIds, List<string> errors);
+    Task<List<PositionData>> GetPositionsAsync(
+      List<Guid> usersIds,
+      List<string> errors);
   }
 }
