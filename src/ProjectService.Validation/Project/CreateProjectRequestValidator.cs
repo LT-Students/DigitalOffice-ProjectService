@@ -1,51 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using FluentValidation;
-using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
-using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
-using MassTransit;
-using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Validation.Project
 {
   public class CreateProjectRequestValidator : AbstractValidator<CreateProjectRequest>, ICreateProjectRequestValidator
   {
-    private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
-    private readonly ILogger<CreateProjectRequestValidator> _logger;
-
     public CreateProjectRequestValidator(
-      ILogger<CreateProjectRequestValidator> logger,
       IProjectRepository projectRepository,
-      IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
       IUserService userService,
       IImageValidator imageValidator)
     {
-      _logger = logger;
-      _rcCheckUsersExistence = rcCheckUsersExistence;
+      CascadeMode = CascadeMode.Stop;
 
       RuleFor(project => project.Name.Trim())
-        .Cascade(CascadeMode.Stop)
-        .MaximumLength(150).WithMessage("Project name is too long.")
-        .MustAsync(async (name, _) => !await projectRepository.DoesProjectNameExistAsync(name))
-        .WithMessage(project => $"Project with name '{project.Name}' already exists.");
+        .MaximumLength(150).WithMessage("Project name is too long.");
+
+      RuleFor(project => project.ShortName)
+        .MaximumLength(40).WithMessage("Project short name is too long.");
+
+      RuleFor(project => project)
+        .MustAsync(async (project, _) => !await projectRepository.DoesProjectNamesExistAsync(project.Name, project.ShortName))
+        .WithMessage(project => "Project's name and short name must be unique.");
 
       RuleFor(project => project.Status)
         .IsInEnum();
-
-      When(project => !string.IsNullOrEmpty(project.ShortName?.Trim()), () =>
-      {
-        RuleFor(project => project.ShortName)
-          .MaximumLength(40)
-          .WithMessage("Project short name is too long.");
-      });
 
       When(project => !string.IsNullOrEmpty(project.ShortDescription?.Trim()), () =>
       {

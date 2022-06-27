@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests')) != 'true'">
-      <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.1.62" />
+      <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.1.63" />
       <PackageReference Include="LT.DigitalOffice.Kernel.BrokerSupport" Version="1.0.7" />
       <PackageReference Include="LT.DigitalOffice.Kernel.RedisSupport" Version="1.0.5" />
       <PackageReference Include="LT.DigitalOffice.Kernel.EndpointSupport" Version="1.0.0" />

@@ -61,20 +61,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
 
       #region Name
 
-      AddFailureForPropertyIf(
-        nameof(EditProjectRequest.Name),
-        x => x == OperationType.Replace,
-        new()
-        {
-          { x => !string.IsNullOrEmpty(x.value?.ToString().Trim()), "Name must not be empty." },
-          { x => x.value.ToString().Trim().Length <= 150, "Name is too long." },
-        }, CascadeMode.Stop);
-
       await AddFailureForPropertyIfAsync(
         nameof(EditProjectRequest.Name),
         x => x == OperationType.Replace,
         new()
         {
+          { x => Task.FromResult(!string.IsNullOrEmpty(x.value?.ToString().Trim())), "Name must not be empty." },
+          { x => Task.FromResult(x.value.ToString().Trim().Length <= 150), "Name is too long." },
           { async x => !await _projectRepository.DoesProjectNameExistAsync(x.value?.ToString()?.Trim()), "The project name already exist." }
         }, CascadeMode.Stop);
 
@@ -82,12 +75,13 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
 
       #region ShortName
 
-      AddFailureForPropertyIf(
+      await AddFailureForPropertyIfAsync(
         nameof(EditProjectRequest.ShortName),
         x => x == OperationType.Replace,
-        new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
+        new ()
         {
-          { x => x.value == null || x.value.ToString().Trim().Length < 41, "Short name is too long." },
+          { x => Task.FromResult(x.value == null || x.value.ToString().Trim().Length < 41), "Short name is too long." },
+          { async x => !await _projectRepository.DoesProjectShortNameExistAsync(x.value?.ToString()?.Trim()), "The project short name already exist." }
         });
 
       #endregion

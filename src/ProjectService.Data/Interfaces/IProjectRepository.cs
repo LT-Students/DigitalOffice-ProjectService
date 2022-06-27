@@ -28,6 +28,10 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<List<Guid>> DoExistAsync(List<Guid> projectsIds);
 
+    Task<bool> DoesProjectNamesExistAsync(string name, string shortName);
+
     Task<bool> DoesProjectNameExistAsync(string name);
+
+    Task<bool> DoesProjectShortNameExistAsync(string shortName);
   }
 }

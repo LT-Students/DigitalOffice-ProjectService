@@ -18,10 +18,10 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
           Id = table.Column<Guid>(nullable: false),
           Status = table.Column<int>(nullable: false),
           Name = table.Column<string>(nullable: false, maxLength: 150),
-          ShortName = table.Column<string>(nullable: true),
+          ShortName = table.Column<string>(nullable: false, maxLength: 40),
           Description = table.Column<string>(nullable: true),
           ShortDescription = table.Column<string>(nullable: true),
-          Customer = table.Column<string>(nullable: true),
+          Customer = table.Column<string>(nullable: true, maxLength: 150),
           StartDateUtc = table.Column<DateTime>(nullable: false),
           EndDateUtc = table.Column<DateTime>(nullable: true),
           CreatedBy = table.Column<Guid>(nullable: false),
@@ -33,6 +33,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         {
           table.PrimaryKey("PK_Projects", x => x.Id);
           table.UniqueConstraint("UC_Projects_Name_Unique", x => x.Name);
+          table.UniqueConstraint("UC_Projects_ShortName_Unique", x => x.Name);
         });
     }
 
