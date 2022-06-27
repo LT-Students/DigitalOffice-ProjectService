@@ -17,7 +17,6 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using Microsoft.AspNetCore.Http;
 
-
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
 {
   public class CreateFilesCommand : ICreateFilesCommand

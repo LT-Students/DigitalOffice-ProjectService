@@ -14,7 +14,6 @@ using LT.DigitalOffice.Kernel.Extensions;
 
 namespace LT.DigitalOffice.ProjectService.Broker.Publishes
 {
-  
   public class Publish : IPublish
   {
     private readonly IBus _bus;
@@ -29,7 +28,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Publishes
     }
 
     public async Task CreateDepartmentEntityAsync(Guid departmentId, Guid createdBy, Guid projectId)
-
     {
       await _bus.Publish<ICreateDepartmentEntityPublish>(ICreateDepartmentEntityPublish.CreateObj(
         departmentId: departmentId,
@@ -40,8 +38,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.Publishes
     public async Task CreateFilesAsync(List<FileData> files)
     {
       await _bus.Publish<ICreateFilesPublish>(ICreateFilesPublish.CreateObj(
-      files: files,
-      createdBy: _httpContextAccessor.HttpContext.GetUserId()));
+        files: files,
+        createdBy: _httpContextAccessor.HttpContext.GetUserId()));
     }
 
     public async Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds)
