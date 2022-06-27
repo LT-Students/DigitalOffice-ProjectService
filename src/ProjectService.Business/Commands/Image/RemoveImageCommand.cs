@@ -9,20 +9,17 @@ using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
-using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 {
   public class RemoveImageCommand : IRemoveImageCommand
   {
     private readonly IImageRepository _repository;
-    private readonly ILogger<RemoveImageCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRemoveImagesRequestValidator _validator;
@@ -32,7 +29,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
     public RemoveImageCommand(
       IImageRepository repository,
-      ILogger<RemoveImageCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IRemoveImagesRequestValidator validator,
@@ -41,7 +37,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
       IPublish publish)
     {
       _repository = repository;
-      _logger = logger;
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _validator = validator;

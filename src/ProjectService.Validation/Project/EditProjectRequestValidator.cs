@@ -87,7 +87,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => x.value == null || x.value.ToString().Trim().Length < 30, "Short name is too long." },
+          { x => x.value == null || x.value.ToString().Trim().Length < 41, "Short name is too long." },
         });
 
       #endregion
