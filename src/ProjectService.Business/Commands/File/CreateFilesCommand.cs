@@ -29,7 +29,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces
     private readonly IResponseCreator _responseCreator;
     private readonly IFileDataMapper _fileDataMapper;
     private readonly IPublish _publish;
-   
     public CreateFilesCommand(
       IDbProjectFileMapper mapper,
       IFileRepository repository,

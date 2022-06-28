@@ -7,7 +7,6 @@ using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Time;
 using LT.DigitalOffice.Models.Broker.Models.File;
-using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
 using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
