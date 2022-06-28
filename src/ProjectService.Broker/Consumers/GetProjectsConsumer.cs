@@ -60,8 +60,12 @@ namespace LT.DigitalOffice.ProjectService.Broker
         ids.Add(request.UserId.Value);
       }
 
-
       List<object> additionalArguments = new() { request.IncludeUsers };
+
+      if (request.AscendingSort.HasValue)
+      {
+        additionalArguments.Add(request.AscendingSort.Value);
+      }
 
       if (request.SkipCount.HasValue)
       {
