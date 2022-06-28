@@ -68,7 +68,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         {
           { x => Task.FromResult(!string.IsNullOrEmpty(x.value?.ToString().Trim())), "Name must not be empty." },
           { x => Task.FromResult(x.value.ToString().Trim().Length <= 150), "Name is too long." },
-          { async x => !await _projectRepository.DoesProjectNameExistAsync(x.value?.ToString()?.Trim()), "The project name already exist." }
+          { async x => !await _projectRepository.DoesNameExistAsync(x.value?.ToString()?.Trim()), "The project name already exist." }
         }, CascadeMode.Stop);
 
       #endregion
@@ -80,8 +80,8 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new ()
         {
-          { x => Task.FromResult(x.value == null || x.value.ToString().Trim().Length < 41), "Short name is too long." },
-          { async x => !await _projectRepository.DoesProjectShortNameExistAsync(x.value?.ToString()?.Trim()), "The project short name already exist." }
+          { x => Task.FromResult(x.value.ToString().Trim().Length < 41), "Short name is too long." },
+          { async x => !await _projectRepository.DoesShortNameExistAsync(x.value?.ToString()?.Trim()), "The project short name already exist." }
         });
 
       #endregion

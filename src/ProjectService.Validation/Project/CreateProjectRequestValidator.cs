@@ -21,14 +21,14 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       CascadeMode = CascadeMode.Stop;
 
       RuleFor(project => project.Name.Trim())
-        .MaximumLength(150).WithMessage("Project name is too long.");
+        .MaximumLength(150).WithMessage("Project name is too long.")
+        .MustAsync(async (name, _) => !await projectRepository.DoesNameExistAsync(name))
+        .WithMessage("Project's name must be unique.");
 
-      RuleFor(project => project.ShortName)
-        .MaximumLength(40).WithMessage("Project short name is too long.");
-
-      RuleFor(project => project)
-        .MustAsync(async (project, _) => !await projectRepository.DoesProjectNamesExistAsync(project.Name, project.ShortName))
-        .WithMessage(project => "Project's name and short name must be unique.");
+      RuleFor(project => project.ShortName.Trim())
+        .MaximumLength(40).WithMessage("Project short name is too long.")
+        .MustAsync(async (shortName, _) => !await projectRepository.DoesShortNameExistAsync(shortName))
+        .WithMessage("Project's short name must be unique.");
 
       RuleFor(project => project.Status)
         .IsInEnum();

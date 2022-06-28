@@ -216,19 +216,12 @@ namespace LT.DigitalOffice.ProjectService.Data
       return await _provider.Projects.AnyAsync(x => x.Id == projectId);
     }
 
-    public async Task<bool> DoesProjectNamesExistAsync(string name, string shortName)
-    {
-      return await _provider.Projects.AnyAsync(p =>
-        p.Name.ToLower().Equals(name.ToLower())
-        || p.ShortName.ToLower().Equals(shortName.ToLower()));
-    }
-
-    public async Task<bool> DoesProjectNameExistAsync(string name)
+    public async Task<bool> DoesNameExistAsync(string name)
     {
       return await _provider.Projects.AnyAsync(p => p.Name.ToLower().Equals(name.ToLower()));
     }
 
-    public async Task<bool> DoesProjectShortNameExistAsync(string shortName)
+    public async Task<bool> DoesShortNameExistAsync(string shortName)
     {
       return await _provider.Projects.AnyAsync(p => p.ShortName.ToLower().Equals(shortName.ToLower()));
     }
