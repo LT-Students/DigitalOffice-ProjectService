@@ -1,8 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.BrokerSupport.Attributes;
 using LT.DigitalOffice.Kernel.BrokerSupport.Configurations;
 using LT.DigitalOffice.Models.Broker.Common;
-using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
-using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Company;
 using LT.DigitalOffice.Models.Broker.Requests.Department;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
@@ -64,13 +62,5 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
     [AutoInjectRequest(typeof(IGetUsersDataRequest))]
     public string GetUsersDataEndpoint { get; set; }
-
-    // file
-
-    [AutoInjectRequest(typeof(ICreateFilesPublish))]
-    public string CreateFilesEndpoint { get; set; }
-
-    [AutoInjectRequest(typeof(IRemoveFilesPublish))]
-    public string RemoveFilesEndpoint { get; set; }
   }
 }
