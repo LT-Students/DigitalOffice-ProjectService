@@ -8,7 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
   {
     public DepartmentInfo Map(DepartmentData department)
     {
-      if (department == null)
+      if (department is null)
       {
         return null;
       }
@@ -16,7 +16,8 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
       return new DepartmentInfo
       {
         Id = department.Id,
-        Name = department.Name
+        Name = department.Name,
+        ShortName = department.ShortName
       };
     }
   }

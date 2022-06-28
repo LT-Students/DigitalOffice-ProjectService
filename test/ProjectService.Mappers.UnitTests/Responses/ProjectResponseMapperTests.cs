@@ -16,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
   internal class ProjectResponseMapperTests
     {
         private IProjectResponseMapper _projectIProjectResponseMapper;
-        private Mock<IProjectInfoMapper> _projectInfoMapperMock;
+        private Mock<Mappers.Models.Interfaces.IProjectInfoMapper> _projectInfoMapperMock;
 
         private DbProject _dbProject;
         private ProjectInfo _projectInfo;
@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _projectInfoMapperMock = new Mock<IProjectInfoMapper>();
+      _projectInfoMapperMock = new Mock<Mappers.Models.Interfaces.IProjectInfoMapper>();
 
             _dbProject = new DbProject
             {

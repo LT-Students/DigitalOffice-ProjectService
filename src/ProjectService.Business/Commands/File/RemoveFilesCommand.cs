@@ -1,107 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
-using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Kernel.Constants;
-using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
+using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using MassTransit;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 {
   public class RemoveFilesCommand : IRemoveFilesCommand
   {
     private readonly IFileRepository _repository;
-    private readonly IRequestClient<IRemoveFilesPublish> _rcFiles;
-    private readonly ILogger<RemoveFilesCommand> _logger;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IProjectUserRepository _userRepository;
     private readonly IResponseCreator _responseCreator;
-
-    private async Task<bool> RemoveFilesAsync(List<Guid> ids, List<string> errors)
-    {
-      if (ids == null || !ids.Any())
-      {
-        return false;
-      }
-
-      try
-      {
-        Response<IOperationResult<bool>> response =
-          await _rcFiles.GetResponse<IOperationResult<bool>>(
-            IRemoveFilesPublish.CreateObj(ids));
-
-        if (response.Message.IsSuccess)
-        {
-          return response.Message.Body;
-        }
-
-        _logger.LogWarning(
-          "Errors while removing files ids {ids}.\nErrors: {Errors}",
-          string.Join(',', ids),
-          string.Join('\n', response.Message.Errors));
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc,
-          "Errors while removing files ids {ids}.",
-          string.Join('\n', ids));
-      }
-
-      errors.Add("Can not remove files. Please try again later.");
-
-      return false;
-    }
+    private readonly IPublish _publish;
 
     public RemoveFilesCommand(
       IFileRepository repository,
-      IRequestClient<IRemoveFilesPublish> rcFiles,
-      ILogger<RemoveFilesCommand> logger,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IProjectUserRepository userRepository,
-      IResponseCreator responseCreator)
+      IResponseCreator responseCreator,
+      IPublish publish)
     {
       _repository = repository;
-      _rcFiles = rcFiles;
-      _logger = logger;
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _userRepository = userRepository;
       _responseCreator = responseCreator;
+      _publish = publish;
     }
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(RemoveFilesRequest request)
     {
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(await _userRepository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), true)))
+        && !(await _userRepository.DoesExistAsync(userId: _httpContextAccessor.HttpContext.GetUserId(), projectId: request.ProjectId, isManager: true)))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
-      OperationResultResponse<bool> response = new();
+      OperationResultResponse<bool> response = new (body: await _repository.RemoveAsync(request.FilesIds));
 
-      bool result = await RemoveFilesAsync(request.FilesIds, response.Errors);
-
-      if (!result)
+      if (response.Body)
       {
-        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, response.Errors);
+        await _publish.RemoveFilesAsync(request.FilesIds);
       }
-
-      response.Body = await _repository.RemoveAsync(request.FilesIds);
-      response.Status = OperationResultStatusType.FullSuccess;
+      else
+      {
+        response = _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, response.Errors);
+      }
 
       return response;
     }

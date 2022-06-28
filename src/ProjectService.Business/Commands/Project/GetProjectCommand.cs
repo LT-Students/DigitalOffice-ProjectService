@@ -96,7 +96,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       {
         var positionsTask = _positionService.GetPositionsAsync(usersIds, response.Errors);
         var companiesTask = _companyService.GetCompaniesAsync(usersIds, response.Errors);
-        var departmentsTask = _departmentService.GetDepartmentsAsync(dbProject.Id, usersIds, response.Errors);
+        var departmentsTask = _departmentService.GetDepartmentsAsync(response.Errors, new List<Guid>() { dbProject.Id }, usersIds);
         var imagesTask = _imageService.GetImagesAsync(usersDatas.Where(u => u.ImageId.HasValue).Select(u => u.ImageId.Value).ToList(), ImageSource.User, response.Errors);
 
         await Task.WhenAll(positionsTask, departmentsTask, companiesTask, imagesTask);
@@ -129,7 +129,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
       else
       {
-        department = (await _departmentService.GetDepartmentsAsync(dbProject.Id, null, response.Errors))?.FirstOrDefault();
+        department = (await _departmentService.GetDepartmentsAsync(errors: response.Errors, projectsIds: new List<Guid>() { dbProject.Id }))?.FirstOrDefault();
       }
 
       AccessType accessType = AccessType.Public;

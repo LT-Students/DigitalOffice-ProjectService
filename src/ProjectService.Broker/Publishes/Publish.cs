@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Department;
+using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.File;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Image;
 using LT.DigitalOffice.Models.Broker.Publishing.Subscriber.Time;
 using LT.DigitalOffice.Models.Broker.Models.File;
@@ -52,6 +53,11 @@ namespace LT.DigitalOffice.ProjectService.Broker.Publishes
       await _bus.Publish<IRemoveImagesPublish>(IRemoveImagesPublish.CreateObj(
         imagesIds: imagesIds,
         imageSource: ImageSource.Project));
+    }
+
+    public async Task RemoveFilesAsync(List<Guid> filesIds)
+    {
+      await _bus.Publish<IRemoveFilesPublish>(IRemoveFilesPublish.CreateObj(filesIds));
     }
   }
 }
