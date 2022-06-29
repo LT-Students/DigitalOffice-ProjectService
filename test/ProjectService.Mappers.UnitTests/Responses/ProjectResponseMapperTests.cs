@@ -49,8 +49,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                     FirstName = "Spartak",
                     LastName = "Ryabtsev",
                     MiddleName = "Alexandrovich",
-                    CreatedAtUtc = DateTime.UtcNow,
-                    ModifiedAtUtc = DateTime.UtcNow,
                     IsActive = true,
                     Role = ProjectUserRoleType.Manager
                 }

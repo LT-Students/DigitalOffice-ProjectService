@@ -51,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Models
         [Test]
         public void ShouldThrowExceptionWhenDbProjectUserIsNull()
         {
-            Assert.Null(_mapper.Map(null, null, null, null, null, null, 0));
+            Assert.Null(_mapper.Map(null, null, null, null));
         }
 
         //[Test]
