@@ -40,7 +40,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<List<ImageInfo>> GetImagesAsync(List<Guid> imagesIds, ImageSource imageSource, List<string> errors)
+    public async Task<List<ImageInfo>> GetImagesAsync(List<Guid> imagesIds, ImageSource imageSource, List<string> errors = null)
     {
       if (imagesIds is null || !imagesIds.Any())
       {
@@ -56,7 +56,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
         .Select(_mapper.Map).ToList();
     }
 
-    public async Task<List<Guid>> CreateImagesAsync(List<ImageContent> projectImages, List<string> errors)
+    public async Task<List<Guid>> CreateImagesAsync(List<ImageContent> projectImages, List<string> errors = null)
     {
       return projectImages is null || !projectImages.Any()
         ? null

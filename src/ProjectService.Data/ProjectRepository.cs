@@ -26,13 +26,6 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
       IQueryable<DbProject> projectsQuery = _provider.Projects.AsQueryable();
 
-      if (filter.IncludeUsers)
-      {
-        projectsQuery = filter.ShowNotActiveUsers
-          ? projectsQuery.Include(x => x.Users)
-          : projectsQuery.Include(x => x.Users.Where(x => x.IsActive));
-      }
-
       if (filter.IncludeFiles)
       {
         projectsQuery = projectsQuery.Include(x => x.Files);
@@ -86,11 +79,17 @@ namespace LT.DigitalOffice.ProjectService.Data
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<(DbProject dbProject, int usersCount)> GetAsync(GetProjectFilter filter)
+    public async Task<(DbProject dbProject, IEnumerable<Guid> usersIds, int usersCount)> GetAsync(GetProjectFilter filter)
     {
-      return (
-        await CreateGetPredicate(filter).FirstOrDefaultAsync(p => p.Id == filter.ProjectId),
-        await _provider.ProjectsUsers.CountAsync(pu => pu.ProjectId == filter.ProjectId && pu.IsActive));
+      IQueryable<DbProject> projectQuery = CreateGetPredicate(filter);
+
+      var dbProject = await projectQuery.Select(project => new
+        {
+          Project = project,
+          UsersIds = project.Users.Select(x => x.UserId)
+        }).FirstOrDefaultAsync(x => x.Project.Id == filter.ProjectId);
+
+      return (dbProject?.Project, dbProject?.UsersIds, dbProject?.UsersIds.Count() ?? 0);
     }
 
     public async Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request)

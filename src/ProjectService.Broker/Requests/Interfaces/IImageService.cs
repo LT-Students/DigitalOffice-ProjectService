@@ -11,8 +11,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces
   [AutoInject]
   public interface IImageService
   {
-    Task<List<ImageInfo>> GetImagesAsync(List<Guid> imagesIds, ImageSource imageSource, List<string> errors);
+    Task<List<ImageInfo>> GetImagesAsync(List<Guid> imagesIds, ImageSource imageSource, List<string> errors = null);
 
-    Task<List<Guid>> CreateImagesAsync(List<ImageContent> projectImages, List<string> errors);
+    Task<List<Guid>> CreateImagesAsync(List<ImageContent> projectImages, List<string> errors = null);
   }
 }

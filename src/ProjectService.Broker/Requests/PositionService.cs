@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
 
     public async Task<List<PositionData>> GetPositionsAsync(
       List<Guid> usersIds,
-      List<string> errors)
+      List<string> errors = null)
     {
       List<PositionData> positions = await _globalCache.GetAsync<List<PositionData>>(Cache.Positions, usersIds.GetRedisCacheHashCode());
 

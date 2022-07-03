@@ -9,6 +9,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,24 +24,24 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     private IQueryable<DbProjectUser> CreateGetPredicate(IGetProjectsUsersRequest request)
     {
-      IQueryable<DbProjectUser> projectUsers = _provider.ProjectsUsers.AsQueryable();
+      IQueryable<DbProjectUser> projectUsersQuery = _provider.ProjectsUsers.AsQueryable();
 
       if (request.UsersIds != null && request.UsersIds.Any())
       {
-        projectUsers = projectUsers.Where(pu => request.UsersIds.Contains(pu.UserId));
+        projectUsersQuery = projectUsersQuery.Where(pu => request.UsersIds.Contains(pu.UserId));
       }
 
       if (request.ProjectsIds != null && request.ProjectsIds.Any())
       {
-        projectUsers = projectUsers.Where(pu => request.ProjectsIds.Contains(pu.ProjectId));
+        projectUsersQuery = projectUsersQuery.Where(pu => request.ProjectsIds.Contains(pu.ProjectId));
       }
 
       if (!request.IncludeDisactivated)
       {
-        projectUsers = projectUsers.Where(pu => pu.IsActive);
+        projectUsersQuery = projectUsersQuery.Where(pu => pu.IsActive);
       }
 
-      return projectUsers;
+      return projectUsersQuery;
     }
 
     #endregion
@@ -81,6 +82,18 @@ namespace LT.DigitalOffice.ProjectService.Data
       }
 
       return (await projectUsers.ToListAsync(), totalCount);
+    }
+
+    public async Task<List<DbProjectUser>> GetAsync(Guid projectId, bool? isActive)
+    {
+      IQueryable<DbProjectUser> projectUsersQuery = _provider.ProjectsUsers.Where(pu => pu.ProjectId == projectId);
+
+      if (isActive.HasValue)
+      {
+        projectUsersQuery = projectUsersQuery.Where(pu => pu.IsActive == isActive.Value);
+      }
+
+      return await projectUsersQuery.ToListAsync();
     }
 
     public async Task<bool> CreateAsync(List<DbProjectUser> newUsers)
