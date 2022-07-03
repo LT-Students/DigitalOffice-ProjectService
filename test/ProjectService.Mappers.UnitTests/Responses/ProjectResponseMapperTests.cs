@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses;
@@ -76,7 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
             _expectedResponse = new ProjectResponse
             {
                 Project = _projectInfo,
-                Users = _users
+                UsersIds = _users.Select(x => x.Id).ToList()
             };
 
             _projectInfoMapperMock
