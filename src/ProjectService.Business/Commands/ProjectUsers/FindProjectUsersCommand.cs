@@ -83,12 +83,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       FindResultResponse<UserInfo> response = new()
       {
-        Body = filteredUsersData.usersData?.Select(userData => _userInfoMapper.Map(
+        Body = filteredUsersData.usersData?.Select(userData =>
+          _userInfoMapper.Map(
             dbProjectUser: projectUsers?.FirstOrDefault(pu => pu.UserId == userData.Id),
             userData: userData,
             image: usersAvatars?.FirstOrDefault(av => av.Id == userData.ImageId),
             userPosition: usersPositions?.FirstOrDefault(p => p.UsersIds.Contains(userData.Id)))
           ).ToList(),
+
         TotalCount = filteredUsersData.totalCount
       };
 
