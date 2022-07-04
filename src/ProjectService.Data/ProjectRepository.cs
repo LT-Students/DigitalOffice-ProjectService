@@ -86,7 +86,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       var dbProject = await projectQuery.Select(project => new
         {
           Project = project,
-          UsersIds = project.Users.Select(x => x.UserId)
+          UsersIds = project.Users.Where(x => x.IsActive).Select(x => x.UserId)
         }).FirstOrDefaultAsync(x => x.Project.Id == filter.ProjectId);
 
       return (dbProject?.Project, dbProject?.UsersIds, dbProject?.UsersIds.Count() ?? 0);
