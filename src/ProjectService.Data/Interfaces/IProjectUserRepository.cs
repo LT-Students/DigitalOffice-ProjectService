@@ -5,6 +5,7 @@ using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
@@ -20,6 +21,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     Task<List<DbProjectUser>> GetExistingUsersAsync(Guid projectId, IEnumerable<Guid> usersIds);
 
     Task<List<DbProjectUser>> GetAsync(List<Guid> usersIds);
+
+    Task<List<DbProjectUser>> GetAsync(Guid projectId, bool? isActive);
 
     Task<bool> CreateAsync(List<DbProjectUser> newUsers);
 

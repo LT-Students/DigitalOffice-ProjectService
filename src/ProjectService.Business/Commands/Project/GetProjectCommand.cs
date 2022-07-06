@@ -38,8 +38,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDepartmentService _departmentService;
     private readonly IImageService _imageService;
-    private readonly IUserService _userService;
-    private readonly IPositionService _positionService;
 
     public GetProjectCommand(
       IProjectRepository repository,
@@ -53,7 +51,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IHttpContextAccessor httpContextAccessor,
       IDepartmentService departmentService,
       IImageService imageService,
-      IUserService userService,
       IPositionService positionService)
     {
       _repository = repository;
@@ -67,13 +64,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _httpContextAccessor = httpContextAccessor;
       _departmentService = departmentService;
       _imageService = imageService;
-      _userService = userService;
-      _positionService = positionService;
     }
 
     public async Task<OperationResultResponse<ProjectResponse>> ExecuteAsync(GetProjectFilter filter)
     {
-      (DbProject dbProject, int usersCount) = await _repository.GetAsync(filter);
+      (DbProject dbProject, IEnumerable<Guid> usersIds, int usersCount) = await _repository.GetAsync(filter);
 
       if (dbProject is null)
       {
@@ -81,43 +76,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       }
 
       OperationResultResponse<ProjectResponse> response = new();
-      DepartmentData department = null;
-      List<UserInfo> usersInfo = null;
 
-      List<UserData> usersDatas = await _userService.GetUsersDatasAsync(dbProject.Users, response.Errors);
-      List<Guid> usersIds = dbProject.Users.Select(u => u.UserId).Distinct().ToList();
-
-      if (usersDatas is not null && usersDatas.Any())
-      {
-        var positionsTask = _positionService.GetPositionsAsync(usersIds, response.Errors);
-        var departmentsTask = _departmentService.GetDepartmentsAsync(response.Errors, new List<Guid>() { dbProject.Id }, usersIds);
-        var imagesTask = _imageService.GetImagesAsync(usersDatas.Where(u => u.ImageId.HasValue).Select(u => u.ImageId.Value).ToList(), ImageSource.User, response.Errors);
-
-        await Task.WhenAll(positionsTask, departmentsTask, imagesTask);
-
-        List<DepartmentData> departments = await departmentsTask;
-        List<PositionData> positions = await positionsTask;
-        List<ImageInfo> imagesInfos = await imagesTask;
-
-        department = departments?.FirstOrDefault(d => d.ProjectsIds != null && d.ProjectsIds.Contains(dbProject.Id));
-
-        usersInfo = dbProject.Users
-          .Select(pu =>
-          {
-            UserData mappedUser = usersDatas.FirstOrDefault(x => x.Id == pu.UserId);
-
-            return _projectUserInfoMapper.Map(
-              pu,
-              mappedUser,
-              imagesInfos?.FirstOrDefault(i => i.Id == mappedUser.ImageId),
-              positions?.FirstOrDefault(p => p.UsersIds.Any(userId => userId == pu.UserId)));
-          })
-          .ToList();
-      }
-      else
-      {
-        department = (await _departmentService.GetDepartmentsAsync(errors: response.Errors, projectsIds: new List<Guid>() { dbProject.Id }))?.FirstOrDefault();
-      }
+      DepartmentData department = (await _departmentService.GetDepartmentsAsync(errors: response.Errors, projectsIds: new List<Guid>() { dbProject.Id }))?.FirstOrDefault();
 
       AccessType accessType = AccessType.Public;
 
@@ -134,10 +94,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         accessType = AccessType.Team;
       }
 
-      List<FileAccess> files = dbProject.Files.Where(x => x.Access >= (int)accessType).Select(_accessMapper.Map).ToList();
-      List<ImageInfo> imagesinfo = await _imageService.GetImagesAsync(dbProject.Images.Select(x => x.ImageId).ToList(), ImageSource.Project, response.Errors);
+      List<FileAccess> files = null;
+      List<ImageInfo> imagesInfo = null;
+      
+      if (filter.IncludeFiles)
+      {
+        files = dbProject.Files.Where(x => x.Access >= (int)accessType).Select(_accessMapper.Map).ToList();
+      }
 
-      response.Body = _projectResponseMapper.Map(dbProject, usersCount, usersInfo, files, imagesinfo, _departmentInfoMapper.Map(department));
+      if (filter.IncludeImages)
+      {
+        imagesInfo = await _imageService.GetImagesAsync(dbProject.Images.Select(x => x.ImageId).ToList(), ImageSource.Project, response.Errors);
+      }
+
+      response.Body = _projectResponseMapper.Map(dbProject, usersCount, usersIds, files, imagesInfo, _departmentInfoMapper.Map(department));
 
       return response;
     }

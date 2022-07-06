@@ -11,6 +11,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces
   {
     Task<List<PositionData>> GetPositionsAsync(
       List<Guid> usersIds,
-      List<string> errors);
+      List<string> errors = null);
   }
 }

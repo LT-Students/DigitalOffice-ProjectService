@@ -26,13 +26,6 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
       IQueryable<DbProject> projectsQuery = _provider.Projects.AsQueryable();
 
-      if (filter.IncludeUsers)
-      {
-        projectsQuery = filter.ShowNotActiveUsers
-          ? projectsQuery.Include(x => x.Users)
-          : projectsQuery.Include(x => x.Users.Where(x => x.IsActive));
-      }
-
       if (filter.IncludeFiles)
       {
         projectsQuery = projectsQuery.Include(x => x.Files);
@@ -49,19 +42,19 @@ namespace LT.DigitalOffice.ProjectService.Data
     private IQueryable<DbProject> CreateGetPredicate(
       IGetProjectsRequest request)
     {
-      IQueryable<DbProject> projects = _provider.Projects.AsQueryable();
+      IQueryable<DbProject> projectsQuery = _provider.Projects.AsQueryable();
 
       if (request.UserId.HasValue)
       {
         if (request.IncludeUsers)
         {
-          projects = _provider.Projects
+          projectsQuery = _provider.Projects
             .Include(pu => pu.Users)
             .Where(p => p.Users.Any(u => u.UserId == request.UserId.Value));
         }
         else
         {
-          projects = _provider.ProjectsUsers
+          projectsQuery = _provider.ProjectsUsers
             .Where(pu => pu.UserId == request.UserId)
             .Include(pu => pu.Project)
             .Select(pu => pu.Project);
@@ -70,10 +63,10 @@ namespace LT.DigitalOffice.ProjectService.Data
 
       if (request.ProjectsIds != null && request.ProjectsIds.Any())
       {
-        projects = projects.Where(p => request.ProjectsIds.Contains(p.Id));
+        projectsQuery = projectsQuery.Where(p => request.ProjectsIds.Contains(p.Id));
       }
 
-      return projects;
+      return projectsQuery;
     }
 
     #endregion
@@ -86,11 +79,17 @@ namespace LT.DigitalOffice.ProjectService.Data
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<(DbProject dbProject, int usersCount)> GetAsync(GetProjectFilter filter)
+    public async Task<(DbProject dbProject, IEnumerable<Guid> usersIds, int usersCount)> GetAsync(GetProjectFilter filter)
     {
-      return (
-        await CreateGetPredicate(filter).FirstOrDefaultAsync(p => p.Id == filter.ProjectId),
-        await _provider.ProjectsUsers.CountAsync(pu => pu.ProjectId == filter.ProjectId && pu.IsActive));
+      IQueryable<DbProject> projectQuery = CreateGetPredicate(filter);
+
+      var dbProject = await projectQuery.Select(project => new
+        {
+          Project = project,
+          UsersIds = project.Users.Where(x => x.IsActive).Select(x => x.UserId)
+        }).FirstOrDefaultAsync(x => x.Project.Id == filter.ProjectId);
+
+      return (dbProject?.Project, dbProject?.UsersIds, dbProject?.UsersIds.Count() ?? 0);
     }
 
     public async Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request)

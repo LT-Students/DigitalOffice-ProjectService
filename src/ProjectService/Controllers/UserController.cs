@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
@@ -18,6 +20,15 @@ namespace LT.DigitalOffice.ProjectService.Controllers
       [FromBody] CreateProjectUsersRequest request)
     {
       return await command.ExecuteAsync(request);
+    }
+
+    [HttpGet("find")]
+    public async Task<FindResultResponse<UserInfo>> FindAsync(
+      [FromServices] IFindProjectUsersCommand command,
+      [FromQuery] Guid projectId,
+      [FromQuery] FindProjectUsersFilter filter)
+    {
+      return await command.ExecuteAsync(projectId, filter);
     }
 
     [HttpPut("editrole")]
