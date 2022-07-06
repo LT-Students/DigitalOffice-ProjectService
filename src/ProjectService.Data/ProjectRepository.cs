@@ -42,19 +42,19 @@ namespace LT.DigitalOffice.ProjectService.Data
     private IQueryable<DbProject> CreateGetPredicate(
       IGetProjectsRequest request)
     {
-      IQueryable<DbProject> projects = _provider.Projects.AsQueryable();
+      IQueryable<DbProject> projectsQuery = _provider.Projects.AsQueryable();
 
       if (request.UserId.HasValue)
       {
         if (request.IncludeUsers)
         {
-          projects = _provider.Projects
+          projectsQuery = _provider.Projects
             .Include(pu => pu.Users)
             .Where(p => p.Users.Any(u => u.UserId == request.UserId.Value));
         }
         else
         {
-          projects = _provider.ProjectsUsers
+          projectsQuery = _provider.ProjectsUsers
             .Where(pu => pu.UserId == request.UserId)
             .Include(pu => pu.Project)
             .Select(pu => pu.Project);
@@ -63,10 +63,10 @@ namespace LT.DigitalOffice.ProjectService.Data
 
       if (request.ProjectsIds != null && request.ProjectsIds.Any())
       {
-        projects = projects.Where(p => request.ProjectsIds.Contains(p.Id));
+        projectsQuery = projectsQuery.Where(p => request.ProjectsIds.Contains(p.Id));
       }
 
-      return projects;
+      return projectsQuery;
     }
 
     #endregion

@@ -62,23 +62,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       {
         filteredUsersData = await _userService.GetFilteredUsersAsync(projectUsers.Select(pu => pu.UserId).ToList(), filter);
 
-        Task<List<ImageInfo>> usersAvatarsTask = Task.FromResult<List<ImageInfo>>(default);
-        Task<List<PositionData>> usersPositionsTask = Task.FromResult<List<PositionData>>(default);
+        Task<List<ImageInfo>> usersAvatarsTask = filter.IncludeAvatars
+          ? _imageService.GetImagesAsync(
+              imagesIds: filteredUsersData.usersData?.Where(x => x.ImageId.HasValue).Select(x => x.ImageId.Value).ToList(),
+              imageSource: ImageSource.User)
+          : Task.FromResult<List<ImageInfo>>(default);
 
-        if (filter.IncludeAvatars)
-        {
-          usersAvatarsTask = _imageService.GetImagesAsync(filteredUsersData.usersData?.Where(x => x.ImageId.HasValue).Select(x => x.ImageId.Value).ToList(), ImageSource.User);
-        }
-
-        if (filter.IncludePositions)
-        {
-          usersPositionsTask = _positionService.GetPositionsAsync(filteredUsersData.usersData?.Select(x => x.Id).ToList());
-        }
+        Task<List<PositionData>> usersPositionsTask = filter.IncludePositions
+          ? _positionService.GetPositionsAsync(usersIds: filteredUsersData.usersData?.Select(x => x.Id).ToList())
+          : Task.FromResult<List<PositionData>>(default);
 
         await Task.WhenAll(usersAvatarsTask, usersPositionsTask);
 
-        usersAvatars = usersAvatarsTask.Result;
-        usersPositions = usersPositionsTask.Result;
+        usersAvatars = await usersAvatarsTask;
+        usersPositions = await usersPositionsTask;
       }
 
       FindResultResponse<UserInfo> response = new()
