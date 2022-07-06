@@ -54,17 +54,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       List<DbProjectUser> projectUsers = await _projectUserRepository.GetAsync(projectId: projectId, isActive: filter.IsActive);
 
-      (List<UserData> usersData, int totalCount) filteredUsersData = default;
-
       if (projectUsers is null)
       {
-        return ResponseCreatorStatic.CreateFindResponse<UserInfo>(HttpStatusCode.OK);
+        return new();
       }
 
-      List<ImageInfo> usersAvatars = null;
-      List<PositionData> usersPositions = null;
-
-      filteredUsersData = await _userService.GetFilteredUsersAsync(projectUsers.Select(pu => pu.UserId).ToList(), filter);
+      (List<UserData> usersData, int totalCount) filteredUsersData =
+        await _userService.GetFilteredUsersAsync(projectUsers.Select(pu => pu.UserId).ToList(), filter);
 
       Task<List<ImageInfo>> usersAvatarsTask = filter.IncludeAvatars
         ? _imageService.GetImagesAsync(
@@ -76,10 +72,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
         ? _positionService.GetPositionsAsync(usersIds: filteredUsersData.usersData?.Select(x => x.Id).ToList())
         : Task.FromResult<List<PositionData>>(default);
 
-      usersAvatars = await usersAvatarsTask;
-      usersPositions = await usersPositionsTask;
+      List<ImageInfo> usersAvatars = await usersAvatarsTask;
+      List<PositionData> usersPositions = await usersPositionsTask;
 
-      FindResultResponse<UserInfo> response = new()
+      return new()
       {
         Body = filteredUsersData.usersData?.Select(userData =>
           _userInfoMapper.Map(
@@ -91,8 +87,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
         TotalCount = filteredUsersData.totalCount
       };
-
-      return response;
     }
   }
 }
