@@ -55,34 +55,35 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       List<DbProjectUser> projectUsers = await _projectUserRepository.GetAsync(projectId: projectId, isActive: filter.IsActive);
 
       (List<UserData> usersData, int totalCount) filteredUsersData = default;
+
+      if (projectUsers is null)
+      {
+        return ResponseCreatorStatic.CreateFindResponse<UserInfo>(HttpStatusCode.OK);
+      }
+
       List<ImageInfo> usersAvatars = null;
       List<PositionData> usersPositions = null;
 
-      if (projectUsers is not null)
-      {
-        filteredUsersData = await _userService.GetFilteredUsersAsync(projectUsers.Select(pu => pu.UserId).ToList(), filter);
+      filteredUsersData = await _userService.GetFilteredUsersAsync(projectUsers.Select(pu => pu.UserId).ToList(), filter);
 
-        Task<List<ImageInfo>> usersAvatarsTask = filter.IncludeAvatars
-          ? _imageService.GetImagesAsync(
-              imagesIds: filteredUsersData.usersData?.Where(x => x.ImageId.HasValue).Select(x => x.ImageId.Value).ToList(),
-              imageSource: ImageSource.User)
-          : Task.FromResult<List<ImageInfo>>(default);
+      Task<List<ImageInfo>> usersAvatarsTask = filter.IncludeAvatars
+        ? _imageService.GetImagesAsync(
+            imagesIds: filteredUsersData.usersData?.Where(x => x.ImageId.HasValue).Select(x => x.ImageId.Value).ToList(),
+            imageSource: ImageSource.User)
+        : Task.FromResult<List<ImageInfo>>(default);
 
-        Task<List<PositionData>> usersPositionsTask = filter.IncludePositions
-          ? _positionService.GetPositionsAsync(usersIds: filteredUsersData.usersData?.Select(x => x.Id).ToList())
-          : Task.FromResult<List<PositionData>>(default);
+      Task<List<PositionData>> usersPositionsTask = filter.IncludePositions
+        ? _positionService.GetPositionsAsync(usersIds: filteredUsersData.usersData?.Select(x => x.Id).ToList())
+        : Task.FromResult<List<PositionData>>(default);
 
-        await Task.WhenAll(usersAvatarsTask, usersPositionsTask);
-
-        usersAvatars = await usersAvatarsTask;
-        usersPositions = await usersPositionsTask;
-      }
+      usersAvatars = await usersAvatarsTask;
+      usersPositions = await usersPositionsTask;
 
       FindResultResponse<UserInfo> response = new()
       {
         Body = filteredUsersData.usersData?.Select(userData =>
           _userInfoMapper.Map(
-            dbProjectUser: projectUsers?.FirstOrDefault(pu => pu.UserId == userData.Id),
+            dbProjectUser: projectUsers.FirstOrDefault(pu => pu.UserId == userData.Id),
             userData: userData,
             image: usersAvatars?.FirstOrDefault(av => av.Id == userData.ImageId),
             userPosition: usersPositions?.FirstOrDefault(p => p.UsersIds.Contains(userData.Id)))
