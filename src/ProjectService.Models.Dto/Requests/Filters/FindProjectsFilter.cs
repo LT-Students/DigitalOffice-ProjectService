@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
     [FromQuery(Name = "includeDepartment")]
     public bool IncludeDepartment { get; set; } = false;
 
-    [FromQuery(Name = "userId")]
+    [FromQuery(Name = "userid")]
     public Guid? UserId { get; set; }
   }
 }
