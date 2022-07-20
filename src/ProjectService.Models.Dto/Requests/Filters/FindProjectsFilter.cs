@@ -1,4 +1,5 @@
-﻿using LT.DigitalOffice.Kernel.Requests;
+﻿using System;
+using LT.DigitalOffice.Kernel.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,5 +18,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
 
     [FromQuery(Name = "includeDepartment")]
     public bool IncludeDepartment { get; set; } = false;
+
+    [FromQuery(Name = "userId")]
+    public Guid? UserId { get; set; }
   }
 }
