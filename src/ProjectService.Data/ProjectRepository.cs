@@ -192,6 +192,8 @@ namespace LT.DigitalOffice.ProjectService.Data
           : dbProjectsQuery.OrderByDescending(p => p.Name);
       }
 
+      int totalCount = dbProjectsQuery.Count();
+
       List<(DbProject dbProject, int usersCount)> dbProjects =
         (await
           (from project in dbProjectsQuery.Skip(filter.SkipCount).Take(filter.TakeCount)
@@ -201,8 +203,6 @@ namespace LT.DigitalOffice.ProjectService.Data
              UsersCount = _provider.ProjectsUsers.Count(pu => pu.ProjectId == project.Id && pu.IsActive)
            }).ToListAsync())
            .Select(p => (p.Project, p.UsersCount)).ToList();
-
-      int totalCount = dbProjects.Count;
 
       return (dbProjects, totalCount);
     }
