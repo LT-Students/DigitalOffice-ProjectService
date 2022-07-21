@@ -192,7 +192,7 @@ namespace LT.DigitalOffice.ProjectService.Data
           : dbProjectsQuery.OrderByDescending(p => p.Name);
       }
 
-      int totalCount = dbProjectsQuery.Count();
+      int totalCount = await dbProjectsQuery.CountAsync();
 
       List<(DbProject dbProject, int usersCount)> dbProjects =
         (await
