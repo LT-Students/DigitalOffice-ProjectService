@@ -178,12 +178,21 @@ namespace LT.DigitalOffice.ProjectService.Data
           .Where(p => p.Status == (int)filter.ProjectStatus);
       }
 
+      if (filter.UserId.HasValue)
+      {
+        dbProjectsQuery = dbProjectsQuery
+          .Where(p => p.Users
+            .Any(u => u.IsActive && u.UserId == filter.UserId));
+      }
+
       if (filter.IsAscendingSort.HasValue)
       {
         dbProjectsQuery = filter.IsAscendingSort.Value
           ? dbProjectsQuery.OrderBy(p => p.Name)
           : dbProjectsQuery.OrderByDescending(p => p.Name);
       }
+
+      int totalCount = await dbProjectsQuery.CountAsync();
 
       List<(DbProject dbProject, int usersCount)> dbProjects =
         (await
@@ -194,8 +203,6 @@ namespace LT.DigitalOffice.ProjectService.Data
              UsersCount = _provider.ProjectsUsers.Count(pu => pu.ProjectId == project.Id && pu.IsActive)
            }).ToListAsync())
            .Select(p => (p.Project, p.UsersCount)).ToList();
-
-      int totalCount = dbProjects.Count();
 
       return (dbProjects, totalCount);
     }
