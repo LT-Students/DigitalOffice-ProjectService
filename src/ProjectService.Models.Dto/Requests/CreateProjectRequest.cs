@@ -24,9 +24,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
     public List<ImageContent> ProjectImages { get; set; }
 
     [Required]
-    public List<FileInfo> Files { get; set; }
-
-    [Required]
     public List<UserRequest> Users { get; set; }
   }
 }

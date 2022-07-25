@@ -57,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService
         .GetSection(BaseRabbitMqConfig.SectionName)
         .Get<RabbitMqConfig>();
 
-      Version = "1.2.2.9";
+      Version = "1.2.3.0";
       Description = "ProjectService is an API intended to work with projects.";
       StartTime = DateTime.UtcNow;
       ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
@@ -239,6 +239,7 @@ namespace LT.DigitalOffice.ProjectService
       x.AddConsumer<CheckProjectUsersExistenceConsumer>();
       x.AddConsumer<DisactivateProjectUserConsumer>();
       x.AddConsumer<CheckFilesAccessesConsumer>();
+      x.AddConsumer<CreateFilesConsumer>();
     }
 
     private void ConfigureEndpoints(
@@ -284,6 +285,11 @@ namespace LT.DigitalOffice.ProjectService
       cfg.ReceiveEndpoint(rabbitMqConfig.CheckFilesAccessesEndpoint, ep =>
       {
         ep.ConfigureConsumer<CheckFilesAccessesConsumer>(context);
+      });
+
+      cfg.ReceiveEndpoint(rabbitMqConfig.CreateFilesEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<CreateFilesConsumer>(context);
       });
     }
 
