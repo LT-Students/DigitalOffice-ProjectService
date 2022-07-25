@@ -82,7 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<FileAccess> accesses = new List<FileAccess>();
       List<FileData> files = request.Files.Select(x => _fileDataMapper.Map(x, accesses)).ToList();
-      
+
       DbProject dbProject = _mapper.Map(request, imagesIds, accesses);
 
       response.Body = await _repository.CreateAsync(dbProject);
