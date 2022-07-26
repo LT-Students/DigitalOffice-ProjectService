@@ -16,7 +16,6 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -75,7 +74,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       OperationResultResponse<Guid?> response = new();
 
       List<Guid> imagesIds = await _imageService.CreateImagesAsync(request.ProjectImages, response.Errors);
-      
       DbProject dbProject = _mapper.Map(request, imagesIds);
 
       response.Body = await _repository.CreateAsync(dbProject);
