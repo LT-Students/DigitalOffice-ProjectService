@@ -15,35 +15,34 @@ namespace LT.DigitalOffice.ProjectService.Broker.Publishes
   {
     private readonly IBus _bus;
 
-    public Publish(
-      IBus bus)
+    public Publish(IBus bus)
     {
       _bus = bus;
     }
 
-    public async Task CreateDepartmentEntityAsync(Guid departmentId, Guid createdBy, Guid projectId)
+    public Task CreateDepartmentEntityAsync(Guid departmentId, Guid createdBy, Guid projectId)
     {
-      await _bus.Publish<ICreateDepartmentEntityPublish>(ICreateDepartmentEntityPublish.CreateObj(
+      return _bus.Publish<ICreateDepartmentEntityPublish>(ICreateDepartmentEntityPublish.CreateObj(
         departmentId: departmentId,
         createdBy: createdBy,
         projectId: projectId));
     }
 
-    public async Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds)
+    public Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds)
     {
-      await _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(projectId, usersIds));
+      return _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(projectId, usersIds));
     }
 
-    public async Task RemoveImagesAsync(List<Guid> imagesIds)
+    public Task RemoveImagesAsync(List<Guid> imagesIds)
     {
-      await _bus.Publish<IRemoveImagesPublish>(IRemoveImagesPublish.CreateObj(
+      return _bus.Publish<IRemoveImagesPublish>(IRemoveImagesPublish.CreateObj(
         imagesIds: imagesIds,
         imageSource: ImageSource.Project));
     }
 
-    public async Task RemoveFilesAsync(List<Guid> filesIds)
+    public Task RemoveFilesAsync(List<Guid> filesIds)
     {
-      await _bus.Publish<IRemoveFilesPublish>(IRemoveFilesPublish.CreateObj(filesIds));
+      return _bus.Publish<IRemoveFilesPublish>(IRemoveFilesPublish.CreateObj(filesIds));
     }
   }
 }
