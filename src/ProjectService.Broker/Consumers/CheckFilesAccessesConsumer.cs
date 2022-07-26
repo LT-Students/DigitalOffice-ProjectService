@@ -7,7 +7,6 @@ using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using MassTransit;
 
 namespace LT.DigitalOffice.ProjectService.Broker.Consumers
@@ -27,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
 
     public async Task Consume(ConsumeContext<ICheckProjectFilesAccessesRequest> context)
     {
-      AccessType accessType = AccessType.Public;
+      FileAccessType accessType = FileAccessType.Public;
 
       List<DbProjectFile> files = await _fileRepository.GetAsync(context.Message.FilesIds);
       List<Guid> resultFiles = new List<Guid>();
@@ -39,11 +38,11 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
 
         if (dbProjectUser?.Role == (int)ProjectUserRoleType.Manager)
         {
-          accessType = AccessType.Manager;
+          accessType = FileAccessType.Manager;
         }
         else if (dbProjectUser is not null)
         {
-          accessType = AccessType.Team;
+          accessType = FileAccessType.Team;
         }
 
         if (file.Access >= (int)accessType)
