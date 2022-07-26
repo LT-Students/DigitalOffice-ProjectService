@@ -17,6 +17,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
@@ -101,7 +102,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
               createdBy: _httpContextAccessor.HttpContext.GetUserId(),
               projectId: response.Body.Value)
           : Task.CompletedTask,
-        usersIds.Any()
+        usersIds.Any() && request.Status == (int)ProjectStatusType.Active
           ? _publish.CreateWorkTimeAsync(
               dbProject.Id,
               usersIds)
