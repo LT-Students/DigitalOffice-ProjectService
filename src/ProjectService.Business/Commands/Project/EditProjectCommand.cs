@@ -92,7 +92,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         DbProject editedProject = (await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = projectId })).dbProject;
         if (previousStatus != (int)ProjectStatusType.Active && editedProject.Status == (int)ProjectStatusType.Active)
         {
-          _publish.CreateWorkTimeAsync(
+          await _publish.CreateWorkTimeAsync(
             editedProject.Id,
             editedProject.Users
               .Where(u => u.IsActive)
