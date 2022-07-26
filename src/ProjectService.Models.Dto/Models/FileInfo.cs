@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
@@ -11,6 +12,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
     public string Content { get; set; }
     [Required]
     public string Extension { get; set; }
-    public AccessType Access { get; set; }
+    public FileAccessType Access { get; set; }
   }
 }

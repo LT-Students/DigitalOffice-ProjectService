@@ -8,16 +8,13 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
-using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Models.Department;
-using LT.DigitalOffice.Models.Broker.Models.Position;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
@@ -30,7 +27,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IProjectRepository _repository;
     private readonly IProjectUserRepository _userRepository;
     private readonly IProjectResponseMapper _projectResponseMapper;
-    private readonly IUserInfoMapper _projectUserInfoMapper;
     private readonly IDepartmentInfoMapper _departmentInfoMapper;
     private readonly IFileAccessMapper _accessMapper;
     private readonly IResponseCreator _responseCreator;
@@ -43,20 +39,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IProjectRepository repository,
       IProjectUserRepository userRepository,
       IProjectResponseMapper projectResponsMapper,
-      IUserInfoMapper projectUserInfoMapper,
       IDepartmentInfoMapper departmentInfoMapper,
       IFileAccessMapper accessMapper,
       IResponseCreator responseCreator,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IDepartmentService departmentService,
-      IImageService imageService,
-      IPositionService positionService)
+      IImageService imageService)
     {
       _repository = repository;
       _userRepository = userRepository;
       _projectResponseMapper = projectResponsMapper;
-      _projectUserInfoMapper = projectUserInfoMapper;
       _departmentInfoMapper = departmentInfoMapper;
       _accessMapper = accessMapper;
       _responseCreator = responseCreator;
@@ -79,7 +72,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       DepartmentData department = (await _departmentService.GetDepartmentsAsync(errors: response.Errors, projectsIds: new List<Guid>() { dbProject.Id }))?.FirstOrDefault();
 
-      AccessType accessType = AccessType.Public;
+      FileAccessType accessType = FileAccessType.Public;
 
       DbProjectUser dbProjectUser = (await _userRepository.GetAsync(new List<Guid>() { _httpContextAccessor.HttpContext.GetUserId() }))
         ?.FirstOrDefault();
@@ -87,11 +80,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       if (await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
         || dbProjectUser?.Role == (int)ProjectUserRoleType.Manager)
       {
-        accessType = AccessType.Manager;
+        accessType = FileAccessType.Manager;
       }
       else if (dbProjectUser is not null)
       {
-        accessType = AccessType.Team;
+        accessType = FileAccessType.Team;
       }
 
       List<FileAccess> files = null;

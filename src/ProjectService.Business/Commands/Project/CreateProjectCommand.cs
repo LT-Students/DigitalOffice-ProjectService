@@ -9,13 +9,11 @@ using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
@@ -33,7 +31,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly ICreateProjectRequestValidator _validator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IResponseCreator _responseCreator;
-    private readonly IFileDataMapper _fileDataMapper;
     private readonly IImageService _imageService;
     private readonly IMessageService _messageService;
     private readonly IPublish _publish;
@@ -45,7 +42,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IDbProjectMapper mapper,
       IHttpContextAccessor httpContextAccessor,
       IResponseCreator responseCreator,
-      IFileDataMapper fileDataMapper,
       IImageService imageService,
       IMessageService messageService,
       IPublish publish)
@@ -56,7 +52,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _responseCreator = responseCreator;
-      _fileDataMapper = fileDataMapper;
       _imageService = imageService;
       _messageService = messageService;
       _publish = publish;
@@ -80,11 +75,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       OperationResultResponse<Guid?> response = new();
 
       List<Guid> imagesIds = await _imageService.CreateImagesAsync(request.ProjectImages, response.Errors);
-
-      List<FileAccess> accesses = new List<FileAccess>();
-      List<FileData> files = request.Files.Select(x => _fileDataMapper.Map(x, accesses)).ToList();
-
-      DbProject dbProject = _mapper.Map(request, imagesIds, accesses);
+      
+      DbProject dbProject = _mapper.Map(request, imagesIds);
 
       response.Body = await _repository.CreateAsync(dbProject);
 
@@ -109,9 +101,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
           : Task.CompletedTask,
         usersIds.Any()
           ? _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors)
-          : Task.CompletedTask,
-        request.Files.Any()
-          ? _publish.CreateFilesAsync(files)
           : Task.CompletedTask);
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
