@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -32,9 +33,14 @@ namespace LT.DigitalOffice.ProjectService.Data
       return files.Select(x => x.FileId).ToList();
     }
 
-    public async Task<List<DbProjectFile>> GetAsync(List<Guid> filesIds)
+    public Task<List<DbProjectFile>> GetAsync(Guid projectId, FileAccessType access = FileAccessType.Manager)
     {
-      return await _provider.ProjectsFiles.Where(x => filesIds.Contains(x.FileId)).ToListAsync();
+      return _provider.ProjectsFiles.Where(x => x.ProjectId == projectId && x.Access >= (int)access).ToListAsync();
+    }
+
+    public Task<List<DbProjectFile>> GetAsync(List<Guid> filesIds)
+    {
+      return _provider.ProjectsFiles.Where(x => filesIds.Contains(x.FileId)).ToListAsync();
     }
 
     public async Task<bool> RemoveAsync(List<Guid> filesIds)

@@ -2,6 +2,7 @@
 using LT.DigitalOffice.Kernel.BrokerSupport.Configurations;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.Models.Broker.Requests.Department;
+using LT.DigitalOffice.Models.Broker.Requests.File;
 using LT.DigitalOffice.Models.Broker.Requests.Image;
 using LT.DigitalOffice.Models.Broker.Requests.Message;
 using LT.DigitalOffice.Models.Broker.Requests.Office;
@@ -60,5 +61,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
 
     [AutoInjectRequest(typeof(IFilteredUsersDataRequest))]
     public string FilterUsersDataEndpoint { get; set; }
+
+    // file
+
+    [AutoInjectRequest(typeof(IGetFilesRequest))]
+    public string GetFilesEndpoint { get; set; }
   }
 }

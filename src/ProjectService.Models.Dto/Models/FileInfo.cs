@@ -1,17 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using LT.DigitalOffice.Models.Broker.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+﻿using System;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
 {
   public record FileInfo
   {
-    [Required]
-    public string Name { get; set; }
-    [Required]
-    public string Content { get; set; }
-    [Required]
+    public Guid Id { get; set; }
     public string Extension { get; set; }
-    public FileAccessType Access { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
+    public int Size { get; set; }
   }
 }
