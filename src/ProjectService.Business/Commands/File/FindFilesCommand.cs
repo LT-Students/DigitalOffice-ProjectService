@@ -15,7 +15,6 @@ using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.Http;
@@ -34,7 +33,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
     public FindFilesCommand(
       IFileRepository repository,
-      IFileAccessMapper accessMapper,
       IResponseCreator responseCreator,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,

@@ -36,7 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public async Task<(List<DbProjectFile>, int filesCount)> FindAsync(Guid projectId, BaseFindFilter filter, FileAccessType access = FileAccessType.Manager)
     {
-      if (filter == null)
+      if (filter is null)
       {
         return (null, 0);
       }
