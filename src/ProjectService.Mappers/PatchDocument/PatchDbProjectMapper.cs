@@ -28,7 +28,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.PatchDocument
           {
             dbRequest.Operations.Add(new Operation<DbProject>("replace", "/EndDateUtc", null, null));
           }
-          
+
           dbRequest.Operations.Add(new Operation<DbProject>(item.op, item.path, item.from, (int)status));
           continue;
         }
