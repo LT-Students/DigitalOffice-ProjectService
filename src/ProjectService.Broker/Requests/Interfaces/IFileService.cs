@@ -9,6 +9,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces
   [AutoInject]
   public interface IFileService
   {
-    Task<List<FileCharacteristicsData>> GetFilesAsync(List<Guid> filesIds, List<string> errors = null);
+    Task<List<FileCharacteristicsData>> GetFilesCharacteristicsAsync(List<Guid> filesIds, List<string> errors = null);
   }
 }

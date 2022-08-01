@@ -78,7 +78,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
         return _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.NotFound);
       }
 
-      List<FileCharacteristicsData> files = await _fileService.GetFilesAsync(dbFiles.Select(file => file.FileId).ToList(), errors);
+      List<FileCharacteristicsData> files = await _fileService.GetFilesCharacteristicsAsync(dbFiles.Select(file => file.FileId).ToList(), errors);
 
       return errors.Any()
         ? _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.BadRequest, errors)

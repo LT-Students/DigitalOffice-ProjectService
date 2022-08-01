@@ -25,7 +25,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       _rcGetFiles = rcGetFiles;
     }
 
-    public async Task<List<FileCharacteristicsData>> GetFilesAsync(List<Guid> filesIds, List<string> errors = null)
+    public async Task<List<FileCharacteristicsData>> GetFilesCharacteristicsAsync(List<Guid> filesIds, List<string> errors = null)
     {
       if (filesIds is null || !filesIds.Any())
       {
