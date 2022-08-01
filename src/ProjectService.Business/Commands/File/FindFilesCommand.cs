@@ -71,14 +71,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
         accessType = FileAccessType.Team;
       }
 
-      (List<DbProjectFile> dbProjects, int totalCount) = await _repository.FindAsync(projectId, findFilter, accessType);
+      (List<DbProjectFile> dbFiles, int totalCount) = await _repository.FindAsync(projectId, findFilter, accessType);
 
-      if (dbProjects is null)
+      if (dbFiles is null)
       {
         return _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.NotFound);
       }
 
-      List<FileCharacteristicsData> files = await _fileService.GetFilesAsync(dbProjects.Select(file => file.Id).ToList(), errors);
+      List<FileCharacteristicsData> files = await _fileService.GetFilesAsync(dbFiles.Select(file => file.Id).ToList(), errors);
 
       return errors.Any()
         ? _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.BadRequest, errors)
