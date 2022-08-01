@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.Requests;
 using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
@@ -27,6 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IProjectUserRepository _projectUserRepository;
     private readonly IFileService _fileService;
+    private readonly IBaseFindFilterValidator _findFilterValidator;
 
     public FindFilesCommand(
       IFileRepository repository,
@@ -35,7 +39,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IProjectUserRepository projectUserRepository,
-      IFileService fileService)
+      IFileService fileService,
+      IBaseFindFilterValidator findFilterValidator)
     {
       _repository = repository;
       _responseCreator = responseCreator;
@@ -43,10 +48,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
       _httpContextAccessor = httpContextAccessor;
       _projectUserRepository = projectUserRepository;
       _fileService = fileService;
+      _findFilterValidator = findFilterValidator;
     }
 
-    public async Task<FindResultResponse<FileCharacteristicsData>> ExecuteAsync(Guid projectId)
+    public async Task<FindResultResponse<FileCharacteristicsData>> ExecuteAsync(Guid projectId, BaseFindFilter findFilter)
     {
+      if (!_findFilterValidator.ValidateCustom(findFilter, out List<string> errors))
+      {
+        return _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.BadRequest, errors);
+      }
+
       FileAccessType accessType = FileAccessType.Public;
 
       DbProjectUser user = (await _projectUserRepository.GetAsync(new List<Guid> { _httpContextAccessor.HttpContext.GetUserId() })).FirstOrDefault();
@@ -60,21 +71,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
         accessType = FileAccessType.Team;
       }
 
-      List<Guid> filesIds = (await _repository.GetAsync(projectId, accessType))?.Select(x => x.FileId).ToList();
+      (List<DbProjectFile> dbProjects, int totalCount) = await _repository.FindAsync(projectId, findFilter, accessType);
 
-      if (filesIds is null)
+      if (dbProjects is null)
       {
         return _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.NotFound);
       }
 
-      List<string> errors = new();
-      List<FileCharacteristicsData> files = await _fileService.GetFilesAsync(filesIds, errors);
+      List<FileCharacteristicsData> files = await _fileService.GetFilesAsync(dbProjects.Select(file => file.Id).ToList(), errors);
 
       return errors.Any()
         ? _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.BadRequest, errors)
         : new FindResultResponse<FileCharacteristicsData>(
           body: files,
-          totalCount: files.Count);
+          totalCount: totalCount);
     }
   }
 }

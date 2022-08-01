@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using LT.DigitalOffice.Kernel.Requests;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
@@ -15,9 +16,10 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [HttpGet("find")]
     public async Task<FindResultResponse<FileCharacteristicsData>> FindAsync(
       [FromServices] IFindFilesCommand command,
-      [FromQuery] Guid projectId)
+      [FromQuery] Guid projectId,
+      [FromQuery] BaseFindFilter findFilter)
     {
-      return await command.ExecuteAsync(projectId);
+      return await command.ExecuteAsync(projectId, findFilter);
     }
 
     [HttpDelete("remove")]
