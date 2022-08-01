@@ -44,12 +44,10 @@ namespace LT.DigitalOffice.ProjectService.Data
       IQueryable<DbProjectFile> dbFilesQuery = _provider.ProjectsFiles
         .AsQueryable();
 
-      int totalCount = await dbFilesQuery.CountAsync();
-
-      List<DbProjectFile> dbFiles = await dbFilesQuery.Where(file => file.ProjectId == projectId && file.Access >= (int)access)
-        .Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync();
-
-      return (dbFiles, totalCount);
+      return (
+        await dbFilesQuery.Where(file => file.ProjectId == projectId && file.Access >= (int)access)
+          .Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
+        await dbFilesQuery.CountAsync());
     }
 
     public Task<List<DbProjectFile>> GetAsync(List<Guid> filesIds)

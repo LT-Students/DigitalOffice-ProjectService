@@ -8,7 +8,6 @@ using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
-using LT.DigitalOffice.Kernel.Requests;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Enums;
@@ -18,6 +17,7 @@ using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File
@@ -51,7 +51,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
       _findFilterValidator = findFilterValidator;
     }
 
-    public async Task<FindResultResponse<FileCharacteristicsData>> ExecuteAsync(Guid projectId, BaseFindFilter findFilter)
+    public async Task<FindResultResponse<FileCharacteristicsData>> ExecuteAsync(FindProjectFilesFilter findFilter)
     {
       if (!_findFilterValidator.ValidateCustom(findFilter, out List<string> errors))
       {
@@ -71,14 +71,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
         accessType = FileAccessType.Team;
       }
 
-      (List<DbProjectFile> dbFiles, int totalCount) = await _repository.FindAsync(projectId, findFilter, accessType);
+      (List<DbProjectFile> dbFiles, int totalCount) = await _repository.FindAsync(findFilter.ProjectId, findFilter, accessType);
 
       if (dbFiles is null)
       {
         return _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.NotFound);
       }
 
-      List<FileCharacteristicsData> files = await _fileService.GetFilesAsync(dbFiles.Select(file => file.Id).ToList(), errors);
+      List<FileCharacteristicsData> files = await _fileService.GetFilesAsync(dbFiles.Select(file => file.FileId).ToList(), errors);
 
       return errors.Any()
         ? _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.BadRequest, errors)

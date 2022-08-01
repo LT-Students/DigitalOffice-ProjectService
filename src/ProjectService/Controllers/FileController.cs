@@ -5,6 +5,7 @@ using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LT.DigitalOffice.ProjectService.Controllers
@@ -16,10 +17,9 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     [HttpGet("find")]
     public async Task<FindResultResponse<FileCharacteristicsData>> FindAsync(
       [FromServices] IFindFilesCommand command,
-      [FromQuery] Guid projectId,
-      [FromQuery] BaseFindFilter findFilter)
+      [FromQuery] FindProjectFilesFilter findFilter)
     {
-      return await command.ExecuteAsync(projectId, findFilter);
+      return await command.ExecuteAsync(findFilter);
     }
 
     [HttpDelete("remove")]
