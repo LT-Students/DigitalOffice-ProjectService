@@ -58,12 +58,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _publish = publish;
     }
 
-    public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, JsonPatchDocument<EditProjectRequest> request)
+    public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId,
+      JsonPatchDocument<EditProjectRequest> request)
     {
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !await _userRepository.DoesExistAsync(userId, projectId, true))
+          && !await _userRepository.DoesExistAsync(userId, projectId, true))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
@@ -76,7 +77,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
           validationResult.Errors.Select(e => e.ErrorMessage).ToList());
       }
 
-      int previousStatus = (await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = projectId })).dbProject.Status;
+      int previousStatus = (await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = projectId })).dbProject
+        .Status;
 
       OperationResultResponse<bool> response = new();
       response.Body = await _projectRepository.EditAsync(projectId, _mapper.Map(request));
@@ -89,15 +91,17 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       {
         await _globalCache.RemoveAsync(projectId);
 
-        DbProject editedProject = (await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = projectId })).dbProject;
-        if (previousStatus != (int)ProjectStatusType.Active && editedProject.Status == (int)ProjectStatusType.Active)
+        (DbProject dbProject, IEnumerable<Guid> usersIds, _) =
+          await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = projectId });
+        List<Guid> usersIdsList = usersIds.ToList();
+
+        if (previousStatus != (int)ProjectStatusType.Active
+            && dbProject.Status == (int)ProjectStatusType.Active
+            && usersIdsList.Any())
         {
           await _publish.CreateWorkTimeAsync(
-            editedProject.Id,
-            editedProject.Users
-              .Where(u => u.IsActive)
-              .Select(u => u.UserId)
-              .ToList());
+            projectId,
+            usersIdsList);
         }
       }
 
