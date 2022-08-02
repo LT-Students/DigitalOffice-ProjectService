@@ -58,6 +58,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
       FileAccessType accessType = FileAccessType.Public;
 
+      //ToDo: add new method to repository
       DbProjectUser user = (await _projectUserRepository.GetAsync(findFilter.ProjectId, true))
         .Where(user => user.Id == _httpContextAccessor.HttpContext.GetUserId()).FirstOrDefault();
       if (user?.Role == (int)ProjectUserRoleType.Manager
