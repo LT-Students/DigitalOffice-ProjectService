@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LT.DigitalOffice.Kernel.Requests;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace LT.DigitalOffice.ProjectService.Data
@@ -32,9 +35,25 @@ namespace LT.DigitalOffice.ProjectService.Data
       return files.Select(x => x.FileId).ToList();
     }
 
-    public async Task<List<DbProjectFile>> GetAsync(List<Guid> filesIds)
+    public async Task<(List<DbProjectFile>, int filesCount)> FindAsync(FindProjectFilesFilter filter, FileAccessType access = FileAccessType.Manager)
     {
-      return await _provider.ProjectsFiles.Where(x => filesIds.Contains(x.FileId)).ToListAsync();
+      if (filter is null)
+      {
+        return (null, 0);
+      }
+
+      IQueryable<DbProjectFile> dbFilesQuery = _provider.ProjectsFiles
+        .AsQueryable();
+
+      return (
+        await dbFilesQuery.Where(file => file.ProjectId == filter.ProjectId && file.Access >= (int)access)
+          .Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
+        await dbFilesQuery.CountAsync());
+    }
+
+    public Task<List<DbProjectFile>> GetAsync(List<Guid> filesIds)
+    {
+      return _provider.ProjectsFiles.Where(x => filesIds.Contains(x.FileId)).ToListAsync();
     }
 
     public async Task<bool> RemoveAsync(List<Guid> filesIds)

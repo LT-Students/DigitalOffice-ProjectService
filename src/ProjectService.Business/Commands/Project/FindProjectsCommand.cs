@@ -58,8 +58,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         : default;
 
       return new FindResultResponse<ProjectInfo>(
-      body: dbProjects.Select(p => _mapper.Map(p.dbProject, p.usersCount, _departmentMapper.Map(departments?.FirstOrDefault(d => d.ProjectsIds.Contains(p.dbProject.Id))))).ToList(),
-      totalCount: totalCount);
+        body: dbProjects.Select(p => _mapper.Map(p.dbProject, p.usersCount, _departmentMapper.Map(departments?.FirstOrDefault(d => d.ProjectsIds.Contains(p.dbProject.Id))))).ToList(),
+        totalCount: totalCount);
     }
   }
 }
