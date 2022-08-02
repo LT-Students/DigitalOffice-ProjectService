@@ -58,9 +58,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
       FileAccessType accessType = FileAccessType.Public;
 
-      DbProjectUser user = (await _projectUserRepository.GetAsync(new List<Guid> { _httpContextAccessor.HttpContext.GetUserId() })).FirstOrDefault();
-      if (await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        || user?.Role == (int)ProjectUserRoleType.Manager)
+      DbProjectUser user = (await _projectUserRepository.GetAsync(findFilter.ProjectId, true))
+        .Where(user => user.Id == _httpContextAccessor.HttpContext.GetUserId()).FirstOrDefault();
+      if (user?.Role == (int)ProjectUserRoleType.Manager
+        || await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
       {
         accessType = FileAccessType.Manager;
       }
@@ -69,20 +70,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
         accessType = FileAccessType.Team;
       }
 
-      (List<DbProjectFile> dbFiles, int totalCount) = await _repository.FindAsync(findFilter.ProjectId, findFilter, accessType);
+      (List<DbProjectFile> dbFiles, int totalCount) = await _repository.FindAsync(findFilter, accessType);
 
-      if (dbFiles is null)
-      {
-        return _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.NotFound);
-      }
+      List<FileCharacteristicsData> files = await _fileService.GetFilesCharacteristicsAsync(dbFiles?.Select(file => file.FileId).ToList(), errors);
 
-      List<FileCharacteristicsData> files = await _fileService.GetFilesCharacteristicsAsync(dbFiles.Select(file => file.FileId).ToList(), errors);
-
-      return errors.Any()
-        ? _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.BadRequest, errors)
-        : new FindResultResponse<FileCharacteristicsData>(
-          body: files,
-          totalCount: totalCount);
+      return new FindResultResponse<FileCharacteristicsData>(
+        body: files,
+        totalCount: totalCount);
     }
   }
 }

@@ -7,6 +7,7 @@ using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace LT.DigitalOffice.ProjectService.Data
@@ -34,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       return files.Select(x => x.FileId).ToList();
     }
 
-    public async Task<(List<DbProjectFile>, int filesCount)> FindAsync(Guid projectId, BaseFindFilter filter, FileAccessType access = FileAccessType.Manager)
+    public async Task<(List<DbProjectFile>, int filesCount)> FindAsync(FindProjectFilesFilter filter, FileAccessType access = FileAccessType.Manager)
     {
       if (filter is null)
       {
@@ -45,7 +46,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         .AsQueryable();
 
       return (
-        await dbFilesQuery.Where(file => file.ProjectId == projectId && file.Access >= (int)access)
+        await dbFilesQuery.Where(file => file.ProjectId == filter.ProjectId && file.Access >= (int)access)
           .Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
         await dbFilesQuery.CountAsync());
     }
