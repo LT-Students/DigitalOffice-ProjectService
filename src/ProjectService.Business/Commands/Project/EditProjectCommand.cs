@@ -64,7 +64,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-          && !await _userRepository.DoesExistAsync(userId, projectId, true))
+        && !await _userRepository.DoesExistAsync(userId, projectId, true))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
@@ -96,8 +96,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         List<Guid> usersIdsList = usersIds.ToList();
 
         if (previousStatus != (int)ProjectStatusType.Active
-            && dbProject.Status == (int)ProjectStatusType.Active
-            && usersIdsList.Any())
+          && dbProject.Status == (int)ProjectStatusType.Active
+          && usersIdsList.Any())
         {
           await _publish.CreateWorkTimeAsync(
             projectId,
