@@ -8,8 +8,8 @@ using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,7 +24,9 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     private IQueryable<DbProjectUser> CreateGetPredicate(IGetProjectsUsersRequest request)
     {
-      IQueryable<DbProjectUser> projectUsersQuery = _provider.ProjectsUsers.AsQueryable();
+      IQueryable<DbProjectUser> projectUsersQuery = _provider.ProjectsUsers
+        .Where(pu => pu.Project.Status == (int)ProjectStatusType.Active)
+        .AsQueryable();
 
       if (request.UsersIds != null && request.UsersIds.Any())
       {

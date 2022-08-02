@@ -10,15 +10,15 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using MassTransit;
 
-namespace LT.DigitalOffice.ProjectService.Broker
+namespace LT.DigitalOffice.ProjectService.Broker.Consumers
 {
   public class GetProjectsUsersConsumer : IConsumer<IGetProjectsUsersRequest>
   {
-    private readonly IProjectUserRepository _userRepository;
+    private readonly IProjectUserRepository _projectUserRepository;
 
     private async Task<object> GetProjectUsersAsync(IGetProjectsUsersRequest request)
     {
-      (List<DbProjectUser> users, int totalCount) = await _userRepository.GetAsync(request);
+      (List<DbProjectUser> users, int totalCount) = await _projectUserRepository.GetAsync(request);
 
       return IGetProjectsUsersResponse.CreateObj(users.Select(
         p =>
@@ -31,9 +31,9 @@ namespace LT.DigitalOffice.ProjectService.Broker
         totalCount);
     }
 
-    public GetProjectsUsersConsumer(IProjectUserRepository userRepository)
+    public GetProjectsUsersConsumer(IProjectUserRepository projectUserRepository)
     {
-      _userRepository = userRepository;
+      _projectUserRepository = projectUserRepository;
     }
 
     public async Task Consume(ConsumeContext<IGetProjectsUsersRequest> context)
