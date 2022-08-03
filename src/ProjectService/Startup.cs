@@ -240,6 +240,7 @@ namespace LT.DigitalOffice.ProjectService
       x.AddConsumer<DisactivateProjectUserConsumer>();
       x.AddConsumer<CheckFilesAccessesConsumer>();
       x.AddConsumer<CreateFilesConsumer>();
+      x.AddConsumer<CheckProjectAndUserExistenceConsumer>();
     }
 
     private void ConfigureEndpoints(
@@ -287,9 +288,9 @@ namespace LT.DigitalOffice.ProjectService
         ep.ConfigureConsumer<CheckFilesAccessesConsumer>(context);
       });
 
-      cfg.ReceiveEndpoint(rabbitMqConfig.CreateFilesEndpoint, ep =>
+      cfg.ReceiveEndpoint(rabbitMqConfig.CheckProjectAndUserExistenceEndpoint, ep =>
       {
-        ep.ConfigureConsumer<CreateFilesConsumer>(context);
+        ep.ConfigureConsumer<CheckProjectAndUserExistenceConsumer>(context);
       });
     }
 

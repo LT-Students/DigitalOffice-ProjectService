@@ -67,6 +67,12 @@ namespace LT.DigitalOffice.ProjectService.Data
         .Where(pu => pu.ProjectId == projectId && usersIds.Contains(pu.UserId)).ToListAsync();
     }
 
+    public async Task<ProjectUserRoleType?> GetUserRoleAsync(Guid projectId, Guid userId)
+    {
+      return (ProjectUserRoleType?)((await _provider.ProjectsUsers
+        .Where(pu => pu.ProjectId == projectId && userId == pu.UserId).FirstOrDefaultAsync())?.Role);
+    }
+
     public async Task<(List<DbProjectUser>, int totalCount)> GetAsync(IGetProjectsUsersRequest request)
     {
       IQueryable<DbProjectUser> projectUsers = CreateGetPredicate(request);
