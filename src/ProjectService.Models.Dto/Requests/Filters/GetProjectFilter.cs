@@ -8,10 +8,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
     [FromQuery(Name = "projectid")]
     public Guid ProjectId { get; set; }
 
-    [FromQuery(Name = "includefiles")]
-    public bool IncludeFiles { get; set; } = false;
+    [FromQuery(Name = "includedepartment")]
+    public bool IncludeDepartment { get; set; } = false;
 
-    [FromQuery(Name = "includeimages")]
-    public bool IncludeImages { get; set; } = false;
+    [FromQuery(Name = "includeprojectusers")]
+    public bool IncludeProjectUsers { get; set; } = false;
   }
 }

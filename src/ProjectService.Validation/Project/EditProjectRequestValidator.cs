@@ -67,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         new()
         {
           { x => Task.FromResult(!string.IsNullOrEmpty(x.value?.ToString().Trim())), "Name must not be empty." },
-          { x => Task.FromResult(x.value.ToString().Trim().Length <= 150), "Name is too long." },
+          { x => Task.FromResult(x.value.ToString().Trim().Length < 151), "Name is too long." },
           { async x => !await _projectRepository.DoesNameExistAsync(x.value?.ToString()?.Trim()), "The project name already exist." }
         }, CascadeMode.Stop);
 
@@ -93,7 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => x.value == null || x.value.ToString().Trim().Length <= 300, "Short description is too long." },
+          { x => x.value == null || x.value.ToString().Trim().Length < 301, "Short description is too long." },
         });
 
       #endregion
@@ -105,7 +105,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => x.value == null || x.value.ToString().Trim().Length <= 150, "Customer is too long." },
+          { x => x.value == null || x.value.ToString().Trim().Length < 151, "Customer is too long." },
         });
 
       #endregion

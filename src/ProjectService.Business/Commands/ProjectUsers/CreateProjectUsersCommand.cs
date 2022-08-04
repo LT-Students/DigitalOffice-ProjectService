@@ -83,7 +83,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       if (result)
       {
-        int projectStatus = (await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = request.ProjectId })).dbProject.Status;
+        int projectStatus = (await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = request.ProjectId })).Status;
+
         if (projectStatus == (int)ProjectStatusType.Active)
         {
           await _publish.CreateWorkTimeAsync(

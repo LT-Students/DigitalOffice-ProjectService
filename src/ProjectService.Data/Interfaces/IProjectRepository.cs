@@ -12,7 +12,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
   [AutoInject]
   public interface IProjectRepository
   {
-    Task<(DbProject dbProject, IEnumerable<Guid> usersIds, int usersCount)> GetAsync(GetProjectFilter filter);
+    Task<DbProject> GetAsync(GetProjectFilter filter);
 
     Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request);
 
