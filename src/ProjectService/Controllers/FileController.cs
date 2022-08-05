@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.Requests;
+﻿using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Controllers
   public class FileController : ControllerBase
   {
     [HttpGet("find")]
-    public async Task<FindResultResponse<FileCharacteristicsData>> FindAsync(
+    public async Task<FindResultResponse<FileInfo>> FindAsync(
       [FromServices] IFindFilesCommand command,
       [FromQuery] FindProjectFilesFilter findFilter)
     {
