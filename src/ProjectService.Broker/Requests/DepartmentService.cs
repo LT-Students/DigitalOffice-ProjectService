@@ -38,11 +38,11 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
     {
       string key;
 
-      if (usersIds != null && usersIds.Any())
+      if (usersIds is not null && usersIds.Any())
       {
         key = usersIds.GetRedisCacheHashCode(departmentsIds.FirstOrDefault());
       }
-      else if (departmentsIds != null && departmentsIds.Any())
+      else if (departmentsIds is not null && departmentsIds.Any())
       {
         key = departmentsIds.GetRedisCacheHashCode();
       }

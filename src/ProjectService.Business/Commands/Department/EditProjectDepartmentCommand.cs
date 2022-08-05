@@ -8,26 +8,22 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Department.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Department;
-using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
 {
   public class EditProjectDepartmentCommand : IEditProjectDepartmentCommand
   {
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IAccessValidator _accessValidator;
     private readonly IDbProjectDepartmentMapper _mapper;
     private readonly IProjectDepartmentRepository _departmentRepository;
     private readonly IResponseCreator _responseCreator;
 
     public EditProjectDepartmentCommand(
-      IHttpContextAccessor httpContextAccessor,
       IAccessValidator accessValidator,
       IDbProjectDepartmentMapper mapper,
       IProjectDepartmentRepository projectRepository,
       IResponseCreator responseCreator)
     {
-      _httpContextAccessor = httpContextAccessor;
       _accessValidator = accessValidator;
       _mapper = mapper;
       _departmentRepository = projectRepository;
@@ -47,8 +43,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
         await _departmentRepository.CreateAsync(
           _mapper.Map(request.ProjectId, request.DepartmentId.Value));
       }
-
-      _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
       return new()
       {

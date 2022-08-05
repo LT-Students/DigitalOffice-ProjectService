@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       modelBuilder.ApplyConfigurationsFromAssembly(
-          Assembly.Load("LT.DigitalOffice.ProjectService.Models.Db"));
+        Assembly.Load("LT.DigitalOffice.ProjectService.Models.Db"));
     }
 
     public ProjectServiceDbContext(DbContextOptions<ProjectServiceDbContext> options)

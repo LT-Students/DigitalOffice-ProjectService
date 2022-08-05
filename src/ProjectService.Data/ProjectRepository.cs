@@ -162,17 +162,15 @@ namespace LT.DigitalOffice.ProjectService.Data
       return (await projects.ToListAsync(), totalCount);
     }
 
-    public async Task<Guid?> CreateAsync(DbProject dbProject)
+    public Task CreateAsync(DbProject dbProject)
     {
-      if (dbProject == null)
+      if (dbProject is null)
       {
         return null;
       }
 
       _provider.Projects.Add(dbProject);
-      await _provider.SaveAsync();
-
-      return dbProject.Id;
+      return _provider.SaveAsync();
     }
 
     public async Task<bool> EditAsync(Guid projectId, JsonPatchDocument<DbProject> request)

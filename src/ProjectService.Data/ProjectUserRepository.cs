@@ -98,18 +98,16 @@ namespace LT.DigitalOffice.ProjectService.Data
       return await projectUsersQuery.ToListAsync();
     }
 
-    public async Task<bool> CreateAsync(List<DbProjectUser> newUsers)
+    public Task CreateAsync(List<DbProjectUser> newUsers)
     {
       if (newUsers is null)
       {
-        return false;
+        return null;
       }
 
       _provider.ProjectsUsers.AddRange(newUsers);
 
-      await _provider.SaveAsync();
-
-      return true;
+      return _provider.SaveAsync();
     }
 
     public async Task<bool> EditIsActiveAsync(List<DbProjectUser> dbUsers, Guid createdBy)

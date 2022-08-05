@@ -8,7 +8,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
   [AutoInject]
   public interface IProjectDepartmentRepository
   {
-    Task<Guid?> CreateAsync(DbProjectDepartment request);
+    Task CreateAsync(DbProjectDepartment request);
 
     Task<bool> EditAsync(Guid projectId, Guid? departmentId);
   }

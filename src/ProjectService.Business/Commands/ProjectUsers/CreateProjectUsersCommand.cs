@@ -78,30 +78,23 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       List<DbProjectUser> existingUsers = await _projectUserRepository.GetExistingUsersAsync(request.ProjectId, request.Users.Select(u => u.UserId));
       List<UserRequest> newUsers = request.Users.ExceptBy(existingUsers.Select(x => x.UserId), request => request.UserId).ToList();
 
-      bool result = await _projectUserRepository.CreateAsync(_mapper.Map(request.ProjectId, newUsers));
+      await _projectUserRepository.CreateAsync(_mapper.Map(request.ProjectId, newUsers));
       await _projectUserRepository.EditIsActiveAsync(existingUsers, _httpContextAccessor.HttpContext.GetUserId());
 
-      if (result)
-      {
-        int projectStatus = (await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = request.ProjectId })).Status;
+      int projectStatus = (await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = request.ProjectId })).Status;
 
-        if (projectStatus == (int)ProjectStatusType.Active)
-        {
-          await _publish.CreateWorkTimeAsync(
-            request.ProjectId,
-            newUsers.Select(u => u.UserId).ToList());
-        }
-
-        await _globalCache.RemoveAsync(request.ProjectId);
-      }
-      else
+      if (projectStatus == (int)ProjectStatusType.Active)
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+        await _publish.CreateWorkTimeAsync(
+          request.ProjectId,
+          newUsers.Select(u => u.UserId).ToList());
       }
+
+      await _globalCache.RemoveAsync(request.ProjectId);
 
       return new()
       {
-        Body = result,
+        Body = true,
         Errors = errors
       };
     }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.Requests;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
@@ -24,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public async Task<List<Guid>> CreateAsync(List<DbProjectFile> files)
     {
-      if (files == null)
+      if (files is null)
       {
         return null;
       }
@@ -58,7 +57,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public async Task<bool> RemoveAsync(List<Guid> filesIds)
     {
-      if (filesIds == null)
+      if (filesIds is null)
       {
         return false;
       }

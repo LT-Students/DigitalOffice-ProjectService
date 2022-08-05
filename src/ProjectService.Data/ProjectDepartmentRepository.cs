@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<Guid?> CreateAsync(DbProjectDepartment request)
+    public Task CreateAsync(DbProjectDepartment request)
     {
       if (request is null)
       {
@@ -30,9 +30,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       }
 
       _provider.ProjectsDepartments.Add(request);
-      await _provider.SaveAsync();
-
-      return request.Id;
+      return _provider.SaveAsync();
     }
 
     public async Task<bool> EditAsync(Guid projectId, Guid? departmentId)

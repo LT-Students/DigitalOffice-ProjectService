@@ -72,22 +72,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       List<Guid> imagesIds = await _imageService.CreateImagesAsync(request.ProjectImages, response.Errors);
       DbProject dbProject = _mapper.Map(request, imagesIds);
 
-      response.Body = await _repository.CreateAsync(dbProject);
+      await _repository.CreateAsync(dbProject);
 
-      if (response.Body is null)
+      if (request.Users.Any() && request.Status == (int)ProjectStatusType.Active)
       {
-        return _responseCreator.CreateFailureResponse<Guid?>(HttpStatusCode.BadRequest);
-      }
-
-      List<Guid> usersIds = request.Users.Select(u => u.UserId).ToList();
-
-      if (usersIds.Any() && request.Status == (int)ProjectStatusType.Active)
-      {
-        await _publish.CreateWorkTimeAsync(dbProject.Id, usersIds);
+        await _publish.CreateWorkTimeAsync(
+          dbProject.Id,
+          usersIds: request.Users.Select(u => u.UserId).ToList());
       }
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
+      response.Body = dbProject.Id;
       return response;
     }
   }
