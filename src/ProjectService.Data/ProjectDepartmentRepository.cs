@@ -11,7 +11,6 @@ namespace LT.DigitalOffice.ProjectService.Data
 {
   public class ProjectDepartmentRepository : IProjectDepartmentRepository
   {
-
     private readonly IDataProvider _provider;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
