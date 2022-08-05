@@ -7,8 +7,8 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
 {
   [AutoInject]
-    public interface IGetProjectCommand
-    {
-        Task<OperationResultResponse<ProjectResponse>> ExecuteAsync(GetProjectFilter filter);
-    }
+  public interface IGetProjectCommand
+  {
+    Task<OperationResultResponse<ProjectResponse>> ExecuteAsync(GetProjectFilter filter);
+  }
 }
