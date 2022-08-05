@@ -1,10 +1,9 @@
-﻿using LT.DigitalOffice.Kernel.Attributes;
+﻿using System;
+using System.Threading.Tasks;
+using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
-using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.JsonPatch;
-using System;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
 {
@@ -13,14 +12,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
   /// Provides method for editing an existing project.
   /// </summary>
   [AutoInject]
-    public interface IEditProjectCommand
-    {
-        /// <summary>
-        /// Calls methods to edit the existing project. Returns true if project edited.
-        /// </summary>
-        /// <param name="projectId">Project id to update the project.</param>
-        /// <param name="request">Data to update the project.</param>
-        /// <returns></returns>
-        Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, JsonPatchDocument<EditProjectRequest> request);
-    }
+  public interface IEditProjectCommand
+  {
+    /// <summary>
+    /// Calls methods to edit the existing project. Returns true if project edited.
+    /// </summary>
+    /// <param name="projectId">Project id to update the project.</param>
+    /// <param name="request">Data to update the project.</param>
+    /// <returns></returns>
+    Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, JsonPatchDocument<EditProjectRequest> request);
+  }
 }

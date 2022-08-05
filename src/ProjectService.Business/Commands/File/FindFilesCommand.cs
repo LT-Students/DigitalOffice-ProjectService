@@ -17,7 +17,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.File;
 using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File
@@ -81,7 +81,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
       return new FindResultResponse<FileInfo>(
         body: files?.Select(file => _fileMapper.Map(
-          file, 
+          file,
           (FileAccessType)dbFiles.Where(x => x.FileId == file.Id).Select(x => x.Access).FirstOrDefault())).ToList(),
         totalCount: totalCount);
     }
