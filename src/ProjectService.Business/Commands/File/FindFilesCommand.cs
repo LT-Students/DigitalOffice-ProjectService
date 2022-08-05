@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -15,7 +14,9 @@ using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
 using Microsoft.AspNetCore.Http;
 
@@ -30,6 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
     private readonly IProjectUserRepository _projectUserRepository;
     private readonly IFileService _fileService;
     private readonly IBaseFindFilterValidator _findFilterValidator;
+    private readonly IFileInfoMapper _fileMapper;
 
     public FindFilesCommand(
       IFileRepository repository,
@@ -38,7 +40,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
       IHttpContextAccessor httpContextAccessor,
       IProjectUserRepository projectUserRepository,
       IFileService fileService,
-      IBaseFindFilterValidator findFilterValidator)
+      IBaseFindFilterValidator findFilterValidator,
+      IFileInfoMapper fileMapper)
     {
       _repository = repository;
       _responseCreator = responseCreator;
@@ -47,13 +50,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
       _projectUserRepository = projectUserRepository;
       _fileService = fileService;
       _findFilterValidator = findFilterValidator;
+      _fileMapper = fileMapper;
     }
 
-    public async Task<FindResultResponse<FileCharacteristicsData>> ExecuteAsync(FindProjectFilesFilter findFilter)
+    public async Task<FindResultResponse<FileInfo>> ExecuteAsync(FindProjectFilesFilter findFilter)
     {
       if (!_findFilterValidator.ValidateCustom(findFilter, out List<string> errors))
       {
-        return _responseCreator.CreateFailureFindResponse<FileCharacteristicsData>(HttpStatusCode.BadRequest, errors);
+        return _responseCreator.CreateFailureFindResponse<FileInfo>(HttpStatusCode.BadRequest, errors);
       }
 
       FileAccessType accessType = FileAccessType.Public;
@@ -75,8 +79,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
       List<FileCharacteristicsData> files = await _fileService.GetFilesCharacteristicsAsync(dbFiles?.Select(file => file.FileId).ToList(), errors);
 
-      return new FindResultResponse<FileCharacteristicsData>(
-        body: files,
+      return new FindResultResponse<FileInfo>(
+        body: files?.Select(file => _fileMapper.Map(
+          file, 
+          (FileAccessType)dbFiles.Where(x => x.FileId == file.Id).Select(x => x.Access).FirstOrDefault())).ToList(),
         totalCount: totalCount);
     }
   }
