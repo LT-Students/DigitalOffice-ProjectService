@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
 {
   [DbContext(typeof(ProjectServiceDbContext))]
-  [Migration("20220531121500_InitialTables")]
+  [Migration("20220805121500_InitialTables")]
   public class InitialTables : Migration
   {
     private void AddProjectsTable(MigrationBuilder migrationBuilder)
@@ -85,6 +85,36 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
         .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
     }
 
+    private void CreateTableProjectsDepartments(MigrationBuilder migrationBuilder)
+    {
+      migrationBuilder.CreateTable(
+        name: DbProjectDepartment.TableName,
+        columns: table => new
+        {
+          Id = table.Column<Guid>(nullable: false),
+          ProjectId = table.Column<Guid>(nullable: false),
+          DepartmentId = table.Column<Guid>(nullable: false),
+          IsActive = table.Column<bool>(nullable: false),
+          CreatedBy = table.Column<Guid>(nullable: false),
+          PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
+            .Annotation("SqlServer:IsTemporal", true)
+            .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
+            .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart"),
+          PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
+            .Annotation("SqlServer:IsTemporal", true)
+            .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
+            .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart")
+        },
+        constraints: table =>
+        {
+          table.PrimaryKey($"PK_{DbProjectDepartment.TableName}", x => x.Id);
+        })
+        .Annotation("SqlServer:IsTemporal", true)
+        .Annotation("SqlServer:TemporalHistoryTableName", $"{DbProjectDepartment.TableName}History")
+        .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
+        .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+    }
+
     private void AddProjectImagesTable(MigrationBuilder migrationBuilder)
     {
       migrationBuilder.CreateTable(
@@ -110,6 +140,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef.Migrations
       AddProjectUsersTable(migrationBuilder);
 
       AddProjectImagesTable(migrationBuilder);
+
+      CreateTableProjectsDepartments(migrationBuilder);
     }
   }
 }

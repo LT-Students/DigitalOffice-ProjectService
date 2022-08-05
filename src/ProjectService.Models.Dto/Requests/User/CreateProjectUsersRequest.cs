@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
+namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.User
 {
   public record CreateProjectUsersRequest
   {

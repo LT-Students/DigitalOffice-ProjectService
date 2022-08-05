@@ -1,6 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces
 {
-    /// <summary>
-    /// Represents interface for a command in command pattern.
-    /// Provides method for editing an existing project.
-    /// </summary>
-    [AutoInject]
+  /// <summary>
+  /// Represents interface for a command in command pattern.
+  /// Provides method for editing an existing project.
+  /// </summary>
+  [AutoInject]
     public interface IEditProjectCommand
     {
         /// <summary>

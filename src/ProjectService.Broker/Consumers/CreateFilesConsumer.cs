@@ -9,11 +9,11 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
 {
   public class CreateFilesConsumer : IConsumer<ICreateFilesPublish>
   {
-    private readonly IFileRepository _repository;
+    private readonly IProjectFileRepository _repository;
     private readonly IDbProjectFileMapper _mapper;
 
     public CreateFilesConsumer(
-      IFileRepository repository,
+      IProjectFileRepository repository,
       IDbProjectFileMapper mapper)
     {
       _repository = repository;

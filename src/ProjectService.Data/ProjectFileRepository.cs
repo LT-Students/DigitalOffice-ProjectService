@@ -7,16 +7,16 @@ using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.File;
 using Microsoft.EntityFrameworkCore;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
-  public class FileRepository : IFileRepository
+  public class ProjectFileRepository : IProjectFileRepository
   {
     private readonly IDataProvider _provider;
 
-    public FileRepository(
+    public ProjectFileRepository(
       IDataProvider provider)
     {
       _provider = provider;

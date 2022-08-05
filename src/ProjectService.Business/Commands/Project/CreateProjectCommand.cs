@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
-using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
@@ -16,7 +15,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
 using Microsoft.AspNetCore.Http;
 
@@ -82,18 +81,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       List<Guid> usersIds = request.Users.Select(u => u.UserId).ToList();
 
-      await Task.WhenAll(
-        request.DepartmentId.HasValue
-          ? _publish.CreateDepartmentEntityAsync(
-              departmentId: request.DepartmentId.Value,
-              createdBy: _httpContextAccessor.HttpContext.GetUserId(),
-              projectId: response.Body.Value)
-          : Task.CompletedTask,
-        usersIds.Any() && request.Status == (int)ProjectStatusType.Active
-          ? _publish.CreateWorkTimeAsync(
-              dbProject.Id,
-              usersIds)
-          : Task.CompletedTask);
+      if (usersIds.Any() && request.Status == (int)ProjectStatusType.Active)
+      {
+        await _publish.CreateWorkTimeAsync(dbProject.Id, usersIds);
+      }
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 

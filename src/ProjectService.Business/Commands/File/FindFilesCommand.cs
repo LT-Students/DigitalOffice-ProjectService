@@ -16,14 +16,14 @@ using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.File;
 using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 {
   public class FindFilesCommand : IFindFilesCommand
   {
-    private readonly IFileRepository _repository;
+    private readonly IProjectFileRepository _repository;
     private readonly IResponseCreator _responseCreator;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
     private readonly IBaseFindFilterValidator _findFilterValidator;
 
     public FindFilesCommand(
-      IFileRepository repository,
+      IProjectFileRepository repository,
       IResponseCreator responseCreator,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
