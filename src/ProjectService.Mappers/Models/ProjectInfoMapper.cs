@@ -1,6 +1,6 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
+﻿using LT.DigitalOffice.Models.Broker.Enums;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Models

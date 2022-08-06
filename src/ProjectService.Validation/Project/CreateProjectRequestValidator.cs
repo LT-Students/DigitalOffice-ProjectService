@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;

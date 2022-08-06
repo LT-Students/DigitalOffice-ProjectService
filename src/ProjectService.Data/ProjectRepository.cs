@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
@@ -121,6 +122,11 @@ namespace LT.DigitalOffice.ProjectService.Data
       }
 
       return (await projects.ToListAsync(), totalCount);
+    }
+
+    public async Task<ProjectStatusType> GetProjectStatusAsync(Guid projectId)
+    {
+      return (ProjectStatusType)(await _provider.Projects.Where(project => project.Id == projectId).FirstOrDefaultAsync()).Status;
     }
 
     public async Task<Guid?> CreateAsync(DbProject dbProject)

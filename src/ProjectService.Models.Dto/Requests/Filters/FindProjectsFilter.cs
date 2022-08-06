@@ -1,6 +1,6 @@
 ﻿using System;
 using LT.DigitalOffice.Kernel.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.Models.Broker.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters

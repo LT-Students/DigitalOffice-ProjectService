@@ -31,7 +31,7 @@
       <PackageReference Include="LT.DigitalOffice.Kernel.RedisSupport" Version="1.0.5" />
       <PackageReference Include="LT.DigitalOffice.Kernel.EndpointSupport" Version="1.0.0" />
       <PackageReference Include="LT.DigitalOffice.Kernel.EFSupport" Version="1.0.1" />
-      <ProjectReference Include="..\..\..\DigitalOffice-Models\src\Models\Models.csproj" />
+      <PackageReference Include="LT.DigitalOffice.Models" Version="1.1.7" />
   </ItemGroup>
 
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests'))">
