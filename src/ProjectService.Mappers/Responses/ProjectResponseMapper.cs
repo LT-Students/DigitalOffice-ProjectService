@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Linq;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -10,33 +10,29 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
 {
   public class ProjectResponseMapper : IProjectResponseMapper
   {
-    private readonly IProjectInfoMapper _projectInfoMapper;
+    private readonly IProjectInfoMapper _projectMapper;
 
-    public ProjectResponseMapper(IProjectInfoMapper projectInfoMapper)
+    public ProjectResponseMapper(IProjectInfoMapper projectMapper)
     {
-      _projectInfoMapper = projectInfoMapper;
+      _projectMapper = projectMapper;
     }
 
     public ProjectResponse Map(
       DbProject dbProject,
-      int usersCount,
-      IEnumerable<Guid> usersIds,
-      IEnumerable<FileAccess> files,
-      IEnumerable<ImageInfo> images,
       DepartmentInfo department)
     {
-      if (dbProject == null)
-      {
-        return null;
-      }
-
-      return new ProjectResponse
-      {
-        Project = _projectInfoMapper.Map(dbProject, usersCount, department),
-        UsersIds = usersIds,
-        Files = files,
-        Images = images
-      };
+      return dbProject is null
+        ? null
+        : new ProjectResponse
+        {
+          Project = _projectMapper.Map(dbProject, dbProject.Users.Count, department),
+          Users = dbProject.Users.Select(pu =>
+            new ProjectUserInfo()
+            {
+              UserId = pu.UserId,
+              Role = (ProjectUserRoleType)pu.Role
+            })
+        };
     }
   }
 }

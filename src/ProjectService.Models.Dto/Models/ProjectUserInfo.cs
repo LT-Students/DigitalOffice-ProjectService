@@ -3,9 +3,9 @@ using LT.DigitalOffice.Models.Broker.Enums;
 
 namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
 {
-  public record FileAccess
+  public record ProjectUserInfo
   {
-    public Guid FileId { get; set; }
-    public FileAccessType Access { get; set; }
+    public Guid UserId { get; set; }
+    public ProjectUserRoleType Role { get; set; }
   }
 }

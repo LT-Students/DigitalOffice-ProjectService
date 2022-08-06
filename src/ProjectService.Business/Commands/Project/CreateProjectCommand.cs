@@ -31,7 +31,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IResponseCreator _responseCreator;
     private readonly IImageService _imageService;
-    private readonly IMessageService _messageService;
     private readonly IPublish _publish;
 
     public CreateProjectCommand(
@@ -42,7 +41,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IHttpContextAccessor httpContextAccessor,
       IResponseCreator responseCreator,
       IImageService imageService,
-      IMessageService messageService,
       IPublish publish)
     {
       _validator = validator;
@@ -52,7 +50,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _httpContextAccessor = httpContextAccessor;
       _responseCreator = responseCreator;
       _imageService = imageService;
-      _messageService = messageService;
       _publish = publish;
     }
 
@@ -96,9 +93,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
           ? _publish.CreateWorkTimeAsync(
               dbProject.Id,
               usersIds)
-          : Task.CompletedTask,
-        usersIds.Any()
-          ? _messageService.CreateWorkspaceAsync(request.Name, usersIds, response.Errors)
           : Task.CompletedTask);
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;

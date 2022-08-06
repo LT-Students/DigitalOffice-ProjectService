@@ -33,20 +33,17 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       }
 
       Guid projectId = Guid.NewGuid();
-      string shortName = request.ShortName?.Trim();
-      string description = request.Description?.Trim();
-      string shortDescription = request.ShortDescription?.Trim();
 
       return new DbProject
       {
         Id = projectId,
         Name = request.Name.Trim(),
-        Status = (int)request.Status,
-        ShortName = shortName is null || !shortName.Any() ? null : shortName,
-        Description = description is null || !description.Any() ? null : description,
-        ShortDescription = shortDescription is null || !shortDescription.Any() ? null : shortDescription,
+        ShortName = request.ShortName.Trim(),
+        Description = String.IsNullOrWhiteSpace(request.Description) ? null : request.Description,
+        ShortDescription = String.IsNullOrWhiteSpace(request.ShortDescription) ? null : request.ShortDescription,
         Customer = request.Customer,
-        StartDateUtc = request.StartDateUtc == default ? DateTime.UtcNow : request.StartDateUtc.Value,
+        Status = (int)request.Status,
+        StartDateUtc = request.StartDateUtc,
         EndDateUtc = request.EndDateUtc,
         CreatedAtUtc = DateTime.UtcNow,
         CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),

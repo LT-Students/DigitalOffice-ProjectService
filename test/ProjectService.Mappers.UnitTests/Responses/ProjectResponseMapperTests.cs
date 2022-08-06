@@ -76,8 +76,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
 
             _expectedResponse = new ProjectResponse
             {
-                Project = _projectInfo,
-                UsersIds = _users.Select(x => x.Id).ToList()
+                Project = _projectInfo
             };
 
             _projectInfoMapperMock

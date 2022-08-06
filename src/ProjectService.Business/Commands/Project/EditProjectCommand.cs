@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -73,15 +72,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       if (!validationResult.IsValid)
       {
-        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest,
+        return _responseCreator.CreateFailureResponse<bool>(
+          HttpStatusCode.BadRequest,
           validationResult.Errors.Select(e => e.ErrorMessage).ToList());
       }
 
-      int previousStatus = (await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = projectId })).dbProject
-        .Status;
+      int previousStatus = (await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = projectId })).Status;
 
-      OperationResultResponse<bool> response = new();
-      response.Body = await _projectRepository.EditAsync(projectId, _mapper.Map(request));
+      OperationResultResponse<bool> response = new(
+        body: await _projectRepository.EditAsync(projectId, _mapper.Map(request)));
 
       if (!response.Body)
       {
@@ -91,17 +90,16 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       {
         await _globalCache.RemoveAsync(projectId);
 
-        (DbProject dbProject, IEnumerable<Guid> usersIds, _) =
-          await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = projectId });
-        List<Guid> usersIdsList = usersIds.ToList();
+        DbProject dbProject =
+          await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = projectId, IncludeProjectUsers = true });
 
         if (previousStatus != (int)ProjectStatusType.Active
           && dbProject.Status == (int)ProjectStatusType.Active
-          && usersIdsList.Any())
+          && dbProject.Users.Any())
         {
           await _publish.CreateWorkTimeAsync(
-            projectId,
-            usersIdsList);
+            projectId: projectId,
+            usersIds: dbProject.Users.Select(u => u.Id).ToList());
         }
       }
 

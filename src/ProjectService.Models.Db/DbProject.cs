@@ -57,7 +57,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
       builder
         .Property(p => p.ShortName)
-        .HasMaxLength(150);
+        .HasMaxLength(150)
+        .IsRequired();
 
       builder
         .Property(p => p.ShortDescription)

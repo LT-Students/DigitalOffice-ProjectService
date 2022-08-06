@@ -288,6 +288,11 @@ namespace LT.DigitalOffice.ProjectService
         ep.ConfigureConsumer<CheckFilesAccessesConsumer>(context);
       });
 
+      cfg.ReceiveEndpoint(rabbitMqConfig.CreateFilesEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<CreateFilesConsumer>(context);
+      });
+
       cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectUserRoleEndpoint, ep =>
       {
         ep.ConfigureConsumer<GetProjectUserRoleConsumer>(context);
