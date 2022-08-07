@@ -17,14 +17,14 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.File;
 using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 {
   public class FindFilesCommand : IFindFilesCommand
   {
-    private readonly IFileRepository _repository;
+    private readonly IProjectFileRepository _repository;
     private readonly IResponseCreator _responseCreator;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -34,7 +34,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
     private readonly IFileInfoMapper _fileMapper;
 
     public FindFilesCommand(
-      IFileRepository repository,
+      IProjectFileRepository repository,
       IResponseCreator responseCreator,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
@@ -79,7 +79,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
       return new FindResultResponse<FileInfo>(
         body: files?.Select(file => _fileMapper.Map(
-          file, 
+          file,
           (FileAccessType)dbFiles.Where(x => x.FileId == file.Id).Select(x => x.Access).FirstOrDefault())).ToList(),
         totalCount: totalCount);
     }

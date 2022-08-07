@@ -33,18 +33,18 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
 
     public async Task<List<DepartmentData>> GetDepartmentsAsync(
       List<string> errors,
-      List<Guid> projectsIds = null,
+      List<Guid> departmentsIds = null,
       List<Guid> usersIds = null)
     {
       string key;
 
-      if (usersIds != null && usersIds.Any())
+      if (usersIds is not null && usersIds.Any())
       {
-        key = usersIds.GetRedisCacheHashCode(projectsIds.FirstOrDefault());
+        key = usersIds.GetRedisCacheHashCode(departmentsIds.FirstOrDefault());
       }
-      else if (projectsIds != null && projectsIds.Any())
+      else if (departmentsIds is not null && departmentsIds.Any())
       {
-        key = projectsIds.GetRedisCacheHashCode();
+        key = departmentsIds.GetRedisCacheHashCode();
       }
       else
       {
@@ -62,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       else
       {
         departments = (await _rcGetDepartments.ProcessRequest<IGetDepartmentsRequest, IGetDepartmentsResponse>(
-            IGetDepartmentsRequest.CreateObj(projectsIds: projectsIds, usersIds: usersIds),
+            IGetDepartmentsRequest.CreateObj(departmentsIds: departmentsIds, usersIds: usersIds),
             errors,
             _logger))
           ?.Departments;

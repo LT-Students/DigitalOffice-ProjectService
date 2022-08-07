@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
-using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
@@ -16,6 +15,8 @@ using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -73,30 +74,18 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       List<Guid> imagesIds = await _imageService.CreateImagesAsync(request.ProjectImages, response.Errors);
       DbProject dbProject = _mapper.Map(request, imagesIds);
 
-      response.Body = await _repository.CreateAsync(dbProject);
+      await _repository.CreateAsync(dbProject);
 
-      if (response.Body is null)
+      if (request.Users.Any() && request.Status == (int)ProjectStatusType.Active)
       {
-        return _responseCreator.CreateFailureResponse<Guid?>(HttpStatusCode.BadRequest);
+        await _publish.CreateWorkTimeAsync(
+          dbProject.Id,
+          usersIds: request.Users.Select(u => u.UserId).ToList());
       }
-
-      List<Guid> usersIds = request.Users.Select(u => u.UserId).ToList();
-
-      await Task.WhenAll(
-        request.DepartmentId.HasValue
-          ? _publish.CreateDepartmentEntityAsync(
-              departmentId: request.DepartmentId.Value,
-              createdBy: _httpContextAccessor.HttpContext.GetUserId(),
-              projectId: response.Body.Value)
-          : Task.CompletedTask,
-        usersIds.Any() && request.Status == (int)ProjectStatusType.Active
-          ? _publish.CreateWorkTimeAsync(
-              dbProject.Id,
-              usersIds)
-          : Task.CompletedTask);
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
+      response.Body = dbProject.Id;
       return response;
     }
   }

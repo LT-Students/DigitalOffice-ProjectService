@@ -5,7 +5,7 @@ using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.User;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
@@ -26,7 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<List<DbProjectUser>> GetAsync(Guid projectId, bool? isActive);
 
-    Task<bool> CreateAsync(List<DbProjectUser> newUsers);
+    Task CreateAsync(List<DbProjectUser> newUsers);
 
     Task<bool> EditIsActiveAsync(List<DbProjectUser> oldUsers, Guid createdBy);
 

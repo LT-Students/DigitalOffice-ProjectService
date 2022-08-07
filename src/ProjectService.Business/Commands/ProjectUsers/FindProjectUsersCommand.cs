@@ -16,7 +16,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.User;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 {

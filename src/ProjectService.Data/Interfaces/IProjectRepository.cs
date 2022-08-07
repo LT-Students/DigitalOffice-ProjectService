@@ -5,7 +5,7 @@ using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using Microsoft.AspNetCore.JsonPatch;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
@@ -21,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<(List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount)> FindAsync(FindProjectsFilter filter);
 
-    Task<Guid?> CreateAsync(DbProject dbProject);
+    Task CreateAsync(DbProject dbProject);
 
     Task<bool> EditAsync(Guid projectId, JsonPatchDocument<DbProject> request);
 

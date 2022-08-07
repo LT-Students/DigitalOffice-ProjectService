@@ -8,14 +8,14 @@ using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.File;
 using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 {
   public class RemoveFilesCommand : IRemoveFilesCommand
   {
-    private readonly IFileRepository _repository;
+    private readonly IProjectFileRepository _repository;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IProjectUserRepository _userRepository;
@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
     private readonly IPublish _publish;
 
     public RemoveFilesCommand(
-      IFileRepository repository,
+      IProjectFileRepository repository,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IProjectUserRepository userRepository,

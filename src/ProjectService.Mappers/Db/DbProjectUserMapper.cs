@@ -4,7 +4,7 @@ using System.Linq;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.User;
 using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Db

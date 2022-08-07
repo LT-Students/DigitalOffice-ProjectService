@@ -26,6 +26,8 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public Guid? ModifiedBy { get; set; }
 
     [IgnoreParse]
+    public DbProjectDepartment Department { get; set; }
+    [IgnoreParse]
     public ICollection<DbProjectUser> Users { get; set; }
     [IgnoreParse]
     public ICollection<DbProjectFile> Files { get; set; }
@@ -34,6 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
     public DbProject()
     {
+      Department = new DbProjectDepartment();
       Users = new HashSet<DbProjectUser>();
       Files = new HashSet<DbProjectFile>();
       Images = new HashSet<DbProjectImage>();
@@ -69,6 +72,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
         .HasMaxLength(150);
 
       builder
+        .HasOne(p => p.Department)
+        .WithOne(u => u.Project);
+
+      builder
         .HasMany(p => p.Users)
         .WithOne(u => u.Project);
 
@@ -78,8 +85,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
       builder
        .HasMany(p => p.Images)
-       .WithOne(tp => tp.Project)
-       .HasForeignKey(o => o.ProjectId);
+       .WithOne(tp => tp.Project);
     }
   }
 }

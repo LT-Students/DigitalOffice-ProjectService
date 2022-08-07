@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Image;
 using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 
 namespace LT.DigitalOffice.ProjectService.Validation.Image

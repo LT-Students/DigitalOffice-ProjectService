@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
+namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project
 {
   public class GetProjectFilter
   {

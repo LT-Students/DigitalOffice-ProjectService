@@ -12,7 +12,7 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
@@ -50,9 +50,9 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       OperationResultResponse<ProjectResponse> response = new();
 
-      DepartmentData department = filter.IncludeDepartment
+      DepartmentData department = dbProject.Department is not null
         ? (await _departmentService
-          .GetDepartmentsAsync(errors: response.Errors, projectsIds: new List<Guid>() { dbProject.Id }))?.FirstOrDefault()
+          .GetDepartmentsAsync(errors: response.Errors, departmentsIds: new List<Guid>() { dbProject.Department.DepartmentId }))?.FirstOrDefault()
         : null;
 
       response.Body = _projectResponseMapper.Map(dbProject, _departmentInfoMapper.Map(department));

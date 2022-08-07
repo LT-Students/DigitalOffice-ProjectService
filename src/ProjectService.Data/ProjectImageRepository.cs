@@ -8,11 +8,11 @@ using LT.DigitalOffice.ProjectService.Models.Db;
 
 namespace LT.DigitalOffice.ProjectService.Data
 {
-  public class ImageRepository : IImageRepository
+  public class ProjectImageRepository : IProjectImageRepository
   {
     private readonly IDataProvider _provider;
 
-    public ImageRepository(
+    public ProjectImageRepository(
       IDataProvider provider)
     {
       _provider = provider;

@@ -2,8 +2,7 @@
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.File;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LT.DigitalOffice.ProjectService.Controllers

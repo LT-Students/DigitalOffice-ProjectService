@@ -13,7 +13,7 @@ using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.User;
 using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
 using Microsoft.AspNetCore.Http;
 

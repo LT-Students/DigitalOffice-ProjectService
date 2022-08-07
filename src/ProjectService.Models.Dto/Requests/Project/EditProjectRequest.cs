@@ -1,7 +1,7 @@
 ﻿using System;
 using LT.DigitalOffice.Models.Broker.Enums;
 
-namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests
+namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project
 {
   public record EditProjectRequest
   {

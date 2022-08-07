@@ -5,12 +5,12 @@ using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Kernel.Requests;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.File;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
   [AutoInject]
-  public interface IFileRepository
+  public interface IProjectFileRepository
   {
     Task<List<Guid>> CreateAsync(List<DbProjectFile> files);
 

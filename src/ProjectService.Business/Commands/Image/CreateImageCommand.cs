@@ -13,7 +13,7 @@ using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Image;
 using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using Microsoft.AspNetCore.Http;
 
@@ -21,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 {
   public class CreateImageCommand : ICreateImageCommand
   {
-    private readonly IImageRepository _repository;
+    private readonly IProjectImageRepository _repository;
     private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDbImageMapper _dbProjectImageMapper;
@@ -31,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     private readonly IImageService _imageService;
 
     public CreateImageCommand(
-      IImageRepository repository,
+      IProjectImageRepository repository,
       IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IDbImageMapper dbProjectImageMapper,

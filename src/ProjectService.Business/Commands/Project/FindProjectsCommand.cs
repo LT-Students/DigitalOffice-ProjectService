@@ -6,14 +6,13 @@ using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Kernel.Validators.Interfaces;
-using LT.DigitalOffice.Models.Broker.Models.Department;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 
 namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 {
@@ -51,14 +50,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
 
       (List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount) = await _repository.FindAsync(filter);
 
-      List<DepartmentData> departments = filter.IncludeDepartment
-        ? await _departmentService.GetDepartmentsAsync(
-          projectsIds: dbProjects.Select(p => p.dbProject.Id).ToList(),
-          errors: errors)
+      List<DepartmentInfo> departments = filter.IncludeDepartment
+        ? (await _departmentService
+          .GetDepartmentsAsync(departmentsIds: dbProjects.Select(p => p.dbProject.Department.DepartmentId).ToList(), errors: errors))
+          ?.Select(_departmentMapper.Map).ToList()
         : default;
 
       return new FindResultResponse<ProjectInfo>(
-        body: dbProjects.Select(p => _mapper.Map(p.dbProject, p.usersCount, _departmentMapper.Map(departments?.FirstOrDefault(d => d.ProjectsIds.Contains(p.dbProject.Id))))).ToList(),
+        body: dbProjects.Select(p => _mapper.Map(p.dbProject, p.usersCount, departments?.FirstOrDefault(d => d.Id == p.dbProject.Department.DepartmentId))).ToList(),
         totalCount: totalCount);
     }
   }
