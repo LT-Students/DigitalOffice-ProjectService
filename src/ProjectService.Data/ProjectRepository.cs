@@ -7,7 +7,7 @@ using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
@@ -24,14 +24,19 @@ namespace LT.DigitalOffice.ProjectService.Data
     private IQueryable<DbProject> CreateGetPredicate(
       GetProjectFilter filter)
     {
-      IQueryable<DbProject> projectsQuery = _provider.Projects.AsQueryable();
+      IQueryable<DbProject> query = _provider.Projects.AsQueryable();
 
       if (filter.IncludeProjectUsers)
       {
-        projectsQuery = projectsQuery.Include(x => x.Users.Where(pu => pu.IsActive));
+        query = query.Include(x => x.Users.Where(pu => pu.IsActive));
       }
 
-      return projectsQuery;
+      if (filter.IncludeDepartment && query.Any(p => p.Id == filter.ProjectId && p.Department.IsActive))
+      {
+        query = query.Include(x => x.Department);
+      }
+
+      return query;
     }
 
     private IQueryable<DbProject> CreateGetPredicate(
@@ -62,6 +67,51 @@ namespace LT.DigitalOffice.ProjectService.Data
       }
 
       return projectsQuery;
+    }
+
+    private IQueryable<DbProject> CreateFindPredicate(FindProjectsFilter filter)
+    {
+      IQueryable<DbProject> query = _provider.Projects.AsQueryable();
+
+      if (!string.IsNullOrWhiteSpace(filter.NameIncludeSubstring))
+      {
+        query = query
+          .Where(p =>
+            p.Name.ToUpper().Contains(filter.NameIncludeSubstring.ToUpper())
+            || p.ShortName.ToUpper().Contains(filter.NameIncludeSubstring.ToUpper()));
+      }
+
+      if (filter.IsAscendingSort.HasValue)
+      {
+        query = filter.IsAscendingSort.Value
+          ? query.OrderBy(p => p.Name)
+          : query.OrderByDescending(p => p.Name);
+      }
+
+      if (filter.ProjectStatus.HasValue)
+      {
+        query = query
+          .Where(p => p.Status == (int)filter.ProjectStatus);
+      }
+
+      if (filter.IncludeDepartment)
+      {
+        query = query.Include(p => p.Department);
+      }
+
+      if (filter.DepartmentId.HasValue)
+      {
+        query = query.Where(p => p.Department.DepartmentId == filter.DepartmentId.Value);
+      }
+
+      if (filter.UserId.HasValue)
+      {
+        query = query
+          .Where(p => p.Users
+            .Any(u => u.IsActive && u.UserId == filter.UserId));
+      }
+
+      return query;
     }
 
     #endregion
@@ -112,17 +162,15 @@ namespace LT.DigitalOffice.ProjectService.Data
       return (await projects.ToListAsync(), totalCount);
     }
 
-    public async Task<Guid?> CreateAsync(DbProject dbProject)
+    public Task CreateAsync(DbProject dbProject)
     {
-      if (dbProject == null)
+      if (dbProject is null)
       {
         return null;
       }
 
       _provider.Projects.Add(dbProject);
-      await _provider.SaveAsync();
-
-      return dbProject.Id;
+      return _provider.SaveAsync();
     }
 
     public async Task<bool> EditAsync(Guid projectId, JsonPatchDocument<DbProject> request)
@@ -145,47 +193,17 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public async Task<(List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount)> FindAsync(FindProjectsFilter filter)
     {
-      if (filter == null)
+      if (filter is null)
       {
         return (null, 0);
       }
 
-      IQueryable<DbProject> dbProjectsQuery = _provider.Projects
-        .AsQueryable();
+      IQueryable<DbProject> query = CreateFindPredicate(filter);
 
-      if (!string.IsNullOrWhiteSpace(filter.NameIncludeSubstring))
-      {
-        dbProjectsQuery = dbProjectsQuery
-          .Where(p =>
-            p.Name.ToUpper().Contains(filter.NameIncludeSubstring.ToUpper())
-            || p.ShortName.ToUpper().Contains(filter.NameIncludeSubstring.ToUpper()));
-      }
+      int totalCount = await query.CountAsync();
 
-      if (filter.ProjectStatus.HasValue)
-      {
-        dbProjectsQuery = dbProjectsQuery
-          .Where(p => p.Status == (int)filter.ProjectStatus);
-      }
-
-      if (filter.UserId.HasValue)
-      {
-        dbProjectsQuery = dbProjectsQuery
-          .Where(p => p.Users
-            .Any(u => u.IsActive && u.UserId == filter.UserId));
-      }
-
-      if (filter.IsAscendingSort.HasValue)
-      {
-        dbProjectsQuery = filter.IsAscendingSort.Value
-          ? dbProjectsQuery.OrderBy(p => p.Name)
-          : dbProjectsQuery.OrderByDescending(p => p.Name);
-      }
-
-      int totalCount = await dbProjectsQuery.CountAsync();
-
-      List<(DbProject dbProject, int usersCount)> dbProjects =
-        (await
-          (from project in dbProjectsQuery.Skip(filter.SkipCount).Take(filter.TakeCount)
+      List<(DbProject dbProject, int usersCount)> dbProjects = 
+        (await (from project in query.Skip(filter.SkipCount).Take(filter.TakeCount)
            select new
            {
              Project = project,

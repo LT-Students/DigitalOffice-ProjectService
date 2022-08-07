@@ -135,7 +135,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
             Assert.Throws<ArgumentNullException>(() => _repository.Find(null, 0, 1, out int _));
         }*/
 
-        [Test]
+        /*[Test]
         public async Task ShouldSearchProject()
         {
             List<DbProject> projects = new()

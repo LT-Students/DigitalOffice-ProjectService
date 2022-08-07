@@ -20,14 +20,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Publishes
       _bus = bus;
     }
 
-    public Task CreateDepartmentEntityAsync(Guid departmentId, Guid createdBy, Guid projectId)
-    {
-      return _bus.Publish<ICreateDepartmentEntityPublish>(ICreateDepartmentEntityPublish.CreateObj(
-        departmentId: departmentId,
-        createdBy: createdBy,
-        projectId: projectId));
-    }
-
     public Task CreateWorkTimeAsync(Guid projectId, List<Guid> usersIds)
     {
       return _bus.Publish<ICreateWorkTimePublish>(ICreateWorkTimePublish.CreateObj(projectId, usersIds));

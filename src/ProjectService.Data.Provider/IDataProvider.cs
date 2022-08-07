@@ -6,12 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LT.DigitalOffice.ProjectService.Data.Provider
 {
-    [AutoInject(InjectType.Scoped)]
-    public interface IDataProvider : IBaseDataProvider
-    {
-        DbSet<DbProject> Projects { get; set; }
-        DbSet<DbProjectFile> ProjectsFiles { get; set; }
-        DbSet<DbProjectUser> ProjectsUsers { get; set; }
-        DbSet<DbProjectImage> Images { get; set; }
-    }
+  [AutoInject(InjectType.Scoped)]
+  public interface IDataProvider : IBaseDataProvider
+  {
+    DbSet<DbProject> Projects { get; set; }
+    DbSet<DbProjectDepartment> ProjectsDepartments { get; set; }
+    DbSet<DbProjectFile> ProjectsFiles { get; set; }
+    DbSet<DbProjectUser> ProjectsUsers { get; set; }
+    DbSet<DbProjectImage> Images { get; set; }
+  }
 }

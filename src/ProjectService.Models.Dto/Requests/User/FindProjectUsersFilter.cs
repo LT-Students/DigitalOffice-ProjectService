@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.Requests;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters
+namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.User
 {
   public record FindProjectUsersFilter : BaseFindFilter
   {

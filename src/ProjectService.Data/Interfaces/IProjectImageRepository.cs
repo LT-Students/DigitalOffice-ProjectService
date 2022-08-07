@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 {
     [AutoInject]
-    public interface IImageRepository
+    public interface IProjectImageRepository
     {
         Task<List<Guid>> CreateAsync(List<DbProjectImage> images);
 
