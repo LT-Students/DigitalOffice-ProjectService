@@ -34,6 +34,11 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       List<Guid> usersIds,
       List<string> errors = null)
     {
+      if (usersIds is null)
+      {
+        return null;
+      }
+
       List<PositionData> positions = await _globalCache.GetAsync<List<PositionData>>(Cache.Positions, usersIds.GetRedisCacheHashCode());
 
       if (positions is not null)
