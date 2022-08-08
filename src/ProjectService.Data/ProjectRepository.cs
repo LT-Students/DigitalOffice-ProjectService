@@ -163,9 +163,9 @@ namespace LT.DigitalOffice.ProjectService.Data
       return (await projects.ToListAsync(), totalCount);
     }
 
-    public async Task<ProjectStatusType> GetProjectStatusAsync(Guid projectId)
+    public async Task<DbProject> GetProjectWithUsersAsync(Guid projectId)
     {
-      return (ProjectStatusType)(await _provider.Projects.Where(project => project.Id == projectId).FirstOrDefaultAsync()).Status;
+      return await _provider.Projects.Include(x => x.Users).Where(project => project.Id == projectId).FirstOrDefaultAsync();
     }
 
     public Task CreateAsync(DbProject dbProject)

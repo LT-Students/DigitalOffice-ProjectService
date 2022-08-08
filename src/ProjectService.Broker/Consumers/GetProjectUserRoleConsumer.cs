@@ -1,9 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.Models.Broker.Responses.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
 using MassTransit;
 
 namespace LT.DigitalOffice.ProjectService.Broker.Consumers
@@ -15,17 +17,25 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
 
     private async Task<object> CheckProjectAndUserExistenceAsync(IGetProjectUserRoleRequest request)
     {
-      ProjectUserRoleType? projectUserRole = null;
-      ProjectStatusType projectType = await _projectRepository.GetProjectStatusAsync(request.ProjectId);
+      DbProject project = await _projectRepository.GetProjectWithUsersAsync(request.ProjectId);
 
-      if (projectType.Equals(ProjectStatusType.Active))
+      DbProjectUser user = project?.Users.Where(x => x.Id == request.UserId).FirstOrDefault();
+
+      ProjectUserRoleType? userRole = ProjectUserRoleType.Observer;
+      if (project is null)
       {
-        projectUserRole = await _projectUserRepository.GetUserRoleAsync(request.ProjectId, request.UserId);
+        userRole = null;
+      } 
+      else if (user is not null)
+      {
+        userRole = (ProjectUserRoleType?)user.Role;
       }
 
       return IGetProjectUserRoleResponse.CreateObj(
-        projectStatus: projectType,
-        projectUserRole: projectUserRole);
+        projectStatus: project is null
+          ? ProjectStatusType.DoesNotExist
+          : (ProjectStatusType)project.Status,
+        projectUserRole: userRole);
     }
 
     public GetProjectUserRoleConsumer(
