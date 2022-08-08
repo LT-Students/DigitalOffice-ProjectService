@@ -22,6 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
     public string CheckProjectUsersExistenceEndpoint { get; set; }
     public string CheckFilesAccessesEndpoint { get; set; }
     public string CreateFilesEndpoint { get; set; }
+    public string GetProjectUserRoleEndpoint { get; set; }
 
     // positions
 

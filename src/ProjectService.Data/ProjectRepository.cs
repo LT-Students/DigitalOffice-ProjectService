@@ -162,6 +162,12 @@ namespace LT.DigitalOffice.ProjectService.Data
       return (await projects.ToListAsync(), totalCount);
     }
 
+    public Task<DbProject> GetProjectWithUserAsync(Guid projectId, Guid userId)
+    {
+      return _provider.Projects.Include(x => x.Users.Where(user => user.Id == userId && user.IsActive))
+        .FirstOrDefaultAsync(project => project.Id == projectId);
+    }
+
     public Task CreateAsync(DbProject dbProject)
     {
       if (dbProject is null)
@@ -224,19 +230,19 @@ namespace LT.DigitalOffice.ProjectService.Data
       return await _provider.Projects.Where(p => p.Name.Contains(text) || p.ShortName.Contains(text)).ToListAsync();
     }
 
-    public async Task<bool> DoesExistAsync(Guid projectId)
+    public Task<bool> DoesExistAsync(Guid projectId)
     {
-      return await _provider.Projects.AnyAsync(x => x.Id == projectId);
+      return _provider.Projects.AnyAsync(x => x.Id == projectId);
     }
 
-    public async Task<bool> DoesNameExistAsync(string name)
+    public Task<bool> DoesNameExistAsync(string name)
     {
-      return await _provider.Projects.AnyAsync(p => p.Name.ToLower().Equals(name.ToLower()));
+      return _provider.Projects.AnyAsync(p => p.Name.ToLower().Equals(name.ToLower()));
     }
 
-    public async Task<bool> DoesShortNameExistAsync(string shortName)
+    public Task<bool> DoesShortNameExistAsync(string shortName)
     {
-      return await _provider.Projects.AnyAsync(p => p.ShortName.ToLower().Equals(shortName.ToLower()));
+      return _provider.Projects.AnyAsync(p => p.ShortName.ToLower().Equals(shortName.ToLower()));
     }
 
     public async Task<List<Guid>> DoExistAsync(List<Guid> projectsIds)
