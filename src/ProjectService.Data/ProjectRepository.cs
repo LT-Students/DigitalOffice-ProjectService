@@ -165,7 +165,7 @@ namespace LT.DigitalOffice.ProjectService.Data
     public async Task<DbProject> GetProjectWithUserAsync(Guid projectId, Guid userId)
     {
       return await _provider.Projects.Include(x => x.Users.Where(user => user.Id == userId && user.IsActive))
-        .Where(project => project.Id == projectId).FirstOrDefaultAsync();
+        .FirstOrDefaultAsync(project => project.Id == projectId);
     }
 
     public Task CreateAsync(DbProject dbProject)
