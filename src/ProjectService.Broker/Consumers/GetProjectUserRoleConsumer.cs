@@ -20,7 +20,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
     {
       DbProject project = await _projectRepository.GetProjectWithUserAsync(request.ProjectId, request.UserId);
 
-      DbProjectUser user = project?.Users.Where(x => x.Id == request.UserId).FirstOrDefault();
+      DbProjectUser user = project?.Users.FirstOrDefault();
 
       ProjectUserRoleType? userRole = ProjectUserRoleType.Observer;
       if (project is null)
