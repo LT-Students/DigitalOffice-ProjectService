@@ -245,9 +245,9 @@ namespace LT.DigitalOffice.ProjectService.Data
       return _provider.Projects.AnyAsync(p => p.ShortName.ToLower().Equals(shortName.ToLower()));
     }
 
-    public Task<List<Guid>> DoExistAsync(List<Guid> projectsIds)
+    public async Task<List<Guid>> DoExistAsync(List<Guid> projectsIds)
     {
-      return _provider.Projects.Where(p => projectsIds.Contains(p.Id)).Select(p => p.Id).ToListAsync();
+      return await _provider.Projects.Where(p => projectsIds.Contains(p.Id)).Select(p => p.Id).ToListAsync();
     }
   }
 }
