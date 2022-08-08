@@ -6,6 +6,7 @@ using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.Models.Broker.Responses.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using MassTransit;
 
 namespace LT.DigitalOffice.ProjectService.Broker.Consumers
@@ -17,7 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
 
     private async Task<object> CheckProjectAndUserExistenceAsync(IGetProjectUserRoleRequest request)
     {
-      DbProject project = await _projectRepository.GetProjectWithUsersAsync(request.ProjectId);
+      DbProject project = await _projectRepository.GetProjectWithUserAsync(request.ProjectId, request.UserId);
 
       DbProjectUser user = project?.Users.Where(x => x.Id == request.UserId).FirstOrDefault();
 

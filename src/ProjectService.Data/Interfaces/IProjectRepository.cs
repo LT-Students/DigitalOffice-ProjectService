@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Attributes;
-using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
@@ -17,7 +16,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request);
 
-    Task<DbProject> GetProjectWithUsersAsync(Guid projectId);
+    Task<DbProject> GetProjectWithUserAsync(Guid projectId, Guid userId);
 
     Task<(List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount)> FindAsync(FindProjectsFilter filter);
 

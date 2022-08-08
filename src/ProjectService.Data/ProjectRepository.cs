@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Extensions;
-using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
@@ -163,9 +162,10 @@ namespace LT.DigitalOffice.ProjectService.Data
       return (await projects.ToListAsync(), totalCount);
     }
 
-    public async Task<DbProject> GetProjectWithUsersAsync(Guid projectId)
+    public async Task<DbProject> GetProjectWithUserAsync(Guid projectId, Guid userId)
     {
-      return await _provider.Projects.Include(x => x.Users).Where(project => project.Id == projectId).FirstOrDefaultAsync();
+      return await _provider.Projects.Include(x => x.Users.Where(user => user.Id == userId && user.IsActive))
+        .Where(project => project.Id == projectId).FirstOrDefaultAsync();
     }
 
     public Task CreateAsync(DbProject dbProject)
