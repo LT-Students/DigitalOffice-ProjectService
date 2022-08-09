@@ -41,23 +41,21 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
     public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid fileId, FileAccessType accessType)
     {
       DbProjectFile file = (await _repository.GetAsync(new List<Guid>() { fileId })).FirstOrDefault();
-      if (file is null 
-        || !await _userRepository.DoesExistAsync(userId: _httpContextAccessor.HttpContext.GetUserId(), projectId: file.ProjectId, isManager: true)
+      if (file is null)
+      {
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.NotFound);
+      }
+
+      if (!await _userRepository.DoesExistAsync(userId: _httpContextAccessor.HttpContext.GetUserId(), projectId: file.ProjectId, isManager: true)
         && !await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
-      OperationResultResponse<bool> response;
-      if (accessType != (FileAccessType)file.Access)
-      {
-        response = new(
-          body: await _repository.EditAsync(fileId, accessType));
-      } 
-      else
-      {
-        response = new(body: true);
-      }
+      OperationResultResponse<bool> response = new();
+      response.Body = accessType != (FileAccessType)file.Access 
+        ? await _repository.EditAsync(fileId, accessType)
+        : true;
 
       if (!response.Body)
       {
