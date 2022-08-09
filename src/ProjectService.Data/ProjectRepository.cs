@@ -44,26 +44,31 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
       IQueryable<DbProject> projectsQuery = _provider.Projects.AsQueryable();
 
-      if (request.UserId.HasValue)
+      if (request.UsersIds is not null && request.UsersIds.Any())
       {
-        if (request.IncludeUsers)
-        {
-          projectsQuery = _provider.Projects
-            .Include(pu => pu.Users)
-            .Where(p => p.Users.Any(u => u.UserId == request.UserId.Value));
-        }
-        else
-        {
-          projectsQuery = _provider.ProjectsUsers
-            .Where(pu => pu.UserId == request.UserId)
-            .Include(pu => pu.Project)
-            .Select(pu => pu.Project);
-        }
+        projectsQuery = projectsQuery.Where(p => p.Users.Any(u => request.UsersIds.Contains(u.UserId)));
+      }      
+
+      if (request.DepartmentsIds is not null && request.DepartmentsIds.Any())
+      {
+        projectsQuery = projectsQuery.Where(p => p.Department != null && request.DepartmentsIds.Contains(p.Department.DepartmentId));
       }
 
-      if (request.ProjectsIds != null && request.ProjectsIds.Any())
+      if (request.IncludeUsers)
       {
-        projectsQuery = projectsQuery.Where(p => request.ProjectsIds.Contains(p.Id));
+        projectsQuery = projectsQuery.Include(pu => pu.Users);
+      }
+
+      if (request.IncludeDepartment)
+      {
+        projectsQuery = projectsQuery.Include(p => p.Department);
+      }
+
+      if (request.AscendingSort.HasValue)
+      {
+        projectsQuery = request.AscendingSort.Value
+          ? projectsQuery.OrderBy(p => p.Name)
+          : projectsQuery.OrderByDescending(p => p.Name);
       }
 
       return projectsQuery;
@@ -133,33 +138,21 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     public async Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request)
     {
-      IQueryable<DbProject> projects = CreateGetPredicate(request);
+      IQueryable<DbProject> projectsQuery = CreateGetPredicate(request);
 
-      int totalCount = await projects.CountAsync();
-
-      if (request.AscendingSort.HasValue)
-      {
-        projects = request.AscendingSort.Value
-          ? projects.OrderBy(p => p.Name)
-          : projects.OrderByDescending(p => p.Name);
-      }
+      int totalCount = await projectsQuery.CountAsync();
 
       if (request.SkipCount.HasValue)
       {
-        projects = projects.Skip(request.SkipCount.Value);
+        projectsQuery = projectsQuery.Skip(request.SkipCount.Value);
       }
 
       if (request.TakeCount.HasValue)
       {
-        projects = projects.Take(request.TakeCount.Value);
+        projectsQuery = projectsQuery.Take(request.TakeCount.Value);
       }
 
-      if (request.IncludeUsers && !request.UserId.HasValue)
-      {
-        projects = projects.Include(p => p.Users);
-      }
-
-      return (await projects.ToListAsync(), totalCount);
+      return (await projectsQuery.ToListAsync(), totalCount);
     }
 
     public Task<DbProject> GetProjectWithUserAsync(Guid projectId, Guid userId)
