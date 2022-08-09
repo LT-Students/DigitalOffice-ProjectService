@@ -12,8 +12,8 @@ using LT.DigitalOffice.Models.Broker.Models.Project;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.Models.Broker.Responses.Project;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using MassTransit;
 using Microsoft.Extensions.Options;
 
@@ -22,6 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
   public class GetProjectsConsumer : IConsumer<IGetProjectsRequest>
   {
     private readonly IProjectRepository _projectRepository;
+    private readonly IProjectDepartmentDataMapper _projectDepartmentDataMapper;
     private readonly IOptions<RedisConfig> _redisConfig;
     private readonly IGlobalCacheRepository _globalCache;
 
@@ -36,6 +37,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
           ((ProjectStatusType)p.Status).ToString(),
           p.ShortName,
           p.ShortDescription,
+          _projectDepartmentDataMapper.Map(p.Department),
           p.Users?.Select(
             u => new ProjectUserData(
               u.UserId,
@@ -50,17 +52,22 @@ namespace LT.DigitalOffice.ProjectService.Broker
     {
       List<Guid> ids = new();
 
-      if (request.ProjectsIds != null && request.ProjectsIds.Any())
+      if (request.ProjectsIds is not null && request.ProjectsIds.Any())
       {
         ids.AddRange(request.ProjectsIds);
       }
 
-      if (request.UserId.HasValue)
+      if (request.UsersIds is not null && request.UsersIds.Any())
       {
-        ids.Add(request.UserId.Value);
+        ids.AddRange(request.UsersIds);
       }
 
-      List<object> additionalArguments = new() { request.IncludeUsers };
+      if (request.DepartmentsIds is not null && request.DepartmentsIds.Any())
+      {
+        ids.AddRange(request.DepartmentsIds);
+      }
+
+      List<object> additionalArguments = new() { request.IncludeDepartment, request.IncludeUsers };
 
       if (request.AscendingSort.HasValue)
       {
@@ -82,10 +89,12 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
     public GetProjectsConsumer(
       IProjectRepository projectRepository,
+      IProjectDepartmentDataMapper projectDepartmentDataMapper,
       IOptions<RedisConfig> redisConfig,
       IGlobalCacheRepository globalCache)
     {
       _projectRepository = projectRepository;
+      _projectDepartmentDataMapper = projectDepartmentDataMapper;
       _redisConfig = redisConfig;
       _globalCache = globalCache;
     }
