@@ -56,9 +56,7 @@ namespace LT.DigitalOffice.ProjectService.Data
 
       if (request.IncludeUsers)
       {
-        projectsQuery = projectsQuery
-          .Include(pu => pu.Users)
-          .Where(p => p.Users.Any(u => request.UsersIds.Contains(u.UserId)));
+        projectsQuery = projectsQuery.Include(pu => pu.Users);
       }
 
       if (request.IncludeDepartment)
