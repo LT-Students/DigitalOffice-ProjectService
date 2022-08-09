@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Business.Commands.File.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.File;
@@ -25,6 +27,15 @@ namespace LT.DigitalOffice.ProjectService.Controllers
       [FromBody] RemoveFilesRequest request)
     {
       return await command.ExecuteAsync(request);
+    }
+
+    [HttpPut("edit")]
+    public async Task<OperationResultResponse<bool>> EditAsync(
+      [FromServices] IEditFilesCommand command,
+      [FromQuery] Guid fileId,
+      [FromQuery] FileAccessType newAccessType)
+    {
+      return await command.ExecuteAsync(fileId, newAccessType);
     }
   }
 }
