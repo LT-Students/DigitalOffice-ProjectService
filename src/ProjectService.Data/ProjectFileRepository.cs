@@ -70,5 +70,21 @@ namespace LT.DigitalOffice.ProjectService.Data
 
       return true;
     }
+
+    public async Task<bool> EditAsync(Guid fileId, FileAccessType access)
+    {
+      DbProjectFile dbFile = await _provider.ProjectsFiles.FirstOrDefaultAsync(p => p.FileId == fileId);
+
+      if (dbFile is null)
+      {
+        return false;
+      }
+
+      dbFile.Access = (int)access;
+
+      await _provider.SaveAsync();
+
+      return true;
+    }
   }
 }

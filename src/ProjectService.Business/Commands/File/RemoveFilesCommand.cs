@@ -40,8 +40,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(RemoveFilesRequest request)
     {
-      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(await _userRepository.DoesExistAsync(userId: _httpContextAccessor.HttpContext.GetUserId(), projectId: request.ProjectId, isManager: true)))
+      if (!await _userRepository.DoesExistAsync(userId: _httpContextAccessor.HttpContext.GetUserId(), projectId: request.ProjectId, isManager: true) 
+        && !await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
