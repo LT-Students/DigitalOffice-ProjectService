@@ -41,6 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.File
     public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid fileId, FileAccessType accessType)
     {
       DbProjectFile file = (await _repository.GetAsync(new List<Guid>() { fileId })).FirstOrDefault();
+
       if (file is null)
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.NotFound);
