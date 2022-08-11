@@ -31,9 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Data
             request.ByEntryDate.Value.AddMonths(1))
           .Where(u => u.IsActive).Distinct()
           .AsQueryable()
-        : _provider.ProjectsUsers
-            //.Where(pu => pu.Project.Status == (int)ProjectStatusType.Active)
-            .AsQueryable();
+        : _provider.ProjectsUsers.AsQueryable();
 
       if (request.UsersIds != null && request.UsersIds.Any())
       {
