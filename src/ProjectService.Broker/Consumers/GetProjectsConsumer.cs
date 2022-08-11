@@ -26,26 +26,24 @@ namespace LT.DigitalOffice.ProjectService.Broker
     private readonly IOptions<RedisConfig> _redisConfig;
     private readonly IGlobalCacheRepository _globalCache;
 
-    private async Task<(List<ProjectData> projects, int totalCount)> GetProjectsAsync(IGetProjectsRequest request)
+    private async Task<List<ProjectData>> GetProjectsAsync(IGetProjectsRequest request)
     {
-      (List<DbProject> projects, int totalCount) = (await _projectRepository.GetAsync(request));
+      List<DbProject> projects = await _projectRepository.GetAsync(request);
 
-      return (projects.Select(
+      return projects.Select(
         p => new ProjectData(
-          p.Id,
-          p.Name,
-          ((ProjectStatusType)p.Status).ToString(),
-          p.ShortName,
-          p.ShortDescription,
-          _projectDepartmentDataMapper.Map(p.Department),
-          p.Users?.Select(
-            u => new ProjectUserData(
-              u.UserId,
-              u.ProjectId,
-              u.IsActive,
-              (ProjectUserRoleType)u.Role))
-            .ToList()))
-          .ToList(), totalCount);
+          id: p.Id,
+          name: p.Name,
+          status: ((ProjectStatusType)p.Status).ToString(),
+          shortName: p.ShortName,
+          shortDescription: p.ShortDescription,
+          department: _projectDepartmentDataMapper.Map(p.Department),
+          users: p.Users?.Select(u => new ProjectUserData(
+            userId: u.UserId,
+            projectId: u.ProjectId,
+            isActive: u.IsActive,
+            projectUserRole: (ProjectUserRoleType)u.Role)).ToList()))
+        .ToList();
     }
 
     private string CreateKey(IGetProjectsRequest request)
@@ -67,24 +65,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
         ids.AddRange(request.DepartmentsIds);
       }
 
-      List<object> additionalArguments = new() { request.IncludeDepartment, request.IncludeUsers };
-
-      if (request.AscendingSort.HasValue)
-      {
-        additionalArguments.Add(request.AscendingSort.Value);
-      }
-
-      if (request.SkipCount.HasValue)
-      {
-        additionalArguments.Add(request.SkipCount.Value);
-      }
-
-      if (request.TakeCount.HasValue)
-      {
-        additionalArguments.Add(request.TakeCount.Value);
-      }
-
-      return ids.GetRedisCacheHashCode(additionalArguments.ToArray());
+      return ids.GetRedisCacheHashCode(request.IncludeDepartment, request.IncludeUsers);
     }
 
     public GetProjectsConsumer(
@@ -101,9 +82,9 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
     public async Task Consume(ConsumeContext<IGetProjectsRequest> context)
     {
-      (List<ProjectData> projects, int totalCount) = await GetProjectsAsync(context.Message);
+      List<ProjectData> projects = await GetProjectsAsync(context.Message);
 
-      object response = OperationResultWrapper.CreateResponse((_) => IGetProjectsResponse.CreateObj(projects, totalCount), context.Message);
+      object response = OperationResultWrapper.CreateResponse(_ => IGetProjectsResponse.CreateObj(projects), context.Message);
 
       await context.RespondAsync<IOperationResult<IGetProjectsResponse>>(response);
 
@@ -112,11 +93,11 @@ namespace LT.DigitalOffice.ProjectService.Broker
         string key = CreateKey(context.Message);
 
         await _globalCache.CreateAsync(
-          Cache.Projects,
-          key,
-          (projects, totalCount),
-          projects.Select(p => p.Id).ToList(),
-          TimeSpan.FromMinutes(_redisConfig.Value.CacheLiveInMinutes));
+          database: Cache.Projects,
+          key: key,
+          item: projects,
+          elementsIds: projects.Select(p => p.Id).ToList(),
+          lifeTime: TimeSpan.FromMinutes(_redisConfig.Value.CacheLiveInMinutes));
       }
     }
   }

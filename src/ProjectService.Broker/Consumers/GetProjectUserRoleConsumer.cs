@@ -13,7 +13,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
 {
   public class GetProjectUserRoleConsumer : IConsumer<IGetProjectUserRoleRequest>
   {
-    private readonly IProjectUserRepository _projectUserRepository;
     private readonly IProjectRepository _projectRepository;
 
     private async Task<object> CheckProjectAndUserExistenceAsync(IGetProjectUserRoleRequest request)
@@ -40,10 +39,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.Consumers
     }
 
     public GetProjectUserRoleConsumer(
-      IProjectUserRepository projectUserRepository,
       IProjectRepository projectRepository)
     {
-      _projectUserRepository = projectUserRepository;
       _projectRepository = projectRepository;
     }
 

@@ -64,13 +64,6 @@ namespace LT.DigitalOffice.ProjectService.Data
         projectsQuery = projectsQuery.Include(p => p.Department);
       }
 
-      if (request.AscendingSort.HasValue)
-      {
-        projectsQuery = request.AscendingSort.Value
-          ? projectsQuery.OrderBy(p => p.Name)
-          : projectsQuery.OrderByDescending(p => p.Name);
-      }
-
       return projectsQuery;
     }
 
@@ -136,23 +129,11 @@ namespace LT.DigitalOffice.ProjectService.Data
         : CreateGetPredicate(filter).FirstOrDefaultAsync(p => p.Id == filter.ProjectId);
     }
 
-    public async Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request)
+    public async Task<List<DbProject>> GetAsync(IGetProjectsRequest request)
     {
       IQueryable<DbProject> projectsQuery = CreateGetPredicate(request);
 
-      int totalCount = await projectsQuery.CountAsync();
-
-      if (request.SkipCount.HasValue)
-      {
-        projectsQuery = projectsQuery.Skip(request.SkipCount.Value);
-      }
-
-      if (request.TakeCount.HasValue)
-      {
-        projectsQuery = projectsQuery.Take(request.TakeCount.Value);
-      }
-
-      return (await projectsQuery.ToListAsync(), totalCount);
+      return await projectsQuery.ToListAsync();
     }
 
     public Task<DbProject> GetProjectWithUserAsync(Guid projectId, Guid userId)
