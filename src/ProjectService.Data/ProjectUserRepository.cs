@@ -24,9 +24,14 @@ namespace LT.DigitalOffice.ProjectService.Data
 
     private IQueryable<DbProjectUser> CreateGetPredicate(IGetProjectsUsersRequest request)
     {
-      IQueryable<DbProjectUser> projectUsersQuery = _provider.ProjectsUsers
-        .Where(pu => pu.Project.Status == (int)ProjectStatusType.Active)
-        .AsQueryable();
+      IQueryable<DbProjectUser> projectUsersQuery = request.ByEntryDate.HasValue
+        ? _provider.ProjectsUsers
+          .TemporalBetween(
+            request.ByEntryDate.Value,
+            request.ByEntryDate.Value.AddMonths(1))
+          .Where(u => u.IsActive).Distinct()
+          .AsQueryable()
+        : _provider.ProjectsUsers.AsQueryable();
 
       if (request.UsersIds != null && request.UsersIds.Any())
       {
@@ -36,11 +41,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       if (request.ProjectsIds != null && request.ProjectsIds.Any())
       {
         projectUsersQuery = projectUsersQuery.Where(pu => request.ProjectsIds.Contains(pu.ProjectId));
-      }
-
-      if (!request.IncludeDisactivated)
-      {
-        projectUsersQuery = projectUsersQuery.Where(pu => pu.IsActive);
       }
 
       return projectUsersQuery;
@@ -78,16 +78,6 @@ namespace LT.DigitalOffice.ProjectService.Data
       IQueryable<DbProjectUser> projectUsers = CreateGetPredicate(request);
 
       int totalCount = await projectUsers.CountAsync();
-
-      if (request.SkipCount.HasValue)
-      {
-        projectUsers = projectUsers.Skip(request.SkipCount.Value);
-      }
-
-      if (request.TakeCount.HasValue)
-      {
-        projectUsers = projectUsers.Take(request.TakeCount.Value);
-      }
 
       return (await projectUsers.ToListAsync(), totalCount);
     }
