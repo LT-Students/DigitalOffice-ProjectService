@@ -13,8 +13,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces
   {
     Task<(List<UserData> usersData, int totalCount)> GetFilteredUsersAsync(List<Guid> usersIds, FindProjectUsersFilter filter);
 
-    Task<List<UserData>> GetUsersDatasAsync(IEnumerable<DbProjectUser> projectUsers, List<string> errors);
-
     Task<List<Guid>> CheckUsersExistenceAsync(List<Guid> usersIds, List<string> errors = null);
   }
 }
