@@ -11,21 +11,17 @@ using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Requests.User;
 using LT.DigitalOffice.Models.Broker.Responses.User;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.User;
 using MassTransit;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Broker.Requests
 {
   public class UserService : IUserService
   {
-    private readonly IRequestClient<IGetUsersDataRequest> _rcGetUsersdata;
     private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
     private readonly IRequestClient<IFilteredUsersDataRequest> _rcGetFilteredUsers;
     private readonly ILogger<UserService> _logger;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IGlobalCacheRepository _globalCache;
 
     private string CreateRedisKey(IEnumerable<Guid> usersIds, FindProjectUsersFilter filter)
@@ -41,18 +37,14 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
     }
 
     public UserService(
-      IRequestClient<IGetUsersDataRequest> rcGetUsersdata,
       IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
       IRequestClient<IFilteredUsersDataRequest> rcGetFilteredUsers,
       ILogger<UserService> logger,
-      IHttpContextAccessor httpContextAccessor,
       IGlobalCacheRepository globalCache)
     {
-      _rcGetUsersdata = rcGetUsersdata;
       _rcCheckUsersExistence = rcCheckUsersExistence;
       _rcGetFilteredUsers = rcGetFilteredUsers;
       _logger = logger;
-      _httpContextAccessor = httpContextAccessor;
       _globalCache = globalCache;
     }
 
@@ -85,34 +77,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       }
 
       return usersFilteredData;
-    }
-
-    public async Task<List<UserData>> GetUsersDatasAsync(IEnumerable<DbProjectUser> projectUsers, List<string> errors)
-    {
-      if (projectUsers == null || !projectUsers.Any())
-      {
-        return null;
-      }
-
-      List<Guid> usersIds = projectUsers.Select(x => x.UserId).ToList();
-
-      List<UserData> usersData = await _globalCache.GetAsync<List<UserData>>(Cache.Users, usersIds.GetRedisCacheHashCode());
-
-      if (usersData is not null)
-      {
-        _logger.LogInformation(
-          "UsersDatas were taken from the cache. Users ids: {usersIds}", string.Join(", ", usersIds));
-      }
-      else
-      {
-        usersData = (await RequestHandler.ProcessRequest<IGetUsersDataRequest, IGetUsersDataResponse>(
-            _rcGetUsersdata,
-            IGetUsersDataRequest.CreateObj(usersIds),
-            errors,
-            _logger))?.UsersData;
-      }
-
-      return usersData;
     }
 
     public async Task<List<Guid>> CheckUsersExistenceAsync(List<Guid> usersIds, List<string> errors = null)
