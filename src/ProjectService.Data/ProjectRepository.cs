@@ -44,6 +44,11 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
       IQueryable<DbProject> projectsQuery = _provider.Projects.AsQueryable();
 
+      if (request.ProjectsIds is not null && request.ProjectsIds.Any())
+      {
+        projectsQuery = projectsQuery.Where(p => request.ProjectsIds.Contains(p.Id));
+      }
+
       if (request.UsersIds is not null && request.UsersIds.Any())
       {
         projectsQuery = projectsQuery.Where(p => p.Users.Any(u => request.UsersIds.Contains(u.UserId)));
