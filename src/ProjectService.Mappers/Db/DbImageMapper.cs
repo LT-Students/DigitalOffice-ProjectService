@@ -1,7 +1,7 @@
 ﻿using System;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Image;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Db
 {
@@ -18,7 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       {
         Id = Guid.NewGuid(),
         ImageId = imageId,
-        EntityId = request.ProjectId
+        ProjectId = request.ProjectId
       };
     }
   }

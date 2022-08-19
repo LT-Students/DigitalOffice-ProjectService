@@ -17,11 +17,16 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public string ShortName { get; set; }
     public string Description { get; set; }
     public string ShortDescription { get; set; }
+    public string Customer { get; set; }
+    public DateTime StartDateUtc { get; set; }
+    public DateTime? EndDateUtc { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public Guid CreatedBy { get; set; }
     public DateTime? ModifiedAtUtc { get; set; }
     public Guid? ModifiedBy { get; set; }
 
+    [IgnoreParse]
+    public DbProjectDepartment Department { get; set; }
     [IgnoreParse]
     public ICollection<DbProjectUser> Users { get; set; }
     [IgnoreParse]
@@ -31,6 +36,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
     public DbProject()
     {
+      Department = new DbProjectDepartment();
       Users = new HashSet<DbProjectUser>();
       Files = new HashSet<DbProjectFile>();
       Images = new HashSet<DbProjectImage>();
@@ -49,15 +55,25 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
       builder
         .Property(P => P.Name)
+        .HasMaxLength(150)
         .IsRequired();
 
       builder
         .Property(p => p.ShortName)
-        .HasMaxLength(30);
+        .HasMaxLength(150)
+        .IsRequired();
 
       builder
         .Property(p => p.ShortDescription)
         .HasMaxLength(300);
+
+      builder
+        .Property(p => p.Customer)
+        .HasMaxLength(150);
+
+      builder
+        .HasOne(p => p.Department)
+        .WithOne(u => u.Project);
 
       builder
         .HasMany(p => p.Users)
@@ -69,8 +85,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
 
       builder
        .HasMany(p => p.Images)
-       .WithOne(tp => tp.Project)
-       .HasForeignKey(o => o.EntityId);
+       .WithOne(tp => tp.Project);
     }
   }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Mappers.PatchDocument.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 
@@ -23,7 +23,13 @@ namespace LT.DigitalOffice.ProjectService.Mappers.PatchDocument
       {
         if (item.path[1..].Equals(nameof(EditProjectRequest.Status), StringComparison.OrdinalIgnoreCase))
         {
-          dbRequest.Operations.Add(new Operation<DbProject>(item.op, item.path, item.from, (int)Enum.Parse<ProjectStatusType>(item.value?.ToString())));
+          ProjectStatusType status = Enum.Parse<ProjectStatusType>(item.value?.ToString());
+          if (status == ProjectStatusType.Active)
+          {
+            dbRequest.Operations.Add(new Operation<DbProject>("replace", "/EndDateUtc", null, null));
+          }
+
+          dbRequest.Operations.Add(new Operation<DbProject>(item.op, item.path, item.from, (int)status));
           continue;
         }
 

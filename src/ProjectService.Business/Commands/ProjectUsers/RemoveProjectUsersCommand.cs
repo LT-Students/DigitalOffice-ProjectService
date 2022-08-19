@@ -18,30 +18,30 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 {
   public class RemoveProjectUsersCommand : IRemoveProjectUsersCommand
   {
-    private readonly IUserRepository _repository;
+    private readonly IProjectUserRepository _repository;
     private readonly IAccessValidator _accessValidator;
     private readonly IResponseCreator _responseCreator;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly ICacheNotebook _cacheNotebook;
+    private readonly IGlobalCacheRepository _globalCache;
 
     public RemoveProjectUsersCommand(
-      IUserRepository repository,
+      IProjectUserRepository repository,
       IAccessValidator accessValidator,
       IResponseCreator responseCreator,
       IHttpContextAccessor httpContextAccessor,
-      ICacheNotebook cacheNotebook)
+      IGlobalCacheRepository globalCache)
     {
       _repository = repository;
       _accessValidator = accessValidator;
       _responseCreator = responseCreator;
       _httpContextAccessor = httpContextAccessor;
-      _cacheNotebook = cacheNotebook;
+      _globalCache = globalCache;
     }
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, List<Guid> userIds)
     {
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !await _repository.IsProjectAdminAsync(projectId, _httpContextAccessor.HttpContext.GetUserId()))
+        && !await _repository.DoesExistAsync(projectId, _httpContextAccessor.HttpContext.GetUserId(), isManager: true))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
@@ -55,12 +55,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       if (result)
       {
-        await _cacheNotebook.RemoveAsync(projectId);
+        await _globalCache.RemoveAsync(projectId);
+      }
+      else
+      {
+        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
       }
 
       return new()
       {
-        Status = result ? OperationResultStatusType.FullSuccess : OperationResultStatusType.Failed,
         Body = result
       };
     }

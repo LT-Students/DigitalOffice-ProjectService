@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using Microsoft.AspNetCore.JsonPatch;
 
 namespace LT.DigitalOffice.ProjectService.Data.Interfaces
@@ -14,11 +14,13 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
   {
     Task<DbProject> GetAsync(GetProjectFilter filter);
 
-    Task<(List<DbProject>, int totalCount)> GetAsync(IGetProjectsRequest request);
+    Task<List<DbProject>> GetAsync(IGetProjectsRequest request);
 
-    Task<(List<DbProject>, int totalCount)> FindAsync(FindProjectsFilter filter);
+    Task<DbProject> GetProjectWithUserAsync(Guid projectId, Guid userId);
 
-    Task<Guid?> CreateAsync(DbProject dbProject);
+    Task<(List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount)> FindAsync(FindProjectsFilter filter);
+
+    Task CreateAsync(DbProject dbProject);
 
     Task<bool> EditAsync(Guid projectId, JsonPatchDocument<DbProject> request);
 
@@ -28,6 +30,8 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<List<Guid>> DoExistAsync(List<Guid> projectsIds);
 
-    Task<bool> DoesProjectNameExistAsync(string name);
+    Task<bool> DoesNameExistAsync(string name);
+
+    Task<bool> DoesShortNameExistAsync(string shortName);
   }
 }

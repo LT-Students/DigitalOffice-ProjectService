@@ -10,11 +10,14 @@ using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
 using LT.DigitalOffice.Kernel.RedisSupport.Configurations;
+using LT.DigitalOffice.Kernel.RedisSupport.Constants;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers;
-using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.ProjectService.Broker;
+using LT.DigitalOffice.ProjectService.Broker.Consumers;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Dto.Configurations;
+using LT.DigitalOffice.Kernel.EFSupport.Extensions;
+using LT.DigitalOffice.Kernel.EFSupport.Helpers;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using MassTransit.RabbitMqTransport;
@@ -33,6 +36,7 @@ namespace LT.DigitalOffice.ProjectService
   public class Startup : BaseApiInfo
   {
     public const string CorsPolicyName = "LtDoCorsPolicy";
+    private string redisConnStr;
 
     public IConfiguration Configuration { get; }
 
@@ -53,11 +57,11 @@ namespace LT.DigitalOffice.ProjectService
         .GetSection(BaseRabbitMqConfig.SectionName)
         .Get<RabbitMqConfig>();
 
-            Version = "1.2.2.1";
-            Description = "ProjectService is an API intended to work with projects.";
-            StartTime = DateTime.UtcNow;
-            ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
-        }
+      Version = "1.2.3.2";
+      Description = "ProjectService is an API intended to work with projects.";
+      StartTime = DateTime.UtcNow;
+      ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
+    }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -93,40 +97,28 @@ namespace LT.DigitalOffice.ProjectService
       services.AddHttpContextAccessor();
 
       services.AddBusinessObjects();
-      services.AddTransient<IRedisHelper, RedisHelper>();
-      services.AddTransient<ICacheNotebook, CacheNotebook>();
 
-      string connStr = Environment.GetEnvironmentVariable("ConnectionString");
-      if (string.IsNullOrEmpty(connStr))
-      {
-        connStr = Configuration.GetConnectionString("SQLConnectionString");
-
-        Log.Information($"SQL connection string from appsettings.json was used. Value '{HidePasswordHelper.HidePassword(connStr)}'.");
-      }
-      else
-      {
-        Log.Information( $"SQL connection string from environment was used. Value '{HidePasswordHelper.HidePassword(connStr)}'.");
-      }
+      string connStr = ConnectionStringHandler.Get(Configuration);
 
       services.AddDbContext<ProjectServiceDbContext>(options =>
       {
         options.UseSqlServer(connStr);
       });
 
-      string redisConnStr = Environment.GetEnvironmentVariable("RedisConnectionString");
+      redisConnStr = Environment.GetEnvironmentVariable("RedisConnectionString");
       if (string.IsNullOrEmpty(redisConnStr))
       {
         redisConnStr = Configuration.GetConnectionString("Redis");
 
-        Log.Information( $"Redis connection string from appsettings.json was used. Value '{HidePasswordHelper.HidePassword(redisConnStr)}'");
+        Log.Information( $"Redis connection string from appsettings.json was used. Value '{PasswordHider.Hide(redisConnStr)}'");
       }
       else
       {
-        Log.Information( $"Redis connection string from environment was used. Value '{HidePasswordHelper.HidePassword(redisConnStr)}'");
+        Log.Information( $"Redis connection string from environment was used. Value '{PasswordHider.Hide(redisConnStr)}'");
       }
 
       services.AddSingleton<IConnectionMultiplexer>(
-        x => ConnectionMultiplexer.Connect(redisConnStr));
+        x => ConnectionMultiplexer.Connect(redisConnStr + ",abortConnect=false,connectRetry=1,connectTimeout=2000"));
 
       services.AddControllers();
       services
@@ -143,7 +135,13 @@ namespace LT.DigitalOffice.ProjectService
 
     public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
     {
-      UpdateDatabase(app);
+      app.UpdateDatabase<ProjectServiceDbContext>();
+
+      string error = FlushRedisDbHelper.FlushDatabase(redisConnStr, Cache.Projects);
+      if (error is not null)
+      {
+        Log.Error(error);
+      }
 
       app.UseForwardedHeaders();
 
@@ -178,17 +176,6 @@ namespace LT.DigitalOffice.ProjectService
     #endregion
 
     #region private methods
-
-    private void UpdateDatabase(IApplicationBuilder app)
-    {
-      using var serviceScope = app.ApplicationServices
-        .GetRequiredService<IServiceScopeFactory>()
-        .CreateScope();
-
-      using var context = serviceScope.ServiceProvider.GetService<ProjectServiceDbContext>();
-
-      context.Database.Migrate();
-    }
 
     #region configure masstransit
 
@@ -247,10 +234,13 @@ namespace LT.DigitalOffice.ProjectService
       x.AddConsumer<SearchProjectsConsumer>();
       x.AddConsumer<FindParseEntitiesConsumer>();
       x.AddConsumer<GetProjectsUsersConsumer>();
-      x.AddConsumer<DisactivateUserConsumer>();
       x.AddConsumer<GetProjectsConsumer>();
       x.AddConsumer<CheckProjectsExistenceConsumer>();
       x.AddConsumer<CheckProjectUsersExistenceConsumer>();
+      x.AddConsumer<DisactivateProjectUserConsumer>();
+      x.AddConsumer<CheckFilesAccessesConsumer>();
+      x.AddConsumer<CreateFilesConsumer>();
+      x.AddConsumer<GetProjectUserRoleConsumer>();
     }
 
     private void ConfigureEndpoints(
@@ -273,9 +263,9 @@ namespace LT.DigitalOffice.ProjectService
         ep.ConfigureConsumer<GetProjectsUsersConsumer>(context);
       });
 
-      cfg.ReceiveEndpoint(rabbitMqConfig.DisactivateUserEndpoint, ep =>
+      cfg.ReceiveEndpoint(rabbitMqConfig.DisactivateProjectUserEndpoint, ep =>
       {
-        ep.ConfigureConsumer<DisactivateUserConsumer>(context);
+        ep.ConfigureConsumer<DisactivateProjectUserConsumer>(context);
       });
 
       cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectsEndpoint, ep =>
@@ -291,6 +281,21 @@ namespace LT.DigitalOffice.ProjectService
       cfg.ReceiveEndpoint(rabbitMqConfig.CheckProjectUsersExistenceEndpoint, ep =>
       {
         ep.ConfigureConsumer<CheckProjectUsersExistenceConsumer>(context);
+      });
+
+      cfg.ReceiveEndpoint(rabbitMqConfig.CheckFilesAccessesEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<CheckFilesAccessesConsumer>(context);
+      });
+
+      cfg.ReceiveEndpoint(rabbitMqConfig.CreateFilesEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<CreateFilesConsumer>(context);
+      });
+
+      cfg.ReceiveEndpoint(rabbitMqConfig.GetProjectUserRoleEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<GetProjectUserRoleConsumer>(context);
       });
     }
 

@@ -4,7 +4,7 @@ using System.Linq;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.User;
 using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Db
@@ -18,7 +18,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public DbProjectUser Map(CreateUserRequest request, Guid projectId)
+    public DbProjectUser Map(UserRequest request, Guid projectId)
     {
       if (request == null)
       {
@@ -31,27 +31,25 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Db
         ProjectId = projectId,
         UserId = request.UserId,
         Role = (int)request.Role,
-        CreatedAtUtc = DateTime.UtcNow,
         CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
         IsActive = true
       };
     }
 
-    public List<DbProjectUser> Map(CreateProjectUsersRequest request)
+    public List<DbProjectUser> Map(Guid projectId, List<UserRequest> users)
     {
-      if (request == null)
+      if (users is null)
       {
         return null;
       }
 
-      return request.Users.Select(u =>
+      return users.Select(u =>
         new DbProjectUser
         {
           Id = Guid.NewGuid(),
-          ProjectId = request.ProjectId,
+          ProjectId = projectId,
           UserId = u.UserId,
           Role = (int)u.Role,
-          CreatedAtUtc = DateTime.UtcNow,
           CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
           IsActive = true
         }).ToList();

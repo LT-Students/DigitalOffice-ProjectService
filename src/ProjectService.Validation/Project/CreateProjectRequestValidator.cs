@@ -1,55 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using FluentValidation;
-using LT.DigitalOffice.Kernel.BrokerSupport.Broker;
-using LT.DigitalOffice.Models.Broker.Common;
+using LT.DigitalOffice.Models.Broker.Enums;
+using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
-using MassTransit;
-using Microsoft.Extensions.Logging;
 
 namespace LT.DigitalOffice.ProjectService.Validation.Project
 {
   public class CreateProjectRequestValidator : AbstractValidator<CreateProjectRequest>, ICreateProjectRequestValidator
   {
-    private readonly IRequestClient<ICheckUsersExistence> _rcCheckUsersExistence;
-    private readonly ILogger<CreateProjectRequestValidator> _logger;
-
     public CreateProjectRequestValidator(
-      ILogger<CreateProjectRequestValidator> logger,
       IProjectRepository projectRepository,
-      IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
+      IUserService userService,
       IImageValidator imageValidator)
     {
-      _logger = logger;
-      _rcCheckUsersExistence = rcCheckUsersExistence;
+      CascadeMode = CascadeMode.Stop;
 
       RuleFor(project => project.Name.Trim())
-        .Cascade(CascadeMode.Stop)
-        .NotEmpty().WithMessage("Project name must not be empty.")
         .MaximumLength(150).WithMessage("Project name is too long.")
-        .MustAsync(async (name, _) => !await projectRepository.DoesProjectNameExistAsync(name))
-        .WithMessage(project => $"Project with name '{project.Name}' already exists.");
+        .MustAsync(async (name, _) => !await projectRepository.DoesNameExistAsync(name))
+        .WithMessage("Project's name must be unique.");
+
+      RuleFor(project => project.ShortName.Trim())
+        .MaximumLength(40).WithMessage("Project short name is too long.")
+        .MustAsync(async (shortName, _) => !await projectRepository.DoesShortNameExistAsync(shortName))
+        .WithMessage("Project's short name must be unique.");
 
       RuleFor(project => project.Status)
         .IsInEnum();
-
-      When(project => !string.IsNullOrEmpty(project.ShortName?.Trim()), () =>
-      {
-        RuleFor(project => project.ShortName)
-          .MaximumLength(30)
-          .WithMessage("Project short name is too long.");
-      });
 
       When(project => !string.IsNullOrEmpty(project.ShortDescription?.Trim()), () =>
       {
         RuleFor(project => project.ShortDescription)
           .MaximumLength(300)
           .WithMessage("Project short description is too long.");
+      });
+
+      When(project => !string.IsNullOrEmpty(project.Customer?.Trim()), () =>
+      {
+        RuleFor(project => project.ShortDescription)
+          .MaximumLength(150)
+          .WithMessage("Project customer is too long.");
+      });
+
+      When(project => !project.Status.Equals(ProjectStatusType.Active), () =>
+      {
+        RuleFor(project => project.EndDateUtc)
+          .Must(endDateUtc => endDateUtc.HasValue)
+          .WithMessage("EndDateUtc can't be null if project is not active.");
       });
 
       When(project => project.DepartmentId.HasValue, () =>
@@ -60,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
           .WithMessage("Wrong type of department Id.");
       });
 
-      When(project => project.Users != null && project.Users.Any(), () =>
+      When(project => project.Users.Any(), () =>
       {
         RuleForEach(project => project.Users)
           .ChildRules(user =>
@@ -76,44 +78,16 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
           .Cascade(CascadeMode.Stop)
           .Must(p => p.Select(pu => pu.UserId).Distinct().Count() == p.Count())
           .WithMessage("User cannot be added to the project twice.")
-          .MustAsync(async (pu, cancellation) => await CheckValidityUsersIds(pu.Select(u => u.UserId).ToList()))
+          .MustAsync(async (projectUsers, cancellation) =>
+            (await userService.CheckUsersExistenceAsync(projectUsers.Select(user => user.UserId).ToList())).Count() == projectUsers.Count())
           .WithMessage("Some users does not exist.");
       });
 
-      When(project => project.ProjectImages != null && project.ProjectImages.Any(), () =>
+      When(project => project.ProjectImages.Any(), () =>
       {
         RuleForEach(project => project.ProjectImages)
           .SetValidator(imageValidator);
       });
-    }
-
-    private async Task<bool> CheckValidityUsersIds(List<Guid> usersIds)
-    {
-      if (!usersIds.Any())
-      {
-        return true;
-      }
-
-      string logMessage = "Cannot check existing users withs this ids {userIds}";
-
-      try
-      {
-        Response<IOperationResult<ICheckUsersExistence>> response =
-          await _rcCheckUsersExistence.GetResponse<IOperationResult<ICheckUsersExistence>>(
-            ICheckUsersExistence.CreateObj(usersIds));
-        if (response.Message.IsSuccess)
-        {
-          return response.Message.Body.UserIds.Count() == usersIds.Count();
-        }
-
-        _logger.LogWarning($"Can not find with this Ids: {usersIds}: {Environment.NewLine}{string.Join('\n', response.Message.Errors)}");
-      }
-      catch (Exception exc)
-      {
-        _logger.LogError(exc, logMessage);
-      }
-
-      return false;
     }
   }
 }

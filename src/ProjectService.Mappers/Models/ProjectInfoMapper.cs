@@ -1,30 +1,34 @@
-﻿using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
+﻿using LT.DigitalOffice.Models.Broker.Enums;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Models;
 
 namespace LT.DigitalOffice.ProjectService.Mappers.Models
 {
   public class ProjectInfoMapper : IProjectInfoMapper
   {
-    public ProjectInfo Map(DbProject value, DepartmentInfo department)
+    public ProjectInfo Map(DbProject dbProject, int usersCount, DepartmentInfo department)
     {
-      if (value == null)
+      if (dbProject == null)
       {
         return null;
       }
 
       return new ProjectInfo
       {
-        Id = value.Id,
-        Name = value.Name,
-        CreatedBy = value.CreatedBy,
-        Status = (ProjectStatusType)value.Status,
-        CreatedAtUtc = value.CreatedAtUtc,
-        ShortName = value.ShortName,
-        Description = value.Description,
-        ShortDescription = value.ShortDescription,
-        Department = department
+        Id = dbProject.Id,
+        Name = dbProject.Name,
+        CreatedBy = dbProject.CreatedBy,
+        Status = (ProjectStatusType)dbProject.Status,
+        CreatedAtUtc = dbProject.CreatedAtUtc,
+        ShortName = dbProject.ShortName,
+        Description = dbProject.Description,
+        ShortDescription = dbProject.ShortDescription,
+        Department = department,
+        StartDateUtc = dbProject.StartDateUtc,
+        EndDateUtc = dbProject.EndDateUtc,
+        Customer = dbProject.Customer,
+        UsersCount = usersCount
       };
     }
   }
