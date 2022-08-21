@@ -53,7 +53,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     public async Task<OperationResultResponse<List<Guid>>> ExecuteAsync(CreateImagesRequest request)
     {
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(await _userRepository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), isManager: true)))
+        && !(await _userRepository.DoesExistAsync(userId: _httpContextAccessor.HttpContext.GetUserId(), projectId: request.ProjectId, isManager: true)))
       {
         return _responseCreator.CreateFailureResponse<List<Guid>>(HttpStatusCode.Forbidden);
       }
