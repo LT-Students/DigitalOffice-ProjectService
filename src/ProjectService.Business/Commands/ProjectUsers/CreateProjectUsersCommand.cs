@@ -62,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       List<string> errors = new();
 
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !await _projectUserRepository.DoesExistAsync(request.ProjectId, _httpContextAccessor.HttpContext.GetUserId(), isManager: true))
+        && !await _projectUserRepository.DoesExistAsync(userId: _httpContextAccessor.HttpContext.GetUserId(), projectId: projectId, isManager: true))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
