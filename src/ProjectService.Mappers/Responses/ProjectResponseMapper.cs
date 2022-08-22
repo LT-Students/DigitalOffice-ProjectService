@@ -25,7 +25,18 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Responses
         ? null
         : new ProjectResponse
         {
-          Project = _projectMapper.Map(dbProject, dbProject.Users.Count, department),
+          Id = dbProject.Id,
+          Name = dbProject.Name,
+          CreatedBy = dbProject.CreatedBy,
+          Status = (ProjectStatusType)dbProject.Status,
+          CreatedAtUtc = dbProject.CreatedAtUtc,
+          ShortName = dbProject.ShortName,
+          Description = dbProject.Description,
+          ShortDescription = dbProject.ShortDescription,
+          Department = department,
+          StartDateUtc = dbProject.StartDateUtc,
+          EndDateUtc = dbProject.EndDateUtc,
+          Customer = dbProject.Customer,
           Users = dbProject.Users.Select(pu =>
             new ProjectUserInfo()
             {

@@ -61,7 +61,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
                 Name = "DepartmentName"
             };
 
-            _projectInfo = new ProjectInfo
+/*            _projectInfo = new ProjectInfo
             {
                 Id = _dbProject.Id,
                 Department = _department,
@@ -77,7 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.UnitTests.Responses
             _expectedResponse = new ProjectResponse
             {
                 Project = _projectInfo
-            };
+            };*/
 
             _projectInfoMapperMock
                 .Setup(x => x.Map(_dbProject, It.IsAny<int>(), _department))
