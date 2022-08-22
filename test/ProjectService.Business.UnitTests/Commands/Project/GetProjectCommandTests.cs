@@ -82,7 +82,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
 
       _response = new ProjectResponse
       {
-        Project = _projectInfo,
         Users = _projectUsersInfo
       };
     }

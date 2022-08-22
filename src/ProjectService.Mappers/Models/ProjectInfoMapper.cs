@@ -22,7 +22,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models
         Status = (ProjectStatusType)dbProject.Status,
         CreatedAtUtc = dbProject.CreatedAtUtc,
         ShortName = dbProject.ShortName,
-        Description = dbProject.Description,
         ShortDescription = dbProject.ShortDescription,
         Department = department,
         StartDateUtc = dbProject.StartDateUtc,
