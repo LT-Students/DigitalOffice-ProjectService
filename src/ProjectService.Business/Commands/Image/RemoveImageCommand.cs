@@ -49,7 +49,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
     {
       Guid userId = _httpContextAccessor.HttpContext.GetUserId();
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(await _userRepository.DoesExistAsync(request.ProjectId, userId, true)))
+        && !(await _userRepository.DoesExistAsync(userId: userId, projectId: request.ProjectId, true)))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
