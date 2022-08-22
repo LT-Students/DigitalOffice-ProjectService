@@ -38,10 +38,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
-      if (!await _departmentRepository.EditAsync(request.ProjectId, request.DepartmentId))
+      Task<bool> isEdit = _departmentRepository.EditAsync(request.ProjectId, request.DepartmentId);
+      if (request.DepartmentId.HasValue && !await isEdit)
       {
         await _departmentRepository.CreateAsync(
           _mapper.Map(request.ProjectId, request.DepartmentId.Value));
+      } 
+      else if (!request.DepartmentId.HasValue && !await isEdit)
+      {
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest);
       }
 
       return new()

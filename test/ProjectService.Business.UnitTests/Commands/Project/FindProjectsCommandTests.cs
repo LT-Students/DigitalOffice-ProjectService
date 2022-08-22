@@ -1,401 +1,210 @@
-﻿//using LT.DigitalOffice.ProjectService.Business.Commands.Interfaces;
-//using NUnit.Framework;
-//using Moq.AutoMock;
-//using LT.DigitalOffice.ProjectService.Data.Interfaces;
-//using LT.DigitalOffice.ProjectService.Mappers.RequestsMappers.Interfaces;
-//using LT.DigitalOffice.ProjectService.Mappers.Responses.Interfaces;
-//using MassTransit;
-//using LT.DigitalOffice.ProjectService.Models.Db;
-//using System.Collections.Generic;
-//using Moq;
-//using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-//using System;
-//using LT.DigitalOffice.ProjectService.Models.Dto.ResponsesModels;
-//using LT.DigitalOffice.Kernel.Broker;
-//using System.Threading.Tasks;
-//using LT.DigitalOffice.UnitTestKernel;
-//using LT.DigitalOffice.ProjectService.Models.Dto.Models;
-//using LT.DigitalOffice.Models.Broker.Responses.Company;
-//using LT.DigitalOffice.Models.Broker.Requests.Company;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using FluentValidation;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.Kernel.Validators.Interfaces;
+using LT.DigitalOffice.Models.Broker.Models.Department;
+using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
+using LT.DigitalOffice.ProjectService.Business.Commands.Project;
+using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Models;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
+using LT.DigitalOffice.UnitTestKernel;
+using Moq;
+using Moq.AutoMock;
+using NUnit.Framework;
 
-//namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
-//{
-//    class FindProjectsCommandTests
-//    {
-//        private IFindProjectsCommand _command;
-//        private AutoMocker _mocker;
-//        private Mock<Response<IOperationResult<IFindDepartmentsResponse>>> _brokerFindResponseMock;
+namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
+{
+  internal class FindProjectsCommandTests
+  {
+    private IFindProjectsCommand _command;
+    private AutoMocker _mocker;
 
-//        private int _totalCount;
-//        private List<DbProject> _dbProjects;
-//        private Dictionary<Guid, string> _idNameFind;
-//        private Dictionary<Guid, string> _idNameGet;
-//        private DbProject _dbProject;
-//        private FindResponse<ProjectInfo> _projectsResponse;
-//        private FindProjectsFilter _findProjectsFilter;
-//        private ProjectInfo _projectInfo;
+    private List<(DbProject dbProject, int usersCount)> _dbProjects;
+    private DbProject _dbProject;
+    private ProjectInfo _projectInfo;
 
-//        private const string Name = "Name";
-//        private const string ShortName = "ShortName";
-//        private const string DepartmentName = "DepartmentName";
-//        private Guid DepartmentId;
+    private const string Name = "Name";
+    private const string ShortName = "ShortName";
 
-//        #region Setup
+    private void Verifiable(
+      Times baseFindFilterValidatorTimes,
+      Times responseCreatorTimes,
+      Times projectRepositoryTimes,
+      Times projectInfoMapperTimes,
+      Times departmentServiceTimess)
+    {
+      _mocker.Verify<IBaseFindFilterValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, baseFindFilterValidatorTimes);
+      _mocker.Verify<IResponseCreator, FindResultResponse<ProjectInfo>>(
+        x => x.CreateFailureFindResponse<ProjectInfo>(It.IsAny<HttpStatusCode>(), It.IsAny<List<string>>()), responseCreatorTimes);
+      _mocker.Verify<IProjectRepository, Task<(List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount)>>(
+        x => x.FindAsync(It.IsAny<FindProjectsFilter>()), projectRepositoryTimes);
+      _mocker.Verify<IProjectInfoMapper, ProjectInfo>(x => x.Map(_dbProject, 0, It.IsAny<DepartmentInfo>()), projectInfoMapperTimes);
+      _mocker.Verify<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(It.IsAny<List<string>>(), It.IsAny<List<Guid>>(), default), departmentServiceTimess);
 
-//        public void SetUpModels()
-//        {
-//            DepartmentId = Guid.NewGuid();
+      _mocker.Resolvers.Clear();
+    }
 
-//            _mocker = new AutoMocker();
-//            _command = _mocker.CreateInstance<FindProjectsCommand>();
+    #region Setup
 
-//            _dbProject = new DbProject
-//            {
-//                Id = Guid.NewGuid(),
-//                Name = Name,
-//                ShortName = ShortName,
-//                ShortDescription = "description",
-//                DepartmentId = DepartmentId,
-//                CreatedAt = DateTime.UtcNow
-//            };
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+      _mocker = new AutoMocker();
+      _command = _mocker.CreateInstance<FindProjectsCommand>();
 
-//            _idNameFind = new();
-//            _idNameFind.Add(DepartmentId, DepartmentName);
+      _dbProject = new DbProject()
+      {
+        Id = Guid.NewGuid(),
+        Name = Name,
+        ShortName = ShortName
+      };
 
-//            _dbProjects = new List<DbProject>
-//            {
-//                _dbProject
-//            };
+      _dbProjects = new List<(DbProject dbProject, int usersCount)>
+      {
+        (_dbProject, 0)
+      };
 
-//            _projectInfo = new ProjectInfo
-//            {
-//                Id = _dbProject.Id,
-//                Name = _dbProject.Name,
-//                ShortName = _dbProject.ShortName,
-//                ShortDescription = _dbProject.ShortDescription,
-//                Department = new DepartmentInfo
-//                {
-//                    Id = DepartmentId,
-//                    Name = DepartmentName
-//                }
-//            };
+      _projectInfo = new ProjectInfo
+      {
+        Id = _dbProject.Id,
+        Name = _dbProject.Name,
+        ShortName = _dbProject.ShortName
+      };
+    }
 
-//            _projectsResponse = new FindResponse<ProjectInfo>
-//            {
-//                TotalCount = 1,
-//                Errors = null,
-//                Body = new List<ProjectInfo>
-//                {
-//                    _projectInfo
-//                }
-//            };
+    [SetUp]
+    public void SetUp()
+    {
+      _mocker.GetMock<IBaseFindFilterValidator>().Reset();
+      _mocker.GetMock<IResponseCreator>().Reset();
+      _mocker.GetMock<IProjectRepository>().Reset();
+      _mocker.GetMock<IProjectInfoMapper>().Reset();
+      _mocker.GetMock<IDepartmentService>().Reset();
 
-//            _idNameGet = new Dictionary<Guid, string>();
-//            _idNameGet.Add(_dbProject.DepartmentId, DepartmentName);
+      _mocker
+        .Setup<IBaseFindFilterValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
+        .Returns(true);
+    }
 
-//            _findProjectsFilter = new FindProjectsFilter
-//            {
-//                Name = Name
-//            };
+    #endregion
 
-//            _findDbProjectsFilter = new FindDbProjectsFilter
-//            {
-//                Name = _findProjectsFilter.Name
-//            };
+    [Test]
+    public async Task FilterNotCorrect()
+    {
+      FindProjectsFilter _findProjectsFilter = new FindProjectsFilter
+      {
+        SkipCount = -1,
+        TakeCount = 100
+      };
 
-//            _brokerFindResponseMock = new Mock<Response<IOperationResult<IFindDepartmentsResponse>>>();
-//            _brokerFindResponseMock
-//                .Setup(x => x.Message.Body.IdNamePairs)
-//                .Returns(_idNameFind);
-//        }
+      _mocker
+        .Setup<IBaseFindFilterValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
+        .Returns(false);
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            SetUpModels();
-//            _mocker.GetMock<IProjectRepository>().Reset();
-//            _mocker.GetMock<IFindDbProjectFilterMapper>().Reset();
-//            _mocker.GetMock<IFindProjectsResponseMapper>().Reset();
+      _mocker
+        .Setup<IResponseCreator, FindResultResponse<ProjectInfo>>(x => x.CreateFailureFindResponse<ProjectInfo>(HttpStatusCode.BadRequest, It.IsAny<List<string>>()))
+        .Returns(new FindResultResponse<ProjectInfo>()
+        {
+          Errors = new() { "Skip count can't be less than 0." }
+        });
 
-//            _brokerFindResponseMock
-//                .Setup(x => x.Message.IsSuccess)
-//                .Returns(true);
-//            _brokerFindResponseMock
-//                .Setup(x => x.Message.Errors)
-//                .Returns(null as List<string>);
+      FindResultResponse<ProjectInfo> expectedResponse = new()
+      {
+        TotalCount = 0,
+        Errors = new List<string> { "Skip count can't be less than 0." }
+      };
 
-//            _mocker
-//                .Setup<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
-//                    x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-//                        It.IsAny<object>(), default, default))
-//                .Returns(System.Threading.Tasks.Task.FromResult(_brokerFindResponseMock.Object));
-//        }
+      SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_findProjectsFilter));
 
-//        #endregion
+      Verifiable(
+        baseFindFilterValidatorTimes: Times.Once(),
+        responseCreatorTimes: Times.Once(),
+        projectRepositoryTimes: Times.Never(),
+        projectInfoMapperTimes: Times.Never(),
+        departmentServiceTimess: Times.Never());
+    }
 
-//        [Test]
-//        public void ShouldThrowArgumentNullExceptionWhenFilterIsNull()
-//        {
-//            Assert.Throws<ArgumentNullException>(() => _command.Execute(null, 0, 0));
-//            _mocker
-//                .Verify<IRequestClient<IFindDepartmentsRequest>>(x =>
-//                    x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-//                        It.IsAny<object>(), default, default),
-//                    Times.Never);
-//            _mocker
-//                .Verify<IProjectRepository>(x =>
-//                    x.FindProjects(
-//                        It.IsAny<FindDbProjectsFilter>(), It.IsAny<int>(), It.IsAny<int>(), out _totalCount),
-//                    Times.Never);
-//        }
+    [Test]
+    public async Task IncludeDepartmentIsFalse()
+    {
+      FindProjectsFilter _findProjectsFilter = new FindProjectsFilter
+      {
+        SkipCount = 0,
+        TakeCount = 100
+      };
 
-//        [Test]
-//        public void ShouldReturnFoundProjectInfosByName()
-//        {
-//            int skip = 0;
-//            int take = 2;
+      _mocker
+        .Setup<IProjectRepository, Task<(List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount)>>(x => x.FindAsync(_findProjectsFilter))
+        .ReturnsAsync((_dbProjects, 1));
 
-//            _mocker
-//                .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
-//                    _findProjectsFilter,
-//                    null))
-//                .Returns(_findDbProjectsFilter);
+      _mocker
+        .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(_dbProject, 0, It.IsAny<DepartmentInfo>()))
+        .Returns(_projectInfo);
 
-//            _mocker
-//                .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
-//                    _findDbProjectsFilter,
-//                    skip,
-//                    take,
-//                    out _totalCount))
-//                .Returns(_dbProjects);
+      FindResultResponse<ProjectInfo> expectedResponse = new()
+      {
+        TotalCount = 1,
+        Body = new List<ProjectInfo>() {
+          _projectInfo
+        }
+      };
 
-//            _mocker
-//                .Setup<IFindProjectsResponseMapper, FindResponse<ProjectInfo>>(x => x.Map(
-//                    _dbProjects,
-//                    It.IsAny<int>(),
-//                    _idNameGet,
-//                    It.IsAny<List<string>>()))
-//                .Returns(_projectsResponse);
+      SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_findProjectsFilter));
 
-//            SerializerAssert.AreEqual(_projectsResponse, _command.Execute(_findProjectsFilter, skip, take));
-//            _mocker
-//                .Verify<IRequestClient<IFindDepartmentsRequest>>(x =>
-//                    x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-//                        It.IsAny<object>(), default, default),
-//                    Times.Once);
-//            _mocker
-//                .Verify<IProjectRepository>(x =>
-//                    x.FindProjects(
-//                        _findDbProjectsFilter, skip, take, out _totalCount),
-//                    Times.Once);
-//        }
+      Verifiable(
+        baseFindFilterValidatorTimes: Times.Once(),
+        responseCreatorTimes: Times.Never(),
+        projectRepositoryTimes: Times.Once(),
+        projectInfoMapperTimes: Times.Once(),
+        departmentServiceTimess: Times.Never());
+    }
 
-//        [Test]
-//        public void ShouldReturnFoundProjectInfosByShortName()
-//        {
-//            _findProjectsFilter = new FindProjectsFilter
-//            {
-//                ShortName = ShortName
-//            };
-//            _findDbProjectsFilter = new FindDbProjectsFilter
-//            {
-//                ShortName = ShortName
-//            };
+    [Test]
+    public async Task IncludeDepartmentIsTrue()
+    {
+      FindProjectsFilter _findProjectsFilter = new FindProjectsFilter
+      {
+        SkipCount = 0,
+        TakeCount = 100,
+        IncludeDepartment = true
+      };
 
-//            int skip = 0;
-//            int take = 2;
+      _mocker
+        .Setup<IProjectRepository, Task<(List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount)>>(x => x.FindAsync(_findProjectsFilter))
+        .ReturnsAsync((_dbProjects, 1));
 
-//            _mocker
-//                .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
-//                    _findProjectsFilter,
-//                    null))
-//                .Returns(_findDbProjectsFilter);
+      _mocker
+        .Setup<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(It.IsAny<List<string>>(), It.IsAny<List<Guid>>(), default))
+        .ReturnsAsync(It.IsAny<List<DepartmentData>>());
 
-//            _mocker
-//                .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
-//                    _findDbProjectsFilter,
-//                    skip,
-//                    take,
-//                    out _totalCount))
-//                .Returns(_dbProjects);
+      _mocker
+        .Setup<IProjectInfoMapper, ProjectInfo>(x => x.Map(_dbProject, 0, It.IsAny<DepartmentInfo>()))
+        .Returns(_projectInfo);
 
-//            _mocker
-//                .Setup<IFindProjectsResponseMapper, FindResponse<ProjectInfo>>(x => x.Map(
-//                    _dbProjects,
-//                    It.IsAny<int>(),
-//                    _idNameGet,
-//                    It.IsAny<List<string>>()))
-//                .Returns(_projectsResponse);
+      FindResultResponse<ProjectInfo> expectedResponse = new()
+      {
+        TotalCount = 1,
+        Body = new List<ProjectInfo>() {
+          _projectInfo
+        }
+      };
 
-//            SerializerAssert.AreEqual(_projectsResponse, _command.Execute(_findProjectsFilter, skip, take));
-//            _mocker
-//                .Verify<IRequestClient<IFindDepartmentsRequest>>(x =>
-//                    x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-//                        It.IsAny<object>(), default, default),
-//                    Times.Once);
-//            _mocker
-//                .Verify<IProjectRepository>(x =>
-//                    x.FindProjects(
-//                        _findDbProjectsFilter, skip, take, out _totalCount),
-//                    Times.Once);
-//        }
+      SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_findProjectsFilter));
 
-//        [Test]
-//        public void ShouldReturnFoundProjectInfosByDepartmentName()
-//        {
-//            int skip = 0;
-//            int take = 2;
-
-//            _findProjectsFilter = new FindProjectsFilter
-//            {
-//                DepartmentName = DepartmentName
-//            };
-//            _findDbProjectsFilter = new FindDbProjectsFilter
-//            {
-//                IdNameDepartments = _idNameFind
-//            };
-
-//            _mocker
-//                .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
-//                    _findProjectsFilter,
-//                    _idNameFind))
-//                .Returns(_findDbProjectsFilter);
-
-//            _mocker
-//                .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
-//                    _findDbProjectsFilter,
-//                    skip,
-//                    take,
-//                    out _totalCount))
-//                .Returns(_dbProjects);
-
-//            _mocker
-//                .Setup<IFindProjectsResponseMapper, FindResponse<ProjectInfo>>(x => x.Map(
-//                    _dbProjects,
-//                    It.IsAny<int>(),
-//                    _idNameGet,
-//                    It.IsAny<List<string>>()))
-//                .Returns(_projectsResponse);
-
-//            SerializerAssert.AreEqual(_projectsResponse, _command.Execute(_findProjectsFilter, skip, take));
-//            _mocker
-//                .Verify<IRequestClient<IFindDepartmentsRequest>>(x =>
-//                    x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-//                        It.IsAny<object>(), default, default),
-//                    Times.Once);
-//            _mocker
-//                .Verify<IProjectRepository>(x =>
-//                    x.FindProjects(
-//                        _findDbProjectsFilter, skip, take, out _totalCount),
-//                    Times.Once);
-//        }
-
-//        [Test]
-//        public void ShouldReturnEmptyListProjectsSearchedByDepartmentNameWhenFindDepartmentRequestIsUnsuccessful()
-//        {
-//            var errors = new List<string> { "some error" };
-
-//            _brokerFindResponseMock
-//                .Setup(x => x.Message.IsSuccess)
-//                .Returns(false);
-//            _brokerFindResponseMock
-//                .Setup(x => x.Message.Errors)
-//                .Returns(errors);
-
-//            _mocker
-//                .Setup<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
-//                    x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-//                        It.IsAny<object>(), default, default))
-//                .Returns(System.Threading.Tasks.Task.FromResult(_brokerFindResponseMock.Object));
-
-//            _findProjectsFilter = new FindProjectsFilter
-//            {
-//                DepartmentName = DepartmentName
-//            };
-//            _findDbProjectsFilter = new FindDbProjectsFilter
-//            {
-//                IdNameDepartments = new Dictionary<Guid, string>()
-//            };
-
-//            _mocker
-//                .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
-//                    _findProjectsFilter,
-//                    It.Is<Dictionary<Guid, string>>(d => d.Count == 0)))
-//                .Returns(_findDbProjectsFilter);
-
-//            _mocker
-//                .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
-//                    _findDbProjectsFilter,
-//                    It.IsAny<int>(),
-//                    It.IsAny<int>(),
-//                    out _totalCount))
-//                .Returns(new List<DbProject>());
-
-//            _projectsResponse = new FindResponse<ProjectInfo>
-//            {
-//                TotalCount = 1,
-//                Errors = errors,
-//                Body = new List<ProjectInfo>()
-//            };
-
-//            _mocker
-//                .Setup<IFindProjectsResponseMapper, FindResponse<ProjectInfo>>(x => x.Map(
-//                    It.IsAny<List<DbProject>>(),
-//                    It.IsAny<int>(),
-//                    It.Is<IDictionary<Guid, string>>(d => d.Count == 0),
-//                    It.IsAny<List<string>>()))
-//                .Returns(_projectsResponse);
-
-//            var response = _command.Execute(_findProjectsFilter, 0, 2);
-
-//            Assert.IsEmpty(response.Body);
-//            Assert.IsNotEmpty(response.Errors);
-//            _mocker.Verify<IRequestClient<IFindDepartmentsRequest>, Task<Response<IOperationResult<IFindDepartmentsResponse>>>>(
-//                x => x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-//                    IFindDepartmentsRequest.CreateObj(_findProjectsFilter.DepartmentName, null), default, default), Times.Once);
-//            _mocker
-//                .Verify<IProjectRepository>(x =>
-//                    x.FindProjects(
-//                        _findDbProjectsFilter, It.IsAny<int>(), It.IsAny<int>(), out _totalCount),
-//                    Times.Once);
-//        }
-
-//        [Test]
-//        public void ShouldThrowExceptionWhenRepositoryThrowEception()
-//        {
-//            _mocker
-//                .Setup<IFindDbProjectFilterMapper, FindDbProjectsFilter>(x => x.Map(
-//                    _findProjectsFilter,
-//                    null))
-//                .Returns(_findDbProjectsFilter);
-
-//            _mocker
-//                .Setup<IProjectRepository, List<DbProject>>(x => x.FindProjects(
-//                    It.IsAny<FindDbProjectsFilter>(),
-//                    It.IsAny<int>(),
-//                    It.IsAny<int>(),
-//                    out _totalCount))
-//                .Throws(new Exception());
-
-//            _mocker
-//                .Setup<IFindProjectsResponseMapper, FindResponse<ProjectInfo>>(x => x.Map(
-//                    _dbProjects,
-//                    It.IsAny<int>(),
-//                    _idNameGet,
-//                    It.IsAny<List<string>>()))
-//                .Returns(_projectsResponse);
-
-//            Assert.Throws<Exception>(() => _command.Execute(_findProjectsFilter, 0, 0));
-//            _mocker
-//                .Verify<IRequestClient<IFindDepartmentsRequest>>(x =>
-//                    x.GetResponse<IOperationResult<IFindDepartmentsResponse>>(
-//                        It.IsAny<object>(), default, default),
-//                    Times.Never);
-//            _mocker
-//                .Verify<IProjectRepository>(x =>
-//                    x.FindProjects(
-//                        It.IsAny<FindDbProjectsFilter>(), It.IsAny<int>(), It.IsAny<int>(), out _totalCount),
-//                    Times.Once);
-//        }
-//    }
-//}
+      Verifiable(
+        baseFindFilterValidatorTimes: Times.Once(),
+        responseCreatorTimes: Times.Never(),
+        projectRepositoryTimes: Times.Once(),
+        projectInfoMapperTimes: Times.Once(),
+        departmentServiceTimess: Times.Once());
+    }
+  }
+}
