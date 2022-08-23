@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Attributes;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models.Department;
 
 namespace LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces
@@ -13,5 +14,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces
       List<string> errors,
       List<Guid> departmentsIds = null,
       List<Guid> usersIds = null);
+
+    Task<DepartmentUserRole?> CheckDepartmentUserRoleAsync(Guid departmentId, Guid userId, List<string> errors = null);
   }
 }

@@ -6,6 +6,7 @@ using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
 using LT.DigitalOffice.Kernel.RedisSupport.Constants;
 using LT.DigitalOffice.Kernel.RedisSupport.Extensions;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
+using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models.Department;
 using LT.DigitalOffice.Models.Broker.Requests.Department;
 using LT.DigitalOffice.Models.Broker.Responses.Department;
@@ -20,15 +21,18 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
     private readonly IRequestClient<IGetDepartmentsRequest> _rcGetDepartments;
     private readonly ILogger<DepartmentService> _logger;
     private readonly IGlobalCacheRepository _globalCache;
+    private readonly IRequestClient<IGetDepartmentUserRoleRequest> _rcGetDepartmentUserRole;
 
     public DepartmentService(
       IRequestClient<IGetDepartmentsRequest> rcGetDepartments,
       ILogger<DepartmentService> logger,
-      IGlobalCacheRepository globalCache)
+      IGlobalCacheRepository globalCache,
+      IRequestClient<IGetDepartmentUserRoleRequest> rcGetDepartmentUserRole)
     {
       _rcGetDepartments = rcGetDepartments;
       _logger = logger;
       _globalCache = globalCache;
+      _rcGetDepartmentUserRole = rcGetDepartmentUserRole;
     }
 
     public async Task<List<DepartmentData>> GetDepartmentsAsync(
@@ -69,6 +73,17 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       }
 
       return departments;
+    }
+
+    public async Task<DepartmentUserRole?> CheckDepartmentUserRoleAsync(Guid departmentId, Guid userId, List<string> errors = null)
+    {
+      IGetDepartmentUserRoleResponse response = await _rcGetDepartmentUserRole.ProcessRequest<IGetDepartmentUserRoleRequest, IGetDepartmentUserRoleResponse>(
+        IGetDepartmentUserRoleRequest.CreateObj(
+          departmentId: departmentId,
+          userId: userId),
+        errors, _logger);
+
+      return response?.DepartmentUserRole;
     }
   }
 }
