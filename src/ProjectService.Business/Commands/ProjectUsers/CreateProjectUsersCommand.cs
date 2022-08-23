@@ -15,7 +15,6 @@ using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.User;
 using LT.DigitalOffice.ProjectService.Validation.User.Interfaces;
