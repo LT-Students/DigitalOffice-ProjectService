@@ -29,8 +29,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
     private AutoMocker _mocker;
     private List<ProjectUserInfo> _projectUsersInfo;
     private DbProject _dbProject;
-    private DepartmentInfo _departmentInfo;
-    private ProjectInfo _projectInfo;
     private ProjectResponse _response;
 
     private void Verifiable(
@@ -43,8 +41,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
       _mocker.Verify<IResponseCreator, OperationResultResponse<ProjectResponse>>(
         x => x.CreateFailureResponse<ProjectResponse>(It.IsAny<HttpStatusCode>(), It.IsAny<List<string>>()), responseCreatorTimes);
       _mocker.Verify<IProjectRepository,Task<DbProject>>(x => x.GetAsync(It.IsAny<GetProjectFilter>()), projectRepositoryTimes);
-      _mocker.Verify<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(It.IsAny<List<string>>(), default, default), departmentServiceTimes);
-      _mocker.Verify<IProjectResponseMapper, ProjectResponse > (x => x.Map(_dbProject, It.IsAny<DepartmentInfo>()), projectResponseMapperTimes);
+      _mocker.Verify<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(It.IsAny<List<string>>(), It.IsAny<List<Guid>>(), default), departmentServiceTimes);
+      _mocker.Verify<IProjectResponseMapper, ProjectResponse > (x => x.Map(It.IsAny<DbProject>(), It.IsAny<DepartmentInfo>()), projectResponseMapperTimes);
       _mocker.Verify<IDepartmentInfoMapper, DepartmentInfo>(x => x.Map(It.IsAny<DepartmentData>()), departmentInfoMapperTimes);
 
       _mocker.Resolvers.Clear();
@@ -62,13 +60,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         Id = Guid.NewGuid(),
         Name = "Project",
         Department = new()
-      };
-
-      _projectInfo = new ProjectInfo
-      {
-        Id = _dbProject.Id,
-        Name = _dbProject.Name,
-        Department = _departmentInfo
       };
 
       _projectUsersInfo = new List<ProjectUserInfo>
@@ -112,8 +103,14 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         .Setup<IResponseCreator, OperationResultResponse<ProjectResponse>>(x => x.CreateFailureResponse<ProjectResponse>(HttpStatusCode.NotFound, default))
         .Returns(expectedResponse);
 
-
       SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(It.IsAny<GetProjectFilter>()));
+
+      Verifiable(
+        responseCreatorTimes: Times.Once(),
+        projectRepositoryTimes: Times.Once(),
+        departmentServiceTimes: Times.Never(),
+        projectResponseMapperTimes: Times.Never(),
+        departmentInfoMapperTimes: Times.Never());
     }
 
     [Test]
@@ -141,6 +138,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
       };
 
       SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(It.IsAny<GetProjectFilter>()));
+
+      Verifiable(
+        responseCreatorTimes: Times.Never(),
+        projectRepositoryTimes: Times.Once(),
+        departmentServiceTimes: Times.Once(),
+        projectResponseMapperTimes: Times.Once(),
+        departmentInfoMapperTimes: Times.Once());
     }
 
     [Test]
@@ -149,7 +153,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
       DbProject _dbProject = new DbProject
       {
         Id = Guid.NewGuid(),
-        Name = "Project"
+        Name = "Project",
+        Department = null
       };
 
       _mocker
@@ -170,6 +175,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
       };
 
       SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(It.IsAny<GetProjectFilter>()));
+
+      Verifiable(
+        responseCreatorTimes: Times.Never(),
+        projectRepositoryTimes: Times.Once(),
+        departmentServiceTimes: Times.Never(),
+        projectResponseMapperTimes: Times.Once(),
+        departmentInfoMapperTimes: Times.Once());
     }
   }
 }

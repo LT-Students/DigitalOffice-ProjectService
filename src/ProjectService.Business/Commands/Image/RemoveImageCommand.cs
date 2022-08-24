@@ -47,9 +47,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Image
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(RemoveImageRequest request)
     {
-      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
-      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
-        && !(await _userRepository.DoesExistAsync(userId: userId, projectId: request.ProjectId, true)))
+      if (!await _userRepository.DoesExistAsync(userId: _httpContextAccessor.HttpContext.GetUserId(), projectId: request.ProjectId, true)
+        && !await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
