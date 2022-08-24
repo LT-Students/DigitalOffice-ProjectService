@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
-using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
@@ -46,8 +44,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, EditProjectUsersRoleRequest request)
     {
-      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects) 
-        && !await _repository.DoesExistAsync(projectId, _httpContextAccessor.HttpContext.GetUserId(), isManager: true))
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects)
+        && !await _repository.DoesExistAsync(userId: _httpContextAccessor.HttpContext.GetUserId(), projectId: projectId, isManager: true))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
