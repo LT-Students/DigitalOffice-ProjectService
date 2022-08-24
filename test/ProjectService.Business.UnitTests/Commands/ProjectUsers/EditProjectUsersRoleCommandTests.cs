@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.ProjectUse
         x => x.CreateFailureResponse<bool>(It.IsAny<HttpStatusCode>(), It.IsAny<List<string>>()), responseCreatorTimes);
       _mocker.Verify<IEditProjectUsersRoleRequestValidator, bool>(
         x => x.ValidateAsync(It.IsAny<(Guid projectId, EditProjectUsersRoleRequest request)>(), default).Result.IsValid, editProjectUsersRoleRequestValidatorTimes);
-      _mocker.Verify<IProjectUserRepository, Task<bool>>(x => x.DoesExistAsync(_projectId, _authorId, true), projectUserRepositoryTimesExists);
+      _mocker.Verify<IProjectUserRepository, Task<bool>>(x => x.DoesExistAsync(_authorId, _projectId, true), projectUserRepositoryTimesExists);
       _mocker.Verify<IProjectUserRepository, Task<bool>>(x => x.EditAsync(_projectId, _request), projectUserRepositoryTimes);
       _mocker.Verify<IGlobalCacheRepository>(x => x.RemoveAsync(_projectId), globalCacheRepositoryTimes);
 

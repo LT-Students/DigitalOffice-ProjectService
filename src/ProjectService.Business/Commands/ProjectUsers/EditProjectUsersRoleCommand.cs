@@ -44,7 +44,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid projectId, EditProjectUsersRoleRequest request)
     {
-      if (!await _repository.DoesExistAsync(projectId, _httpContextAccessor.HttpContext.GetUserId(), isManager: true)
+      if (!await _repository.DoesExistAsync(userId: _httpContextAccessor.HttpContext.GetUserId(), projectId: projectId, isManager: true)
         && !await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
