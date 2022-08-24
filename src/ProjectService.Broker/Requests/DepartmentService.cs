@@ -75,7 +75,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       return departments;
     }
 
-    public async Task<DepartmentUserRole?> CheckDepartmentUserRoleAsync(Guid departmentId, Guid userId, List<string> errors = null)
+    public async Task<DepartmentUserRole?> GetDepartmentUserRoleAsync(Guid departmentId, Guid userId, List<string> errors = null)
     {
       IGetDepartmentUserRoleResponse response = await _rcGetDepartmentUserRole.ProcessRequest<IGetDepartmentUserRoleRequest, IGetDepartmentUserRoleResponse>(
         IGetDepartmentUserRoleRequest.CreateObj(

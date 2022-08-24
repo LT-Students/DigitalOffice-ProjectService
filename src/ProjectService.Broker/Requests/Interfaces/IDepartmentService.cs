@@ -15,6 +15,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces
       List<Guid> departmentsIds = null,
       List<Guid> usersIds = null);
 
-    Task<DepartmentUserRole?> CheckDepartmentUserRoleAsync(Guid departmentId, Guid userId, List<string> errors = null);
+    Task<DepartmentUserRole?> GetDepartmentUserRoleAsync(Guid departmentId, Guid userId, List<string> errors = null);
   }
 }

@@ -50,15 +50,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.NotFound);
       }
 
+      Task<DepartmentUserRole?> role = _departmentService.GetDepartmentUserRoleAsync(
+        userId: _httpContextAccessor.HttpContext.GetUserId(),
+        departmentId: dbProjectDepartment.DepartmentId);
+
       if ((!request.DepartmentId.HasValue
-          && (await _departmentService.CheckDepartmentUserRoleAsync(
-            userId: _httpContextAccessor.HttpContext.GetUserId(),
-            departmentId: dbProjectDepartment.DepartmentId) != DepartmentUserRole.Manager)
+          && await role != DepartmentUserRole.Manager
           && !await _accessValidator.HasRightsAsync(Rights.AddEditRemoveDepartments))
         || (request.DepartmentId.HasValue
-          && (await _departmentService.CheckDepartmentUserRoleAsync(
-            userId: _httpContextAccessor.HttpContext.GetUserId(),
-            departmentId: request.DepartmentId.Value) != DepartmentUserRole.Manager)
+          && await role != DepartmentUserRole.Manager
           && !await _accessValidator.HasRightsAsync(Rights.AddEditRemoveDepartments)))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
