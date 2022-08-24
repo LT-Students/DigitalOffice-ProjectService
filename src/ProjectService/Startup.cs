@@ -30,6 +30,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using StackExchange.Redis;
+using Microsoft.AspNetCore.Http;
 
 namespace LT.DigitalOffice.ProjectService
 {
@@ -171,6 +172,8 @@ namespace LT.DigitalOffice.ProjectService
           ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
       });
+
+      ResponseCreatorStatic.ResponseCreatorConfigure(app.ApplicationServices.GetService<IHttpContextAccessor>());
     }
 
     #endregion
