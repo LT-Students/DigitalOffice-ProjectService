@@ -59,6 +59,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.Image
     public void OneTimeSetUp()
     {
       _authorId = Guid.NewGuid();
+      _projectId = Guid.NewGuid();
 
       _mocker = new AutoMocker();
       _command = _mocker.CreateInstance<CreateImageCommand>();
