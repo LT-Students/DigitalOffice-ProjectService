@@ -86,8 +86,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       if (projectStatus == (int)ProjectStatusType.Active)
       {
         await _publish.CreateWorkTimeAsync(
-          request.ProjectId,
-          newUsers.Select(u => u.UserId).ToList());
+          projectId: request.ProjectId,
+          usersIds: request.Users.Select(u => u.UserId).ToList());
       }
 
       await _globalCache.RemoveAsync(request.ProjectId);
