@@ -64,7 +64,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
-      Task<bool> isEdit = _departmentRepository.EditAsync(request.ProjectId, request.DepartmentId);
+      Task<bool> isEdit = _projectDepartmentRepository.EditAsync(request.ProjectId, request.DepartmentId);
       if (request.DepartmentId.HasValue && !await isEdit)
       {
         await _projectDepartmentRepository.CreateAsync(
