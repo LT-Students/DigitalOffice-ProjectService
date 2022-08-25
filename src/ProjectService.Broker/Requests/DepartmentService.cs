@@ -81,7 +81,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
         IGetDepartmentUserRoleRequest.CreateObj(
           departmentId: departmentId,
           userId: userId),
-        errors, _logger);
+        errors,
+        _logger);
 
       return response?.DepartmentUserRole;
     }

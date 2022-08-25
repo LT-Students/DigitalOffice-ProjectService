@@ -45,20 +45,20 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
     {
       DbProjectDepartment dbProjectDepartment = await _projectDepartmentRepository.GetAsync(request.ProjectId);
 
-      if (dbProjectDepartment is null)
+      if (dbProjectDepartment is null && !request.DepartmentId.HasValue)
       {
-        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.NotFound);
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, new() { "This project is already has not department" });
       }
 
-      Task<DepartmentUserRole?> role = _departmentService.GetDepartmentUserRoleAsync(
-        userId: _httpContextAccessor.HttpContext.GetUserId(),
-        departmentId: dbProjectDepartment.DepartmentId);
-
       if ((!request.DepartmentId.HasValue
-          && await role != DepartmentUserRole.Manager
+          && (await _departmentService.GetDepartmentUserRoleAsync(
+        userId: _httpContextAccessor.HttpContext.GetUserId(),
+        departmentId: dbProjectDepartment.DepartmentId) != DepartmentUserRole.Manager)
           && !await _accessValidator.HasRightsAsync(Rights.AddEditRemoveDepartments))
         || (request.DepartmentId.HasValue
-          && await role != DepartmentUserRole.Manager
+          && (await _departmentService.GetDepartmentUserRoleAsync(
+        userId: _httpContextAccessor.HttpContext.GetUserId(),
+        departmentId: request.DepartmentId.Value) != DepartmentUserRole.Manager)
           && !await _accessValidator.HasRightsAsync(Rights.AddEditRemoveDepartments)))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
