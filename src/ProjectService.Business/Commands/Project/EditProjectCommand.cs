@@ -98,7 +98,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         {
           await _publish.CreateWorkTimeAsync(
             projectId: projectId,
-            usersIds: dbProject.Users.Select(u => u.Id).ToList());
+            usersIds: dbProject.Users.Select(u => u.UserId).ToList());
         }
       }
 
