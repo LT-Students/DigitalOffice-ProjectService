@@ -1,214 +1,270 @@
-﻿//using FluentValidation;
-//using LT.DigitalOffice.Kernel.AccessValidatorEngine.Interfaces;
-//using LT.DigitalOffice.Kernel.Broker;
-//using LT.DigitalOffice.Kernel.Enums;
-//using LT.DigitalOffice.Kernel.Exceptions.Models;
-//using LT.DigitalOffice.Models.Broker.Requests.Company;
-//using LT.DigitalOffice.Models.Broker.Responses.Company;
-//using LT.DigitalOffice.ProjectService.Business.Commands.Project;
-//using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
-//using LT.DigitalOffice.ProjectService.Data.Interfaces;
-//using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
-//using LT.DigitalOffice.ProjectService.Models.Db;
-//using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
-//using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Filters;
-//using LT.DigitalOffice.ProjectService.Models.Dto.Responses;
-//using LT.DigitalOffice.ProjectService.Validation.Interfaces;
-//using LT.DigitalOffice.UnitTestKernel;
-//using MassTransit;
-//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.JsonPatch;
-//using Microsoft.AspNetCore.JsonPatch.Operations;
-//using Moq;
-//using Moq.AutoMock;
-//using Newtonsoft.Json.Serialization;
-//using NUnit.Framework;
-//using System;
-//using System.Collections.Generic;
-//using System.Threading.Tasks;
+﻿using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Constants;
+using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.Models.Broker.Enums;
+using LT.DigitalOffice.ProjectService.Business.Commands.Project;
+using LT.DigitalOffice.ProjectService.Business.Commands.Project.Interfaces;
+using LT.DigitalOffice.ProjectService.Data.Interfaces;
+using LT.DigitalOffice.ProjectService.Mappers.PatchDocument.Interfaces;
+using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
+using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
+using LT.DigitalOffice.UnitTestKernel;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
+using Moq;
+using Moq.AutoMock;
+using Newtonsoft.Json.Serialization;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
-//namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands.UnitTests
-//{
-//    internal class EditProjectCommandTests
-//    {
-//        private AutoMocker _mocker;
-//        private JsonPatchDocument<EditProjectRequest> _request;
-//        private DbProject _dbProject;
-//        private JsonPatchDocument<DbProject> _dbRequest;
-//        private OperationResultResponse<bool> _response;
-//        private Guid _departmentId = Guid.NewGuid();
-//        private Guid _departamentDirectorId = Guid.NewGuid();
-//        private Guid _notDepartmentDirectorUserId = Guid.NewGuid();
-//        IDictionary<object, object> _httpContextData;
+namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands.UnitTests
+{
+  internal class EditProjectCommandTests
+  {
+    private AutoMocker _mocker;
+    private JsonPatchDocument<EditProjectRequest> _request;
+    private DbProject _dbProject;
+    private IDictionary<object, object> _items;
+    private Guid _projectId;
 
-//        private Mock<IGetDepartmentResponse> _getDepartmentResponse;
-//        private Mock<IOperationResult<IGetDepartmentResponse>> _operationResult;
-//        private Mock<Response<IOperationResult<IGetDepartmentResponse>>> _brokerResponse;
+    private IEditProjectCommand _command;
 
-//        private IEditProjectCommand _command;
+    private void Verifiable(
+      Times accessValidatorTimes,
+      Times responseCreatorTimes,
+      Times editProjectRequestValidatorTimes,
+      Times projectUserRepositoryExistsTimes,
+      Times projectRepositoryGetTimes,
+      Times patchDbProjectMapperTimes,
+      Times projectRepositoryEditTimes,
+      Times globalCacheRepositoryTimes)
+    {
+      _mocker.Verify<IAccessValidator, Task<bool>>(x => x.HasRightsAsync(It.IsAny<int>()), accessValidatorTimes);
+      _mocker.Verify<IEditProjectRequestValidator, bool>(x => x.ValidateAsync(It.IsAny<JsonPatchDocument<EditProjectRequest>>(), default).Result.IsValid, editProjectRequestValidatorTimes);
+      _mocker.Verify<IResponseCreator, OperationResultResponse<bool>>(
+        x => x.CreateFailureResponse<bool>(It.IsAny<HttpStatusCode>(), It.IsAny<List<string>>()), responseCreatorTimes);
+      _mocker.Verify<IProjectUserRepository, Task<bool>>(x => x.DoesExistAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), true), projectUserRepositoryExistsTimes);
+      _mocker.Verify<IProjectRepository, Task<DbProject>>(x => x.GetAsync(It.IsAny<GetProjectFilter>()), projectRepositoryGetTimes);
+      _mocker.Verify<IPatchDbProjectMapper, JsonPatchDocument<DbProject>>(x =>
+            x.Map(It.IsAny<JsonPatchDocument<EditProjectRequest>>()), patchDbProjectMapperTimes);
+      _mocker.Verify<IProjectRepository, Task<bool>>(x => x.EditAsync(It.IsAny<Guid>(), It.IsAny<JsonPatchDocument<DbProject>>()), projectRepositoryEditTimes);
+      _mocker.Verify<IGlobalCacheRepository>(x => x.RemoveAsync(It.IsAny<Guid>()), globalCacheRepositoryTimes);
 
-//        [OneTimeSetUp]
-//        public void OneTimeSetUp()
-//        {
-//            _request = new JsonPatchDocument<EditProjectRequest>(
-//                new List<Operation<EditProjectRequest>>
-//                {
-//                    new Operation<EditProjectRequest>(
-//                        "replace",
-//                        $"/{nameof(EditProjectRequest.DepartmentId)}",
-//                        "",
-//                        _departmentId)
-//                }, new CamelCasePropertyNamesContractResolver());
+      _mocker.Resolvers.Clear();
+    }
 
-//            _dbProject = new DbProject { DepartmentId = _departmentId };
-//            _dbRequest = new JsonPatchDocument<DbProject>();
-//        }
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+      _mocker = new AutoMocker();
+      _command = _mocker.CreateInstance<EditProjectCommand>();
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            _response = new OperationResultResponse<bool>();
-//            _response.Body = true;
-//            _response.Status = OperationResultStatusType.FullSuccess;
+      _request = new JsonPatchDocument<EditProjectRequest>(
+        new List<Operation<EditProjectRequest>>
+        {
+          new Operation<EditProjectRequest>(
+            "replace",
+            $"/{nameof(EditProjectRequest.Name)}",
+            "",
+            "Name"),
+          new Operation<EditProjectRequest>(
+            "replace",
+            $"/{nameof(EditProjectRequest.Description)}",
+            "",
+            "Description"),
+          new Operation<EditProjectRequest>(
+            "replace",
+            $"/{nameof(EditProjectRequest.Status)}",
+            "",
+            "Active")
+        }, new CamelCasePropertyNamesContractResolver());
 
-//            _getDepartmentResponse = new Mock<IGetDepartmentResponse>();
-//            _getDepartmentResponse.Setup(x => x.DepartmentId).Returns(_departmentId);
-//            _getDepartmentResponse.Setup(x => x.Name).Returns("Name");
-//            _getDepartmentResponse.Setup(x => x.DirectorUserId).Returns(_departamentDirectorId);
+      _projectId = Guid.NewGuid();
+      _dbProject = new DbProject {
+        Id = _projectId,
+        Status = (int)ProjectStatusType.Suspend,
+        Users = new List<DbProjectUser>()
+      };
 
-//            _operationResult = new Mock<IOperationResult<IGetDepartmentResponse>>();
-//            _operationResult.Setup(x => x.Body).Returns(_getDepartmentResponse.Object);
-//            _operationResult.Setup(x => x.IsSuccess).Returns(true);
+      _items = new Dictionary<object, object>();
+      _items.Add("UserId", Guid.NewGuid());
 
-//            _brokerResponse = new Mock<Response<IOperationResult<IGetDepartmentResponse>>>();
-//            _brokerResponse.Setup(x => x.Message).Returns(_operationResult.Object);
+      _mocker
+        .Setup<IHttpContextAccessor, int>(a => a.HttpContext.Response.StatusCode)
+        .Returns(400);
+    }
 
-//            _mocker = new AutoMocker();
-//            _mocker
-//                .Setup<IEditProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
-//                .Returns(true);
+    [SetUp]
+    public void SetUp()
+    {
+      _mocker.GetMock<IAccessValidator>().Reset();
+      _mocker.GetMock<IResponseCreator>().Reset();
+      _mocker.GetMock<IEditProjectRequestValidator>().Reset();
+      _mocker.GetMock<IProjectRepository>().Reset();
+      _mocker.GetMock<IPatchDbProjectMapper>().Reset();
+      _mocker.GetMock<IGlobalCacheRepository>().Reset();
 
-//            _mocker
-//                .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
-//                .Returns(true);
+      _mocker
+        .Setup<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items)
+        .Returns(_items);
 
-//            _mocker
-//                .Setup<IProjectRepository, DbProject>(x => x.Get(It.IsAny<GetProjectFilter>()))
-//                .Returns(_dbProject);
+      _mocker
+        .Setup<IAccessValidator, Task<bool>>(x => x.HasRightsAsync(Rights.AddEditRemoveProjects))
+        .ReturnsAsync(true);
 
-//            _httpContextData = new Dictionary<object, object>();
-//            _httpContextData.Add("UserId", _departamentDirectorId);
+      _mocker
+        .Setup<IEditProjectRequestValidator, bool>(x => x.ValidateAsync(It.IsAny<JsonPatchDocument<EditProjectRequest>>(), default).Result.IsValid)
+        .Returns(true);
 
-//            _mocker
-//                .Setup<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items)
-//                .Returns(_httpContextData);
+      _mocker
+        .Setup<IResponseCreator, OperationResultResponse<bool>>(x => x.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, It.IsAny<List<string>>()))
+        .Returns(new OperationResultResponse<bool>()
+        {
+          Errors = new() { "Request is not correct." }
+        });
 
-//            _mocker
-//                .Setup<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
-//                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-//                    IGetDepartmentRequest.CreateObj(null, _departmentId), default, default))
-//                .Returns(Task.FromResult(_brokerResponse.Object));
+      _mocker
+        .Setup<IResponseCreator, OperationResultResponse<bool>>(x => x.CreateFailureResponse<bool>(HttpStatusCode.Forbidden, default))
+        .Returns(new OperationResultResponse<bool>()
+        {
+          Errors = new() { "Not enough rights." }
+        });
+    }
 
-//            _mocker
-//                .Setup<IPatchDbProjectMapper, JsonPatchDocument<DbProject>>(x =>
-//                    x.Map(It.IsAny<JsonPatchDocument<EditProjectRequest>>()))
-//                .Returns(_dbRequest);
+    [Test]
+    public async Task UserDoesNotHaveRights()
+    {
+      OperationResultResponse<bool> expectedResponse = new()
+      {
+        Errors = new List<string> { "Not enough rights." }
+      };
 
-//            _mocker
-//                .Setup<IProjectRepository, bool>(x => x.Edit(_dbProject, _dbRequest))
-//                .Returns(true);
+      _mocker
+        .Setup<IAccessValidator, Task<bool>>(x => x.HasRightsAsync(Rights.AddEditRemoveProjects))
+        .ReturnsAsync(false);
 
-//            _command = _mocker.CreateInstance<EditProjectCommand>();
-//        }
+      _mocker
+        .Setup<IProjectUserRepository, Task<bool>>(x => x.DoesExistAsync((Guid)_items["UserId"], _projectId, true))
+        .ReturnsAsync(false);
 
-//        [Test]
-//        public void SuccessCommandExecuteWhenRequesterDepartamentDirecorAndNotAdmin()
-//        {
-//            _mocker
-//                .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
-//                .Returns(false);
+      SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_projectId, _request));
 
-//            SerializerAssert.AreEqual(_response, _command.Execute(It.IsAny<Guid>(), _request));
-//        }
+      Verifiable(
+        accessValidatorTimes: Times.Once(),
+        responseCreatorTimes: Times.Once(),
+        editProjectRequestValidatorTimes: Times.Never(),
+        projectUserRepositoryExistsTimes: Times.Once(),
+        projectRepositoryGetTimes: Times.Never(),
+        patchDbProjectMapperTimes: Times.Never(),
+        projectRepositoryEditTimes: Times.Never(),
+        globalCacheRepositoryTimes: Times.Never());
+    }
 
-//        [Test]
-//        public void SuccessCommandExecuteWhenRequesterAdminAndNotDepartmentDirector()
-//        {
-//            _getDepartmentResponse.Setup(x => x.DirectorUserId).Returns(_notDepartmentDirectorUserId);
+    [Test]
+    public async Task RequestIsNotCorrect()
+    {
+      OperationResultResponse<bool> expectedResponse = new()
+      {
+        Errors = new List<string> { "Request is not correct." }
+      };
 
-//            SerializerAssert.AreEqual(_response, _command.Execute(It.IsAny<Guid>(), _request));
-//        }
+      _mocker
+        .Setup<IEditProjectRequestValidator, bool>(x => x.ValidateAsync(It.IsAny<JsonPatchDocument<EditProjectRequest>>(), default).Result.IsValid)
+        .Returns(false);
 
-//        [Test]
-//        public void ValidationExceptionWhenInvalidRequest()
-//        {
-//            _mocker
-//                .Setup<IEditProjectValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
-//                .Returns(false);
+      SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_projectId, _request));
 
-//            Assert.Throws<ValidationException>(() => _command.Execute(It.IsAny<Guid>(), _request));
-//            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Never);
-//            _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
-//                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-//                    IGetDepartmentRequest.CreateObj(null, _departmentId), default, default),
-//                    Times.Never);
-//            _mocker.Verify<IPatchDbProjectMapper, JsonPatchDocument<DbProject>>(x => x.Map(_request), Times.Never);
-//            _mocker.Verify<IProjectRepository, bool>(x => x.Edit(It.IsAny<DbProject>(), It.IsAny<JsonPatchDocument<DbProject>>()), Times.Never);
-//        }
+      Verifiable(
+        accessValidatorTimes: Times.Once(),
+        responseCreatorTimes: Times.Once(),
+        editProjectRequestValidatorTimes: Times.Once(),
+        projectUserRepositoryExistsTimes: Times.Never(),
+        projectRepositoryGetTimes: Times.Never(),
+        patchDbProjectMapperTimes: Times.Never(),
+        projectRepositoryEditTimes: Times.Never(),
+        globalCacheRepositoryTimes: Times.Never());
+    }
 
-//        [Test]
-//        public void ForbiddenExceptionWhenRequesterNotAdminAndNotDepartmetDirector()
-//        {
-//            _mocker
-//                .Setup<IAccessValidator, bool>(x => x.IsAdmin(null))
-//                .Returns(false);
+    [Test]
+    public async Task ResponseBodyIsFalse()
+    {
+      OperationResultResponse<bool> expectedResponse = new()
+      {
+        Body = false
+      };
 
-//            _getDepartmentResponse.Setup(x => x.DirectorUserId).Returns(_notDepartmentDirectorUserId);
+      _mocker
+        .Setup<IProjectRepository, Task<DbProject>>(x => x.GetAsync(It.IsAny<GetProjectFilter>()))
+        .ReturnsAsync(_dbProject);
 
-//            Assert.Throws<ForbiddenException>(() => _command.Execute(It.IsAny<Guid>(), _request));
-//            _mocker.Verify<IAccessValidator, bool>(x => x.IsAdmin(null), Times.Once);
-//            _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
-//                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-//                    IGetDepartmentRequest.CreateObj(null, _departmentId), default, default),
-//                    Times.Once);
-//            _mocker.Verify<IPatchDbProjectMapper, JsonPatchDocument<DbProject>>(x => x.Map(_request), Times.Never);
-//            _mocker.Verify<IProjectRepository, bool>(x => x.Edit(It.IsAny<DbProject>(), It.IsAny<JsonPatchDocument<DbProject>>()), Times.Never);
-//        }
+      _mocker
+        .Setup<IPatchDbProjectMapper, JsonPatchDocument<DbProject>>(x =>
+            x.Map(It.IsAny<JsonPatchDocument<EditProjectRequest>>()))
+        .Returns(It.IsAny<JsonPatchDocument<DbProject>>());
 
-//        [Test]
-//        public void NotSuccessBrokerResponse()
-//        {
-//            _operationResult.Setup(x => x.IsSuccess).Returns(false);
+      _mocker
+        .Setup<IProjectRepository, Task<bool>>(x => x.EditAsync(_projectId, It.IsAny<JsonPatchDocument<DbProject>>()))
+        .ReturnsAsync(false);
 
-//            Assert.Throws<BadRequestException>(() => _command.Execute(It.IsAny<Guid>(), _request));
-//            _mocker.Verify<IRequestClient<IGetDepartmentRequest>, Task<Response<IOperationResult<IGetDepartmentResponse>>>>(
-//                x => x.GetResponse<IOperationResult<IGetDepartmentResponse>>(
-//                    IGetDepartmentRequest.CreateObj(null, _departmentId), default, default), Times.Once);
-//            _mocker.Verify<IPatchDbProjectMapper, JsonPatchDocument<DbProject>>(x => x.Map(_request), Times.Never);
-//            _mocker.Verify<IProjectRepository, bool>(x => x.Edit(It.IsAny<DbProject>(), It.IsAny<JsonPatchDocument<DbProject>>()), Times.Never);
-//        }
+      SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_projectId, _request));
 
-//        [Test]
-//        public void MapperArgumentNullExceptionWhenRequestIsNull()
-//        {
-//            _mocker
-//                .Setup<IPatchDbProjectMapper, JsonPatchDocument<DbProject>>(x => x.Map(_request))
-//                .Throws(new ArgumentNullException());
+      Verifiable(
+        accessValidatorTimes: Times.Once(),
+        responseCreatorTimes: Times.Never(),
+        editProjectRequestValidatorTimes: Times.Once(),
+        projectUserRepositoryExistsTimes: Times.Never(),
+        projectRepositoryGetTimes: Times.Once(),
+        patchDbProjectMapperTimes: Times.Once(),
+        projectRepositoryEditTimes: Times.Once(),
+        globalCacheRepositoryTimes: Times.Never());
+    }
 
-//            Assert.Throws<ArgumentNullException>(() => _command.Execute(It.IsAny<Guid>(), _request));
-//            _mocker.Verify<IPatchDbProjectMapper, JsonPatchDocument<DbProject>>(x => x.Map(_request), Times.Once);
-//            _mocker.Verify<IProjectRepository, bool>(x => x.Edit(It.IsAny<DbProject>(), It.IsAny<JsonPatchDocument<DbProject>>()), Times.Never);
-//        }
+    [Test]
+    public async Task SuccessResult()
+    {
+      OperationResultResponse<bool> expectedResponse = new()
+      {
+        Body = true
+      };
 
-//        [Test]
-//        public void NullReferenceExceptionWhenDbProjectNotFound()
-//        {
-//            _mocker
-//                .Setup<IProjectRepository, bool>(x => x.Edit(It.IsAny<DbProject>(), _dbRequest))
-//                .Throws(new NullReferenceException());
+      _mocker
+        .Setup<IProjectRepository, Task<DbProject>>(x => x.GetAsync(It.IsAny<GetProjectFilter>()))
+        .ReturnsAsync(_dbProject);
 
-//            Assert.Throws<NullReferenceException>(() => _command.Execute(It.IsAny<Guid>(), _request));
-//            _mocker.Verify<IProjectRepository, bool>(x => x.Edit(It.IsAny<DbProject>(), It.IsAny<JsonPatchDocument<DbProject>>()), Times.Once);
-//        }
-//    }
-//}
+      _mocker
+        .Setup<IPatchDbProjectMapper, JsonPatchDocument<DbProject>>(x =>
+          x.Map(It.IsAny<JsonPatchDocument<EditProjectRequest>>()))
+        .Returns(It.IsAny<JsonPatchDocument<DbProject>>());
+
+      _mocker
+        .Setup<IProjectRepository, Task<bool>>(x => x.EditAsync(_projectId, It.IsAny<JsonPatchDocument<DbProject>>()))
+        .ReturnsAsync(true);
+
+      _mocker
+        .Setup<IGlobalCacheRepository>(x => x.RemoveAsync(_projectId));
+
+      _mocker
+        .Setup<IProjectRepository, Task<bool>>(x => x.EditAsync(_projectId, It.IsAny<JsonPatchDocument<DbProject>>()))
+        .ReturnsAsync(true);
+
+      SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_projectId, _request));
+
+      Verifiable(
+        accessValidatorTimes: Times.Once(),
+        responseCreatorTimes: Times.Never(),
+        editProjectRequestValidatorTimes: Times.Once(),
+        projectUserRepositoryExistsTimes: Times.Never(),
+        projectRepositoryGetTimes: Times.Exactly(2),
+        patchDbProjectMapperTimes: Times.Once(),
+        projectRepositoryEditTimes: Times.Once(),
+        globalCacheRepositoryTimes: Times.Once());
+    }
+  }
+}
