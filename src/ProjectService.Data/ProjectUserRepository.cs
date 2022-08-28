@@ -192,6 +192,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       foreach (DbProjectUser user in users)
       {
         user.IsActive = false;
+        user.CreatedBy = _contextAccessor.HttpContext.GetUserId();
       }
 
       _provider.ProjectsUsers.UpdateRange(users);
