@@ -97,7 +97,7 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
       if (newUsers is null)
       {
-        return null;
+        return Task.CompletedTask;
       }
 
       _provider.ProjectsUsers.AddRange(newUsers);
@@ -189,7 +189,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         return false;
       }
 
-      foreach (var user in users)
+      foreach (DbProjectUser user in users)
       {
         user.IsActive = false;
       }
