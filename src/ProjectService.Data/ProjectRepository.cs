@@ -151,7 +151,7 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
       if (dbProject is null)
       {
-        return null;
+        return Task.CompletedTask;
       }
 
       _provider.Projects.Add(dbProject);

@@ -1,6 +1,5 @@
 ﻿using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Requests.Project;
-using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
@@ -20,13 +19,11 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
   {
     private IDataProvider _provider;
     private ProjectUserRepository _userRepository;
-    private IProjectRepository _projectRepository;
     private DbContextOptions<ProjectServiceDbContext> _dbContext;
 
     private DbProjectUser _user1;
     private DbProjectUser _user2;
     private DbProjectUser _user3;
-    private List<DbProject> _projects;
     private List<DbProjectUser> _projectsUsers;
 
     private Guid _creatorId;
@@ -53,6 +50,8 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
     private void CreateUsers()
     {
+      _creatorId = Guid.NewGuid();
+
       _userId1 = Guid.NewGuid();
       _userId2 = Guid.NewGuid();
       _userId3 = Guid.NewGuid();
@@ -89,20 +88,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
         _user2,
         _user3
       };
-
-/*      _projects = new List<DbProject>
-      {
-        new DbProject
-        {
-          Id = _firstProject,
-          Users = new List<DbProjectUser> { _projectsUser[0] }
-        },
-        new DbProject
-        {
-          Id = _secondProject,
-          Users = new List<DbProjectUser> { _projectsUser[1] }
-        },
-      };*/
     }
 
     public void CreateMemoryDb()
@@ -127,10 +112,6 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     public void SaveUsers()
     {
       _provider.ProjectsUsers.AddRange(_projectsUsers);
-/*      _provider.Positions.AddRange(_position2);
-      _provider.Positions.AddRange(_deactivatedPosition);
-      _provider.Positions.AddRange(_positionWithUser);
-      _provider.PositionsUsers.AddRange(_user);*/
       _provider.Save();
     }
 
@@ -301,17 +282,9 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     }
 
     [Test]
-    public async Task ShouldRemoveByUsersId()
-    {
-      SerializerAssert.AreEqual(new List<Guid> { _userId2, _userId3 }, await _userRepository.DoExistAsync(_projectId2, new List<Guid> { _userId2, _userId3 }));
-      SerializerAssert.AreEqual(new List<Guid>(), await _userRepository.DoExistAsync(_projectId1, new List<Guid> { _userId2 }));
-    }
-
-    [Test]
     public async Task ShouldNotRemoveByUsersId()
     {
-      SerializerAssert.AreEqual(new List<Guid> { _userId2 }, await _userRepository.DoExistAsync(_projectId2, new List<Guid> { _userId2, _userId3 }, true));
-      SerializerAssert.AreEqual(null, await _userRepository.DoExistAsync(_projectId2, null, true));
+      SerializerAssert.AreEqual(false, await _userRepository.RemoveAsync(Guid.NewGuid(), (IEnumerable<Guid>)default));
     }
 
     #endregion

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
+using System.Text.Json.Serialization;
 
 namespace LT.DigitalOffice.ProjectService.Models.Db
 {
@@ -16,6 +17,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public Guid CreatedBy { get; set; }
     public bool IsActive { get; set; }
 
+    [JsonIgnore]
     public DbProject Project { get; set; }
   }
 

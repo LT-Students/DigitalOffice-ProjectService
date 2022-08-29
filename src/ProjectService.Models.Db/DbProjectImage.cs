@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,6 +13,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Db
     public Guid ProjectId { get; set; }
     public Guid ImageId { get; set; }
 
+    [JsonIgnore]
     public DbProject Project { get; set; }
   }
 
