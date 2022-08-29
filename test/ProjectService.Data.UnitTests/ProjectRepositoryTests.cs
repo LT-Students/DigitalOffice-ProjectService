@@ -268,7 +268,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     public async Task ShouldReturnProjectsWhichContainTextAsync()
     {
       SerializerAssert.AreEqual(new List<DbProject> { _project1 }, await _repository.SearchAsync("1"));
-      SerializerAssert.AreEqual(new List<DbProject> { _project1, _project2 }, await _repository.SearchAsync("Name"));
+      SerializerAssert.AreEqual(new List<DbProject> { _project1, _project2 }, await _repository.SearchAsync("name"));
     }
 
     [Test]
