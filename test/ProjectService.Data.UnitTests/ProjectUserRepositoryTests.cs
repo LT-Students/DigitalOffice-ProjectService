@@ -3,6 +3,7 @@ using LT.DigitalOffice.Models.Broker.Requests.Project;
 using LT.DigitalOffice.ProjectService.Data.Provider;
 using LT.DigitalOffice.ProjectService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.ProjectService.Models.Db;
+using LT.DigitalOffice.ProjectService.Models.Dto.Requests.User;
 using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +35,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     private Guid _projectId2;
 
     private AutoMocker _mocker;
-    private IHttpContextAccessor _contextAccessor;
+    private Mock<IHttpContextAccessor> _accessorMock;
 
     [SetUp]
     public void SetUp()
@@ -60,6 +61,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
       _user1 = new DbProjectUser
       {
+        Id = Guid.NewGuid(),
         UserId = _userId1,
         ProjectId = _projectId1,
         IsActive = true,
@@ -68,6 +70,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
       _user2 = new DbProjectUser
       {
+        Id = Guid.NewGuid(),
         UserId = _userId2,
         ProjectId = _projectId2,
         IsActive = true,
@@ -76,6 +79,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
 
       _user3 = new DbProjectUser
       {
+        Id = Guid.NewGuid(),
         UserId = _userId3,
         ProjectId = _projectId2,
         IsActive = false,
@@ -93,20 +97,21 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     public void CreateMemoryDb()
     {
       _mocker = new AutoMocker();
-      _contextAccessor = _mocker.CreateInstance<HttpContextAccessor>();
       _dbContext = new DbContextOptionsBuilder<ProjectServiceDbContext>()
         .UseInMemoryDatabase(databaseName: "ProjectServiceTests")
         .Options;
 
+      _accessorMock = new();
+
       IDictionary<object, object> _items = new Dictionary<object, object>();
       _items.Add("UserId", _creatorId);
 
-      _mocker
-        .Setup<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items)
+      _accessorMock
+        .Setup(x => x.HttpContext.Items)
         .Returns(_items);
 
       _provider = new ProjectServiceDbContext(_dbContext);
-      _userRepository = new ProjectUserRepository(_provider, _contextAccessor);
+      _userRepository = new ProjectUserRepository(_provider, _accessorMock.Object);
     }
 
     public void SaveUsers()
@@ -284,7 +289,42 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     [Test]
     public async Task ShouldNotRemoveByUsersId()
     {
+      SerializerAssert.AreEqual(true, await _userRepository.RemoveAsync(_projectId1, new List<Guid>() { _userId1 }));
+      SerializerAssert.AreEqual(new List<DbProjectUser>(), await _userRepository.GetAsync(new List<Guid> { _userId1 }));
+      SerializerAssert.AreEqual(new List<DbProjectUser> { _user1 }, await _userRepository.GetExistingUsersAsync(_projectId1, new List<Guid> { _userId1 }));
+
       SerializerAssert.AreEqual(false, await _userRepository.RemoveAsync(Guid.NewGuid(), (IEnumerable<Guid>)default));
+    }
+
+    #endregion
+
+    #region EditAsync
+
+    [Test]
+    public async Task ShouldEditByUserId()
+    {
+      DbProjectUser user = new DbProjectUser
+      {
+        Id = _user1.Id,
+        UserId = _userId1,
+        ProjectId = _projectId1,
+        CreatedBy = _creatorId,
+        IsActive = true,
+        Role = (int)ProjectUserRoleType.Manager
+      };
+
+      EditProjectUsersRoleRequest request = new EditProjectUsersRoleRequest
+      {
+        Role = ProjectUserRoleType.Manager,
+        UsersIds = new List<Guid>
+        {
+          _userId1
+        }
+      };
+
+      SerializerAssert.AreEqual(true, await _userRepository.EditAsync(_projectId1, request));
+
+      SerializerAssert.AreEqual(new List<DbProjectUser> { user }, await _userRepository.GetAsync(new List<Guid> { _userId1 }));
     }
 
     #endregion

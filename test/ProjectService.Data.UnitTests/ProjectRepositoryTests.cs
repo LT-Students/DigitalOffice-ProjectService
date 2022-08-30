@@ -10,9 +10,11 @@ using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using LT.DigitalOffice.UnitTestKernel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.AutoMock;
+using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
@@ -40,7 +42,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     private Guid _projectId2;
 
     private AutoMocker _mocker;
-    private IHttpContextAccessor _contextAccessor;
+    private Mock<IHttpContextAccessor> _accessorMock;
 
     [SetUp]
     public void SetUp()
@@ -119,20 +121,21 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     public void CreateMemoryDb()
     {
       _mocker = new AutoMocker();
-      _contextAccessor = _mocker.CreateInstance<HttpContextAccessor>();
       _dbContext = new DbContextOptionsBuilder<ProjectServiceDbContext>()
         .UseInMemoryDatabase(databaseName: "ProjectServiceTests")
         .Options;
 
+      _accessorMock = new();
+
       IDictionary<object, object> _items = new Dictionary<object, object>();
       _items.Add("UserId", _creatorId);
 
-      _mocker
-        .Setup<IHttpContextAccessor, IDictionary<object, object>>(x => x.HttpContext.Items)
+      _accessorMock
+        .Setup(x => x.HttpContext.Items)
         .Returns(_items);
 
       _provider = new ProjectServiceDbContext(_dbContext);
-      _repository = new ProjectRepository(_provider, _contextAccessor);
+      _repository = new ProjectRepository(_provider, _accessorMock.Object);
     }
 
     public void SaveProjectsAndUsers()
@@ -281,6 +284,43 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     #endregion
 
     #region Edit
+
+    [Test]
+    public async Task ShouldEditByProjectId()
+    {
+      DbProject project = new DbProject
+      {
+        Id = _projectId1,
+        Name = "NewName",
+        ShortName = "ShortName1",
+        ModifiedBy = _creatorId
+      };
+
+      JsonPatchDocument<DbProject> patchPosition;
+
+      patchPosition = new JsonPatchDocument<DbProject>(new List<Operation<DbProject>>
+      {
+        new Operation<DbProject>(
+          "replace",
+          $"/{nameof(DbProject.Name)}",
+          "",
+          $"{project.Name}"),
+      }, new CamelCasePropertyNamesContractResolver());
+
+      SerializerAssert.AreEqual(true, await _repository.EditAsync(_projectId1, patchPosition));
+
+      GetProjectFilter filter = new GetProjectFilter
+      {
+        ProjectId = project.Id
+      };
+
+      DbProject editProject = await _repository.GetAsync(filter);
+
+      SerializerAssert.AreEqual(project.Name, editProject.Name);
+      SerializerAssert.AreEqual(project.ModifiedBy, editProject.ModifiedBy);
+      SerializerAssert.AreEqual(project.ShortName, editProject.ShortName);
+      SerializerAssert.AreEqual(project.Id, editProject.Id);
+    }
 
     [Test]
     public async Task ShouldReturnFalseWhenProjectIdIsWrongAsync()
