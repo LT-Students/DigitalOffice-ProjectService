@@ -206,7 +206,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         return null;
       }
 
-      return await _provider.Projects.Where(p => p.Name.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0 || p.ShortName.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0).ToListAsync();
+      return await _provider.Projects.Where(p => p.Name.IndexOf(text, StringComparison.OrdinalIgnoreCase) > -1 || p.ShortName.IndexOf(text, StringComparison.OrdinalIgnoreCase) > -1).ToListAsync();
     }
 
     public Task<bool> DoesExistAsync(Guid projectId)
