@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
@@ -50,16 +51,19 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, new() { "This project is already has not department" });
       }
 
+      Task<bool> checkRights = _accessValidator.HasRightsAsync(Rights.AddEditRemoveDepartments);
+      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
+
       if ((!request.DepartmentId.HasValue
           && (await _departmentService.GetDepartmentUserRoleAsync(
-        userId: _httpContextAccessor.HttpContext.GetUserId(),
+        userId: userId,
         departmentId: dbProjectDepartment.DepartmentId) != DepartmentUserRole.Manager)
-          && !await _accessValidator.HasRightsAsync(Rights.AddEditRemoveDepartments))
+          && !await checkRights)
         || (request.DepartmentId.HasValue
           && (await _departmentService.GetDepartmentUserRoleAsync(
-        userId: _httpContextAccessor.HttpContext.GetUserId(),
+        userId: userId,
         departmentId: request.DepartmentId.Value) != DepartmentUserRole.Manager)
-          && !await _accessValidator.HasRightsAsync(Rights.AddEditRemoveDepartments)))
+          && !await checkRights))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
