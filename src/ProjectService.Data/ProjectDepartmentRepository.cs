@@ -51,5 +51,10 @@ namespace LT.DigitalOffice.ProjectService.Data
 
       return true;
     }
+
+    public Task<DbProjectDepartment> GetAsync(Guid projectId)
+    {
+      return _provider.ProjectsDepartments.FirstOrDefaultAsync(pd => pd.ProjectId == projectId);
+    }
   }
 }

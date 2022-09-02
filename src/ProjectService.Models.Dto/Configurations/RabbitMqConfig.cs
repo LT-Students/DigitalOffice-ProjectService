@@ -42,6 +42,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
     [AutoInjectRequest(typeof(IGetDepartmentsRequest))]
     public string GetDepartmentsEndpoint { get; set; }
 
+    [AutoInjectRequest(typeof(IGetDepartmentUserRoleRequest))]
+    public string GetDepartmentUserRoleEndpoint { get; set; }
+
     // office
 
     [AutoInjectRequest(typeof(IGetOfficesRequest))]
