@@ -56,13 +56,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
 
       if ((!request.DepartmentId.HasValue
           && (await _departmentService.GetDepartmentUserRoleAsync(
-        userId: userId,
-        departmentId: dbProjectDepartment.DepartmentId) != DepartmentUserRole.Manager)
+            userId: userId,
+            departmentId: dbProjectDepartment.DepartmentId) != DepartmentUserRole.Manager)
           && !await checkRights)
         || (request.DepartmentId.HasValue
           && (await _departmentService.GetDepartmentUserRoleAsync(
-        userId: userId,
-        departmentId: request.DepartmentId.Value) != DepartmentUserRole.Manager)
+            userId: userId,
+            departmentId: request.DepartmentId.Value) != DepartmentUserRole.Manager)
           && !await checkRights))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
