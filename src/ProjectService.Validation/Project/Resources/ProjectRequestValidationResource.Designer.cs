@@ -170,7 +170,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Some users does not exist.
+        ///   Looks up a localized string similar to Some users don`t exist.
         /// </summary>
         internal static string UsersDoNotExist {
             get {
