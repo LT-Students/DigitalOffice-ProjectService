@@ -63,7 +63,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       {
         RuleFor(project => project.DepartmentId)
           .Cascade(CascadeMode.Stop)
-          .Must(departmentId => departmentId != Guid.Empty)
+          .NotEmpty()
           .WithMessage(ProjectRequestValidationResource.DepartmentIdIsEmpty);
       });
 

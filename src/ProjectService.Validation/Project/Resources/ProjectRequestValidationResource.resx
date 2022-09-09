@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AddUserTwice" xml:space="preserve">
-    <value>Пользователь не может быть добавлен дважды</value>
+    <value>User cannot be added to the project twice</value>
   </data>
   <data name="CustomerLong" xml:space="preserve">
     <value>Project customer is too long</value>

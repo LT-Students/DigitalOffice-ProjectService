@@ -120,38 +120,14 @@
   <data name="AddUserTwice" xml:space="preserve">
     <value>Пользователь не может быть добавлен в проект дважды</value>
   </data>
-  <data name="CustomerLong" xml:space="preserve">
-    <value>Наименование заказчика проекта слишком длинное</value>
-  </data>
-  <data name="DepartmentIdIsEmpty" xml:space="preserve">
-    <value>Id департамента не может быть пустым</value>
-  </data>
   <data name="EndDateUtcIsNull" xml:space="preserve">
     <value>Если проект закрыт, у него должна быть дата закрытия</value>
-  </data>
-  <data name="IncorrectStatus" xml:space="preserve">
-    <value>Указан некорретный статус проекта</value>
   </data>
   <data name="NameExists" xml:space="preserve">
     <value>Проект с таким именем уже существует</value>
   </data>
-  <data name="NameLong" xml:space="preserve">
-    <value>Имя проекта слишкои длинное</value>
-  </data>
-  <data name="NameNotNullOrEmpty" xml:space="preserve">
-    <value>Имя не может быть пустым</value>
-  </data>
-  <data name="ShortDescriptionLong" xml:space="preserve">
-    <value>Краткое описание проекта слишком длинное</value>
-  </data>
   <data name="ShortNameExists" xml:space="preserve">
     <value>Проект с таким сокращенным именем уже существует</value>
-  </data>
-  <data name="ShortNameLong" xml:space="preserve">
-    <value>Сокращенное имя проекта слишком длинное</value>
-  </data>
-  <data name="UserIdIsEmpty" xml:space="preserve">
-    <value>Id пользователя не может быть пустым</value>
   </data>
   <data name="UsersDoNotExist" xml:space="preserve">
     <value>Некоторых пользователей из данного списка не найдено</value>

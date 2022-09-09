@@ -62,7 +62,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Пользователь не может быть добавлен дважды.
+        ///   Looks up a localized string similar to User cannot be added to the project twice.
         /// </summary>
         internal static string AddUserTwice {
             get {
