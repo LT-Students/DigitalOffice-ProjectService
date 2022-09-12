@@ -31,6 +31,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using StackExchange.Redis;
 using Microsoft.AspNetCore.Http;
+using DigitalOffice.Kernel.RedisSupport.Extensions;
 
 namespace LT.DigitalOffice.ProjectService
 {
@@ -106,20 +107,7 @@ namespace LT.DigitalOffice.ProjectService
         options.UseSqlServer(connStr);
       });
 
-      redisConnStr = Environment.GetEnvironmentVariable("RedisConnectionString");
-      if (string.IsNullOrEmpty(redisConnStr))
-      {
-        redisConnStr = Configuration.GetConnectionString("Redis");
-
-        Log.Information( $"Redis connection string from appsettings.json was used. Value '{PasswordHider.Hide(redisConnStr)}'");
-      }
-      else
-      {
-        Log.Information( $"Redis connection string from environment was used. Value '{PasswordHider.Hide(redisConnStr)}'");
-      }
-
-      services.AddSingleton<IConnectionMultiplexer>(
-        x => ConnectionMultiplexer.Connect(redisConnStr + ",abortConnect=false,connectRetry=1,connectTimeout=2000"));
+      redisConnStr = services.AddRedisSingleton(Configuration);
 
       services.AddControllers();
       services
@@ -138,11 +126,7 @@ namespace LT.DigitalOffice.ProjectService
     {
       app.UpdateDatabase<ProjectServiceDbContext>();
 
-      string error = FlushRedisDbHelper.FlushDatabase(redisConnStr, Cache.Projects);
-      if (error is not null)
-      {
-        Log.Error(error);
-      }
+      FlushRedisDbHelper.FlushDatabase(redisConnStr, Cache.Projects);
 
       app.UseForwardedHeaders();
 

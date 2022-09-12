@@ -11,9 +11,9 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces
   public interface IDepartmentService
   {
     Task<List<DepartmentData>> GetDepartmentsAsync(
-      List<string> errors,
       List<Guid> departmentsIds = null,
-      List<Guid> usersIds = null);
+      List<Guid> usersIds = null,
+      List<string> errors = null);
 
     Task<DepartmentUserRole?> GetDepartmentUserRoleAsync(Guid departmentId, Guid userId, List<string> errors = null);
   }
