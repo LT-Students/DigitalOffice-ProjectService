@@ -24,18 +24,6 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
     private readonly ILogger<UserService> _logger;
     private readonly IGlobalCacheRepository _globalCache;
 
-    private string CreateRedisKey(IEnumerable<Guid> usersIds, FindProjectUsersFilter filter)
-    {
-      List<object> additionalArgs = new() { filter.SkipCount, filter.TakeCount };
-
-      if (filter.AscendingSort.HasValue)
-      {
-        additionalArgs.Add(filter.AscendingSort.Value);
-      }
-
-      return usersIds.GetRedisCacheHashCode(additionalArgs.ToArray());
-    }
-
     public UserService(
       IRequestClient<ICheckUsersExistence> rcCheckUsersExistence,
       IRequestClient<IFilteredUsersDataRequest> rcGetFilteredUsers,
@@ -55,7 +43,14 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
         return default;
       }
 
-      (List<UserData> usersData, int totalCount) usersFilteredData = await _globalCache.GetAsync<(List<UserData>, int)>(Cache.Users, CreateRedisKey(usersIds, filter));
+      object request = IFilteredUsersDataRequest.CreateObj(
+        usersIds: usersIds,
+        skipCount: filter.SkipCount,
+        takeCount: filter.TakeCount,
+        ascendingSort: filter.AscendingSort);
+
+      (List<UserData> usersData, int totalCount) usersFilteredData =
+        await _globalCache.GetAsync<(List<UserData>, int)>(Cache.Users, usersIds.GetRedisCacheKey(request.GetBasicProperties()));
 
       if (usersFilteredData.usersData is not null)
       {
@@ -65,11 +60,7 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       else
       {
         IFilteredUsersDataResponse response = await _rcGetFilteredUsers.ProcessRequest<IFilteredUsersDataRequest, IFilteredUsersDataResponse>(
-          request: IFilteredUsersDataRequest.CreateObj(
-            usersIds: usersIds,
-            skipCount: filter.SkipCount,
-            takeCount: filter.TakeCount,
-            ascendingSort: filter.AscendingSort),
+          request: request,
           logger: _logger);
 
         usersFilteredData.usersData = response?.UsersData;

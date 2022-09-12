@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
       _mocker.Verify<IProjectRepository, Task<(List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount)>>(
         x => x.FindAsync(It.IsAny<FindProjectsFilter>()), projectRepositoryTimes);
       _mocker.Verify<IProjectInfoMapper, ProjectInfo>(x => x.Map(_dbProject, 0, It.IsAny<DepartmentInfo>()), projectInfoMapperTimes);
-      _mocker.Verify<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(It.IsAny<List<string>>(), It.IsAny<List<Guid>>(), default), departmentServiceTimess);
+      _mocker.Verify<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(It.IsAny<List<Guid>>(), default, It.IsAny<List<string>>()), departmentServiceTimess);
 
       _mocker.Resolvers.Clear();
     }
@@ -182,7 +182,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         .ReturnsAsync((_dbProjects, 1));
 
       _mocker
-        .Setup<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(It.IsAny<List<string>>(), It.IsAny<List<Guid>>(), default))
+        .Setup<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(It.IsAny<List<Guid>>(), default, It.IsAny<List<string>>()))
         .ReturnsAsync(It.IsAny<List<DepartmentData>>());
 
       _mocker
