@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
       _mocker.Verify<IResponseCreator, OperationResultResponse<ProjectResponse>>(
         x => x.CreateFailureResponse<ProjectResponse>(It.IsAny<HttpStatusCode>(), It.IsAny<List<string>>()), responseCreatorTimes);
       _mocker.Verify<IProjectRepository,Task<DbProject>>(x => x.GetAsync(It.IsAny<GetProjectFilter>()), projectRepositoryTimes);
-      _mocker.Verify<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(It.IsAny<List<string>>(), It.IsAny<List<Guid>>(), default), departmentServiceTimes);
+      _mocker.Verify<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(It.IsAny<List<Guid>>(), default, It.IsAny<List<string>>()), departmentServiceTimes);
       _mocker.Verify<IProjectResponseMapper, ProjectResponse > (x => x.Map(It.IsAny<DbProject>(), It.IsAny<DepartmentInfo>()), projectResponseMapperTimes);
       _mocker.Verify<IDepartmentInfoMapper, DepartmentInfo>(x => x.Map(It.IsAny<DepartmentData>()), departmentInfoMapperTimes);
 
@@ -121,7 +121,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
         .ReturnsAsync(_dbProject);
 
       _mocker
-        .Setup<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(It.IsAny<List<string>>(), default, default))
+        .Setup<IDepartmentService, Task<List<DepartmentData>>>(x => x.GetDepartmentsAsync(default, default, It.IsAny<List<string>>()))
         .ReturnsAsync(It.IsAny<List<DepartmentData>>());
 
       _mocker
