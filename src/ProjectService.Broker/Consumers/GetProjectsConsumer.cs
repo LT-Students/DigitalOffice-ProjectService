@@ -46,28 +46,6 @@ namespace LT.DigitalOffice.ProjectService.Broker
         .ToList();
     }
 
-    private string CreateKey(IGetProjectsRequest request)
-    {
-      List<Guid> ids = new();
-
-      if (request.ProjectsIds is not null && request.ProjectsIds.Any())
-      {
-        ids.AddRange(request.ProjectsIds);
-      }
-
-      if (request.UsersIds is not null && request.UsersIds.Any())
-      {
-        ids.AddRange(request.UsersIds);
-      }
-
-      if (request.DepartmentsIds is not null && request.DepartmentsIds.Any())
-      {
-        ids.AddRange(request.DepartmentsIds);
-      }
-
-      return ids.GetRedisCacheHashCode(request.IncludeDepartment, request.IncludeUsers);
-    }
-
     public GetProjectsConsumer(
       IProjectRepository projectRepository,
       IProjectDepartmentDataMapper projectDepartmentDataMapper,
@@ -90,14 +68,32 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
       if (projects != null && projects.Any())
       {
-        string key = CreateKey(context.Message);
+        List<Guid> allGuids = new();
 
-        await _globalCache.CreateAsync(
-          database: Cache.Projects,
-          key: key,
-          item: projects,
-          elementsIds: projects.Select(p => p.Id).ToList(),
-          lifeTime: TimeSpan.FromMinutes(_redisConfig.Value.CacheLiveInMinutes));
+        if (context.Message.ProjectsIds is not null)
+        {
+          allGuids.AddRange(context.Message.ProjectsIds);
+        }
+
+        if (context.Message.UsersIds is not null)
+        {
+          allGuids.AddRange(context.Message.UsersIds);
+        }
+
+        if (context.Message.DepartmentsIds is not null)
+        {
+          allGuids.AddRange(context.Message.DepartmentsIds);
+        }
+
+        if (allGuids.Any())
+        {
+          await _globalCache.CreateAsync(
+            database: Cache.Projects,
+            key: allGuids.GetRedisCacheKey(context.Message.GetBasicProperties()),
+            item: projects,
+            elementsIds: projects.Select(p => p.Id).ToList(),
+            lifeTime: TimeSpan.FromMinutes(_redisConfig.Value.CacheLiveInMinutes));
+        }
       }
     }
   }

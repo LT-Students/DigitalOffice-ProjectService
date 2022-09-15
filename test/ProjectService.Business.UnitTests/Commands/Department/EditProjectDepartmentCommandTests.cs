@@ -6,6 +6,8 @@ using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.Models.Broker.Enums;
+using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Department;
 using LT.DigitalOffice.ProjectService.Business.Commands.Department.Interfaces;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
@@ -13,6 +15,7 @@ using LT.DigitalOffice.ProjectService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Db;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Department;
 using LT.DigitalOffice.UnitTestKernel;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Moq.AutoMock;
 using NUnit.Framework;
@@ -21,27 +24,53 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.Department
 {
   internal class EditProjectDepartmentCommandTests
   {
+    private readonly Guid _createdBy = Guid.NewGuid();
+
     private AutoMocker _mocker;
     private EditProjectDepartmentRequest _request;
     private EditProjectDepartmentRequest _requestWithNullDepartmentId;
     private Guid _projectId;
     private Guid _departmentId;
+    private Dictionary<object, object> _items;
+    private DbProjectDepartment _dbProjectDepartment;
+    private DepartmentUserRole? _userRole;
 
     private IEditProjectDepartmentCommand _command;
 
     private void Verifiable(
       Times accessValidatorTimes,
+      Times departmentServiceTimes,
       Times responseCreatorTimes,
       Times projectDepartmentRepositoryEditTimes,
       Times projectDepartmentRepositoryCreateTimes,
-      Times dbProjectDepartmentMapperTimes)
+      Times projectDepartmentRepositoryGetTimes,
+      Times dbProjectDepartmentMapperTimes
+      )
     {
-      _mocker.Verify<IAccessValidator, Task<bool>>(x => x.HasRightsAsync(It.IsAny<int>()), accessValidatorTimes);
-      _mocker.Verify<IResponseCreator, OperationResultResponse<bool>>(
-        x => x.CreateFailureResponse<bool>(It.IsAny<HttpStatusCode>(), It.IsAny<List<string>>()), responseCreatorTimes);
-      _mocker.Verify<IProjectDepartmentRepository, Task<bool>>(x => x.EditAsync(It.IsAny<Guid>(), It.IsAny<Guid?>()), projectDepartmentRepositoryEditTimes);
-      _mocker.Verify<IProjectDepartmentRepository>(x => x.CreateAsync(It.IsAny<DbProjectDepartment>()), projectDepartmentRepositoryCreateTimes);
-      _mocker.Verify<IDbProjectDepartmentMapper, DbProjectDepartment>(x => x.Map(It.IsAny<Guid>(), It.IsAny<Guid>()), dbProjectDepartmentMapperTimes);
+      _mocker.Verify<IAccessValidator, Task<bool>>(x =>
+          x.HasRightsAsync(It.IsAny<int>()),
+        accessValidatorTimes);
+
+      _mocker.Verify<IDepartmentService, Task<DepartmentUserRole?>> (x =>
+          x.GetDepartmentUserRoleAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<List<string>>()), departmentServiceTimes);
+
+      _mocker.Verify<IResponseCreator, OperationResultResponse<bool>>(x =>
+          x.CreateFailureResponse<bool>(It.IsAny<HttpStatusCode>(), It.IsAny<List<string>>()),
+        responseCreatorTimes);
+
+      _mocker.Verify<IProjectDepartmentRepository, Task<bool>>(x =>
+          x.EditAsync(It.IsAny<Guid>(), It.IsAny<Guid?>()),
+        projectDepartmentRepositoryEditTimes);
+      _mocker.Verify<IProjectDepartmentRepository>(x =>
+          x.CreateAsync(It.IsAny<DbProjectDepartment>()),
+        projectDepartmentRepositoryCreateTimes);
+      _mocker.Verify<IProjectDepartmentRepository, Task<DbProjectDepartment>>(x =>
+          x.GetAsync(_request.ProjectId),
+        projectDepartmentRepositoryGetTimes);
+
+      _mocker.Verify<IDbProjectDepartmentMapper, DbProjectDepartment>(x =>
+          x.Map(It.IsAny<Guid>(), It.IsAny<Guid>()),
+        dbProjectDepartmentMapperTimes);
 
       _mocker.Resolvers.Clear();
     }
@@ -55,6 +84,8 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.Department
       _projectId = Guid.NewGuid();
       _departmentId = Guid.NewGuid();
 
+      _userRole = DepartmentUserRole.Manager;
+
       _request = new EditProjectDepartmentRequest()
       {
         ProjectId = _projectId,
@@ -65,19 +96,37 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.Department
       {
         ProjectId = _projectId
       };
+
+      _dbProjectDepartment = new DbProjectDepartment { ProjectId = _request.ProjectId };
+
+      _items = new() { { "UserId", _createdBy } };
     }
 
     [SetUp]
     public void SetUp()
     {
       _mocker.GetMock<IAccessValidator>().Reset();
+      _mocker.GetMock<IHttpContextAccessor>().Reset();
       _mocker.GetMock<IResponseCreator>().Reset();
       _mocker.GetMock<IProjectDepartmentRepository>().Reset();
       _mocker.GetMock<IDbProjectDepartmentMapper>().Reset();
+      _mocker.GetMock<IDepartmentService>().Reset();
 
       _mocker
         .Setup<IAccessValidator, Task<bool>>(x => x.HasRightsAsync(Rights.AddEditRemoveDepartments))
         .ReturnsAsync(true);
+
+      _mocker
+        .Setup<IDepartmentService, Task<DepartmentUserRole?>>(x => x.GetDepartmentUserRoleAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<List<string>>()))
+        .ReturnsAsync(_userRole);
+
+      _mocker
+        .Setup<IHttpContextAccessor, IDictionary<object,object>>(x => x.HttpContext.Items)
+        .Returns(_items);
+
+      _mocker
+        .Setup<IProjectDepartmentRepository, Task<DbProjectDepartment>>(x => x.GetAsync(_request.ProjectId))
+        .ReturnsAsync(_dbProjectDepartment);
 
       _mocker
         .Setup<IResponseCreator, OperationResultResponse<bool>>(x => x.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, It.IsAny<List<string>>()))
@@ -95,7 +144,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.Department
     }
 
     [Test]
-    public async Task UserDoesNotHaveRights()
+    public async Task UserIsNotManagerAndDoesNotHaveRights()
     {
       OperationResultResponse<bool> expectedResponse = new()
       {
@@ -103,16 +152,20 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.Department
       };
 
       _mocker
-        .Setup<IAccessValidator, Task<bool>>(x => x.HasRightsAsync(Rights.AddEditRemoveDepartments))
+        .Setup<IDepartmentService, Task<DepartmentUserRole?>>(x => x.GetDepartmentUserRoleAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<List<string>>()))
+        .ReturnsAsync(DepartmentUserRole.Employee);
+      _mocker.Setup<IAccessValidator, Task<bool>>(x => x.HasRightsAsync(Rights.AddEditRemoveDepartments))
         .ReturnsAsync(false);
 
       SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_request));
 
       Verifiable(
         accessValidatorTimes: Times.Once(),
+        departmentServiceTimes: Times.Once(),
         responseCreatorTimes: Times.Once(),
         projectDepartmentRepositoryEditTimes: Times.Never(),
         projectDepartmentRepositoryCreateTimes: Times.Never(),
+        projectDepartmentRepositoryGetTimes: Times.Once(),
         dbProjectDepartmentMapperTimes: Times.Never());
     }
 
@@ -132,9 +185,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.Department
 
       Verifiable(
         accessValidatorTimes: Times.Once(),
+        departmentServiceTimes: Times.Once(),
         responseCreatorTimes: Times.Never(),
         projectDepartmentRepositoryEditTimes: Times.Once(),
         projectDepartmentRepositoryCreateTimes: Times.Never(),
+        projectDepartmentRepositoryGetTimes: Times.Once(),
         dbProjectDepartmentMapperTimes: Times.Never());
     }
 
@@ -154,9 +209,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.Department
 
       Verifiable(
         accessValidatorTimes: Times.Once(),
+        departmentServiceTimes: Times.Once(),
         responseCreatorTimes: Times.Once(),
         projectDepartmentRepositoryEditTimes: Times.Once(),
         projectDepartmentRepositoryCreateTimes: Times.Never(),
+        projectDepartmentRepositoryGetTimes: Times.Once(),
         dbProjectDepartmentMapperTimes: Times.Never());
     }
 
@@ -183,9 +240,11 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.Department
 
       Verifiable(
         accessValidatorTimes: Times.Once(),
+        departmentServiceTimes: Times.Once(),
         responseCreatorTimes: Times.Never(),
         projectDepartmentRepositoryEditTimes: Times.Once(),
         projectDepartmentRepositoryCreateTimes: Times.Once(),
+        projectDepartmentRepositoryGetTimes: Times.Once(),
         dbProjectDepartmentMapperTimes: Times.Once());
     }
   }

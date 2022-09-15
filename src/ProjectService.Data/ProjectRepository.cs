@@ -151,7 +151,7 @@ namespace LT.DigitalOffice.ProjectService.Data
     {
       if (dbProject is null)
       {
-        return null;
+        return Task.CompletedTask;
       }
 
       _provider.Projects.Add(dbProject);
@@ -206,7 +206,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         return null;
       }
 
-      return await _provider.Projects.Where(p => p.Name.Contains(text) || p.ShortName.Contains(text)).ToListAsync();
+      return await _provider.Projects.Where(p => p.Name.IndexOf(text, StringComparison.OrdinalIgnoreCase) > -1 || p.ShortName.IndexOf(text, StringComparison.OrdinalIgnoreCase) > -1).ToListAsync();
     }
 
     public Task<bool> DoesExistAsync(Guid projectId)

@@ -11,5 +11,7 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
     Task CreateAsync(DbProjectDepartment request);
 
     Task<bool> EditAsync(Guid projectId, Guid? departmentId);
+
+    Task<DbProjectDepartment> GetAsync(Guid projectId);
   }
 }

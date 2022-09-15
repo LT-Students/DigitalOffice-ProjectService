@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Validators;
@@ -8,6 +10,7 @@ using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
+using LT.DigitalOffice.ProjectService.Validation.Project.Resources;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 
 namespace LT.DigitalOffice.ProjectService.Validation.Project
@@ -20,6 +23,8 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
     {
       Context = context;
       RequestedOperation = requestedOperation;
+
+      Thread.CurrentThread.CurrentUICulture = new CultureInfo("ru-RU");
 
       #region paths
 
@@ -54,7 +59,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => Enum.TryParse(typeof(ProjectStatusType), x.value?.ToString(), true, out _), "Incorrect project status." }
+          { x => Enum.TryParse(typeof(ProjectStatusType), x.value?.ToString(), true, out _), ProjectRequestValidationResource.IncorrectStatus }
         });
 
       #endregion
@@ -66,9 +71,9 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new()
         {
-          { x => Task.FromResult(!string.IsNullOrEmpty(x.value?.ToString().Trim())), "Name must not be empty." },
-          { x => Task.FromResult(x.value.ToString().Trim().Length < 151), "Name is too long." },
-          { async x => !await _projectRepository.DoesNameExistAsync(x.value?.ToString()?.Trim()), "The project name already exist." }
+          { x => Task.FromResult(!string.IsNullOrEmpty(x.value?.ToString().Trim())), string.Join(' ', nameof(EditProjectRequest.Name), ProjectRequestValidationResource.NameNotNullOrEmpty) },
+          { x => Task.FromResult(x.value.ToString().Trim().Length < 151), ProjectRequestValidationResource.NameLong },
+          { async x => !await _projectRepository.DoesNameExistAsync(x.value?.ToString()?.Trim()), ProjectRequestValidationResource.NameExists }
         }, CascadeMode.Stop);
 
       #endregion
@@ -80,8 +85,8 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new ()
         {
-          { x => Task.FromResult(x.value.ToString().Trim().Length < 41), "Short name is too long." },
-          { async x => !await _projectRepository.DoesShortNameExistAsync(x.value?.ToString()?.Trim()), "The project short name already exist." }
+          { x => Task.FromResult(x.value.ToString().Trim().Length < 41), ProjectRequestValidationResource.ShortNameLong },
+          { async x => !await _projectRepository.DoesShortNameExistAsync(x.value?.ToString()?.Trim()), ProjectRequestValidationResource.ShortNameExists }
         });
 
       #endregion
@@ -89,11 +94,11 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
       #region ShortDescription
 
       AddFailureForPropertyIf(
-        nameof(EditProjectRequest.ShortName),
+        nameof(EditProjectRequest.ShortDescription),
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => x.value == null || x.value.ToString().Trim().Length < 301, "Short description is too long." },
+          { x => x.value == null || x.value.ToString().Trim().Length < 301, ProjectRequestValidationResource.ShortDescriptionLong },
         });
 
       #endregion
@@ -105,7 +110,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditProjectRequest>, bool>, string>
         {
-          { x => x.value == null || x.value.ToString().Trim().Length < 151, "Customer is too long." },
+          { x => x.value == null || x.value.ToString().Trim().Length < 151, ProjectRequestValidationResource.CustomerLong },
         });
 
       #endregion
