@@ -29,7 +29,6 @@
       <PackageReference Include="DigitalOffice.Kernel" Version="1.0.0" />
       <PackageReference Include="DigitalOffice.Kernel.BrokerSupport" Version="1.0.0" />
       <PackageReference Include="DigitalOffice.Kernel.RedisSupport" Version="1.0.2" />
-      <PackageReference Include="DigitalOffice.Kernel.EndpointSupport" Version="1.0.1" />
       <PackageReference Include="DigitalOffice.Kernel.EFSupport" Version="1.0.0" />
       <PackageReference Include="DigitalOffice.Models" Version="1.0.1" />
   </ItemGroup>
