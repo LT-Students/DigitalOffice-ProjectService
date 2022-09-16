@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands.UnitTests
       Times globalCacheRepositoryTimes)
     {
       _mocker.Verify<IAccessValidator, Task<bool>>(x => x.HasRightsAsync(It.IsAny<int>()), accessValidatorTimes);
-      _mocker.Verify<IEditProjectRequestValidator, bool>(x => x.ValidateAsync(It.IsAny<JsonPatchDocument<EditProjectRequest>>(), default).Result.IsValid, editProjectRequestValidatorTimes);
+      _mocker.Verify<IEditProjectRequestValidator, bool>(x => x.ValidateAsync(It.IsAny<ValueTuple<Guid, JsonPatchDocument<EditProjectRequest>>>(), default).Result.IsValid, editProjectRequestValidatorTimes);
       _mocker.Verify<IResponseCreator, OperationResultResponse<bool>>(
         x => x.CreateFailureResponse<bool>(It.IsAny<HttpStatusCode>(), It.IsAny<List<string>>()), responseCreatorTimes);
       _mocker.Verify<IProjectUserRepository, Task<bool>>(x => x.DoesExistAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), true), projectUserRepositoryExistsTimes);
@@ -120,7 +120,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands.UnitTests
         .ReturnsAsync(true);
 
       _mocker
-        .Setup<IEditProjectRequestValidator, bool>(x => x.ValidateAsync(It.IsAny<JsonPatchDocument<EditProjectRequest>>(), default).Result.IsValid)
+        .Setup<IEditProjectRequestValidator, bool>(x => x.ValidateAsync(It.IsAny<ValueTuple<Guid, JsonPatchDocument<EditProjectRequest>>>(), default).Result.IsValid)
         .Returns(true);
 
       _mocker
@@ -176,7 +176,7 @@ namespace LT.DigitalOffice.ProjectServiceUnitTests.Commands.UnitTests
       };
 
       _mocker
-        .Setup<IEditProjectRequestValidator, bool>(x => x.ValidateAsync(It.IsAny<JsonPatchDocument<EditProjectRequest>>(), default).Result.IsValid)
+        .Setup<IEditProjectRequestValidator, bool>(x => x.ValidateAsync(It.IsAny<ValueTuple<Guid, JsonPatchDocument<EditProjectRequest>>>(), default).Result.IsValid)
         .Returns(false);
 
       SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_projectId, _request));

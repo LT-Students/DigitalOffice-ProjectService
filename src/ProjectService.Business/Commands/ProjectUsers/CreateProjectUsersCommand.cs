@@ -69,7 +69,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       ValidationResult validationResult = await _validator.ValidateAsync(request);
 
       errors.AddRange(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
-
       if (!validationResult.IsValid)
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
@@ -91,6 +90,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       }
 
       await _globalCache.RemoveAsync(request.ProjectId);
+      newUsers?.ForEach(async user => await _globalCache.RemoveAsync(user.UserId));
 
       return new()
       {
