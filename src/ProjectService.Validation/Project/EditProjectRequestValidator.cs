@@ -11,15 +11,19 @@ using LT.DigitalOffice.ProjectService.Data.Interfaces;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests.Project;
 using LT.DigitalOffice.ProjectService.Validation.Project.Interfaces;
 using LT.DigitalOffice.ProjectService.Validation.Project.Resources;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 
 namespace LT.DigitalOffice.ProjectService.Validation.Project
 {
-  public class EditProjectRequestValidator : BaseEditRequestValidator<EditProjectRequest>, IEditProjectRequestValidator
+  public class EditProjectRequestValidator : ExtendedEditRequestValidator<Guid, EditProjectRequest>, IEditProjectRequestValidator
   {
     private readonly IProjectRepository _projectRepository;
 
-    private async Task HandleInternalPropertyValidationAsync(Operation<EditProjectRequest> requestedOperation, CustomContext context)
+    private async Task HandleInternalPropertyValidationAsync(
+      Operation<EditProjectRequest> requestedOperation,
+      Guid projectId,
+      ValidationContext<(Guid, JsonPatchDocument<EditProjectRequest>)> context)
     {
       Context = context;
       RequestedOperation = requestedOperation;
@@ -73,7 +77,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         {
           { x => Task.FromResult(!string.IsNullOrEmpty(x.value?.ToString().Trim())), string.Join(' ', nameof(EditProjectRequest.Name), ProjectRequestValidationResource.NameNotNullOrEmpty) },
           { x => Task.FromResult(x.value.ToString().Trim().Length < 151), ProjectRequestValidationResource.NameLong },
-          { async x => !await _projectRepository.DoesNameExistAsync(x.value?.ToString()?.Trim()), ProjectRequestValidationResource.NameExists }
+          { async x => !await _projectRepository.DoesNameExistAsync(x.value?.ToString()?.Trim(), projectId), ProjectRequestValidationResource.NameExists }
         }, CascadeMode.Stop);
 
       #endregion
@@ -86,7 +90,7 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
         new ()
         {
           { x => Task.FromResult(x.value.ToString().Trim().Length < 41), ProjectRequestValidationResource.ShortNameLong },
-          { async x => !await _projectRepository.DoesShortNameExistAsync(x.value?.ToString()?.Trim()), ProjectRequestValidationResource.ShortNameExists }
+          { async x => !await _projectRepository.DoesShortNameExistAsync(x.value?.ToString()?.Trim(), projectId), ProjectRequestValidationResource.ShortNameExists }
         });
 
       #endregion
@@ -121,8 +125,14 @@ namespace LT.DigitalOffice.ProjectService.Validation.Project
     {
       _projectRepository = projectRepository;
 
-      RuleForEach(x => x.Operations)
-        .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
+      RuleFor(x => x)
+        .CustomAsync(async (x, context, _) =>
+        {
+          foreach (var op in x.Item2.Operations)
+          {
+            await HandleInternalPropertyValidationAsync(op, x.Item1, context);
+          }
+        });
     }
   }
 }

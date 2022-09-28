@@ -249,7 +249,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         projectUserRepositoryEditTimes: Times.Once(),
         projectRepositoryTimes: Times.Once(),
         dbProjectUserMapperTimes: Times.Once(),
-        globalCacheRepositoryTimes: Times.Once(),
+        globalCacheRepositoryTimes: Times.Exactly(2),
         publishTimes: Times.Never());
     }
 
@@ -303,7 +303,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         projectUserRepositoryEditTimes: Times.Once(),
         projectRepositoryTimes: Times.Once(),
         dbProjectUserMapperTimes: Times.Once(),
-        globalCacheRepositoryTimes: Times.Once(),
+        globalCacheRepositoryTimes: Times.Exactly(2),
         publishTimes: Times.Once());
     }
   }
