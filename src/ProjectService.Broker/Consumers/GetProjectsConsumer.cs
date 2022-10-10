@@ -66,7 +66,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
 
       await context.RespondAsync<IOperationResult<IGetProjectsResponse>>(response);
 
-      if (projects != null && projects.Any())
+      if (projects is not null && projects.Any())
       {
         List<Guid> allGuids = new();
 
@@ -91,7 +91,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
             database: Cache.Projects,
             key: allGuids.GetRedisCacheKey(context.Message.GetBasicProperties()),
             item: projects,
-            elementsIds: projects.Select(p => p.Id).ToList(),
+            elementsIds: allGuids,
             lifeTime: TimeSpan.FromMinutes(_redisConfig.Value.CacheLiveInMinutes));
         }
       }

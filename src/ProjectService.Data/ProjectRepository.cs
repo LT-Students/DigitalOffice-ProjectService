@@ -214,14 +214,18 @@ namespace LT.DigitalOffice.ProjectService.Data
       return _provider.Projects.AnyAsync(x => x.Id == projectId);
     }
 
-    public Task<bool> DoesNameExistAsync(string name)
+    public Task<bool> DoesNameExistAsync(string name, Guid? projectId = null)
     {
-      return _provider.Projects.AnyAsync(p => p.Name.ToLower().Equals(name.ToLower()));
+      return projectId.HasValue
+        ? _provider.Projects.AnyAsync(p => p.Id != projectId.Value && p.Name.ToLower().Equals(name.ToLower()))
+        : _provider.Projects.AnyAsync(p => p.Name.ToLower().Equals(name.ToLower()));
     }
 
-    public Task<bool> DoesShortNameExistAsync(string shortName)
+    public Task<bool> DoesShortNameExistAsync(string shortName, Guid? projectId = null)
     {
-      return _provider.Projects.AnyAsync(p => p.ShortName.ToLower().Equals(shortName.ToLower()));
+      return projectId.HasValue
+        ? _provider.Projects.AnyAsync(p => p.Id != projectId.Value && p.ShortName.ToLower().Equals(shortName.ToLower()))
+        : _provider.Projects.AnyAsync(p => p.ShortName.ToLower().Equals(shortName.ToLower()));
     }
 
     public async Task<List<Guid>> DoExistAsync(List<Guid> projectsIds)

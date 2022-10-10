@@ -7,6 +7,7 @@ using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
@@ -31,6 +32,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
     private readonly IResponseCreator _responseCreator;
     private readonly IImageService _imageService;
     private readonly IPublish _publish;
+    private readonly IGlobalCacheRepository _globalCache;
 
     public CreateProjectCommand(
       IProjectRepository repository,
@@ -40,7 +42,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       IHttpContextAccessor httpContextAccessor,
       IResponseCreator responseCreator,
       IImageService imageService,
-      IPublish publish)
+      IPublish publish,
+      IGlobalCacheRepository globalCache)
     {
       _validator = validator;
       _repository = repository;
@@ -50,6 +53,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
       _responseCreator = responseCreator;
       _imageService = imageService;
       _publish = publish;
+      _globalCache = globalCache;
     }
 
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateProjectRequest request)
@@ -80,6 +84,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
           dbProject.Id,
           usersIds: request.Users.Select(u => u.UserId).ToList());
       }
+
+      if (request.DepartmentId.HasValue)
+      {
+        await _globalCache.RemoveAsync(request.DepartmentId.Value);
+      }
+      request.Users?.ForEach(async user => await _globalCache.RemoveAsync(user.UserId));
 
       _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.Created;
 
