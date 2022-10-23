@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
 using LT.DigitalOffice.Kernel.Extensions;
@@ -40,20 +41,18 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<List<ImageInfo>> GetImagesAsync(List<Guid> imagesIds, ImageSource imageSource, List<string> errors = null)
+    public async Task<List<ImageInfo>> GetImagesAsync(
+      List<Guid> imagesIds,
+      ImageSource imageSource,
+      List<string> errors = null,
+      CancellationToken cancellationToken = default)
     {
-      if (imagesIds is null || !imagesIds.Any())
-      {
-        return null;
-      }
-
-      return (await RequestHandler.ProcessRequest<IGetImagesRequest, IGetImagesResponse>(
-          _rcGetImages,
+      return imagesIds is null || !imagesIds.Any()
+        ? null
+        : (await _rcGetImages.ProcessRequest<IGetImagesRequest, IGetImagesResponse>(
           IGetImagesRequest.CreateObj(imagesIds, imageSource),
           errors,
-          _logger))
-        ?.ImagesData
-        .Select(_mapper.Map).ToList();
+          _logger))?.ImagesData.Select(_mapper.Map).ToList();
     }
 
     public async Task<List<Guid>> CreateImagesAsync(List<ImageContent> projectImages, List<string> errors = null)

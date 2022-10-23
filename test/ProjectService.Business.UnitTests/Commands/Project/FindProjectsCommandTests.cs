@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using FluentValidation;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Kernel.Validators.Interfaces;
 using LT.DigitalOffice.Models.Broker.Models.Department;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
 using LT.DigitalOffice.ProjectService.Business.Commands.Project;
@@ -35,13 +33,11 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
     private const string ShortName = "ShortName";
 
     private void Verifiable(
-      Times baseFindFilterValidatorTimes,
       Times responseCreatorTimes,
       Times projectRepositoryTimes,
       Times projectInfoMapperTimes,
       Times departmentServiceTimess)
     {
-      _mocker.Verify<IBaseFindFilterValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid, baseFindFilterValidatorTimes);
       _mocker.Verify<IResponseCreator, FindResultResponse<ProjectInfo>>(
         x => x.CreateFailureFindResponse<ProjectInfo>(It.IsAny<HttpStatusCode>(), It.IsAny<List<string>>()), responseCreatorTimes);
       _mocker.Verify<IProjectRepository, Task<(List<(DbProject dbProject, int usersCount)> dbProjects, int totalCount)>>(
@@ -83,54 +79,13 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
     [SetUp]
     public void SetUp()
     {
-      _mocker.GetMock<IBaseFindFilterValidator>().Reset();
       _mocker.GetMock<IResponseCreator>().Reset();
       _mocker.GetMock<IProjectRepository>().Reset();
       _mocker.GetMock<IProjectInfoMapper>().Reset();
       _mocker.GetMock<IDepartmentService>().Reset();
-
-      _mocker
-        .Setup<IBaseFindFilterValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
-        .Returns(true);
     }
 
     #endregion
-
-    [Test]
-    public async Task FilterNotCorrect()
-    {
-      FindProjectsFilter _findProjectsFilter = new FindProjectsFilter
-      {
-        SkipCount = -1,
-        TakeCount = 100
-      };
-
-      _mocker
-        .Setup<IBaseFindFilterValidator, bool>(x => x.Validate(It.IsAny<IValidationContext>()).IsValid)
-        .Returns(false);
-
-      _mocker
-        .Setup<IResponseCreator, FindResultResponse<ProjectInfo>>(x => x.CreateFailureFindResponse<ProjectInfo>(HttpStatusCode.BadRequest, It.IsAny<List<string>>()))
-        .Returns(new FindResultResponse<ProjectInfo>()
-        {
-          Errors = new() { "Skip count can't be less than 0." }
-        });
-
-      FindResultResponse<ProjectInfo> expectedResponse = new()
-      {
-        TotalCount = 0,
-        Errors = new List<string> { "Skip count can't be less than 0." }
-      };
-
-      SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_findProjectsFilter));
-
-      Verifiable(
-        baseFindFilterValidatorTimes: Times.Once(),
-        responseCreatorTimes: Times.Once(),
-        projectRepositoryTimes: Times.Never(),
-        projectInfoMapperTimes: Times.Never(),
-        departmentServiceTimess: Times.Never());
-    }
 
     [Test]
     public async Task IncludeDepartmentIsFalse()
@@ -160,7 +115,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
       SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_findProjectsFilter));
 
       Verifiable(
-        baseFindFilterValidatorTimes: Times.Once(),
         responseCreatorTimes: Times.Never(),
         projectRepositoryTimes: Times.Once(),
         projectInfoMapperTimes: Times.Once(),
@@ -200,7 +154,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.UnitTests
       SerializerAssert.AreEqual(expectedResponse, await _command.ExecuteAsync(_findProjectsFilter));
 
       Verifiable(
-        baseFindFilterValidatorTimes: Times.Once(),
         responseCreatorTimes: Times.Never(),
         projectRepositoryTimes: Times.Once(),
         projectInfoMapperTimes: Times.Once(),
