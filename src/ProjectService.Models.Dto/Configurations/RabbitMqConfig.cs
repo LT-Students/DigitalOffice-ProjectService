@@ -29,6 +29,9 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
     [AutoInjectRequest(typeof(IGetPositionsRequest))]
     public string GetPositionsEndpoint { get; set; }
 
+    [AutoInjectRequest(typeof(IFilterPositionsRequest))]
+    public string FilterPositionsEndpoint { get; set; }
+
     // image
 
     [AutoInjectRequest(typeof(IGetImagesRequest))]

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
 using LT.DigitalOffice.Kernel.RedisSupport.Constants;
@@ -36,7 +37,10 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       _globalCache = globalCache;
     }
 
-    public async Task<(List<UserData> usersData, int totalCount)> GetFilteredUsersAsync(List<Guid> usersIds, FindProjectUsersFilter filter)
+    public async Task<(List<UserData> usersData, int totalCount)> GetFilteredUsersAsync(
+      List<Guid> usersIds,
+      FindProjectUsersFilter filter,
+      CancellationToken cancellationToken = default)
     {
       if (usersIds is null || !usersIds.Any() || filter is null)
       {
@@ -47,7 +51,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
         usersIds: usersIds,
         skipCount: filter.SkipCount,
         takeCount: filter.TakeCount,
-        ascendingSort: filter.AscendingSort);
+        ascendingSort: filter.IsAscendingSort,
+        fullNameIncludeSubstring: filter.FullNameIncludeSubstring);
 
       (List<UserData> usersData, int totalCount) usersFilteredData =
         await _globalCache.GetAsync<(List<UserData>, int)>(Cache.Users, usersIds.GetRedisCacheKey(request.GetBasicProperties()));

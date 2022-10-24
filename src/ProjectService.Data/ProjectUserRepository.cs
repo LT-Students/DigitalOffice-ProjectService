@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Models.Broker.Enums;
@@ -81,7 +82,7 @@ namespace LT.DigitalOffice.ProjectService.Data
       return (await projectUsers.ToListAsync(), totalCount);
     }
 
-    public async Task<List<DbProjectUser>> GetAsync(Guid projectId, bool? isActive)
+    public async Task<List<DbProjectUser>> GetAsync(Guid projectId, bool? isActive, CancellationToken cancellationToken)
     {
       IQueryable<DbProjectUser> projectUsersQuery = _provider.ProjectsUsers.Where(pu => pu.ProjectId == projectId);
 
@@ -90,7 +91,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         projectUsersQuery = projectUsersQuery.Where(pu => pu.IsActive == isActive.Value);
       }
 
-      return await projectUsersQuery.ToListAsync();
+      return await projectUsersQuery.ToListAsync(cancellationToken);
     }
 
     public Task CreateAsync(List<DbProjectUser> newUsers)

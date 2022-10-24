@@ -10,6 +10,8 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Broker.Requests
@@ -19,20 +21,24 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
     private readonly IRequestClient<IGetPositionsRequest> _rcGetPositions;
     private readonly ILogger<PositionService> _logger;
     private readonly IGlobalCacheRepository _globalCache;
+    private readonly IRequestClient<IFilterPositionsRequest> _rcGetFilteredPositions;
 
     public PositionService(
       IRequestClient<IGetPositionsRequest> rcGetPositions,
       ILogger<PositionService> logger,
-      IGlobalCacheRepository globalCache)
+      IGlobalCacheRepository globalCache,
+      IRequestClient<IFilterPositionsRequest> rcGetFilteredPositions)
     {
       _rcGetPositions = rcGetPositions;
       _logger = logger;
       _globalCache = globalCache;
+      _rcGetFilteredPositions = rcGetFilteredPositions;
     }
 
     public async Task<List<PositionData>> GetPositionsAsync(
       List<Guid> usersIds,
-      List<string> errors = null)
+      List<string> errors = null,
+      CancellationToken cancellationToken = default)
     {
       if (usersIds is null)
       {
@@ -58,6 +64,37 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       }
 
       return positions;
+    }
+
+    public async Task<List<PositionFilteredData>> GetPositionFilteredDataAsync(List<Guid> positionsIds, List<string> errors = null)
+    {
+      if (positionsIds is null || !positionsIds.Any())
+      {
+        return null;
+      }
+
+      object request = IFilterPositionsRequest.CreateObj(positionsIds);
+
+      List<PositionFilteredData> positionsData = await _globalCache.GetAsync<List<PositionFilteredData>>(
+        Cache.Positions, positionsIds.GetRedisCacheKey(request.GetBasicProperties()));
+
+      if (positionsData is null)
+      {
+        positionsData =
+          (await RequestHandler.ProcessRequest<IFilterPositionsRequest, IFilterPositionsResponse>(
+            _rcGetFilteredPositions,
+            request,
+            errors,
+            _logger))
+          ?.Positions;
+      }
+
+      if (positionsData is null)
+      {
+        errors.Add("Can not filter by positions.");
+      }
+
+      return positionsData;
     }
   }
 }
