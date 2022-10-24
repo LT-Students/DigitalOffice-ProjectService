@@ -21,7 +21,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.User
     [FromQuery(Name = "includePositions")]
     public bool IncludePositions { get; set; } = false;
 
-    [FromQuery(Name = "byPositionId")]
-    public Guid? ByPositionId { get; set; } = null;
+    [FromQuery(Name = "positionId")]
+    public Guid? PositionId { get; set; } = null;
   }
 }

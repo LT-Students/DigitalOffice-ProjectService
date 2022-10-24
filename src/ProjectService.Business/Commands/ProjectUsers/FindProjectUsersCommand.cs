@@ -54,10 +54,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       IEnumerable<Guid> usersIds = projectUsers.Select(pu => pu.UserId);
 
-      if (filter.ByPositionId.HasValue)
+      if (filter.PositionId.HasValue)
       {
         PositionFilteredData data = (await _positionService.GetPositionFilteredDataAsync(
-          new List<Guid>() { filter.ByPositionId.Value }, errors))?.FirstOrDefault();
+          new List<Guid>() { filter.PositionId.Value }, errors))?.FirstOrDefault();
 
         usersIds = data is not null ? usersIds.Where(data.UsersIds.Contains).ToList() : Enumerable.Empty<Guid>();
       }
@@ -73,7 +73,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
         : Task.FromResult<List<ImageInfo>>(default);
 
       Task<List<PositionData>> usersPositionsTask = filter.IncludePositions
-        ? _positionService.GetPositionsAsync(usersIds: usersData.Select(ud => ud.Id).ToList(), errors, cancellationToken)
+        ? _positionService.GetPositionsAsync(usersIds: usersData?.Select(ud => ud.Id).ToList(), errors, cancellationToken)
         : Task.FromResult<List<PositionData>>(default);
 
       List<ImageInfo> usersAvatars = await usersAvatarsTask;
