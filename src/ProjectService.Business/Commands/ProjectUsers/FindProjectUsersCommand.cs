@@ -59,7 +59,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
         PositionFilteredData data = (await _positionService.GetPositionFilteredDataAsync(
           new List<Guid>() { filter.ByPositionId.Value }, errors))?.FirstOrDefault();
 
-        usersIds = data is not null ? usersIds.Where(i => data.UsersIds.Contains(i)).ToList() : Enumerable.Empty<Guid>();
+        usersIds = data is not null ? usersIds.Where(data.UsersIds.Contains).ToList() : Enumerable.Empty<Guid>();
       }
 
       (List<UserData> usersData, int totalCount) = await _userService.GetFilteredUsersAsync(usersIds.ToList(), filter, cancellationToken);

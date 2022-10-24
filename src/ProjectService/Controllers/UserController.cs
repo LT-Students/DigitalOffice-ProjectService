@@ -24,10 +24,10 @@ namespace LT.DigitalOffice.ProjectService.Controllers
 
     [HttpGet("find")]
     public async Task<FindResultResponse<UserInfo>> FindAsync(
-       [FromServices] IFindProjectUsersCommand command,
-       [FromQuery] Guid projectId,
-       [FromQuery] FindProjectUsersFilter filter,
-       CancellationToken cancellationToken)
+      [FromServices] IFindProjectUsersCommand command,
+      [FromQuery] Guid projectId,
+      [FromQuery] FindProjectUsersFilter filter,
+      CancellationToken cancellationToken)
     {
       return await command.ExecuteAsync(projectId, filter, cancellationToken);
     }

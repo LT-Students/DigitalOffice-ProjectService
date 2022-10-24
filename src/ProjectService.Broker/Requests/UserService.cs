@@ -38,9 +38,9 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
     }
 
     public async Task<(List<UserData> usersData, int totalCount)> GetFilteredUsersAsync(
-          List<Guid> usersIds,
-          FindProjectUsersFilter filter,
-          CancellationToken cancellationToken = default)
+      List<Guid> usersIds,
+      FindProjectUsersFilter filter,
+      CancellationToken cancellationToken = default)
     {
       if (usersIds is null || !usersIds.Any() || filter is null)
       {
