@@ -106,17 +106,29 @@ namespace LT.DigitalOffice.ProjectService.Data
       return _provider.SaveAsync();
     }
 
-    public async Task<bool> EditIsActiveAsync(List<DbProjectUser> dbUsers, Guid createdBy)
+    public async Task<bool> EditIsActiveAsync(List<DbProjectUser> dbUsers, Guid createdBy, List<UserRequest> usersRoles = null)
     {
       if (dbUsers is null)
       {
         return false;
       }
 
-      foreach (DbProjectUser oldUser in dbUsers)
+      if (usersRoles is null)
       {
-        oldUser.IsActive = true;
-        oldUser.CreatedBy = createdBy;
+        foreach (DbProjectUser oldUser in dbUsers)
+        {
+          oldUser.IsActive = true;
+          oldUser.CreatedBy = createdBy;
+        }
+      }
+      else
+      {
+        foreach (DbProjectUser oldUser in dbUsers)
+        {
+          oldUser.IsActive = true;
+          oldUser.CreatedBy = createdBy;
+          oldUser.Role = usersRoles.Where(ur => ur.UserId == oldUser.UserId).Select(ur => (int)ur.Role).First();
+        }
       }
 
       await _provider.SaveAsync();
