@@ -58,7 +58,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
       _mocker.Verify<IProjectUserRepository, Task<List<DbProjectUser>>>(x => x.GetExistingUsersAsync(It.IsAny<Guid>(), It.IsAny<IEnumerable<Guid>>()), projectUserRepositoryGetTimes);
       _mocker.Verify<IDbProjectUserMapper, List<DbProjectUser>>(x => x.Map(It.IsAny<Guid>(), It.IsAny<List<UserRequest>>()), dbProjectUserMapperTimes);
       _mocker.Verify<IProjectRepository, Task<DbProject>>(x => x.GetAsync(It.IsAny<GetProjectFilter>()), projectRepositoryTimes);
-      _mocker.Verify<IProjectUserRepository>(x => x.EditIsActiveAsync(It.IsAny<List<DbProjectUser>>(), It.IsAny<Guid>()), projectUserRepositoryEditTimes);
+      _mocker.Verify<IProjectUserRepository>(x => x.EditIsActiveAsync(It.IsAny<List<DbProjectUser>>(), It.IsAny<Guid>(), It.IsAny<List<UserRequest>>()), projectUserRepositoryEditTimes);
       _mocker.Verify<IProjectUserRepository>(x => x.CreateAsync(It.IsAny<List<DbProjectUser>>()), projectUserRepositoryCreateTimes);
       _mocker.Verify<IGlobalCacheRepository>(x => x.RemoveAsync(It.IsAny<Guid>()), globalCacheRepositoryTimes);
       _mocker.Verify<IPublish>(x => x.CreateWorkTimeAsync(It.IsAny<Guid>(), It.IsAny<List<Guid>>()), publishTimes);
@@ -217,7 +217,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         .Setup<IProjectUserRepository>(x => x.CreateAsync(It.IsAny<List<DbProjectUser>>()));
 
       _mocker
-        .Setup<IProjectUserRepository>(x => x.EditIsActiveAsync(It.IsAny<List<DbProjectUser>>(), It.IsAny<Guid>()));
+        .Setup<IProjectUserRepository>(x => x.EditIsActiveAsync(It.IsAny<List<DbProjectUser>>(), It.IsAny<Guid>(), It.IsAny<List<UserRequest>>()));
 
       DbProject dbProject = new DbProject
       {
@@ -268,7 +268,7 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands
         .Setup<IProjectUserRepository>(x => x.CreateAsync(It.IsAny<List<DbProjectUser>>()));
 
       _mocker
-        .Setup<IProjectUserRepository>(x => x.EditIsActiveAsync(It.IsAny<List<DbProjectUser>>(), It.IsAny<Guid>()));
+        .Setup<IProjectUserRepository>(x => x.EditIsActiveAsync(It.IsAny<List<DbProjectUser>>(), It.IsAny<Guid>(), It.IsAny<List<UserRequest>>()));
 
       DbProject dbProject = new DbProject
       {
