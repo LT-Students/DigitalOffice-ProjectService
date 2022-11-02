@@ -55,7 +55,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
         fullNameIncludeSubstring: filter.FullNameIncludeSubstring);
 
       (List<UserData> usersData, int totalCount) usersFilteredData =
-        await _globalCache.GetAsync<(List<UserData>, int)>(Cache.Users, usersIds.GetRedisCacheKey(request.GetBasicProperties()));
+        await _globalCache.GetAsync<(List<UserData>, int)>(Cache.Users, usersIds.GetRedisCacheKey(
+          nameof(IFilteredUsersDataRequest), request.GetBasicProperties()));
 
       if (usersFilteredData.usersData is not null)
       {

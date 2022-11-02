@@ -55,7 +55,8 @@ namespace LT.DigitalOffice.ProjectService.Broker.Requests
       object request = IGetDepartmentsRequest.CreateObj(departmentsIds: departmentsIds, usersIds: usersIds);
 
       List<DepartmentData> departments = await _globalCache
-        .GetAsync<List<DepartmentData>>(Cache.Departments, allGuids.GetRedisCacheKey(request.GetBasicProperties()));
+        .GetAsync<List<DepartmentData>>(Cache.Departments, allGuids.GetRedisCacheKey(
+          nameof(IGetDepartmentsRequest), request.GetBasicProperties()));
 
       if (departments is not null)
       {
