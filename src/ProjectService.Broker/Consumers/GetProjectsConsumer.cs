@@ -89,7 +89,7 @@ namespace LT.DigitalOffice.ProjectService.Broker
         {
           await _globalCache.CreateAsync(
             database: Cache.Projects,
-            key: allGuids.GetRedisCacheKey(context.Message.GetBasicProperties()),
+            key: allGuids.GetRedisCacheKey(nameof(IGetProjectsRequest), context.Message.GetBasicProperties()),
             item: projects,
             elementsIds: allGuids,
             lifeTime: TimeSpan.FromMinutes(_redisConfig.Value.CacheLiveInMinutes));
