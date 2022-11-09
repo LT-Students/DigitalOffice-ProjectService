@@ -11,7 +11,7 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Models
     public string LastName { get; set; }
     public bool IsActive { get; set; }
     public ProjectUserRoleType Role { get; set; }
-    public ImageInfo AvatarImage { get; set; }
+    public Guid? ImageId { get; set; }
     public PositionInfo Position { get; set; }
   }
 }

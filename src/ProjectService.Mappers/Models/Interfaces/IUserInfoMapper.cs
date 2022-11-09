@@ -12,7 +12,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Models.Interfaces
     UserInfo Map(
       DbProjectUser dbProjectUser,
       UserData userData,
-      ImageInfo image,
       PositionData userPosition);
   }
 }

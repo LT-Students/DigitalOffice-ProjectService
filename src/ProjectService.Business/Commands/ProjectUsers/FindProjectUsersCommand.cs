@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Models.Position;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
@@ -64,19 +63,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 
       (List<UserData> usersData, int totalCount) = await _userService.GetFilteredUsersAsync(usersIds.ToList(), filter, cancellationToken);
 
-      Task<List<ImageInfo>> usersAvatarsTask = filter.IncludeAvatars
-        ? _imageService.GetImagesAsync(
-          imagesIds: usersData?.Where(ud => ud.ImageId.HasValue).Select(ud => ud.ImageId.Value).ToList(),
-          imageSource: ImageSource.User,
-          errors,
-          cancellationToken)
-        : Task.FromResult<List<ImageInfo>>(default);
-
       Task<List<PositionData>> usersPositionsTask = filter.IncludePositions
         ? _positionService.GetPositionsAsync(usersIds: usersData?.Select(ud => ud.Id).ToList(), errors, cancellationToken)
         : Task.FromResult<List<PositionData>>(default);
 
-      List<ImageInfo> usersAvatars = await usersAvatarsTask;
       List<PositionData> usersPositions = await usersPositionsTask;
 
       return new FindResultResponse<UserInfo>(
@@ -85,7 +75,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
         body: usersData?.Select(userData => _userInfoMapper.Map(
           dbProjectUser: projectUsers.FirstOrDefault(pu => pu.UserId == userData.Id),
           userData: userData,
-          image: usersAvatars?.FirstOrDefault(ua => ua.Id == userData.ImageId),
           userPosition: usersPositions?.FirstOrDefault(up => up.UsersIds.Contains(userData.Id))))
         .ToList());
     }
