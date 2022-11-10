@@ -15,9 +15,6 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Requests.User
     [FromQuery(Name = "fullNameIncludeSubstring")]
     public string FullNameIncludeSubstring { get; set; }
 
-    [FromQuery(Name = "includeAvatars")]
-    public bool IncludeAvatars { get; set; } = false;
-
     [FromQuery(Name = "includePositions")]
     public bool IncludePositions { get; set; } = false;
 

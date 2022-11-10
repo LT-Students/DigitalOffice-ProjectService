@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Models.Position;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
@@ -44,13 +43,10 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.ProjectUse
       _mocker.Verify<IProjectUserRepository, Task<List<DbProjectUser>>>(x => x.GetAsync(_projectId, _filter.IsActive, _cancellationToken), projectRepositoryTimes);
       _mocker.Verify<IUserService, Task<(List<UserData> usersData, int totalCount)>>(x =>
           x.GetFilteredUsersAsync(It.IsAny<List<Guid>>(), _filter, _cancellationToken), userServiceTimes);
-      _mocker.Verify<IImageService, Task<List<ImageInfo>>>(x =>
-        x.GetImagesAsync(It.IsAny<List<Guid>>(), ImageSource.User, default, _cancellationToken), imageServiceTimes);
       _mocker.Verify<IPositionService, Task<List<PositionData>>>(x => x.GetPositionsAsync(It.IsAny<List<Guid>>(), default, _cancellationToken), positionServiceTimes);
       _mocker.Verify<IUserInfoMapper, UserInfo>(x => x.Map(
           It.IsAny<DbProjectUser>(),
           It.IsAny<UserData>(),
-          It.IsAny<ImageInfo>(),
           It.IsAny<PositionData>()), userInfoMapperTimes);
 
       _mocker.Resolvers.Clear();
@@ -67,7 +63,6 @@ namespace LT.DigitalOffice.ProjectService.Business.UnitTests.Commands.ProjectUse
       _filter = new FindProjectUsersFilter
       {
         IsActive = true,
-        IncludeAvatars = true,
         IncludePositions = true
       };
 

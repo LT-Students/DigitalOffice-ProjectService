@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using FluentValidation.TestHelper;
 using LT.DigitalOffice.Models.Broker.Common;
 using LT.DigitalOffice.ProjectService.Data.Interfaces;
-using LT.DigitalOffice.ProjectService.Models.Dto.Enums;
 using LT.DigitalOffice.ProjectService.Models.Dto.Requests;
 using LT.DigitalOffice.ProjectService.Validation.Image.Interfaces;
 using LT.DigitalOffice.ProjectService.Validation.Project;

@@ -12,7 +12,6 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
     public UserInfo Map(
       DbProjectUser dbProjectUser,
       UserData userData,
-      ImageInfo image,
       PositionData userPosition)
     {
       if (dbProjectUser == null)
@@ -32,7 +31,7 @@ namespace LT.DigitalOffice.ProjectService.Mappers.Interfaces
         LastName = userData.LastName,
         MiddleName = userData.MiddleName,
         IsActive = dbProjectUser.IsActive,
-        AvatarImage = image,
+        ImageId = userData.ImageId,
         Role = (ProjectUserRoleType)dbProjectUser.Role,
         Position = userPosition is null
           ? null
