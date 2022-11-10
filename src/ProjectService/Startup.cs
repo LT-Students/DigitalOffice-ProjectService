@@ -59,7 +59,7 @@ namespace LT.DigitalOffice.ProjectService
         .GetSection(BaseRabbitMqConfig.SectionName)
         .Get<RabbitMqConfig>();
 
-      Version = "1.2.3.4";
+      Version = "1.2.3.5";
       Description = "ProjectService is an API intended to work with projects.";
       StartTime = DateTime.UtcNow;
       ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
