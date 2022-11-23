@@ -29,16 +29,20 @@ namespace LT.DigitalOffice.ProjectService.Data
           .TemporalBetween(
             request.ByEntryDate.Value,
             request.ByEntryDate.Value.AddMonths(1))
-          .Where(u => u.IsActive).Distinct()
-          .AsQueryable()
-        : _provider.ProjectsUsers.AsQueryable();
+          .AsNoTracking()
+        : _provider.ProjectsUsers.AsNoTracking();
 
-      if (request.UsersIds != null && request.UsersIds.Any())
+      if (request.IsActive.HasValue)
+      {
+        projectUsersQuery = projectUsersQuery.Where(pu => pu.IsActive == request.IsActive.Value);
+      }
+
+      if (request.UsersIds is not null && request.UsersIds.Any())
       {
         projectUsersQuery = projectUsersQuery.Where(pu => request.UsersIds.Contains(pu.UserId));
       }
 
-      if (request.ProjectsIds != null && request.ProjectsIds.Any())
+      if (request.ProjectsIds is not null && request.ProjectsIds.Any())
       {
         projectUsersQuery = projectUsersQuery.Where(pu => request.ProjectsIds.Contains(pu.ProjectId));
       }
@@ -79,7 +83,9 @@ namespace LT.DigitalOffice.ProjectService.Data
 
       int totalCount = await projectUsers.CountAsync();
 
-      return (await projectUsers.ToListAsync(), totalCount);
+      return (
+        (await projectUsers.ToListAsync()).DistinctBy(pu => (pu.ProjectId, pu.UserId, pu.IsActive)).ToList(),
+        totalCount);
     }
 
     public async Task<List<DbProjectUser>> GetAsync(Guid projectId, bool? isActive, CancellationToken cancellationToken)
