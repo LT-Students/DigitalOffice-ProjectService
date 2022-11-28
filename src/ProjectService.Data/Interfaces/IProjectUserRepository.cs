@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Models.Broker.Enums;
@@ -24,11 +25,11 @@ namespace LT.DigitalOffice.ProjectService.Data.Interfaces
 
     Task<List<DbProjectUser>> GetAsync(List<Guid> usersIds);
 
-    Task<List<DbProjectUser>> GetAsync(Guid projectId, bool? isActive);
+    Task<List<DbProjectUser>> GetAsync(Guid projectId, bool? isActive, CancellationToken cancellationToken);
 
     Task CreateAsync(List<DbProjectUser> newUsers);
 
-    Task<bool> EditIsActiveAsync(List<DbProjectUser> oldUsers, Guid createdBy);
+    Task<bool> EditIsActiveAsync(List<DbProjectUser> oldUsers, Guid createdBy, List<UserRequest> usersRoles = null);
 
     Task<bool> DoesExistAsync(Guid userId, Guid projectId, bool? isManager = null);
 

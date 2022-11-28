@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Models.Broker.Enums;
@@ -28,16 +29,20 @@ namespace LT.DigitalOffice.ProjectService.Data
           .TemporalBetween(
             request.ByEntryDate.Value,
             request.ByEntryDate.Value.AddMonths(1))
-          .Where(u => u.IsActive).Distinct()
-          .AsQueryable()
-        : _provider.ProjectsUsers.AsQueryable();
+          .AsNoTracking()
+        : _provider.ProjectsUsers.AsNoTracking();
 
-      if (request.UsersIds != null && request.UsersIds.Any())
+      if (request.IsActive.HasValue)
+      {
+        projectUsersQuery = projectUsersQuery.Where(pu => pu.IsActive == request.IsActive.Value);
+      }
+
+      if (request.UsersIds is not null && request.UsersIds.Any())
       {
         projectUsersQuery = projectUsersQuery.Where(pu => request.UsersIds.Contains(pu.UserId));
       }
 
-      if (request.ProjectsIds != null && request.ProjectsIds.Any())
+      if (request.ProjectsIds is not null && request.ProjectsIds.Any())
       {
         projectUsersQuery = projectUsersQuery.Where(pu => request.ProjectsIds.Contains(pu.ProjectId));
       }
@@ -78,10 +83,12 @@ namespace LT.DigitalOffice.ProjectService.Data
 
       int totalCount = await projectUsers.CountAsync();
 
-      return (await projectUsers.ToListAsync(), totalCount);
+      return (
+        (await projectUsers.ToListAsync()).DistinctBy(pu => (pu.ProjectId, pu.UserId, pu.IsActive)).ToList(),
+        totalCount);
     }
 
-    public async Task<List<DbProjectUser>> GetAsync(Guid projectId, bool? isActive)
+    public async Task<List<DbProjectUser>> GetAsync(Guid projectId, bool? isActive, CancellationToken cancellationToken)
     {
       IQueryable<DbProjectUser> projectUsersQuery = _provider.ProjectsUsers.Where(pu => pu.ProjectId == projectId);
 
@@ -90,7 +97,7 @@ namespace LT.DigitalOffice.ProjectService.Data
         projectUsersQuery = projectUsersQuery.Where(pu => pu.IsActive == isActive.Value);
       }
 
-      return await projectUsersQuery.ToListAsync();
+      return await projectUsersQuery.ToListAsync(cancellationToken);
     }
 
     public Task CreateAsync(List<DbProjectUser> newUsers)
@@ -105,17 +112,29 @@ namespace LT.DigitalOffice.ProjectService.Data
       return _provider.SaveAsync();
     }
 
-    public async Task<bool> EditIsActiveAsync(List<DbProjectUser> dbUsers, Guid createdBy)
+    public async Task<bool> EditIsActiveAsync(List<DbProjectUser> dbUsers, Guid createdBy, List<UserRequest> usersRoles = null)
     {
       if (dbUsers is null)
       {
         return false;
       }
 
-      foreach (DbProjectUser oldUser in dbUsers)
+      if (usersRoles is null)
       {
-        oldUser.IsActive = true;
-        oldUser.CreatedBy = createdBy;
+        foreach (DbProjectUser oldUser in dbUsers)
+        {
+          oldUser.IsActive = true;
+          oldUser.CreatedBy = createdBy;
+        }
+      }
+      else
+      {
+        foreach (DbProjectUser oldUser in dbUsers)
+        {
+          oldUser.IsActive = true;
+          oldUser.CreatedBy = createdBy;
+          oldUser.Role = usersRoles.Where(ur => ur.UserId == oldUser.UserId).Select(ur => (int)ur.Role).First();
+        }
       }
 
       await _provider.SaveAsync();

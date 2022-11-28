@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.FluentValidationExtensions;
-using LT.DigitalOffice.Kernel.Helpers;
 using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Kernel.Validators.Interfaces;
-using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models;
 using LT.DigitalOffice.Models.Broker.Models.Position;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
@@ -22,7 +18,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
 {
   public class FindProjectUsersCommand : IFindProjectUsersCommand
   {
-    private readonly IBaseFindFilterValidator _baseFindFilterValidator;
     private readonly IProjectUserRepository _projectUserRepository;
     private readonly IUserService _userService;
     private readonly IImageService _imageService;
@@ -30,14 +25,12 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
     private readonly IUserInfoMapper _userInfoMapper;
 
     public FindProjectUsersCommand(
-      IBaseFindFilterValidator baseFindFilterValidator,
       IProjectUserRepository projectUserRepository,
       IUserService userService,
       IImageService imageService,
       IPositionService positionService,
       IUserInfoMapper userInfoMapper)
     {
-      _baseFindFilterValidator = baseFindFilterValidator;
       _projectUserRepository = projectUserRepository;
       _userService = userService;
       _imageService = imageService;
@@ -45,48 +38,45 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       _userInfoMapper = userInfoMapper;
     }
 
-    public async Task<FindResultResponse<UserInfo>> ExecuteAsync(Guid projectId, FindProjectUsersFilter filter)
+    public async Task<FindResultResponse<UserInfo>> ExecuteAsync(
+      Guid projectId, FindProjectUsersFilter filter, CancellationToken cancellationToken)
     {
-      if (!_baseFindFilterValidator.ValidateCustom(filter, out List<string> errors))
+      List<DbProjectUser> projectUsers = await _projectUserRepository.GetAsync(
+        projectId: projectId, isActive: filter.IsActive, cancellationToken: cancellationToken);
+
+      List<string> errors = new();
+
+      if (projectUsers is null || !projectUsers.Any())
       {
-        return ResponseCreatorStatic.CreateFindResponse<UserInfo>(statusCode: HttpStatusCode.BadRequest, errors: errors);
+        return new(errors: errors);
       }
 
-      List<DbProjectUser> projectUsers = await _projectUserRepository.GetAsync(projectId: projectId, isActive: filter.IsActive);
+      IEnumerable<Guid> usersIds = projectUsers.Select(pu => pu.UserId);
 
-      if (projectUsers is null)
+      if (filter.PositionId.HasValue)
       {
-        return new();
+        PositionFilteredData data = (await _positionService.GetPositionFilteredDataAsync(
+          new List<Guid>() { filter.PositionId.Value }, errors))?.FirstOrDefault();
+
+        usersIds = data is not null ? usersIds.Where(data.UsersIds.Contains).ToList() : Enumerable.Empty<Guid>();
       }
 
-      (List<UserData> usersData, int totalCount) filteredUsersData =
-        await _userService.GetFilteredUsersAsync(projectUsers.Select(pu => pu.UserId).ToList(), filter);
-
-      Task<List<ImageInfo>> usersAvatarsTask = filter.IncludeAvatars
-        ? _imageService.GetImagesAsync(
-            imagesIds: filteredUsersData.usersData?.Where(x => x.ImageId.HasValue).Select(x => x.ImageId.Value).ToList(),
-            imageSource: ImageSource.User)
-        : Task.FromResult<List<ImageInfo>>(default);
+      (List<UserData> usersData, int totalCount) = await _userService.GetFilteredUsersAsync(usersIds.ToList(), filter, cancellationToken);
 
       Task<List<PositionData>> usersPositionsTask = filter.IncludePositions
-        ? _positionService.GetPositionsAsync(usersIds: filteredUsersData.usersData?.Select(x => x.Id).ToList())
+        ? _positionService.GetPositionsAsync(usersIds: usersData?.Select(ud => ud.Id).ToList(), errors, cancellationToken)
         : Task.FromResult<List<PositionData>>(default);
 
-      List<ImageInfo> usersAvatars = await usersAvatarsTask;
       List<PositionData> usersPositions = await usersPositionsTask;
 
-      return new()
-      {
-        Body = filteredUsersData.usersData?.Select(userData =>
-          _userInfoMapper.Map(
-            dbProjectUser: projectUsers.FirstOrDefault(pu => pu.UserId == userData.Id),
-            userData: userData,
-            image: usersAvatars?.FirstOrDefault(av => av.Id == userData.ImageId),
-            userPosition: usersPositions?.FirstOrDefault(p => p.UsersIds.Contains(userData.Id)))
-          ).ToList(),
-
-        TotalCount = filteredUsersData.totalCount
-      };
+      return new FindResultResponse<UserInfo>(
+        errors: errors,
+        totalCount: totalCount,
+        body: usersData?.Select(userData => _userInfoMapper.Map(
+          dbProjectUser: projectUsers.FirstOrDefault(pu => pu.UserId == userData.Id),
+          userData: userData,
+          userPosition: usersPositions?.FirstOrDefault(up => up.UsersIds.Contains(userData.Id))))
+        .ToList());
     }
   }
 }

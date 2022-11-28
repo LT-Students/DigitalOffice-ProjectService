@@ -5,6 +5,7 @@ using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
+using LT.DigitalOffice.Kernel.RedisSupport.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.ProjectService.Broker.Requests.Interfaces;
@@ -25,6 +26,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
     private readonly IProjectDepartmentRepository _projectDepartmentRepository;
     private readonly IResponseCreator _responseCreator;
     private readonly IDepartmentService _departmentService;
+    private readonly IGlobalCacheRepository _globalCache;
 
     public EditProjectDepartmentCommand(
       IAccessValidator accessValidator,
@@ -32,7 +34,8 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
       IDbProjectDepartmentMapper mapper,
       IProjectDepartmentRepository projectDepartmentRepository,
       IResponseCreator responseCreator,
-      IDepartmentService departmentService)
+      IDepartmentService departmentService,
+      IGlobalCacheRepository globalCache)
     {
       _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
@@ -40,6 +43,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
       _projectDepartmentRepository = projectDepartmentRepository;
       _responseCreator = responseCreator;
       _departmentService = departmentService;
+      _globalCache = globalCache;
     }
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(EditProjectDepartmentRequest request)
@@ -73,11 +77,15 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Department
       {
         await _projectDepartmentRepository.CreateAsync(
           _mapper.Map(request.ProjectId, request.DepartmentId.Value));
+
+        await _globalCache.RemoveAsync(request.DepartmentId.Value);
       } 
       else if (!request.DepartmentId.HasValue && !await isEdit)
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest);
       }
+
+      await _globalCache.RemoveAsync(request.ProjectId);
 
       return new()
       {

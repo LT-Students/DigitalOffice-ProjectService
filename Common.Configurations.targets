@@ -26,12 +26,11 @@
   </PropertyGroup>
 
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests')) != 'true'">
-      <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.1.63" />
-      <PackageReference Include="LT.DigitalOffice.Kernel.BrokerSupport" Version="1.0.7" />
-      <PackageReference Include="DigitalOffice.Kernel.RedisSupport" Version="1.0.0" />
-      <PackageReference Include="LT.DigitalOffice.Kernel.EndpointSupport" Version="1.0.0" />
-      <PackageReference Include="LT.DigitalOffice.Kernel.EFSupport" Version="1.0.1" />
-      <PackageReference Include="DigitalOffice.Models" Version="1.0.1" />
+      <PackageReference Include="DigitalOffice.Kernel" Version="1.0.5" />
+      <PackageReference Include="DigitalOffice.Kernel.BrokerSupport" Version="1.0.0" />
+      <PackageReference Include="DigitalOffice.Kernel.RedisSupport" Version="1.0.3" />
+      <PackageReference Include="DigitalOffice.Kernel.EFSupport" Version="1.0.0" />
+      <PackageReference Include="DigitalOffice.Models" Version="1.0.11" />
   </ItemGroup>
 
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests'))">

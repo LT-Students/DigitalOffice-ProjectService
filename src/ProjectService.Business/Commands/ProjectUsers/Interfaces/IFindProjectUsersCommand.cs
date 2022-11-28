@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.Kernel.Responses;
@@ -10,6 +11,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfa
   [AutoInject]
   public interface IFindProjectUsersCommand
   {
-    Task<FindResultResponse<UserInfo>> ExecuteAsync(Guid projectId, FindProjectUsersFilter filter);
+    Task<FindResultResponse<UserInfo>> ExecuteAsync(Guid projectId, FindProjectUsersFilter filter, CancellationToken cancellationToken);
   }
 }

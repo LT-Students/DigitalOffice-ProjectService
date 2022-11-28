@@ -69,7 +69,6 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       ValidationResult validationResult = await _validator.ValidateAsync(request);
 
       errors.AddRange(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
-
       if (!validationResult.IsValid)
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
@@ -79,7 +78,10 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       List<UserRequest> newUsers = request.Users.ExceptBy(existingUsers.Select(x => x.UserId), request => request.UserId).ToList();
 
       await _projectUserRepository.CreateAsync(_mapper.Map(request.ProjectId, newUsers));
-      await _projectUserRepository.EditIsActiveAsync(existingUsers, _httpContextAccessor.HttpContext.GetUserId());
+      await _projectUserRepository.EditIsActiveAsync(
+        oldUsers: existingUsers,
+        createdBy: _httpContextAccessor.HttpContext.GetUserId(),
+        usersRoles: request.Users);
 
       int projectStatus = (await _projectRepository.GetAsync(new GetProjectFilter { ProjectId = request.ProjectId })).Status;
 
@@ -91,6 +93,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers
       }
 
       await _globalCache.RemoveAsync(request.ProjectId);
+      newUsers?.ForEach(async user => await _globalCache.RemoveAsync(user.UserId));
 
       return new()
       {

@@ -12,6 +12,7 @@ using Moq.AutoMock;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.ProjectService.Data.UnitTests
@@ -21,6 +22,7 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     private IDataProvider _provider;
     private ProjectUserRepository _userRepository;
     private DbContextOptions<ProjectServiceDbContext> _dbContext;
+    private CancellationToken _cancellationToken;
 
     private DbProjectUser _user1;
     private DbProjectUser _user2;
@@ -164,13 +166,13 @@ namespace LT.DigitalOffice.ProjectService.Data.UnitTests
     [Test]
     public async Task ShouldReturnAllUsersFromProjectAsync()
     {
-      SerializerAssert.AreEqual(new List<DbProjectUser> { _user2, _user3 }, await _userRepository.GetAsync(_projectId2, default));
+      SerializerAssert.AreEqual(new List<DbProjectUser> { _user2, _user3 }, await _userRepository.GetAsync(_projectId2, default, _cancellationToken));
     }
 
     [Test]
     public async Task ShouldReturnAllActiveUsersFromProjectAsync()
     {
-      SerializerAssert.AreEqual(new List<DbProjectUser> { _user2 }, await _userRepository.GetAsync(_projectId2, true));
+      SerializerAssert.AreEqual(new List<DbProjectUser> { _user2 }, await _userRepository.GetAsync(_projectId2, true, _cancellationToken));
     }
 
     #endregion

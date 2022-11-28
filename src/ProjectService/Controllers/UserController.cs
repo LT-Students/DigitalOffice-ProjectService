@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.ProjectService.Business.Commands.ProjectUsers.Interfaces;
@@ -25,9 +26,10 @@ namespace LT.DigitalOffice.ProjectService.Controllers
     public async Task<FindResultResponse<UserInfo>> FindAsync(
       [FromServices] IFindProjectUsersCommand command,
       [FromQuery] Guid projectId,
-      [FromQuery] FindProjectUsersFilter filter)
+      [FromQuery] FindProjectUsersFilter filter,
+      CancellationToken cancellationToken)
     {
-      return await command.ExecuteAsync(projectId, filter);
+      return await command.ExecuteAsync(projectId, filter, cancellationToken);
     }
 
     [HttpPut("editrole")]

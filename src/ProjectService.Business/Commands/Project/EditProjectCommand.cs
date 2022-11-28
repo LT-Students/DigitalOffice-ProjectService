@@ -67,7 +67,7 @@ namespace LT.DigitalOffice.ProjectService.Business.Commands.Project
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
-      ValidationResult validationResult = await _validator.ValidateAsync(request);
+      ValidationResult validationResult = await _validator.ValidateAsync((projectId, request));
 
       if (!validationResult.IsValid)
       {

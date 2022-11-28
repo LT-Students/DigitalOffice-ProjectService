@@ -29,10 +29,10 @@ namespace LT.DigitalOffice.ProjectService.Models.Dto.Configurations
     [AutoInjectRequest(typeof(IGetPositionsRequest))]
     public string GetPositionsEndpoint { get; set; }
 
-    // image
+    [AutoInjectRequest(typeof(IFilterPositionsRequest))]
+    public string FilterPositionsEndpoint { get; set; }
 
-    [AutoInjectRequest(typeof(IGetImagesRequest))]
-    public string GetImagesEndpoint { get; set; }
+    // image
 
     [AutoInjectRequest(typeof(ICreateImagesRequest))]
     public string CreateImagesEndpoint { get; set; }
